@@ -42,7 +42,7 @@
             "image": "/imagens/cocalata.jpeg"
         },
         {
-            "image": "/imagens/kingsclassic.jpg",
+            "image": "/imagens/kingsclassic.jpeg",
             "title": "kings burger classic",
             "price": 28,
             "categoria": "burger",
@@ -51,3 +51,4 @@
     ]
 
 }
+
