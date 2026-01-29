@@ -383,20 +383,25 @@ body {
 /* ============================= */
 /* TOAST CENTRAL (DISCRETO) */
 /* ============================= */
+/* ============================= */
+/* TOAST CENTRAL (DISCRETO E VISÍVEL EM QUALQUER FUNDO) */
+/* ============================= */
+/* TOAST CENTRAL (DISCRETO E VISÍVEL EM QUALQUER FUNDO) */
+/* ============================= */
 .toast {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.9);
-    background: rgba(50, 50, 50, 0.85); /* fundo discreto */
-    color: #fff;
+    background: rgba(255, 255, 255, 0.9); /* fundo claro e translúcido */
+    color: #111; /* texto escuro para contraste */
     padding: 14px 20px;
     border-radius: 14px;
     font-size: 0.9rem;
     font-weight: 600;
     opacity: 0;
     z-index: 9999;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15); /* sombra suave */
     transition: all 0.35s ease;
 }
 
@@ -404,6 +409,8 @@ body {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
 }
+
+
 
 
 
