@@ -39,7 +39,7 @@
             "price": 8.5,
             "categoria": "bebida",
             "ingredientes": "600ml",
-            "image": "/imagens/COCA600.jpg"
+            "image": "/imagens/coca600.jpg"
         },
         {
             "image": "/imagens/kingsclassic.jpeg",
@@ -51,5 +51,6 @@
     ]
 
 }
+
 
 
