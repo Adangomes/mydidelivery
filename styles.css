@@ -16,26 +16,44 @@ body {
 /* ============================= */
 /* SPLASH */
 /* ============================= */
+/* ============================= */
+/* SPLASH PROFISSIONAL */
+/* ============================= */
 #splash {
     position: fixed;
     inset: 0;
-    background: #0f0f0f;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 9999;
+    overflow: hidden;
 }
 
-.splash-logo {
-    width: 180px;
-    animation: pulse 1.5s infinite;
+/* FUNDO COM IMAGEM */
+.splash-bg {
+    position: absolute;
+    inset: -10%;
+    background-image: url("assets/splash.jpg"); /* AJUSTE O CAMINHO SE PRECISAR */
+    background-size: cover;
+    background-position: center;
+    animation: splashMove 6s ease-in-out infinite alternate;
 }
 
-@keyframes pulse {
-    0% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.05); opacity: .85; }
-    100% { transform: scale(1); opacity: 1; }
+/* OVERLAY LEVE (DEIXA MAIS PRO) */
+.splash-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.15);
 }
+
+/* ANIMAÇÃO DE MOVIMENTO */
+@keyframes splashMove {
+    0% {
+        transform: scale(1) translateY(0);
+    }
+    100% {
+        transform: scale(1.08) translateY(-12px);
+    }
+}
+
 
 /* ============================= */
 /* HEADER */
@@ -338,3 +356,4 @@ body {
     font-size: .7rem;
     color: #777;
 }
+
