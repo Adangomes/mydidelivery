@@ -294,25 +294,7 @@ body {
 /* ============================= */
 /* LOADING TAXA */
 /* ============================= */
-#loading-taxa {
-    flex-direction: column;
-    gap: 12px;
-    color: #fff;
-    text-align: center;
-}
 
-.spinner {
-    width: 45px;
-    height: 45px;
-    border: 4px solid rgba(255,255,255,.3);
-    border-top: 4px solid #fff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
 
 /* ============================= */
 /* RESUMO */
@@ -332,22 +314,7 @@ body {
 }
 
 /* Loading taxa dentro do mesmo card */
-#loading-taxa {
-    position: absolute;        /* centralizado dentro do card */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: none;             /* controlado pelo JS */
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255,255,255,0.85); /* leve translucido */
-    width: 90%;
-    height: 90%;
-    border-radius: 18px;
-    z-index: 10;               /* acima do resumo */
-    text-align: center;
-}
+
 
 /* ============================= */
 /* CONTATO */
@@ -437,66 +404,14 @@ body {
 
 
 
-#loading-taxa {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5); /* leve fundo escuro */
-    display: none; /* começa escondido */
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    z-index: 9999;
-    color: #fff;
-}
 
-.spinner {
-    width: 45px;
-    height: 45px;
-    border: 4px solid rgba(255,255,255,0.3);
-    border-top: 4px solid #fff;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    margin-bottom: 12px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
 
 
 
 /* RESET DE CONFLITOS */
 /* LOADING CLEAN - SÓ O CÍRCULO */
 /* LOADING CLEAN - CENTRALIZAÇÃO TOTAL */
-#loading-taxa {
-    position: fixed !important;
-    inset: 0 !important;
-    width: 100vw !important;
-    height: 100vh !important;
-    background: rgba(255, 255, 255, 0.7) !important; /* Fundo levemente esbranquiçado para destacar o spinner */
-    backdrop-filter: blur(4px); /* Desfoque mais elegante */
-    display: none; /* Controlado pelo JS */
-    align-items: center;
-    justify-content: center;
-    z-index: 99999 !important; /* Fica acima de absolutamente tudo */
-    pointer-events: all; /* Impede cliques no fundo enquanto carrega */
-}
 
-/* Spinner Profissional */
-.spinner {
-    width: 60px;
-    height: 60px;
-    border: 6px solid #f3f3f3; /* Cinza bem claro */
-    border-top: 6px solid #000000; /* Cor de destaque (Preto Kings) */
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0,0,0,0.05); /* Sombra suave para profundidade */
-    animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite; /* Animação mais fluida */
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
 
 /* AJUSTE DO RESUMO PARA NÃO SAIR DA CAIXA */
 #resumo-pedido {
@@ -533,4 +448,34 @@ input, select, textarea {
 }
 
 
+/* ================================================== */
+/* LOADING TAXA - VERSÃO FINAL UNIFICADA */
+/* ================================================== */
+#loading-taxa {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background: rgba(255, 255, 255, 0.8) !important; 
+    backdrop-filter: blur(4px); 
+    display: none; /* Controlado pelo JS */
+    align-items: center;
+    justify-content: center;
+    z-index: 99999 !important; 
+    pointer-events: all; 
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid #f3f3f3; 
+    border-top: 6px solid #000000; 
+    border-radius: 50%;
+    animation: spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
 
