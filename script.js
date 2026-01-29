@@ -180,34 +180,46 @@ async function calcularTaxa(endereco) {
 }
 
 // ==================================================
-// RESUMO + LOADING
+// RESUMO + LOADING (COM TEMPO MÍNIMO DE 3 SEGUNDOS)
 // ==================================================
 async function mostrarResumo() {
-    document.getElementById("loading-taxa").style.display = "flex";
-    document.getElementById("resumo-pedido").style.display = "none";
+    const loadingEl = document.getElementById("loading-taxa");
+    const resumoEl = document.getElementById("resumo-pedido");
+
+    if (loadingEl) loadingEl.style.display = "flex";
+    if (resumoEl) resumoEl.style.display = "none";
 
     const endereco = `${rua.value}, ${numero.value}, ${bairro.value}, ${cidade.value}`;
 
-    let subtotal = 0;
-    carrinho.forEach(i => subtotal += i.price * i.qtd);
+    const timer = new Promise(resolve => setTimeout(resolve, 3000));
+    const calculo = calcularTaxa(endereco);
 
-    taxaEntregaCalculada = await calcularTaxa(endereco);
+    try {
+        const [distanciaResultado] = await Promise.all([calculo, timer]);
+        taxaEntregaCalculada = distanciaResultado;
 
-    const resumoItens = document.getElementById("resumo-itens");
-    resumoItens.innerHTML = "";
+        let subtotal = 0;
+        carrinho.forEach(i => subtotal += i.price * i.qtd);
 
-    carrinho.forEach(i => {
-        resumoItens.innerHTML += `<p>${i.qtd}x ${i.title}</p>`;
-    });
+        const resumoItens = document.getElementById("resumo-itens");
+        resumoItens.innerHTML = "";
+        carrinho.forEach(i => {
+            resumoItens.innerHTML += `<p>${i.qtd}x ${i.title}</p>`;
+        });
 
-    document.getElementById("resumo-taxa").innerText =
-        `Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}`;
+        document.getElementById("resumo-taxa").innerText =
+            `Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}`;
 
-    document.getElementById("resumo-total").innerText =
-        `Total: R$ ${(subtotal + taxaEntregaCalculada).toFixed(2).replace(".", ",")}`;
+        document.getElementById("resumo-total").innerText =
+            `Total: R$ ${(subtotal + taxaEntregaCalculada).toFixed(2).replace(".", ",")}`;
 
-    document.getElementById("loading-taxa").style.display = "none";
-    document.getElementById("resumo-pedido").style.display = "block";
+    } catch (error) {
+        console.error("Erro ao calcular taxa:", error);
+        alert("Erro ao calcular o frete. Verifique o endereço.");
+    } finally {
+        if (loadingEl) loadingEl.style.display = "none";
+        if (resumoEl) resumoEl.style.display = "block";
+    }
 }
 
 // ==================================================
