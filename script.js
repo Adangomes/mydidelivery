@@ -37,25 +37,6 @@ function initMenu() {
 }
 
 // ==================================================
-// STATUS DA LOJA
-// ==================================================
-async function carregarStatusLoja() {
-    try {
-        const res = await fetch('/content/status.json');
-        const data = await res.json();
-
-        LOJA_ABERTA = data.aberto;
-        MENSAGEM_FECHADA = data.mensagem || MENSAGEM_FECHADA;
-
-        const statusEl = document.getElementById("status-loja");
-        if (statusEl) {
-            statusEl.textContent = LOJA_ABERTA ? "🟢 ABERTO" : "🔴 FECHADO";
-            statusEl.className = LOJA_ABERTA ? "aberto" : "fechado";
-        }
-    } catch (e) {
-        console.error("Erro ao carregar status da loja", e);
-    }
-}
 
 // CARREGAR PRODUTOS & BEBIDAS
 // ==================================================
@@ -270,5 +251,6 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
 
 
