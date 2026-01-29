@@ -6,8 +6,11 @@ const RESTAURANTE_COORD = [-49.0716, -26.4856];
 const TAXA_BASE = 5;
 const VALOR_POR_KM = 1.5;
 
+const WHATSAPP_NUMERO = "554798419-6636";
+
 let carrinho = [];
 let produtos = [];
+let taxaEntregaCalculada = 0;
 
 // ==================================================
 // SPLASH
@@ -147,18 +150,51 @@ async function mostrarResumo() {
 
     const endereco = `${rua.value}, ${numero.value}, ${bairro.value}, ${cidade.value}`;
 
-    const subtotal = carrinho.reduce((t, i) => t + i.price * i.qtd, 0);
+    let subtotal = 0;
+    carrinho.forEach(i => subtotal += i.price * i.qtd);
 
-    const taxa = await calcularTaxa(endereco);
+    taxaEntregaCalculada = await calcularTaxa(endereco);
+
+    // itens
+    const resumoItens = document.getElementById("resumo-itens");
+    resumoItens.innerHTML = "";
+    carrinho.forEach(i => {
+        resumoItens.innerHTML += `<p>${i.qtd}x ${i.title}</p>`;
+    });
 
     document.getElementById("resumo-taxa").innerText =
-        `Taxa: R$ ${taxa.toFixed(2).replace(".", ",")}`;
+        `Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}`;
 
     document.getElementById("resumo-total").innerText =
-        `Total: R$ ${(subtotal + taxa).toFixed(2).replace(".", ",")}`;
+        `Total: R$ ${(subtotal + taxaEntregaCalculada).toFixed(2).replace(".", ",")}`;
 
     document.getElementById("loading-taxa").style.display = "none";
     document.getElementById("resumo-pedido").style.display = "block";
+}
+
+// ==================================================
+// FINALIZAR PEDIDO (WHATSAPP)
+// ==================================================
+function finalizarEntrega() {
+    let subtotal = 0;
+    let msg = "🍔 *NOVO PEDIDO - KINGS BURGUER*%0A%0A";
+
+    carrinho.forEach(i => {
+        subtotal += i.price * i.qtd;
+        msg += `• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2)}%0A`;
+    });
+
+    msg += `%0A👤 *Cliente:* ${nomeCliente.value}%0A`;
+    msg += `📍 *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}, ${cidade.value}%0A%0A`;
+
+    msg += `🧾 Subtotal: R$ ${subtotal.toFixed(2)}%0A`;
+    msg += `🚚 Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2)}%0A`;
+    msg += `💰 *Total:* R$ ${(subtotal + taxaEntregaCalculada).toFixed(2)}%0A`;
+
+    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`, "_blank");
+
+    carrinho = [];
+    fecharDelivery();
 }
 
 // ==================================================
