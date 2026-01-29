@@ -32,14 +32,14 @@
             "price": 6.5,
             "categoria": "bebida",
             "ingredientes": "350ml",
-            "image": "/imagens/guarana.jpg"
+            "image": "/imagens/guarana.jpeg"
         },
         {
             "title": "Coca-Cola 600ml",
             "price": 8.5,
             "categoria": "bebida",
             "ingredientes": "600ml",
-            "image": "/imagens/cocalata.jpeg"
+            "image": "/imagens/COCA600.jpg"
         },
         {
             "image": "/imagens/kingsclassic.jpeg",
@@ -51,4 +51,5 @@
     ]
 
 }
+
 
