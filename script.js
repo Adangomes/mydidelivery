@@ -1,7 +1,7 @@
 // ==================================================
 // CONFIG
 // ==================================================
-const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775"; 
+const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";  
 const RESTAURANTE_COORD = [-49.0716, -26.4856];
 const TAXA_BASE = 5;
 const VALOR_POR_KM = 1.5;
@@ -49,7 +49,7 @@ async function carregarProdutos() {
     const container = document.getElementById("burgers");
     container.innerHTML = "";
 
-    produtos.forEach((p, i) => {
+    produtos.forEach((p) => {
         if (p.categoria !== "burger") return;
 
         const card = document.createElement("div");
@@ -63,7 +63,6 @@ async function carregarProdutos() {
             <button>Adicionar</button>
         `;
 
-        // 👉 Corrigido: chama a função unificada para adicionar ao carrinho
         card.querySelector("button").onclick = () => adicionarCarrinhoPorProduto(p);
         container.appendChild(card);
     });
@@ -83,7 +82,7 @@ async function carregarBebidas() {
 
     container.innerHTML = "";
 
-    bebidas.forEach((p, i) => {
+    bebidas.forEach((p) => {
         const card = document.createElement("div");
         card.className = "card-produto";
 
@@ -103,6 +102,18 @@ async function carregarBebidas() {
 // ==================================================
 // CARRINHO
 // ==================================================
+function salvarCarrinho() {
+    localStorage.setItem("carrinho", JSON.stringify(carrinho));
+}
+
+function carregarCarrinhoStorage() {
+    const dados = localStorage.getItem("carrinho");
+    if (dados) {
+        carrinho = JSON.parse(dados);
+        atualizarCarrinho();
+    }
+}
+
 function adicionarCarrinhoPorProduto(p) {
     const item = carrinho.find(i => i.title === p.title);
 
@@ -112,6 +123,7 @@ function adicionarCarrinhoPorProduto(p) {
         carrinho.push({ ...p, qtd: 1 });
     }
 
+    salvarCarrinho();
     atualizarCarrinho();
     mostrarToast();
 }
@@ -134,29 +146,20 @@ function atualizarCarrinho() {
         `;
     });
 
-    document.getElementById("subtotal").innerText =
-        `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}`;
+    const subtotalEl = document.getElementById("subtotal");
+    if (subtotalEl) subtotalEl.innerText = `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}`;
 
-    document.getElementById("total").innerText =
-        `Total: R$ ${subtotal.toFixed(2).replace(".", ",")}`;
+    const totalEl = document.getElementById("total");
+    if (totalEl) totalEl.innerText = `Total: R$ ${subtotal.toFixed(2).replace(".", ",")}`;
 }
 
 // ==================================================
 // MODAIS
 // ==================================================
-function abrirCarrinho() {
-    document.getElementById("cart-modal").style.display = "flex";
-}
-function fecharCarrinho() {
-    document.getElementById("cart-modal").style.display = "none";
-}
-function abrirDelivery() {
-    fecharCarrinho();
-    document.getElementById("delivery-modal").style.display = "flex";
-}
-function fecharDelivery() {
-    document.getElementById("delivery-modal").style.display = "none";
-}
+function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
+function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
+function abrirDelivery() { fecharCarrinho(); document.getElementById("delivery-modal").style.display = "flex"; }
+function fecharDelivery() { document.getElementById("delivery-modal").style.display = "none"; }
 
 // ==================================================
 // GEOAPIFY
@@ -229,6 +232,7 @@ function finalizarEntrega() {
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`, "_blank");
 
     carrinho = [];
+    salvarCarrinho();
     fecharDelivery();
 }
 
@@ -240,6 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initMenu();
     carregarProdutos();
     carregarBebidas();
+    carregarCarrinhoStorage(); // <- recarrega carrinho do localStorage
 });
 
 // ==================================================
