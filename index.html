@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>KINGSBURGUER</title>
+    <title>KINGS BURGUER</title>
 
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <link rel="stylesheet" href="styles.css" />
@@ -15,6 +15,12 @@
     <!-- SPLASH -->
     <div id="splash">
         <img src="imagens/kingslogo.jpeg" class="splash-logo" alt="Kings Burguer">
+    </div>
+
+    <!-- LOADING TAXA -->
+    <div id="loading-taxa" style="display:none" class="loading">
+        <div class="spinner"></div>
+        <p>Calculando taxa...</p>
     </div>
 
     <!-- CONTEÚDO -->
@@ -107,6 +113,7 @@
                 <button onclick="mostrarResumo()">Próximo</button>
             </div>
 
+            <!-- RESUMO -->
             <div id="resumo-pedido" style="display:none">
                 <h3>Resumo</h3>
                 <div id="resumo-itens"></div>
