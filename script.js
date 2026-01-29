@@ -12,14 +12,7 @@ let carrinho = [];
 let produtos = [];
 let taxaEntregaCalculada = 0;
 
-// STATUS DA LOJA
-let LOJA_ABERTA = true;
-let MENSAGEM_FECHADA = "Estamos fechados no momento 😔";
-const carrinho = [];
-
 // ==================================================
-
-
 // ==================================================
 // SPLASH & MENU
 // ==================================================
@@ -251,6 +244,7 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
 
 
 
