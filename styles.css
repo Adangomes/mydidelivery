@@ -465,6 +465,46 @@ body {
 
 
 
+/* RESET DE CONFLITOS */
+#loading-taxa {
+    position: fixed !important;
+    inset: 0 !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 10000 !important;
+    color: #fff;
+    top: 0 !important;
+    left: 0 !important;
+    transform: none !important;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    border-top: 5px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 15px;
+}
+
+/* AJUSTE DO RESUMO PARA NÃO SAIR DA CAIXA */
+#resumo-pedido {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+    display: none; /* JS controla */
+}
+
+#resumo-itens p {
+    margin-bottom: 5px;
+    color: #444;
+}
 
 
 
