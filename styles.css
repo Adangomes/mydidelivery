@@ -377,4 +377,29 @@ body {
 }
 
 
+/* ============================= */
+/* TOAST CENTRAL */
+/* ============================= */
+.toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(.9);
+    background: #111;
+    color: #fff;
+    padding: 16px 22px;
+    border-radius: 18px;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 0;
+    z-index: 9999;
+    box-shadow: 0 15px 40px rgba(0,0,0,.35);
+    transition: all .35s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
 
