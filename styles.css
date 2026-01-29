@@ -393,15 +393,15 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.9);
-    background: rgba(255, 255, 255, 0.9); /* fundo claro e translúcido */
-    color: #111; /* texto escuro para contraste */
+    background: rgba(255, 255, 255, 0.9); /* fundo discreto */
+    color: #111;
     padding: 14px 20px;
-    border-radius: 14px;
+    border-radius: 14px !important; /* força o arredondamento igual em todas as páginas */
     font-size: 0.9rem;
     font-weight: 600;
     opacity: 0;
     z-index: 9999;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.15); /* sombra suave */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
     transition: all 0.35s ease;
 }
 
@@ -409,6 +409,7 @@ body {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
 }
+
 
 
 
