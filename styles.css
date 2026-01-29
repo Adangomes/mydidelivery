@@ -748,4 +748,60 @@ body {
 
 .cart-box .buttons button:hover {
     background-color: #b00610;
+
+}
+
+
+/* ============================= */
+/* MENU MOBILE */
+/* ============================= */
+
+.hamburger {
+    font-size: 28px;
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    z-index: 10001;
+}
+
+.menu {
+    position: absolute;
+    top: 70px;
+    right: 15px;
+    background: #000;
+    border-radius: 10px;
+    min-width: 200px;
+
+    display: flex;
+    flex-direction: column;
+
+    opacity: 0;
+    transform: translateY(-10px);
+    pointer-events: none;
+
+    transition: all 0.3s ease;
+    z-index: 10000;
+}
+
+.menu a {
+    padding: 14px;
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid #222;
+}
+
+.menu a:last-child {
+    border-bottom: none;
+}
+
+.menu a:hover {
+    background: #111;
+}
+
+/* ATIVO */
+.menu.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
 }
