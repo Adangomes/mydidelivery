@@ -1,0 +1,751 @@
+/* =====================================================
+   RESET
+   ===================================================== */
+
+** {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+/* =====================================================
+   BODY
+   ===================================================== */
+
+body {
+    background: #f8f9fa;
+    color: #1a1a1a;
+    min-height: 100vh;
+}
+
+
+/* =====================================================
+   HEADER
+   ===================================================== */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #e50914;
+    padding: 12px 20px;
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+}
+
+.hamburger,
+.cart {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #fff;
+}
+
+
+/* =====================================================
+   MENU
+   ===================================================== */
+
+.menu {
+    display: none;
+    flex-direction: column;
+    background: #e50914;
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    z-index: 2000;
+}
+
+.menu.active {
+    display: flex;
+}
+
+.menu a {
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 0;
+    font-weight: 500;
+}
+
+
+/* =====================================================
+   STATUS
+   ===================================================== */
+
+.status {
+    padding: 6px 10px;
+    font-weight: bold;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+.status.aberto {
+    background: #27ae60;
+}
+
+.status.fechado {
+    background: #c0392b;
+}
+
+
+/* =====================================================
+   SEÇÃO DE DESTAQUES / GRID DE PRODUTOS
+   ===================================================== */
+
+.destaques {
+    padding: 25px 15px;
+    background: #f8f9fa;
+    min-height: calc(100vh - 120px);
+}
+
+.destaques h2 {
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+
+/* GRID DE PRODUTOS */
+
+.cards,
+.cards-bebidas,
+.cards-sobremesas,
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+    padding: 16px;
+}
+
+
+/* CARD DE PRODUTO */
+
+.product-card {
+    background: #fff;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, .08);
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* IMAGEM */
+
+.product-card .image-wrapper {
+    width: 100%;
+    height: 140px;
+    background: #f1f1f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.product-card .image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+/* CONTEÚDO DO CARD */
+
+.product-card .content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    text-align: center;
+}
+
+
+/* TÍTULO */
+
+.product-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #111;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+/* DESCRIÇÃO */
+
+.product-card .desc {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+/* PREÇO */
+
+.price {
+    font-weight: 700;
+    font-size: 26px;
+    color: #111;
+    text-align: center;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+
+/* BOTÃO */
+
+.btn {
+    width: 100%;
+    height: 40px;
+    border-radius: 0 0 14px 14px;
+    background: #e50914;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn:hover {
+    background: #b00610;
+    transform: scale(1.05);
+}
+
+
+/* =====================================================
+   MODAL DE CARRINHO
+   ===================================================== */
+
+#cart-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    padding: 15px;
+}
+
+.cart-box {
+    background: #fff;
+    padding: 25px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+}
+
+
+/* ITENS DO CARRINHO */
+
+#cart-items .cart-item {
+    background: #fff;
+    border: 2px solid #e50914;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+
+/* =====================================================
+   MODAL DE ENTREGA / FORMULÁRIO DE PEDIDO
+   ===================================================== */
+
+#delivery-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 4000;
+    padding: 15px;
+}
+
+.delivery-box {
+    background: #fff;
+    padding: 30px 25px;
+    border-radius: 18px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+    animation: fadeInUp 0.4s ease-out;
+}
+
+
+/* Animação suave */
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+/* Título */
+
+.delivery-box h2,
+#resumo-pedido h3 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #e50914;
+}
+
+
+/* Inputs e selects */
+
+.delivery-box input,
+.delivery-box select,
+.delivery-box textarea {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 14px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.delivery-box input:focus,
+.delivery-box select:focus,
+.delivery-box textarea:focus {
+    border-color: #e50914;
+    box-shadow: 0 0 5px rgba(229, 9, 20, 0.4);
+    outline: none;
+}
+
+
+/* Labels */
+
+.delivery-box label {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+    display: block;
+    color: #333;
+}
+
+
+/* Botões do formulário */
+
+.delivery-box .buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.delivery-box .buttons button {
+    flex: 1;
+    padding: 12px 0;
+    font-weight: 700;
+    font-size: 16px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.delivery-box .buttons button:first-child {
+    background: #ddd;
+    color: #333;
+}
+
+.delivery-box .buttons button:last-child {
+    background: #e50914;
+    color: #fff;
+}
+
+.delivery-box .buttons button:hover {
+    transform: scale(1.03);
+}
+
+.delivery-box .buttons button:last-child:hover {
+    background: #b00610;
+}
+
+
+/* Troco */
+
+#troco-box {
+    display: none;
+    margin-bottom: 12px;
+}
+
+
+/* Resumo do pedido */
+
+#resumo-pedido {
+    display: none;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+#resumo-pedido #resumo-itens div {
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #444;
+}
+
+#resumo-pedido p {
+    font-size: 15px;
+    color: #111;
+    margin: 8px 0;
+}
+
+#resumo-total {
+    font-weight: 700;
+    font-size: 18px;
+    color: #e50914;
+}
+
+
+/* Scroll elegante */
+
+.delivery-box::-webkit-scrollbar {
+    width: 6px;
+}
+
+.delivery-box::-webkit-scrollbar-track {
+    background: #f0f0f0;
+    border-radius: 3px;
+}
+
+.delivery-box::-webkit-scrollbar-thumb {
+    background: #e50914;
+    border-radius: 3px;
+}
+
+
+/* Responsivo */
+
+@media (max-width: 480px) {
+    .delivery-box {
+        padding: 20px 15px;
+    }
+    .delivery-box h2,
+    #resumo-pedido h3 {
+        font-size: 20px;
+    }
+    .delivery-box .buttons button {
+        font-size: 14px;
+        padding: 10px 0;
+    }
+}
+
+
+/* =====================================================
+   FOOTER
+   ===================================================== */
+
+.footer {
+    background: #111;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+    font-size: 14px;
+}
+
+
+/* =====================================================
+   SPLASH
+   ===================================================== */
+
+#splash {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+.splash-logo {
+    width: 300px;
+    max-width: 90%;
+    animation: softPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes softPulse {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 1;
+    }
+}
+
+
+/* =====================================================
+   CARDS DE BEBIDAS
+   ===================================================== */
+
+.cards-bebidas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    padding: 12px;
+}
+
+.cards-bebidas .product-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    height: auto;
+}
+
+.cards-bebidas .product-card .image-wrapper {
+    width: 100%;
+    height: 120px;
+    background: #f1f1f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.cards-bebidas .product-card .image-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cards-bebidas .product-card .content {
+    padding: 8px 8px 0 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cards-bebidas .product-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    margin: 4px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cards-bebidas .product-card .desc {
+    font-size: 11px;
+    color: #666;
+    text-align: center;
+    margin: 2px 0;
+    line-height: 1.2;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.cards-bebidas .price {
+    font-size: 20px;
+    font-weight: 800;
+    color: #111;
+    text-align: center;
+    margin: 8px 0;
+    width: 100%;
+}
+
+.cards-bebidas .product-card .footer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+}
+
+.cards-bebidas .btn {
+    width: 100%;
+    height: 40px;
+    border-radius: 0 0 12px 12px;
+    background: #e50914;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.cards-bebidas .btn:hover {
+    background: #b00610;
+}
+
+
+/* =============================== */
+
+
+/* BOTÕES DO CARRINHO              */
+
+
+/* =============================== */
+
+
+/* =============================== */
+
+
+/* MODAL DO CARRINHO               */
+
+
+/* =============================== */
+
+#cart-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    padding: 15px;
+}
+
+.cart-box {
+    background: #fff;
+    padding: 25px 20px 20px 20px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+    position: relative;
+}
+
+
+/* BOTÃO FECHAR X NO CANTO */
+
+.cart-header button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 22px;
+    cursor: pointer;
+    color: #e50914;
+}
+
+
+/* ITENS DO CARRINHO */
+
+#cart-items .cart-item {
+    background: #fff;
+    border: 2px solid #e50914;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+
+/* =============================== */
+
+
+/* RESUMO (Subtotal e Total)       */
+
+
+/* =============================== */
+
+.summary {
+    background-color: #f9f9f9;
+    padding: 12px 15px;
+    border-radius: 12px;
+    margin-top: 10px;
+    border: 1px solid #ddd;
+}
+
+.summary p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+
+/* =============================== */
+
+
+/* BOTOES                          */
+
+
+/* =============================== */
+
+.cart-box .buttons {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.cart-box .buttons button {
+    flex: 1 1 auto;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+    color: #fff;
+    background-color: #e50914;
+    /* todos vermelhos */
+    transition: all 0.2s ease;
+}
+
+.cart-box .buttons button:hover {
+    background-color: #b00610;
+}
