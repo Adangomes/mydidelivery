@@ -95,9 +95,9 @@ async function carregarBebidas() {
         `;
 
         card.querySelector("button").onclick = () => {
-            const index = produtos.findIndex(x => x.title === p.title);
-            adicionarCarrinho(index);
-        };
+    adicionarCarrinhoPorProduto(p);
+};
+
 
         container.appendChild(card);
     });
@@ -106,17 +106,20 @@ async function carregarBebidas() {
 // ==================================================
 // CARRINHO
 // ==================================================
-function adicionarCarrinho(index) {
-    const p = produtos[index];
+function adicionarCarrinhoPorProduto(p) {
 
     const item = carrinho.find(i => i.title === p.title);
-    if (item) item.qtd++;
-    else carrinho.push({ ...p, qtd: 1 });
+
+    if (item) {
+        item.qtd++;
+    } else {
+        carrinho.push({ ...p, qtd: 1 });
+    }
 
     atualizarCarrinho();
-     // 🔥 EFEITO VISUAL
     mostrarToast();
 }
+
 
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
@@ -262,3 +265,4 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
