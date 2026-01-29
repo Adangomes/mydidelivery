@@ -30,27 +30,7 @@
                 <a href="contato.html">CONTATO</a>
             </nav>
 
-            <!-- Carrinho -->
-            <div class="cart" title="Ver carrinho" onclick="abrirCarrinho()">🛒</div>
-        </header>
-
-        <!-- TÍTULO -->
-        <section class="destaques">
-            <h2>BEBIDAS</h2>
-
-            <!-- PRODUTOS VINDOS DO JSON -->
-            <div class="products-grid" id="bebidas"></div>
-        </section>
-
-        <!-- RODAPÉ -->
-        <footer class="footer">
-            <p>Sistema Desenvolvido por Adan Gomes</p>
-        </footer>
-    </div>
-
-
-
-    <!-- MODAL DO CARRINHO -->
+           <!-- CARRINHO -->
     <div id="cart-modal" style="display:none;">
         <div class="cart-box">
             <div class="cart-header">
@@ -66,89 +46,69 @@
             </div>
 
             <div class="buttons">
-                <button class="continue-btn" onclick="fecharCarrinho()">Continuar comprando</button>
-                <button class="checkout-btn" onclick="abrirDelivery()">Finalizar compra</button>
-                <button onclick="limparCarrinho()">🗑️ Limpar Carrinho</button>
+                <button onclick="fecharCarrinho()">Continuar</button>
+                <button onclick="abrirDelivery()">Finalizar compra</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE ENTREGA -->
-    <!-- MODAL DE ENTREGA -->
+    <!-- ENTREGA -->
     <div id="delivery-modal" style="display:none;">
         <div class="delivery-box">
             <h2>Informações de Entrega</h2>
 
-            <!-- Nome do cliente -->
             <label>Nome:</label>
-            <input type="text" id="nomeCliente" required>
+            <input type="text" id="nomeCliente">
 
-            <!-- Seleção de cidade -->
             <label>Cidade:</label>
-            <select id="cidade" onchange="carregarBairros()">
-            <option value="">Selecione</option>
-            <option value="jaragua">Jaraguá do Sul</option>
-            <option value="guaramirim">Guaramirim</option>
-        </select>
+            <select id="cidade">
+                <option value="">Selecione</option>
+                <option value="Jaraguá do Sul">Jaraguá do Sul</option>
+                <option value="Guaramirim">Guaramirim</option>
+            </select>
 
-            <!-- Bairros dinâmicos -->
             <label>Bairro:</label>
-            <select id="bairro"></select>
+            <input type="text" id="bairro">
 
-            <!-- Endereço -->
             <label>Rua:</label>
             <input type="text" id="rua">
 
             <label>Número:</label>
             <input type="text" id="numero">
 
-            <label>Ponto de Referência:</label>
-            <input type="text" id="referencia">
-
-            <!-- Observação extra -->
             <label>Observações:</label>
             <textarea id="observacao"></textarea>
 
-            <!-- Forma de pagamento -->
-            <label>Forma de Pagamento:</label>
-            <select id="pagamento" onchange="toggleTroco()">
-            <option value="">Selecione</option>
-            <option value="Credito">Crédito</option>
-            <option value="Debito">Débito</option>
-            <option value="Pix">Pix</option>
-            <option value="Dinheiro">Dinheiro</option>
-        </select>
+            <label>Pagamento:</label>
+            <select id="pagamento">
+                <option value="">Selecione</option>
+                <option value="Pix">Pix</option>
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="Crédito">Crédito</option>
+                <option value="Débito">Débito</option>
+            </select>
 
-            <!-- Troco -->
-            <div id="troco-box" style="display:none;">
-                <label>Precisa de troco para quanto?</label>
-                <input type="number" id="troco">
-            </div>
-
-            <!-- Etapa 1: Botões do formulário -->
-            <div id="step1-buttons" class="buttons">
+            <div class="buttons">
                 <button onclick="fecharDelivery()">Voltar</button>
                 <button onclick="mostrarResumo()">Próximo</button>
             </div>
+            <div class="text-center">
+  <div class="spinner-border" role="status">
+    <span class="sr-only">Loading...</span>
+  </div>
+</div>
 
-            <!-- Etapa 2: Resumo do pedido -->
-            <div id="resumo-pedido" style="display: none; margin-top:20px;">
-                <h3>Resumo do Pedido</h3>
+            <!-- RESUMO -->
+            <div id="resumo-pedido" style="display:none">
+                <h3>Resumo</h3>
                 <div id="resumo-itens"></div>
                 <p id="resumo-taxa"></p>
-                <p><strong>Tempo de entrega: 30 a 45 minutos</strong></p>
                 <p id="resumo-total"></p>
 
-                <div class="buttons">
-                    <button onclick="voltarFormulario()">Voltar</button>
-                    <button onclick="finalizarEntrega()">Finalizar Pedido</button>
-                </div>
+                <button onclick="finalizarEntrega()">Finalizar Pedido</button>
             </div>
         </div>
-        <!-- fecha delivery-box -->
     </div>
-    <!-- fecha delivery-modal -->
-
     <div id="toast" class="toast">
     ✅ Produto adicionado ao carrinho
 </div>
@@ -160,4 +120,5 @@
 
 
 </html>
+
 
