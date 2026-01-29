@@ -6,7 +6,7 @@ const RESTAURANTE_COORD = [-49.0716, -26.4856];
 const TAXA_BASE = 5;
 const VALOR_POR_KM = 1.5;
 
-const WHATSAPP_NUMERO = "554798419-6636";
+const WHATSAPP_NUMERO = "5547984196636"; // sem traço
 
 let carrinho = [];
 let produtos = [];
@@ -20,8 +20,7 @@ function initSplash() {
     if (!splash) return;
 
     setTimeout(() => {
-        splash.classList.add("hide");
-        setTimeout(() => splash.remove(), 500);
+        splash.remove();
     }, 1500);
 }
 
@@ -33,15 +32,15 @@ function initMenu() {
     const menu = document.getElementById("mobile-menu");
     if (!btn || !menu) return;
 
-    btn.addEventListener("click", () => {
-        menu.classList.toggle("open");
-    });
+    btn.onclick = () => menu.classList.toggle("open");
 }
 
 // ==================================================
-// PRODUTOS
+// PRODUTOS (index.html)
 // ==================================================
 async function carregarProdutos() {
+    if (!document.getElementById("burgers")) return;
+
     const res = await fetch("/content/produtos.json");
     const data = await res.json();
 
@@ -51,6 +50,8 @@ async function carregarProdutos() {
     container.innerHTML = "";
 
     produtos.forEach((p, i) => {
+        if (p.categoria !== "burger") return;
+
         const card = document.createElement("div");
         card.className = "card-produto";
 
@@ -59,12 +60,44 @@ async function carregarProdutos() {
             <h3>${p.title}</h3>
             <p>${p.ingredientes}</p>
             <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
-            <button data-index="${i}">Adicionar</button>
+            <button>Adicionar</button>
         `;
 
-        card.querySelector("button").addEventListener("click", () => {
-            adicionarCarrinho(i);
-        });
+        card.querySelector("button").onclick = () => adicionarCarrinho(i);
+        container.appendChild(card);
+    });
+}
+
+// ==================================================
+// BEBIDAS (bebidas.html)
+// ==================================================
+async function carregarBebidas() {
+    if (!document.getElementById("bebidas")) return;
+
+    const res = await fetch("/content/produtos.json");
+    const data = await res.json();
+
+    const bebidas = data.produtos.filter(p => p.categoria === "bebida");
+    const container = document.getElementById("bebidas");
+
+    container.innerHTML = "";
+
+    bebidas.forEach((p, i) => {
+        const card = document.createElement("div");
+        card.className = "card-produto";
+
+        card.innerHTML = `
+            <img src="${p.image}">
+            <h3>${p.title}</h3>
+            <p>${p.ingredientes}</p>
+            <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
+            <button>Adicionar</button>
+        `;
+
+        card.querySelector("button").onclick = () => {
+            const index = produtos.findIndex(x => x.title === p.title);
+            adicionarCarrinho(index);
+        };
 
         container.appendChild(card);
     });
@@ -85,6 +118,8 @@ function adicionarCarrinho(index) {
 
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
+    if (!box) return;
+
     box.innerHTML = "";
 
     let subtotal = 0;
@@ -142,7 +177,7 @@ async function calcularTaxa(endereco) {
 }
 
 // ==================================================
-// RESUMO
+// RESUMO + LOADING
 // ==================================================
 async function mostrarResumo() {
     document.getElementById("loading-taxa").style.display = "flex";
@@ -155,9 +190,9 @@ async function mostrarResumo() {
 
     taxaEntregaCalculada = await calcularTaxa(endereco);
 
-    // itens
     const resumoItens = document.getElementById("resumo-itens");
     resumoItens.innerHTML = "";
+
     carrinho.forEach(i => {
         resumoItens.innerHTML += `<p>${i.qtd}x ${i.title}</p>`;
     });
@@ -184,12 +219,12 @@ function finalizarEntrega() {
         msg += `• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2)}%0A`;
     });
 
-    msg += `%0A👤 *Cliente:* ${nomeCliente.value}%0A`;
-    msg += `📍 *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}, ${cidade.value}%0A%0A`;
+    msg += `%0A *Cliente:* ${nomeCliente.value}%0A`;
+    msg += ` *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}, ${cidade.value}%0A%0A`;
 
-    msg += `🧾 Subtotal: R$ ${subtotal.toFixed(2)}%0A`;
-    msg += `🚚 Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2)}%0A`;
-    msg += `💰 *Total:* R$ ${(subtotal + taxaEntregaCalculada).toFixed(2)}%0A`;
+    msg += ` Subtotal: R$ ${subtotal.toFixed(2)}%0A`;
+    msg += ` Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2)}%0A`;
+    msg += ` *Total:* R$ ${(subtotal + taxaEntregaCalculada).toFixed(2)}%0A`;
 
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`, "_blank");
 
@@ -204,4 +239,5 @@ document.addEventListener("DOMContentLoaded", () => {
     initSplash();
     initMenu();
     carregarProdutos();
+    carregarBebidas();
 });
