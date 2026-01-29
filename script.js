@@ -18,6 +18,25 @@ let MENSAGEM_FECHADA = "Estamos fechados no momento 😔";
 const carrinho = [];
 
 // ==================================================
+
+
+// ==================================================
+// SPLASH & MENU
+// ==================================================
+function initSplash() {
+    const splash = document.getElementById("splash");
+    if (!splash) return;
+    setTimeout(() => { splash.remove(); }, 1500);
+}
+
+function initMenu() {
+    const btn = document.getElementById("hamburger");
+    const menu = document.getElementById("mobile-menu");
+    if (!btn || !menu) return;
+    btn.onclick = () => menu.classList.toggle("open");
+}
+
+// ==================================================
 // STATUS DA LOJA
 // ==================================================
 async function carregarStatusLoja() {
@@ -38,24 +57,6 @@ async function carregarStatusLoja() {
     }
 }
 
-
-// ==================================================
-// SPLASH & MENU
-// ==================================================
-function initSplash() {
-    const splash = document.getElementById("splash");
-    if (!splash) return;
-    setTimeout(() => { splash.remove(); }, 1500);
-}
-
-function initMenu() {
-    const btn = document.getElementById("hamburger");
-    const menu = document.getElementById("mobile-menu");
-    if (!btn || !menu) return;
-    btn.onclick = () => menu.classList.toggle("open");
-}
-
-// ==================================================
 // CARREGAR PRODUTOS & BEBIDAS
 // ==================================================
 async function carregarProdutos() {
@@ -269,4 +270,5 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
 
