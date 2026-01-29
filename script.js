@@ -114,6 +114,8 @@ function adicionarCarrinho(index) {
     else carrinho.push({ ...p, qtd: 1 });
 
     atualizarCarrinho();
+     // 🔥 EFEITO VISUAL
+    mostrarToast();
 }
 
 function atualizarCarrinho() {
@@ -241,3 +243,22 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarProdutos();
     carregarBebidas();
 });
+
+// EFEITO PRODUTO INDO PARA O CARRINHO 
+// ==================================================
+// TOAST + ANIMAÇÃO DO CARRINHO
+// ==================================================
+function mostrarToast() {
+    const toast = document.getElementById("toast");
+    const cart = document.querySelector(".cart");
+
+    if (!toast || !cart) return;
+
+    toast.classList.add("show");
+    cart.classList.add("bounce");
+
+    setTimeout(() => {
+        toast.classList.remove("show");
+        cart.classList.remove("bounce");
+    }, 2000);
+}
