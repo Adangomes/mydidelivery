@@ -1,7 +1,7 @@
 // ==================================================
 // CONFIG
 // ==================================================
-const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";
+const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775"; 
 const RESTAURANTE_COORD = [-49.0716, -26.4856];
 const TAXA_BASE = 5;
 const VALOR_POR_KM = 1.5;
@@ -63,7 +63,8 @@ async function carregarProdutos() {
             <button>Adicionar</button>
         `;
 
-        card.querySelector("button").onclick = () => adicionarCarrinho(i);
+        // 👉 Corrigido: chama a função unificada para adicionar ao carrinho
+        card.querySelector("button").onclick = () => adicionarCarrinhoPorProduto(p);
         container.appendChild(card);
     });
 }
@@ -94,11 +95,7 @@ async function carregarBebidas() {
             <button>Adicionar</button>
         `;
 
-        card.querySelector("button").onclick = () => {
-    adicionarCarrinhoPorProduto(p);
-};
-
-
+        card.querySelector("button").onclick = () => adicionarCarrinhoPorProduto(p);
         container.appendChild(card);
     });
 }
@@ -107,7 +104,6 @@ async function carregarBebidas() {
 // CARRINHO
 // ==================================================
 function adicionarCarrinhoPorProduto(p) {
-
     const item = carrinho.find(i => i.title === p.title);
 
     if (item) {
@@ -119,7 +115,6 @@ function adicionarCarrinhoPorProduto(p) {
     atualizarCarrinho();
     mostrarToast();
 }
-
 
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
@@ -247,7 +242,6 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarBebidas();
 });
 
-// EFEITO PRODUTO INDO PARA O CARRINHO 
 // ==================================================
 // TOAST + ANIMAÇÃO DO CARRINHO
 // ==================================================
@@ -265,4 +259,3 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
-
