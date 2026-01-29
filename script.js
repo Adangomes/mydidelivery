@@ -12,6 +12,33 @@ let carrinho = [];
 let produtos = [];
 let taxaEntregaCalculada = 0;
 
+// STATUS DA LOJA
+let LOJA_ABERTA = true;
+let MENSAGEM_FECHADA = "Estamos fechados no momento 😔";
+const carrinho = [];
+
+// ==================================================
+// STATUS DA LOJA
+// ==================================================
+async function carregarStatusLoja() {
+    try {
+        const res = await fetch('/content/status.json');
+        const data = await res.json();
+
+        LOJA_ABERTA = data.aberto;
+        MENSAGEM_FECHADA = data.mensagem || MENSAGEM_FECHADA;
+
+        const statusEl = document.getElementById("status-loja");
+        if (statusEl) {
+            statusEl.textContent = LOJA_ABERTA ? "🟢 ABERTO" : "🔴 FECHADO";
+            statusEl.className = LOJA_ABERTA ? "aberto" : "fechado";
+        }
+    } catch (e) {
+        console.error("Erro ao carregar status da loja", e);
+    }
+}
+
+
 // ==================================================
 // SPLASH & MENU
 // ==================================================
@@ -242,3 +269,4 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
