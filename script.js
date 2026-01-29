@@ -3,15 +3,19 @@
 // ==================================================
 const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";
 
-// COORDENADA DO RESTAURANTE
-const RESTAURANTE_COORD = [-49.0716, -26.4856]; // longitude, latitude
+// COORDENADA DO RESTAURANTE (longitude, latitude)
+const RESTAURANTE_COORD = [-49.0716, -26.4856];
 
 const TAXA_BASE = 5;
 const VALOR_POR_KM = 1.5;
 
 // ==================================================
+// CARRINHO
+// ==================================================
 const carrinho = [];
 
+// ==================================================
+// CALCULAR TAXA POR DISTÂNCIA
 // ==================================================
 async function calcularTaxaPorDistancia(enderecoCompleto) {
     const geoUrl = `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(enderecoCompleto)}&filter=countrycode:br&limit=1&apiKey=${GEOAPIFY_KEY}`;
@@ -19,7 +23,9 @@ async function calcularTaxaPorDistancia(enderecoCompleto) {
     const geoRes = await fetch(geoUrl);
     const geoData = await geoRes.json();
 
-    if (!geoData.features.length) throw "Endereço inválido";
+    if (!geoData.features || !geoData.features.length) {
+        throw "Endereço inválido";
+    }
 
     const destino = geoData.features[0].geometry.coordinates;
 
@@ -34,13 +40,15 @@ async function calcularTaxaPorDistancia(enderecoCompleto) {
 }
 
 // ==================================================
+// MOSTRAR RESUMO
+// ==================================================
 function mostrarResumo() {
-    const nome = nomeCliente.value;
-    const cidade = cidade.value;
-    const bairro = bairro.value;
-    const rua = rua.value;
-    const numero = numero.value;
-    const pagamento = pagamento.value;
+    const nome = document.getElementById("nomeCliente").value;
+    const cidade = document.getElementById("cidade").value;
+    const bairro = document.getElementById("bairro").value;
+    const rua = document.getElementById("rua").value;
+    const numero = document.getElementById("numero").value;
+    const pagamento = document.getElementById("pagamento").value;
 
     if (!nome || !cidade || !bairro || !rua || !numero || !pagamento) {
         alert("Preencha todos os campos");
@@ -52,17 +60,19 @@ function mostrarResumo() {
 
     const endereco = `${rua}, ${numero}, ${bairro}, ${cidade}`;
 
-    calcularTaxaPorDistancia(endereco).then(taxa => {
-        document.getElementById("resumo-taxa").innerText =
-            `Taxa de entrega: R$ ${taxa.toFixed(2).replace(".", ",")}`;
+    calcularTaxaPorDistancia(endereco)
+        .then(taxa => {
+            document.getElementById("resumo-taxa").innerText =
+                `Taxa de entrega: R$ ${taxa.toFixed(2).replace(".", ",")}`;
 
-        document.getElementById("resumo-total").innerText =
-            `Total: R$ ${(subtotal + taxa).toFixed(2).replace(".", ",")}`;
+            document.getElementById("resumo-total").innerText =
+                `Total: R$ ${(subtotal + taxa).toFixed(2).replace(".", ",")}`;
 
-        document.getElementById("resumo-pedido").style.display = "block";
-    }).catch(() => {
-        alert("Erro ao calcular entrega");
-    });
+            document.getElementById("resumo-pedido").style.display = "block";
+        })
+        .catch(() => {
+            alert("Erro ao calcular entrega");
+        });
 }
 
 // ==================================================
@@ -72,14 +82,19 @@ function initSplash() {
     const splash = document.getElementById("splash");
     if (!splash) return;
 
-    // tempo que o splash fica visível
     setTimeout(() => {
         splash.classList.add("hide");
 
-        // remove do DOM depois da animação
         setTimeout(() => {
             splash.style.display = "none";
         }, 500);
 
-    }, 1500); // 1.5 segundos
+    }, 1500);
 }
+
+// ==================================================
+// INIT GERAL (ESSENCIAL)
+// ==================================================
+document.addEventListener("DOMContentLoaded", () => {
+    initSplash(); // 👈 ISSO DESBLOQUEIA O SITE
+});
