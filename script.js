@@ -180,46 +180,60 @@ async function calcularTaxa(endereco) {
 }
 
 // ==================================================
-// RESUMO + LOADING (COM TEMPO MÍNIMO DE 3 SEGUNDOS)
+// RESUMO + LOADING (Sincronizado 3 segundos)
 // ==================================================
 async function mostrarResumo() {
     const loadingEl = document.getElementById("loading-taxa");
     const resumoEl = document.getElementById("resumo-pedido");
+    const formEl = document.getElementById("form-entrega");
 
-    if (loadingEl) loadingEl.style.display = "flex";
-    if (resumoEl) resumoEl.style.display = "none";
+    // Validação de segurança
+    if (!document.getElementById("rua").value || !document.getElementById("nomeCliente").value) {
+        alert("Por favor, preencha nome e endereço.");
+        return;
+    }
+
+    // 1. Mostra o Loading cobrindo tudo
+    loadingEl.style.display = "flex";
 
     const endereco = `${rua.value}, ${numero.value}, ${bairro.value}, ${cidade.value}`;
-
+    
+    // Timer forçado de 3 segundos + Cálculo da API Geoapify
     const timer = new Promise(resolve => setTimeout(resolve, 3000));
     const calculo = calcularTaxa(endereco);
 
     try {
-        const [distanciaResultado] = await Promise.all([calculo, timer]);
-        taxaEntregaCalculada = distanciaResultado;
+        const [taxa] = await Promise.all([calculo, timer]);
+        taxaEntregaCalculada = taxa;
 
         let subtotal = 0;
         carrinho.forEach(i => subtotal += i.price * i.qtd);
 
+        // Preenche os dados no resumo
         const resumoItens = document.getElementById("resumo-itens");
-        resumoItens.innerHTML = "";
-        carrinho.forEach(i => {
-            resumoItens.innerHTML += `<p>${i.qtd}x ${i.title}</p>`;
-        });
+        resumoItens.innerHTML = carrinho.map(i => 
+            `<p>• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}</p>`
+        ).join("");
 
-        document.getElementById("resumo-taxa").innerText =
-            `Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}`;
+        document.getElementById("resumo-taxa").innerText = `Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}`;
+        document.getElementById("resumo-total").innerText = `Total: R$ ${(subtotal + taxaEntregaCalculada).toFixed(2).replace(".", ",")}`;
 
-        document.getElementById("resumo-total").innerText =
-            `Total: R$ ${(subtotal + taxaEntregaCalculada).toFixed(2).replace(".", ",")}`;
+        // 2. Finaliza o loading e troca o formulário pelo resumo
+        loadingEl.style.display = "none";
+        formEl.style.display = "none";
+        resumoEl.style.display = "block";
 
     } catch (error) {
-        console.error("Erro ao calcular taxa:", error);
-        alert("Erro ao calcular o frete. Verifique o endereço.");
-    } finally {
-        if (loadingEl) loadingEl.style.display = "none";
-        if (resumoEl) resumoEl.style.display = "block";
+        loadingEl.style.display = "none";
+        console.error("Erro:", error);
+        alert("Erro ao calcular a distância. Verifique o endereço.");
     }
+}
+
+// Função para o botão "Editar" no resumo
+function voltarParaDados() {
+    document.getElementById("resumo-pedido").style.display = "none";
+    document.getElementById("form-entrega").style.display = "block";
 }
 
 // ==================================================
@@ -231,21 +245,24 @@ function finalizarEntrega() {
 
     carrinho.forEach(i => {
         subtotal += i.price * i.qtd;
-        msg += `• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2)}%0A`;
+        msg += `• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}%0A`;
     });
 
     msg += `%0A *Cliente:* ${nomeCliente.value}%0A`;
     msg += ` *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}, ${cidade.value}%0A%0A`;
 
-    msg += ` Subtotal: R$ ${subtotal.toFixed(2)}%0A`;
-    msg += ` Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2)}%0A`;
-    msg += ` *Total:* R$ ${(subtotal + taxaEntregaCalculada).toFixed(2)}%0A`;
+    msg += ` Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
+    msg += ` Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
+    msg += ` *Total:* R$ ${(subtotal + taxaEntregaCalculada).toFixed(2).replace(".", ",")}%0A`;
 
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`, "_blank");
 
     carrinho = [];
     salvarCarrinho();
     fecharDelivery();
+    
+    // Opcional: recarregar a página para limpar o form
+    setTimeout(() => location.reload(), 1000);
 }
 
 // ==================================================
@@ -256,7 +273,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initMenu();
     carregarProdutos();
     carregarBebidas();
-    carregarCarrinhoStorage(); // <- recarrega carrinho do localStorage
+    carregarCarrinhoStorage();
 });
 
 // ==================================================
