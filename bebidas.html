@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BEBIDAS</title>
-<!-- CSS principal -->
+    <title>BEBIDAS | KINGS BURGUER</title>
+
+    <!-- CSS principal -->
     <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -17,7 +18,6 @@
         <!-- HEADER -->
         <header class="header">
             <div class="logo">KINGS BURGUER</div>
-            <div id="status-loja" class="status"></div>
 
             <!-- Botão menu hamburguer -->
             <button class="hamburger" id="hamburger">&#9776;</button>
@@ -29,7 +29,27 @@
                 <a href="contato.html">CONTATO</a>
             </nav>
 
-           <!-- CARRINHO -->
+            <!-- Ícone carrinho -->
+            <div class="cart" onclick="abrirCarrinho()">🛒</div>
+        </header>
+
+        <!-- SEÇÃO BEBIDAS -->
+        <section class="secao">
+            <h2 style="text-align:center; margin-bottom:12px;">🥤 Bebidas</h2>
+
+            <!-- PRODUTOS DE BEBIDAS -->
+            <div class="products-grid" id="bebidas"></div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>Sistema Desenvolvido por Adan Gomes</p>
+        </footer>
+    </div>
+
+    <!-- ===================== -->
+    <!-- MODAL CARRINHO -->
+    <!-- ===================== -->
     <div id="cart-modal" style="display:none;">
         <div class="cart-box">
             <div class="cart-header">
@@ -51,7 +71,9 @@
         </div>
     </div>
 
-    <!-- ENTREGA -->
+    <!-- ===================== -->
+    <!-- MODAL ENTREGA -->
+    <!-- ===================== -->
     <div id="delivery-modal" style="display:none;">
         <div class="delivery-box">
             <h2>Informações de Entrega</h2>
@@ -91,11 +113,6 @@
                 <button onclick="fecharDelivery()">Voltar</button>
                 <button onclick="mostrarResumo()">Próximo</button>
             </div>
-            <div class="text-center">
-  <div class="spinner-border" role="status">
-    <span class="sr-only">Loading...</span>
-  </div>
-</div>
 
             <!-- RESUMO -->
             <div id="resumo-pedido" style="display:none">
@@ -108,17 +125,53 @@
             </div>
         </div>
     </div>
-    <div id="toast" class="toast">
-    ✅ Produto adicionado ao carrinho
-</div>
 
-    <!-- SCRIPT SEMPRE ANTES DO BODY FECHAR -->
+    <!-- TOAST -->
+    <div id="toast" class="toast">
+        ✅ Produto adicionado ao carrinho
+    </div>
+
+    <!-- SCRIPT -->
     <script src="script.js"></script>
 
+    <!-- SCRIPT ESPECÍFICO BEBIDAS -->
+    <script>
+        async function carregarBebidas() {
+            const res = await fetch("/content/produtos.json");
+            const data = await res.json();
+
+            const bebidas = data.produtos.filter(p => p.categoria === "bebida");
+            const container = document.getElementById("bebidas");
+
+            container.innerHTML = "";
+
+            bebidas.forEach((p, i) => {
+                const card = document.createElement("div");
+                card.className = "card-produto";
+
+                card.innerHTML = `
+                    <img src="${p.image}">
+                    <h3>${p.title}</h3>
+                    <p>${p.ingredientes}</p>
+                    <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
+                    <button>Adicionar</button>
+                `;
+
+                card.querySelector("button").addEventListener("click", () => {
+                    adicionarCarrinho(produtos.findIndex(prod => prod.title === p.title));
+                    mostrarToast();
+                });
+
+                container.appendChild(card);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            initMenu();
+            carregarProdutos(); // mantém carrinho sincronizado
+            carregarBebidas();
+        });
+    </script>
+
 </body>
-
-
 </html>
-
-
-
