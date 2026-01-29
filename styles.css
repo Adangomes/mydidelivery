@@ -514,6 +514,23 @@ body {
 }
 
 
+/* Garante que o modal ocupe a largura correta sem transbordar */
+.modal-content {
+    width: 90% !important; /* Ocupa 90% da largura da tela */
+    max-width: 400px;      /* Não deixa ficar gigante em telas maiores */
+    margin: 0 auto;        /* Centraliza horizontalmente */
+    position: fixed;       /* Mantém ele fixo em relação à tela */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centralização perfeita no meio da tela */
+    box-sizing: border-box;
+    overflow-x: hidden;    /* Impede qualquer rolagem lateral estranha */
+}
+
+/* Ajuste nos inputs para não causarem zoom no iPhone */
+input, select, textarea {
+    font-size: 16px !important; /* Se a fonte for menor que 16px, o iOS dá zoom automático */
+}
 
 
 
