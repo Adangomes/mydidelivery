@@ -64,3 +64,22 @@ function mostrarResumo() {
         alert("Erro ao calcular entrega");
     });
 }
+
+// ==================================================
+// SPLASH
+// ==================================================
+function initSplash() {
+    const splash = document.getElementById("splash");
+    if (!splash) return;
+
+    // tempo que o splash fica visível
+    setTimeout(() => {
+        splash.classList.add("hide");
+
+        // remove do DOM depois da animação
+        setTimeout(() => {
+            splash.style.display = "none";
+        }, 500);
+
+    }, 1500); // 1.5 segundos
+}
