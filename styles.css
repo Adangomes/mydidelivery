@@ -317,11 +317,36 @@ body {
 /* ============================= */
 /* RESUMO */
 /* ============================= */
+/* ============================= */
+/* RESUMO DENTRO DO CARD DE ENDEREÇO */
+/* ============================= */
 #resumo-pedido {
-    background: #f1f2f4;
+    background: #fff;          /* branco para se destacar */
+    border-radius: 18px;       /* arredondado igual ao card */
+    padding: 16px;             /* espaçamento interno */
+    margin-top: 12px;          /* pequeno espaço em relação aos inputs */
+    width: 100%;               /* ocupa toda largura do card */
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1); /* sombra suave */
+    position: relative;        /* importante para que loading fique relativo */
+    z-index: 1;                /* abaixo do loading */
+}
+
+/* Loading taxa dentro do mesmo card */
+#loading-taxa {
+    position: absolute;        /* centralizado dentro do card */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;             /* controlado pelo JS */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255,255,255,0.85); /* leve translucido */
+    width: 90%;
+    height: 90%;
     border-radius: 18px;
-    padding: 14px;
-    margin-top: 14px;
+    z-index: 10;               /* acima do resumo */
+    text-align: center;
 }
 
 /* ============================= */
@@ -437,6 +462,7 @@ body {
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
+
 
 
 
