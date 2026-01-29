@@ -1,9 +1,9 @@
 // ==================================================
-// CONFIGURAÇÕES GEOAPIFY
+// GEOAPIFY CONFIG
 // ==================================================
 const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";
 
-// Coordenada do restaurante (longitude, latitude)
+// Coordenadas do restaurante (longitude, latitude)
 const RESTAURANTE_COORD = [-49.0716, -26.4856];
 
 const TAXA_BASE = 5;
@@ -13,29 +13,6 @@ const VALOR_POR_KM = 1.5;
 // CARRINHO
 // ==================================================
 const carrinho = [];
-
-// ==================================================
-// STATUS DA LOJA
-// ==================================================
-async function carregarStatusLoja() {
-    try {
-        const res = await fetch("/content/status.json");
-        const data = await res.json();
-
-        const statusEl = document.getElementById("status-loja");
-        if (!statusEl) return;
-
-        if (data.aberto) {
-            statusEl.textContent = "🟢 ABERTO";
-            statusEl.className = "status aberto";
-        } else {
-            statusEl.textContent = "🔴 FECHADO";
-            statusEl.className = "status fechado";
-        }
-    } catch (e) {
-        console.warn("Status da loja não carregado");
-    }
-}
 
 // ==================================================
 // PRODUTOS
@@ -48,17 +25,15 @@ async function carregarProdutos() {
         const burgers = document.getElementById("burgers");
         const bebidas = document.getElementById("bebidas");
 
-        if (!data.produtos) return;
-
         data.produtos.forEach(prod => {
             const card = document.createElement("div");
             card.className = "product-card";
 
             card.innerHTML = `
-                <img src="${prod.image}" alt="${prod.title}">
+                <img src="${prod.image}">
                 <h3>${prod.title}</h3>
-                <p class="desc">${prod.ingredientes || ""}</p>
-                <p class="price">R$ ${prod.price.toFixed(2).replace(".", ",")}</p>
+                <p>${prod.ingredientes || ""}</p>
+                <strong>R$ ${prod.price.toFixed(2).replace(".", ",")}</strong>
                 <button onclick="adicionarAoCarrinho('${prod.title}', ${prod.price})">
                     Adicionar
                 </button>
@@ -69,7 +44,7 @@ async function carregarProdutos() {
         });
 
     } catch (e) {
-        console.error("Erro ao carregar produtos", e);
+        console.error("Erro produtos", e);
     }
 }
 
@@ -79,11 +54,8 @@ async function carregarProdutos() {
 function adicionarAoCarrinho(nome, preco) {
     const item = carrinho.find(i => i.nome === nome);
 
-    if (item) {
-        item.quantidade++;
-    } else {
-        carrinho.push({ nome, preco, quantidade: 1 });
-    }
+    if (item) item.quantidade++;
+    else carrinho.push({ nome, preco, quantidade: 1 });
 
     salvarCarrinho();
     atualizarCarrinho();
@@ -91,19 +63,18 @@ function adicionarAoCarrinho(nome, preco) {
 }
 
 function atualizarCarrinho() {
-    const container = document.getElementById("cart-items");
-    if (!container) return;
+    const el = document.getElementById("cart-items");
+    if (!el) return;
 
-    container.innerHTML = "";
+    el.innerHTML = "";
     let subtotal = 0;
 
-    carrinho.forEach((item, i) => {
-        subtotal += item.preco * item.quantidade;
-
-        container.innerHTML += `
+    carrinho.forEach((i, idx) => {
+        subtotal += i.preco * i.quantidade;
+        el.innerHTML += `
             <div class="cart-item">
-                <span>${item.quantidade}x ${item.nome}</span>
-                <button onclick="removerItem(${i})">✖</button>
+                ${i.quantidade}x ${i.nome}
+                <button onclick="removerItem(${idx})">X</button>
             </div>
         `;
     });
@@ -135,16 +106,13 @@ function carregarCarrinhoSalvo() {
 function abrirCarrinho() {
     document.getElementById("cart-modal").style.display = "flex";
 }
-
 function fecharCarrinho() {
     document.getElementById("cart-modal").style.display = "none";
 }
-
 function abrirDelivery() {
     fecharCarrinho();
     document.getElementById("delivery-modal").style.display = "flex";
 }
-
 function fecharDelivery() {
     document.getElementById("delivery-modal").style.display = "none";
 }
@@ -157,9 +125,7 @@ async function calcularTaxaPorDistancia(endereco) {
     const geoRes = await fetch(geoUrl);
     const geoData = await geoRes.json();
 
-    if (!geoData.features || !geoData.features.length) {
-        throw "Endereço inválido";
-    }
+    if (!geoData.features.length) throw "Endereço inválido";
 
     const destino = geoData.features[0].geometry.coordinates;
 
@@ -172,37 +138,61 @@ async function calcularTaxaPorDistancia(endereco) {
 }
 
 // ==================================================
-// RESUMO DO PEDIDO
+// RESUMO + LOADING
 // ==================================================
-function mostrarResumo() {
+async function mostrarResumo() {
     const nome = nomeCliente.value;
     const cidade = cidade.value;
     const bairro = bairro.value;
     const rua = rua.value;
     const numero = numero.value;
-    const pagamento = pagamento.value;
 
-    if (!nome || !cidade || !bairro || !rua || !numero || !pagamento) {
+    if (!nome || !cidade || !bairro || !rua || !numero) {
         alert("Preencha todos os campos");
         return;
     }
+
+    const resumo = document.getElementById("resumo-pedido");
+
+    // SPINNER
+    resumo.style.display = "block";
+    resumo.innerHTML = `
+        <div style="text-align:center; padding:20px">
+            <div class="spinner-border"></div>
+            <p>Calculando taxa de entrega...</p>
+        </div>
+    `;
 
     let subtotal = 0;
     carrinho.forEach(i => subtotal += i.preco * i.quantidade);
 
     const endereco = `${rua}, ${numero}, ${bairro}, ${cidade}`;
 
-    calcularTaxaPorDistancia(endereco)
-        .then(taxa => {
-            document.getElementById("resumo-taxa").innerText =
-                `Taxa de entrega: R$ ${taxa.toFixed(2).replace(".", ",")}`;
+    try {
+        const taxa = await calcularTaxaPorDistancia(endereco);
 
-            document.getElementById("resumo-total").innerText =
-                `Total: R$ ${(subtotal + taxa).toFixed(2).replace(".", ",")}`;
+        let itensHTML = "";
+        carrinho.forEach(i => {
+            itensHTML += `<p>${i.quantidade}x ${i.nome}</p>`;
+        });
 
-            document.getElementById("resumo-pedido").style.display = "block";
-        })
-        .catch(() => alert("Erro ao calcular entrega"));
+        resumo.innerHTML = `
+            <h3>Resumo</h3>
+            <div id="resumo-itens">${itensHTML}</div>
+            <p id="resumo-taxa">Taxa de entrega: R$ ${taxa.toFixed(2).replace(".", ",")}</p>
+            <p id="resumo-total"><strong>Total: R$ ${(subtotal + taxa).toFixed(2).replace(".", ",")}</strong></p>
+            <button onclick="finalizarEntrega()">Finalizar Pedido</button>
+        `;
+    } catch {
+        resumo.innerHTML = "<p>Erro ao calcular entrega</p>";
+    }
+}
+
+// ==================================================
+// FINALIZAR (placeholder)
+// ==================================================
+function finalizarEntrega() {
+    alert("Pedido finalizado com sucesso 🚀");
 }
 
 // ==================================================
@@ -214,22 +204,14 @@ function initMenuMobile() {
 
     if (!btn || !menu) return;
 
-    btn.addEventListener("click", e => {
+    btn.onclick = e => {
         e.stopPropagation();
         menu.classList.toggle("active");
-    });
+    };
 
-    document.addEventListener("click", e => {
-        if (!menu.contains(e.target) && !btn.contains(e.target)) {
-            menu.classList.remove("active");
-        }
-    });
-
-    menu.querySelectorAll("a").forEach(link => {
-        link.addEventListener("click", () => {
-            menu.classList.remove("active");
-        });
-    });
+    document.onclick = e => {
+        if (!menu.contains(e.target)) menu.classList.remove("active");
+    };
 }
 
 // ==================================================
@@ -246,11 +228,10 @@ function initSplash() {
 }
 
 // ==================================================
-// INIT GERAL
+// INIT
 // ==================================================
 document.addEventListener("DOMContentLoaded", () => {
     initSplash();
-    carregarStatusLoja();
     carregarCarrinhoSalvo();
     atualizarCarrinho();
     carregarProdutos();
