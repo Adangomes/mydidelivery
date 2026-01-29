@@ -110,7 +110,8 @@ body {
     padding: 16px;
 }
 
-.cards {
+.cards,
+.products-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
     gap: 14px;
@@ -161,10 +162,6 @@ body {
     cursor: pointer;
 }
 
-.card-produto button:active {
-    transform: scale(.97);
-}
-
 /* ============================= */
 /* MODAIS */
 /* ============================= */
@@ -174,7 +171,7 @@ body {
     position: fixed;
     inset: 0;
     background: rgba(0,0,0,.6);
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     z-index: 999;
@@ -279,6 +276,7 @@ body {
     flex-direction: column;
     gap: 12px;
     color: #fff;
+    text-align: center;
 }
 
 .spinner {
@@ -304,19 +302,31 @@ body {
     margin-top: 14px;
 }
 
-#resumo-pedido h3 {
-    font-size: 1rem;
-    margin-bottom: 8px;
+/* ============================= */
+/* CONTATO */
+/* ============================= */
+.destaques {
+    text-align: center;
+    padding: 3rem 1rem;
 }
 
-#resumo-itens {
-    font-size: .8rem;
+.destaques h2 {
+    margin-bottom: 10px;
 }
 
-#resumo-taxa,
-#resumo-total {
-    margin-top: 6px;
-    font-weight: 700;
+.destaques p {
+    color: #555;
+}
+
+.btn {
+    display: inline-block;
+    padding: 14px 20px;
+    border-radius: 14px;
+    background: #111;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    margin: 10px;
 }
 
 /* ============================= */
