@@ -82,7 +82,6 @@ async function carregarBebidas() {
     });
 }
 
-// FUNÇÃO MESTRE PARA CRIAR O CARD (VISUAL LIMPO E SEM PORCENTAGEM)
 function criarCardProduto(p) {
     const temDesconto = p.oldPrice && p.oldPrice > p.price;
 
@@ -204,16 +203,50 @@ async function mostrarResumo() {
     }
 }
 
-function finalizarEntrega() {
+// ==================================================
+// FUNÇÃO ATUALIZADA: FINALIZAR E ENVIAR PARA FIREBASE
+// ==================================================
+async function finalizarEntrega() {
     let subtotal = 0;
-    let msg = "🍔 *NOVO PEDIDO - KINGS BURGUER*%0A%0A";
-    carrinho.forEach(i => {
+    let msgWhatsApp = "🍔 *NOVO PEDIDO - KINGS BURGUER*%0A%0A";
+    
+    // Preparar dados para o Firebase
+    const itensPedido = carrinho.map(i => {
         subtotal += i.price * i.qtd;
-        msg += `• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}%0A`;
+        msgWhatsApp += `• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}%0A`;
+        return {
+            produto: i.title,
+            qtd: i.qtd,
+            precoUn: i.price
+        };
     });
-    msg += `%0A *Cliente:* ${nomeCliente.value}%0A *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}%0A *Total:* R$ ${(subtotal + taxaEntregaCalculada).toFixed(2).replace(".", ",")}`;
-    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`, "_blank");
-    carrinho = []; salvarCarrinho(); fecharDelivery();
+
+    const totalGeral = subtotal + taxaEntregaCalculada;
+    msgWhatsApp += `%0A *Cliente:* ${nomeCliente.value}%0A *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}%0A *Total:* R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
+
+    // 1. SALVAR NO FIREBASE (ENVIA PARA O ADM)
+    try {
+        await db.ref('pedidos').push({
+            cliente: nomeCliente.value,
+            endereco: `${rua.value}, ${numero.value} - ${bairro.value}`,
+            itens: itensPedido,
+            taxaEntrega: taxaEntregaCalculada,
+            total: totalGeral,
+            data: new Date().toISOString(),
+            status: "novo"
+        });
+        console.log("Pedido enviado ao Admin!");
+    } catch (error) {
+        console.error("Erro ao salvar no Firebase:", error);
+    }
+
+    // 2. ABRIR WHATSAPP
+    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`, "_blank");
+    
+    // 3. LIMPAR CARRINHO E RECARREGAR
+    carrinho = []; 
+    salvarCarrinho(); 
+    fecharDelivery();
     setTimeout(() => location.reload(), 1000);
 }
 
@@ -241,20 +274,16 @@ function mostrarToast() {
     }, 2000);
 }
 
-
-
-//RECEBER PEDIDOS
-// O espelhamento acontece aqui
-db.ref('pedidos').on('child_added', (snapshot) => {
-    const pedido = snapshot.val();
-    
-    // Mostra o pedido no console para teste
-    console.log("Novo pedido recebido!", pedido);
-
-    // 1. Toca um som de aviso (opcional)
-    // new Audio('aviso.mp3').play();
-
-    // 2. Manda para a impressora
-    window.print(); 
-});
-
+// ==================================================
+// RECEBER PEDIDOS (LÓGICA DO PAINEL ADM)
+// ==================================================
+// Nota: Certifique-se que 'db' (firebase database) está inicializado no seu HTML antes deste script.
+if (typeof db !== 'undefined') {
+    db.ref('pedidos').on('child_added', (snapshot) => {
+        const pedido = snapshot.val();
+        console.log("Novo pedido recebido no painel!", pedido);
+        
+        // Aqui você pode adicionar a lógica de criar um card visual na tela do ADM
+        // window.print(); // Cuidado: isso abrirá a caixa de impressão toda vez que um pedido entrar
+    });
+}
