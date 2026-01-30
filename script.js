@@ -11,6 +11,28 @@ const WHATSAPP_NUMERO = "5547984196636"; // sem traço
 let carrinho = [];
 let produtos = [];
 let taxaEntregaCalculada = 0;
+let LOJA_ABERTA = true; // Variável global para controle
+let MENSAGEM_FECHADA = "Loja Fechada no momento.";
+
+// ==================================================
+// STATUS DA LOJA (ADICIONADO AQUI)
+// ==================================================
+async function carregarStatusLoja() {
+    try {
+        const res = await fetch('/content/status.json');
+        const data = await res.json();
+        LOJA_ABERTA = data.aberto;
+        MENSAGEM_FECHADA = data.mensagem || MENSAGEM_FECHADA;
+        
+        const statusEl = document.getElementById("status-loja");
+        if (statusEl) {
+            statusEl.textContent = LOJA_ABERTA ? "🟢 ABERTO" : "🔴 FECHADO";
+            statusEl.className = "status " + (LOJA_ABERTA ? "aberto" : "fechado");
+        }
+    } catch (e) {
+        console.error("Erro ao carregar status da loja", e);
+    }
+}
 
 // ==================================================
 // ==================================================
@@ -244,6 +266,7 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
 
 
 
