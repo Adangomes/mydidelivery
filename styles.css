@@ -497,7 +497,7 @@ input, select, textarea {
     box-shadow: none !important;
     padding: 0;
     /* O margin-left de 16px costuma alinhar com a margem dos cards abaixo */
-    margin: -5px 0 10px 16px; 
+    margin: 25px 0 10px 16px;
     letter-spacing: 0.5px;
 }
 
@@ -559,4 +559,5 @@ input, select, textarea {
 .card-produto button:active {
     transform: scale(0.98);
 }
+
 
