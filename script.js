@@ -212,7 +212,7 @@ async function mostrarResumo() {
 }
 
 // ==================================================
-// FINALIZAR E ENVIAR PARA FIREBASE
+// FINALIZAR E ENVIAR PARA FIREBASE + WHATSAPP
 // ==================================================
 async function finalizarEntrega() {
     if (typeof db === 'undefined') {
@@ -221,7 +221,8 @@ async function finalizarEntrega() {
     }
 
     let subtotal = 0;
-    let msgWhatsApp = "🍔 *NOVO PEDIDO - KINGS BURGUER*%0A%0A";
+    let msgWhatsApp = "🍔 *NOVO PEDIDO - KINGS BURGUER*%0A";
+    msgWhatsApp += "✨ _Prepararemos tudo com muito carinho!_%0A%0A";
     
     const itensPedido = carrinho.map(i => {
         subtotal += i.price * i.qtd;
@@ -230,10 +231,12 @@ async function finalizarEntrega() {
     });
 
     const totalGeral = subtotal + taxaEntregaCalculada;
-    msgWhatsApp += `%0A *Cliente:* ${nomeCliente.value}%0A *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}%0A *Total:* R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
+    msgWhatsApp += `%0A👤 *Cliente:* ${nomeCliente.value}`;
+    msgWhatsApp += `%0A📍 *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}`;
+    msgWhatsApp += `%0A💰 *Total:* R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
 
     try {
-        // 1. Envia para o Firebase
+        // 1. Envia para o Firebase (Painel Pedidos.html)
         await db.ref('pedidos').push({
             cliente: nomeCliente.value,
             endereco: `${rua.value}, ${numero.value} - ${bairro.value}`,
@@ -245,28 +248,23 @@ async function finalizarEntrega() {
         });
         console.log("Pedido registrado no sistema!");
 
-        // 2. Monta o link e abre o WhatsApp ANTES de qualquer limpeza
+        // 2. Abre o WhatsApp em nova aba
         const urlWhatsApp = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
         window.open(urlWhatsApp, "_blank");
 
-        // 3. Limpa o carrinho e o formulário sem resetar a página inteira
+        // 3. Limpeza total sem recarregar a página
         carrinho = []; 
         salvarCarrinho(); 
-        atualizarCarrinho(); // Zera a lista visualmente
-        fecharDelivery();    // Fecha o modal de entrega
+        atualizarCarrinho(); 
+        fecharDelivery();
         
-        alert("Pedido enviado com sucesso! Verifique seu WhatsApp.");
+        alert("🍔 Pedido recebido! Agora vamos preparar tudo com muito carinho para você.");
 
     } catch (error) {
         console.error("Erro Firebase:", error);
-        alert("Erro ao salvar pedido, mas tente enviar pelo WhatsApp.");
+        // Plano B: Se o Firebase falhar, abre o WhatsApp mesmo assim
         window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`, "_blank");
     }
-    
-    carrinho = []; 
-    salvarCarrinho(); 
-    fecharDelivery();
-    setTimeout(() => location.reload(), 1000);
 }
 
 // ==================================================
@@ -292,4 +290,3 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
-
