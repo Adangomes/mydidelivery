@@ -18,26 +18,22 @@ let MENSAGEM_FECHADA = "Loja Fechada no momento.";
 // STATUS DA LOJA (ADICIONADO AQUI)
 // ==================================================
 async function carregarStatusLoja() {
-    const statusEl = document.getElementById("status-loja");
-    if (!statusEl) return;
-
     try {
         const res = await fetch('content/status.json');
         const data = await res.json();
         
-        // 1. Atualiza a variável que bloqueia o carrinho
-        LOJA_ABERTA = data.aberto; 
+        LOJA_ABERTA = data.aberto;
         
-        // 2. AQUI ESTÁ A MUDANÇA: 
-        // Ele vai pegar EXATAMENTE o que o dono escreveu no ADM (data.mensagem)
-        // Se o dono escreveu "Estamos fechados", é isso que vai aparecer.
-        statusEl.innerHTML = data.mensagem; 
-        
-        // 3. Aplica apenas a cor (verde se 'aberto' for true, vermelho se for false)
-        statusEl.className = "status " + (LOJA_ABERTA ? "aberto" : "fechado");
+        // AQUI: A gente salva o texto do ADM na variável global
+        MENSAGEM_FECHADA = data.mensagem; 
 
+        const statusEl = document.getElementById("status-loja");
+        if (statusEl) {
+            statusEl.innerHTML = data.mensagem; // Texto no topo do site
+            statusEl.className = "status " + (LOJA_ABERTA ? "aberto" : "fechado");
+        }
     } catch (e) {
-        console.error("Erro ao puxar o texto do ADM", e);
+        console.error("Erro ao carregar");
     }
 }
 // ==================================================
@@ -281,6 +277,7 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
 
 
 
