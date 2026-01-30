@@ -82,10 +82,9 @@ async function carregarBebidas() {
     });
 }
 
-// FUNÇÃO MESTRE PARA CRIAR O CARD (EVITA DESALINHAMENTO)
+// FUNÇÃO MESTRE PARA CRIAR O CARD (VISUAL LIMPO E SEM PORCENTAGEM)
 function criarCardProduto(p) {
     const temDesconto = p.oldPrice && p.oldPrice > p.price;
-    const porcentagem = temDesconto ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0;
 
     const card = document.createElement("div");
     card.className = "card-produto";
@@ -97,7 +96,6 @@ function criarCardProduto(p) {
             <div class="price-container">
                 <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
                 ${temDesconto ? `<span class="old-price">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
-                ${temDesconto ? `<span class="badge-desconto">-${porcentagem}%</span>` : ""}
             </div>
             <button onclick="adicionarCarrinhoPorProduto(${JSON.stringify(p).replace(/"/g, '&quot;')})">Adicionar</button>
         </div>
