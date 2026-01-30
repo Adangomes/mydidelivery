@@ -187,7 +187,7 @@ async function finalizarEntrega() {
     const observacao = obsCampo ? obsCampo.value : "Nenhuma";
 
     let subtotal = 0;
-    let msgWhatsApp = " *NOVO PEDIDO *%0A%0A";
+    let msgWhatsApp = " *NOVO PEDIDO*%0A%0A";
     
     const itensPedido = carrinho.map(i => {
         subtotal += i.price * i.qtd;
@@ -249,3 +249,4 @@ function mostrarToast() {
     toast.classList.add("show");
     setTimeout(() => { toast.classList.remove("show"); }, 2000);
 }
+
