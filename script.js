@@ -18,22 +18,32 @@ let MENSAGEM_FECHADA = "Loja Fechada no momento.";
 // STATUS DA LOJA (ADICIONADO AQUI)
 // ==================================================
 async function carregarStatusLoja() {
+    const statusEl = document.getElementById("status-loja");
+    if (!statusEl) return;
+
     try {
-        const res = await fetch('/content/status.json');
+        // Tentamos carregar o arquivo. 
+        // Se estiver no Netlify, o caminho 'content/status.json' é o mais seguro.
+        const res = await fetch('content/status.json');
+        
+        if (!res.ok) throw new Error("Não achei o arquivo JSON");
+
         const data = await res.json();
         LOJA_ABERTA = data.aberto;
-        MENSAGEM_FECHADA = data.mensagem || MENSAGEM_FECHADA;
         
-        const statusEl = document.getElementById("status-loja");
-        if (statusEl) {
-            statusEl.textContent = LOJA_ABERTA ? "🟢 ABERTO" : "🔴 FECHADO";
-            statusEl.className = "status " + (LOJA_ABERTA ? "aberto" : "fechado");
-        }
+        // Inserimos o texto e as classes que você criou no CSS
+        statusEl.innerHTML = LOJA_ABERTA ? "🟢 ABERTO" : "🔴 FECHADO";
+        statusEl.className = "status " + (LOJA_ABERTA ? "aberto" : "fechado");
+        
+        console.log("Status carregado com sucesso:", LOJA_ABERTA);
+
     } catch (e) {
-        console.error("Erro ao carregar status da loja", e);
+        console.error("Erro ao carregar status:", e);
+        // Se der erro, mostramos um aviso visual para você saber
+        statusEl.innerHTML = "⚠️ STATUS INDISPONÍVEL";
+        statusEl.style.background = "#eee";
     }
 }
-
 // ==================================================
 // ==================================================
 // SPLASH & MENU
@@ -266,6 +276,7 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
 
 
 
