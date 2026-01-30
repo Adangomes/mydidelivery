@@ -526,12 +526,22 @@ input, select, textarea {
 }
 
 /* PREÇO ANTIGO (BEM PEQUENO E DISCRETO) */
+/* ============================================================ */
+/* AJUSTE SOMENTE DO VALOR ANTIGO (RISCADO)                     */
+/* ============================================================ */
 .old-price {
     text-decoration: line-through;
-    color: #a0a0a0; 
-    font-size: 0.75rem; /* REDUZIDO: Para dar o contraste de tamanho que você quer */
+    color: #999;
     font-weight: 400;
+    font-size: 0.8rem; /* Tamanho reduzido como pedido */
     white-space: nowrap;
+
+    /* AJUSTE DE ALTURA: */
+    display: inline-block; /* Necessário para o movimento funcionar */
+    
+    /* Aumente o valor (ex: 2px, 3px) para DESCER o preço riscado */
+    /* Diminua ou use negativo (ex: -1px) para SUBIR */
+    transform: translateY(2px); 
 }
 
 /* ============================= */
@@ -560,6 +570,7 @@ input, select, textarea {
 .card-produto button:active {
     transform: scale(0.98);
 }
+
 
 
 
