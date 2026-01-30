@@ -479,3 +479,30 @@ input, select, textarea {
     to { transform: rotate(360deg); }
 }
 
+/* ============================= */
+/* STATUS DA LOJA (ADICIONADO)   */
+/* ============================= */
+.status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 14px;
+    border-radius: 50px; /* Estilo pílula */
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin: 10px 16px; /* Alinhado com o padding das seções */
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.status.aberto {
+    background: #e8f5e9; /* Verde clarinho */
+    color: #2e7d32;      /* Verde escuro para leitura */
+    border: 1px solid #c8e6c9;
+}
+
+.status.fechado {
+    background: #ffebee; /* Vermelho clarinho */
+    color: #c62828;      /* Vermelho escuro */
+    border: 1px solid #ffcdd2;
+}
