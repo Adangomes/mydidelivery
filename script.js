@@ -120,10 +120,14 @@ function carregarCarrinhoStorage() {
 }
 
 function adicionarCarrinhoPorProduto(p) {
+    // Se a loja não estiver aberta...
     if (!LOJA_ABERTA) {
-        alert("Desculpe, a loja está fechada no momento!");
+        // ...o alert mostra a variável MENSAGEM_FECHADA (que vem do ADM)
+        // e NÃO o texto que estava entre aspas antes.
+        alert(MENSAGEM_FECHADA); 
         return;
     }
+    
     const item = carrinho.find(i => i.title === p.title);
     if (item) { item.qtd++; } else { carrinho.push({ ...p, qtd: 1 }); }
     salvarCarrinho();
@@ -277,6 +281,7 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
 
 
 
