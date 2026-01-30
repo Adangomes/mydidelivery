@@ -15,7 +15,7 @@ let LOJA_ABERTA = true; // Variável global para controle
 let MENSAGEM_FECHADA = "Loja Fechada no momento.";
 
 // ==================================================
-// STATUS DA LOJA (ADICIONADO AQUI)
+// STATUS DA LOJA
 // ==================================================
 async function carregarStatusLoja() {
     try {
@@ -29,14 +29,14 @@ async function carregarStatusLoja() {
 
         const statusEl = document.getElementById("status-loja");
         if (statusEl) {
-            statusEl.innerHTML = data.mensagem; // Texto no topo do site
+            statusEl.innerHTML = data.mensagem; // Texto configurado pelo ADM
             statusEl.className = "status " + (LOJA_ABERTA ? "aberto" : "fechado");
         }
     } catch (e) {
-        console.error("Erro ao carregar");
+        console.error("Erro ao carregar status");
     }
 }
-// ==================================================
+
 // ==================================================
 // SPLASH & MENU
 // ==================================================
@@ -54,8 +54,7 @@ function initMenu() {
 }
 
 // ==================================================
-
-// CARREGAR PRODUTOS & BEBIDAS
+// CARREGAR PRODUTOS (COM DESCONTO AUTOMÁTICO)
 // ==================================================
 async function carregarProdutos() {
     if (!document.getElementById("burgers")) return;
@@ -64,15 +63,25 @@ async function carregarProdutos() {
     produtos = data.produtos;
     const container = document.getElementById("burgers");
     container.innerHTML = "";
+    
     produtos.forEach((p) => {
         if (p.categoria !== "burger") return;
+        
+        // LÓGICA DE DESCONTO
+        const temDesconto = p.oldPrice && p.oldPrice > p.price;
+        const porcentagem = temDesconto ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0;
+
         const card = document.createElement("div");
         card.className = "card-produto";
         card.innerHTML = `
             <img src="${p.image}">
             <h3>${p.title}</h3>
             <p>${p.ingredientes}</p>
-            <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
+            <div class="price-container">
+                <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
+                ${temDesconto ? `<span class="old-price">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
+                ${temDesconto ? `<span class="badge-desconto">-${porcentagem}%</span>` : ""}
+            </div>
             <button onclick="adicionarCarrinhoPorProduto(${JSON.stringify(p).replace(/"/g, '&quot;')})">Adicionar</button>
         `;
         container.appendChild(card);
@@ -86,14 +95,23 @@ async function carregarBebidas() {
     const bebidas = data.produtos.filter(p => p.categoria === "bebida");
     const container = document.getElementById("bebidas");
     container.innerHTML = "";
+    
     bebidas.forEach((p) => {
+        // LÓGICA DE DESCONTO PARA BEBIDAS TBM
+        const temDesconto = p.oldPrice && p.oldPrice > p.price;
+        const porcentagem = temDesconto ? Math.round(((p.oldPrice - p.price) / p.oldPrice) * 100) : 0;
+
         const card = document.createElement("div");
         card.className = "card-produto";
         card.innerHTML = `
             <img src="${p.image}">
             <h3>${p.title}</h3>
             <p>${p.ingredientes}</p>
-            <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
+            <div class="price-container">
+                <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
+                ${temDesconto ? `<span class="old-price">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
+                ${temDesconto ? `<span class="badge-desconto">-${porcentagem}%</span>` : ""}
+            </div>
             <button onclick="adicionarCarrinhoPorProduto(${JSON.stringify(p).replace(/"/g, '&quot;')})">Adicionar</button>
         `;
         container.appendChild(card);
@@ -117,7 +135,7 @@ function carregarCarrinhoStorage() {
 
 function adicionarCarrinhoPorProduto(p) {
     if (!LOJA_ABERTA) {
-        // Pega a frase que o dono digitou no ADM e guardamos na variável
+        // Mostra a mensagem exata que o ADM escreveu
         alert(MENSAGEM_FECHADA); 
         return;
     }
@@ -151,7 +169,6 @@ function fecharCarrinho() { document.getElementById("cart-modal").style.display 
 function abrirDelivery() { 
     fecharCarrinho(); 
     document.getElementById("delivery-modal").style.display = "flex";
-    // Garante que ao abrir, o formulário apareça e o resumo suma
     document.getElementById("form-entrega").style.display = "block";
     document.getElementById("resumo-pedido").style.display = "none";
 }
@@ -173,7 +190,7 @@ async function calcularTaxa(endereco) {
 }
 
 // ==================================================
-// MOSTRAR RESUMO (AJUSTADO PARA NÃO AMPLIAR)
+// MOSTRAR RESUMO
 // ==================================================
 async function mostrarResumo() {
     const loadingEl = document.getElementById("loading-taxa");
@@ -181,22 +198,18 @@ async function mostrarResumo() {
     const formEl = document.getElementById("form-entrega");
     const modalContent = document.querySelector("#delivery-modal .modal-content");
 
-    // Validação simples
     if (!document.getElementById("rua").value || !document.getElementById("nomeCliente").value) {
         alert("Por favor, preencha nome e endereço.");
         return;
     }
 
-    // 1. ESCONDE O FORMULÁRIO IMEDIATAMENTE (Evita o erro de zoom)
     formEl.style.display = "none";
     loadingEl.style.display = "flex";
     
-    // Centraliza o scroll do modal no topo
     if(modalContent) modalContent.scrollTop = 0;
 
     const endereco = `${rua.value}, ${numero.value}, ${bairro.value}, ${cidade.value}`;
     
-    // Timer forçado de 3 segundos + Cálculo
     const timer = new Promise(resolve => setTimeout(resolve, 3000));
     const calculo = calcularTaxa(endereco);
 
@@ -215,13 +228,12 @@ async function mostrarResumo() {
         document.getElementById("resumo-taxa").innerText = `Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}`;
         document.getElementById("resumo-total").innerText = `Total: R$ ${(subtotal + taxaEntregaCalculada).toFixed(2).replace(".", ",")}`;
 
-        // 2. TROCA PARA O RESUMO
         loadingEl.style.display = "none";
         resumoEl.style.display = "block";
 
     } catch (error) {
         loadingEl.style.display = "none";
-        formEl.style.display = "block"; // Volta se der erro
+        formEl.style.display = "block";
         alert("Erro ao calcular a distância. Verifique o endereço.");
     }
 }
@@ -274,16 +286,3 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
