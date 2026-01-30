@@ -480,25 +480,26 @@ input, select, textarea {
 }
 
 
+
 /* ============================= */
-/* ============================= */
-/* STATUS DA LOJA (SÓ TEXTO)     */
-/* ============================= */
-/* STATUS (ABAIXO DA LOGO)       */
-/* ============================= */
+/* ============================================================ */
+/* STATUS (ABERTO/FECHADO) - AJUSTE FINAL DE ALINHAMENTO        */
+/* ============================================================ */
 .status {
     display: block !important;
     text-align: left;
-    font-size: 13px; /* Tamanho discreto */
-    font-weight: 800;
+    font-size: 14px;
+    font-weight: 900;
     text-transform: uppercase;
     background: none !important;
     border: none !important;
-    box-shadow: none !important;
     padding: 0;
-    /* O margin-left de 16px costuma alinhar com a margem dos cards abaixo */
-    margin: 25px 0 10px 16px;
-    letter-spacing: 0.5px;
+
+    /* AJUSTE AQUI: Mude o 20px para alinhar perfeitamente com o preço */
+    /* Se precisar descer mais, aumente para 22px ou 25px */
+    margin: 20px 0 10px 16px; 
+    
+    letter-spacing: -0.5px;
 }
 
 .status.aberto { color: #2ecc71 !important; }
@@ -559,5 +560,6 @@ input, select, textarea {
 .card-produto button:active {
     transform: scale(0.98);
 }
+
 
 
