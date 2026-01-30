@@ -483,60 +483,77 @@ input, select, textarea {
 /* ============================= */
 /* ============================= */
 /* STATUS DA LOJA (SÓ TEXTO)     */
-/* STATUS ABAIXO DA LOGO */
+/* ============================= */
+/* STATUS (ABAIXO DA LOGO)       */
+/* ============================= */
 .status {
     display: block !important;
-    text-align: left; /* Garante alinhamento à esquerda */
-    font-size: 14px;
-    font-weight: 900;
+    text-align: left;
+    font-size: 13px; /* Tamanho discreto */
+    font-weight: 800;
     text-transform: uppercase;
     background: none !important;
     border: none !important;
+    box-shadow: none !important;
     padding: 0;
-    margin: -2px 0 15px 20px; /* Ajuste o 20px para alinhar com o 'K' da logo */
-    letter-spacing: -0.5px;
+    /* O margin-left de 16px costuma alinhar com a margem dos cards abaixo */
+    margin: -5px 0 15px 16px; 
+    letter-spacing: 0.5px;
 }
 
 .status.aberto { color: #2ecc71 !important; }
 .status.fechado { color: #e74c3c !important; }
 
-/* CONTAINER DE PREÇO ALINHADO */
+/* ============================= */
+/* CONTAINER DE PREÇO            */
+/* ============================= */
 .price-container {
     padding: 0 16px;
     display: flex;
-    align-items: center;
-    gap: 6px;
-    height: 30px; /* ALTURA FIXA: Impede o desalinhamento dos cards */
-    margin-top: 5px;
-    margin-bottom: 15px;
+    align-items: baseline; /* Alinha os textos pela base */
+    gap: 8px;
+    height: 35px; /* Altura fixa para alinhar os botões de todos os cards */
+    margin-bottom: 10px;
 }
 
 .price-container strong {
-    font-size: 1.1rem;
+    font-size: 1.2rem;
     color: #000;
-    white-space: nowrap;
 }
 
 .old-price {
     text-decoration: line-through;
     color: #999;
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: 400;
 }
 
-.badge-desconto {
-    background: #2ecc71;
-    color: #fff;
-    font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 4px; /* Quadrado levemente arredondado como na foto */
-    font-weight: 700;
-    line-height: 1.2;
-}
+/* Badge de porcentagem removido para visual clean */
 
-/* GARANTE QUE O BOTÃO FIQUE SEMPRE NO MESMO LUGAR */
+/* ============================= */
+/* CARD E BOTÃO (ESTILO FULL)    */
+/* ============================= */
 .card-produto {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    /* Adicione um background e border-radius se não tiver no seu arquivo original */
+}
+
+.card-produto button {
+    width: calc(100% - 32px); /* Ocupa a largura total menos as margens */
+    margin: 0 16px 16px 16px; /* Margens laterais e inferior */
+    padding: 12px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.card-produto button:active {
+    transform: scale(0.98); /* Efeito de clique */
 }
