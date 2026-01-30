@@ -1,0 +1,133 @@
+/* Configurações Gerais */
+
+body {
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: #121212;
+    color: #e0e0e0;
+    padding: 20px;
+    margin: 0;
+}
+
+h2 {
+    text-align: center;
+    color: #ffcc00;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+}
+
+#lista-pedidos {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+
+/* Card do Pedido */
+
+.pedido-card {
+    background: #1e1e1e;
+    border-left: 6px solid #ffcc00;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    list-style: none;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pedido-card h3 {
+    margin: 0 0 10px 0;
+    color: #ffcc00;
+    display: flex;
+    justify-content: space-between;
+}
+
+
+/* Detalhes do Endereço e Itens */
+
+.info-entrega {
+    color: #bbb;
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.itens-lista {
+    background: #2a2a2a;
+    padding: 15px;
+    border-radius: 6px;
+    margin: 10px 0;
+    border: 1px solid #333;
+}
+
+.item-linha {
+    display: flex;
+    justify-content: space-between;
+    padding: 3px 0;
+    border-bottom: 1px solid #333;
+}
+
+.total-container {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 10px;
+    text-align: right;
+}
+
+
+/* Botões */
+
+.btn-imprimir {
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+    margin-top: 15px;
+    transition: background 0.2s;
+}
+
+.btn-imprimir:hover {
+    background: #128C7E;
+}
+
+
+/* Regras de Impressão */
+
+@media print {
+    .btn-imprimir,
+    h2 {
+        display: none;
+    }
+    body {
+        background: white;
+        color: black;
+        padding: 0;
+    }
+    .pedido-card {
+        border: 1px solid #000;
+        background: white;
+        color: black;
+        box-shadow: none;
+        margin: 0;
+        padding: 10px;
+    }
+    .itens-lista {
+        background: white;
+        border: 1px solid #ccc;
+        color: black;
+    }
+}
