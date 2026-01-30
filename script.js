@@ -240,3 +240,21 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
+
+
+//RECEBER PEDIDOS
+// O espelhamento acontece aqui
+db.ref('pedidos').on('child_added', (snapshot) => {
+    const pedido = snapshot.val();
+    
+    // Mostra o pedido no console para teste
+    console.log("Novo pedido recebido!", pedido);
+
+    // 1. Toca um som de aviso (opcional)
+    // new Audio('aviso.mp3').play();
+
+    // 2. Manda para a impressora
+    window.print(); 
+});
+
