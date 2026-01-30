@@ -493,7 +493,7 @@ input, select, textarea {
     top: 40px; 
     
     /* DISTÂNCIA DA ESQUERDA: 0 ou 5px cola no canto */
-    left: 10px; 
+    left: 15px; 
 
     /* ESTILO DO TEXTO */
     display: block !important;
@@ -577,6 +577,7 @@ input, select, textarea {
 .card-produto button:active {
     transform: scale(0.98);
 }
+
 
 
 
