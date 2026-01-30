@@ -506,3 +506,9 @@ input, select, textarea {
     color: #c62828;      /* Vermelho escuro */
     border: 1px solid #ffcdd2;
 }
+#status-loja {
+    min-width: 100px;
+    min-height: 20px;
+    background: orange !important; /* Cor de teste */
+    display: block !important;
+}
