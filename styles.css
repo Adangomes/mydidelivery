@@ -507,8 +507,6 @@ input, select, textarea {
     border: 1px solid #ffcdd2;
 }
 #status-loja {
-    min-width: 100px;
-    min-height: 20px;
-    background: orange !important; /* Cor de teste */
-    display: block !important;
+    background: none !important; /* Remove o laranja */
+    display: inline-flex !important;
 }
