@@ -506,43 +506,45 @@ input, select, textarea {
 
 /* ============================= */
 /* CONTAINER DE PREÇO            */
-/* ============================= */
+/* CONTAINER DE PREÇO - ALINHAMENTO LADO A LADO */
 .price-container {
     padding: 0 16px;
     display: flex;
-    align-items: baseline; /* Alinha os textos pela base */
-    gap: 8px;
-    height: 35px; /* Altura fixa para alinhar os botões de todos os cards */
+    flex-direction: row; /* Força ficar na mesma linha */
+    align-items: baseline; /* Alinha os textos pela base (chão da letra) */
+    gap: 6px; /* Espaço curto entre o preço novo e o antigo */
+    height: 35px; 
     margin-bottom: 10px;
 }
 
+/* PREÇO ATUAL (DESTAQUE) */
 .price-container strong {
-    font-size: 1.2rem;
+    font-size: 1.1rem; /* Um pouco menor para garantir que caiba tudo */
     color: #000;
+    white-space: nowrap; /* Não deixa o preço quebrar linha */
 }
 
+/* PREÇO ANTIGO (BEM PEQUENO E DISCRETO) */
 .old-price {
     text-decoration: line-through;
-    color: #999;
-    font-size: 0.9rem;
+    color: #a0a0a0; 
+    font-size: 0.75rem; /* REDUZIDO: Para dar o contraste de tamanho que você quer */
     font-weight: 400;
+    white-space: nowrap;
 }
 
-/* Badge de porcentagem removido para visual clean */
-
 /* ============================= */
-/* CARD E BOTÃO (ESTILO FULL)    */
+/* CARD E BOTÃO (SEM ALTERAÇÃO)  */
 /* ============================= */
 .card-produto {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    /* Adicione um background e border-radius se não tiver no seu arquivo original */
 }
 
 .card-produto button {
-    width: calc(100% - 32px); /* Ocupa a largura total menos as margens */
-    margin: 0 16px 16px 16px; /* Margens laterais e inferior */
+    width: calc(100% - 32px); 
+    margin: 0 16px 16px 16px; 
     padding: 12px;
     background-color: #000;
     color: #fff;
@@ -555,5 +557,5 @@ input, select, textarea {
 }
 
 .card-produto button:active {
-    transform: scale(0.98); /* Efeito de clique */
+    transform: scale(0.98);
 }
