@@ -3,46 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <title>Painel Admin - KingsBurguer</title>
-    <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a1a; color: white; padding: 20px; }
-        #lista-pedidos { max-width: 800px; margin: 0 auto; }
-        .pedido-card { 
-            background: #2d2d2d; 
-            border-left: 8px solid #ffcc00; 
-            padding: 20px; 
-            margin-bottom: 20px; 
-            border-radius: 12px;
-            list-style: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            position: relative;
-        }
-        .pedido-card h3 { margin: 0 0 10px 0; color: #ffcc00; text-transform: uppercase; letter-spacing: 1px; }
-        .pedido-card p { margin: 5px 0; font-size: 1.1em; }
-        .itens-lista { background: #3d3d3d; padding: 10px; border-radius: 5px; margin: 10px 0; }
-        .btn-imprimir { 
-            background: #25D366; 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            font-weight: bold;
-            font-size: 1em;
-            transition: 0.3s;
-        }
-        .btn-imprimir:hover { background: #128C7E; }
-        
-        @media print { 
-            .btn-imprimir, h2 { display: none; } 
-            body { background: white; color: black; }
-            .pedido-card { border: 1px solid #000; background: white; color: black; box-shadow: none; }
-        }
-    </style>
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
     <div id="lista-pedidos">
-        <h2 style="text-align: center;">🍔 Gestão de Pedidos em Tempo Real</h2>
+        <h2>🍔 Gestão de Pedidos</h2>
         <ul id="pedidos-container" style="padding: 0;"></ul>
     </div>
 
@@ -50,17 +16,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
-        authDomain: "myproject26-10f0e.firebaseapp.com",
-        databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
-        projectId: "myproject26-10f0e",
-        storageBucket: "myproject26-10f0e.firebasestorage.app",
-        messagingSenderId: "884850608032",
-        appId: "1:884850608032:web:79db6983346c3c20edc6c5",
-        measurementId: "G-GZS299V6HM"
-      };
-
+      // ... (Suas configurações de Firebase Config aqui) ...
       firebase.initializeApp(firebaseConfig);
       const db = firebase.database();
 
@@ -68,33 +24,23 @@
           const pedido = snapshot.val();
           const container = document.getElementById('pedidos-container');
           
-          // Formatar a lista de itens corretamente
-          let itensHtml = "";
-          if (Array.isArray(pedido.itens)) {
-              itensHtml = pedido.itens.map(i => `<div>• ${i.qtd}x ${i.produto}</div>`).join('');
-          } else {
-              itensHtml = pedido.itens; 
-          }
+          let itensHtml = Array.isArray(pedido.itens) 
+              ? pedido.itens.map(i => `<div class="item-linha"><span>${i.qtd}x ${i.produto}</span> <span>R$ ${(i.precoUn * i.qtd).toFixed(2)}</span></div>`).join('')
+              : pedido.itens;
           
           const li = document.createElement('li');
           li.className = 'pedido-card';
           li.innerHTML = `
-              <h3>👤 ${pedido.cliente || 'Cliente'}</h3>
-              <p>📍 <strong>Endereço:</strong> ${pedido.endereco || 'Retirada'}</p>
-              <div class="itens-lista">
-                  <strong>Itens:</strong><br>
-                  ${itensHtml}
-              </div>
-              <p>💰 <strong>Total:</strong> R$ ${pedido.total.toFixed(2).replace('.', ',')}</p>
-              <small>📅 ${new Date(pedido.data).toLocaleString('pt-BR')}</small>
-              <br><br>
-              <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir Comanda</button>
+              <h3>👤 ${pedido.cliente}</h3>
+              <div class="info-entrega">📍 ${pedido.endereco}</div>
+              <div class="itens-lista">${itensHtml}</div>
+              <div class="total-container">TOTAL: R$ ${pedido.total.toFixed(2).replace('.', ',')}</div>
+              <small>⏰ ${new Date(pedido.data).toLocaleTimeString('pt-BR')}</small>
+              <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir Pedido</button>
           `;
           
           container.prepend(li);
-
-          const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
-          audio.play().catch(e => console.log("Aguardando interação para som."));
+          new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3').play().catch(() => {});
       });
     </script>
 </body>
