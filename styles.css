@@ -520,3 +520,27 @@ input, select, textarea {
     border-radius: 12px;
     font-weight: bold;
 }
+
+.precos {
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* O preço riscado */
+.precos span {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.8rem;
+}
+
+/* A porcentagem de desconto */
+.precos small {
+    background: #2ecc71;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
