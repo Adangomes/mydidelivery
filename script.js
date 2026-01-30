@@ -233,7 +233,7 @@ async function finalizarEntrega() {
     msgWhatsApp += `%0A *Cliente:* ${nomeCliente.value}%0A *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}%0A *Total:* R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
 
     try {
-        // Envia para o Firebase
+        // 1. Envia para o Firebase
         await db.ref('pedidos').push({
             cliente: nomeCliente.value,
             endereco: `${rua.value}, ${numero.value} - ${bairro.value}`,
@@ -244,11 +244,24 @@ async function finalizarEntrega() {
             status: "novo"
         });
         console.log("Pedido registrado no sistema!");
+
+        // 2. Monta o link e abre o WhatsApp ANTES de qualquer limpeza
+        const urlWhatsApp = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
+        window.open(urlWhatsApp, "_blank");
+
+        // 3. Limpa o carrinho e o formulário sem resetar a página inteira
+        carrinho = []; 
+        salvarCarrinho(); 
+        atualizarCarrinho(); // Zera a lista visualmente
+        fecharDelivery();    // Fecha o modal de entrega
+        
+        alert("Pedido enviado com sucesso! Verifique seu WhatsApp.");
+
     } catch (error) {
         console.error("Erro Firebase:", error);
+        alert("Erro ao salvar pedido, mas tente enviar pelo WhatsApp.");
+        window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`, "_blank");
     }
-
-    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`, "_blank");
     
     carrinho = []; 
     salvarCarrinho(); 
@@ -279,3 +292,4 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
