@@ -15,7 +15,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
-        // MESMA CONFIGURAÇÃO QUE VOCÊ USOU NO INDEX
         const firebaseConfig = {
             apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
             authDomain: "myproject26-10f0e.firebaseapp.com",
@@ -29,18 +28,16 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ESCUTADOR DE PEDIDOS
         db.ref('pedidos').on('child_added', (snapshot) => {
             const pedido = snapshot.val();
             const container = document.getElementById('pedidos-container');
             
-            // Formata os itens para exibir no card
             let itensHtml = Array.isArray(pedido.itens) 
                 ? pedido.itens.map(i => `<div class="item-linha"><span>${i.qtd}x ${i.produto}</span></div>`).join('')
                 : pedido.itens;
             
             const li = document.createElement('li');
-            li.className = 'pedido-card'; // Estilo definido no seu admin.css
+            li.className = 'pedido-card'; 
             li.innerHTML = `
                 <h3> ${pedido.cliente}</h3>
                 <div class="info-entrega"> ${pedido.endereco}</div>
@@ -48,22 +45,25 @@
                     <strong>Itens:</strong><br>
                     ${itensHtml}
                 </div>
-                <div class="total-container">TOTAL: R$ ${pedido.total.toFixed(2).replace('.', ',')}</div>
+                
+                <div style="margin-top: 10px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                    <div><strong>Obs:</strong> ${pedido.observacao || 'Nenhuma'}</div>
+                    <div style="font-size: 0.9em; margin-top: 5px;">Taxa Entrega: R$ ${(pedido.taxaEntrega || 0).toFixed(2).replace('.', ',')}</div>
+                    <div class="total-container" style="font-weight: bold; font-size: 1.2em;">TOTAL: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}</div>
+                </div>
+
                 <small> ${new Date(pedido.data).toLocaleTimeString('pt-BR')}</small>
                 <br>
                 <button class="btn-imprimir" onclick="window.print()"> Imprimir Pedido</button>
             `;
             
-            // Coloca o novo pedido no topo da lista
             container.prepend(li);
 
-          
-            // Som de Campainha de Recepção (mais nítido para cozinha)
-const som = new Audio('https://www.myinstants.com/media/sounds/ding-sound-effect_1.mp3');
-som.play().catch(() => console.log("Aguardando clique para ativar áudio."));
+            // Som de Alerta (Digital Watch Alarm)
+            const som = new Audio('https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg');
+            som.volume = 1.0; 
+            som.play().catch(() => console.log("Clique na tela para liberar o som."));
         });
     </script>
 </body>
 </html>
-
-
