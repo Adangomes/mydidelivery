@@ -541,7 +541,7 @@ input, select, textarea {
     
     /* Aumente o valor (ex: 2px, 3px) para DESCER o preço riscado */
     /* Diminua ou use negativo (ex: -1px) para SUBIR */
-    transform: translateY(11px); 
+    transform: translateY(15px); 
 }
 
 /* ============================= */
@@ -570,6 +570,7 @@ input, select, textarea {
 .card-produto button:active {
     transform: scale(0.98);
 }
+
 
 
 
