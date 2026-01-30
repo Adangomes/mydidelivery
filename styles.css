@@ -483,39 +483,38 @@ input, select, textarea {
 /* ============================= */
 /* ============================= */
 /* STATUS DA LOJA (SÓ TEXTO)     */
+/* STATUS ABAIXO DA LOGO */
 .status {
-    display: block; /* Garante que fique logo abaixo do nome */
-    font-size: 14px; /* Tamanho real da foto */
+    display: block !important;
+    text-align: left; /* Garante alinhamento à esquerda */
+    font-size: 14px;
     font-weight: 900;
     text-transform: uppercase;
     background: none !important;
     border: none !important;
-    box-shadow: none !important;
     padding: 0;
-    margin: -5px 16px 10px 16px; /* Sobe um pouco para colar na logo */
+    margin: -2px 0 15px 20px; /* Ajuste o 20px para alinhar com o 'K' da logo */
     letter-spacing: -0.5px;
 }
 
-.status.aberto { 
-    color: #2ecc71 !important; /* Verde vibrante da Kings Burger */
-}
+.status.aberto { color: #2ecc71 !important; }
+.status.fechado { color: #e74c3c !important; }
 
-.status.fechado { 
-    color: #e74c3c !important; /* Vermelho vibrante */
-}
-
+/* CONTAINER DE PREÇO ALINHADO */
 .price-container {
     padding: 0 16px;
     display: flex;
-    flex-direction: row; /* Força ficar um do lado do outro */
-    align-items: center; 
-    gap: 8px;
-    margin-bottom: 12px;
+    align-items: center;
+    gap: 6px;
+    height: 30px; /* ALTURA FIXA: Impede o desalinhamento dos cards */
+    margin-top: 5px;
+    margin-bottom: 15px;
 }
 
 .price-container strong {
     font-size: 1.1rem;
     color: #000;
+    white-space: nowrap;
 }
 
 .old-price {
@@ -528,35 +527,16 @@ input, select, textarea {
 .badge-desconto {
     background: #2ecc71;
     color: #fff;
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 50px; /* Estilo pílula da foto */
-    font-weight: 700;
-    display: inline-block;
-    line-height: 1; /* Evita que a bolinha fique oval/estranha */
-}
-
-.precos {
-    padding: 0 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-/* O preço riscado */
-.precos span {
-    text-decoration: line-through;
-    color: #999;
-    font-size: 0.8rem;
-}
-
-/* A porcentagem de desconto */
-.precos small {
-    background: #2ecc71;
-    color: white;
+    font-size: 11px;
     padding: 2px 6px;
-    border-radius: 20px;
-    font-size: 0.7rem;
-    font-weight: bold;
+    border-radius: 4px; /* Quadrado levemente arredondado como na foto */
+    font-weight: 700;
+    line-height: 1.2;
 }
 
+/* GARANTE QUE O BOTÃO FIQUE SEMPRE NO MESMO LUGAR */
+.card-produto {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
