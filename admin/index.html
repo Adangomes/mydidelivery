@@ -4,36 +4,45 @@
     <meta charset="UTF-8">
     <title>Painel Admin - KingsBurguer</title>
     <style>
-        /* Estilo rápido para os pedidos não ficarem bagunçados */
-        body { font-family: Arial, sans-serif; background: #222; color: white; padding: 20px; }
-        #lista-pedidos { max-width: 600px; margin: 0 auto; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a1a; color: white; padding: 20px; }
+        #lista-pedidos { max-width: 800px; margin: 0 auto; }
         .pedido-card { 
-            background: #333; 
-            border-left: 5px solid #ffcc00; 
-            padding: 15px; 
-            margin-bottom: 15px; 
-            border-radius: 8px;
+            background: #2d2d2d; 
+            border-left: 8px solid #ffcc00; 
+            padding: 20px; 
+            margin-bottom: 20px; 
+            border-radius: 12px;
             list-style: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
         }
-        .pedido-card h3 { margin: 0 0 10px 0; color: #ffcc00; }
+        .pedido-card h3 { margin: 0 0 10px 0; color: #ffcc00; text-transform: uppercase; letter-spacing: 1px; }
+        .pedido-card p { margin: 5px 0; font-size: 1.1em; }
+        .itens-lista { background: #3d3d3d; padding: 10px; border-radius: 5px; margin: 10px 0; }
         .btn-imprimir { 
-            background: #ffcc00; 
-            color: #000; 
+            background: #25D366; 
+            color: white; 
             border: none; 
-            padding: 8px 15px; 
+            padding: 10px 20px; 
             border-radius: 5px; 
             cursor: pointer; 
             font-weight: bold;
-            margin-top: 10px;
+            font-size: 1em;
+            transition: 0.3s;
         }
-        /* Esconde o botão na hora da impressão real */
-        @media print { .btn-imprimir, h2 { display: none; } .pedido-card { border: 1px solid #000; color: #000; } }
+        .btn-imprimir:hover { background: #128C7E; }
+        
+        @media print { 
+            .btn-imprimir, h2 { display: none; } 
+            body { background: white; color: black; }
+            .pedido-card { border: 1px solid #000; background: white; color: black; box-shadow: none; }
+        }
     </style>
 </head>
 <body>
 
     <div id="lista-pedidos">
-        <h2>🍔 Pedidos Recentes</h2>
+        <h2 style="text-align: center;">🍔 Gestão de Pedidos em Tempo Real</h2>
         <ul id="pedidos-container" style="padding: 0;"></ul>
     </div>
 
@@ -55,34 +64,38 @@
       firebase.initializeApp(firebaseConfig);
       const db = firebase.database();
 
-      // ESCUTADOR DE PEDIDOS (Espelhamento)
       db.ref('pedidos').on('child_added', (snapshot) => {
           const pedido = snapshot.val();
-          
           const container = document.getElementById('pedidos-container');
           
-          // Criamos o HTML do pedido
+          // Formatar a lista de itens corretamente
+          let itensHtml = "";
+          if (Array.isArray(pedido.itens)) {
+              itensHtml = pedido.itens.map(i => `<div>• ${i.qtd}x ${i.produto}</div>`).join('');
+          } else {
+              itensHtml = pedido.itens; 
+          }
+          
           const li = document.createElement('li');
           li.className = 'pedido-card';
           li.innerHTML = `
-              <h3>Pedido de: ${pedido.cliente || 'Cliente'}</h3>
-              <p><strong>Itens:</strong> ${pedido.itens || 'Não especificado'}</p>
-              <p><strong>Total:</strong> R$ ${pedido.total || '0,00'}</p>
-              <small>${pedido.data || ''}</small>
-              <br>
-              <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+              <h3>👤 ${pedido.cliente || 'Cliente'}</h3>
+              <p>📍 <strong>Endereço:</strong> ${pedido.endereco || 'Retirada'}</p>
+              <div class="itens-lista">
+                  <strong>Itens:</strong><br>
+                  ${itensHtml}
+              </div>
+              <p>💰 <strong>Total:</strong> R$ ${pedido.total.toFixed(2).replace('.', ',')}</p>
+              <small>📅 ${new Date(pedido.data).toLocaleString('pt-BR')}</small>
+              <br><br>
+              <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir Comanda</button>
           `;
           
-          // Adiciona no topo da lista
           container.prepend(li);
 
-          // Toca um aviso sonoro
           const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
-          audio.play().catch(e => console.log("Som bloqueado pelo navegador até você interagir com a página."));
+          audio.play().catch(e => console.log("Aguardando interação para som."));
       });
     </script>
-
-    <script src="script.js"></script>
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </body>
 </html>
