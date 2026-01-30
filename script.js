@@ -35,7 +35,7 @@ async function carregarStatusLoja() {
 }
 
 // ==================================================
-// UI & INTERFACE
+// MOTOR DE RENDERIZAÇÃO
 // ==================================================
 function initSplash() {
     const splash = document.getElementById("splash");
@@ -50,49 +50,35 @@ function initMenu() {
     btn.onclick = () => menu.classList.toggle("open");
 }
 
-// ==================================================
-// MOTOR DE RENDERIZAÇÃO DE PRODUTOS
-// ==================================================
 async function carregarProdutos() {
     const container = document.getElementById("burgers");
     if (!container) return;
-
     try {
         const res = await fetch("/content/produtos.json");
         const data = await res.json();
         produtos = data.produtos;
         container.innerHTML = "";
-        
         produtos.forEach((p) => {
             if (p.categoria !== "burger") return;
             container.appendChild(criarCardProduto(p));
         });
-    } catch (error) {
-        console.error("Erro ao carregar produtos:", error);
-    }
+    } catch (error) { console.error("Erro produtos:", error); }
 }
 
 async function carregarBebidas() {
     const container = document.getElementById("bebidas");
     if (!container) return;
-
     try {
         const res = await fetch("/content/produtos.json");
         const data = await res.json();
         const bebidas = data.produtos.filter(p => p.categoria === "bebida");
         container.innerHTML = "";
-        
-        bebidas.forEach((p) => {
-            container.appendChild(criarCardProduto(p));
-        });
-    } catch (error) {
-        console.error("Erro ao carregar bebidas:", error);
-    }
+        bebidas.forEach((p) => { container.appendChild(criarCardProduto(p)); });
+    } catch (error) { console.error("Erro bebidas:", error); }
 }
 
 function criarCardProduto(p) {
     const temDesconto = p.oldPrice && p.oldPrice > p.price;
-
     const card = document.createElement("div");
     card.className = "card-produto";
     card.innerHTML = `
@@ -113,28 +99,18 @@ function criarCardProduto(p) {
 // ==================================================
 // LÓGICA DO CARRINHO
 // ==================================================
-function salvarCarrinho() {
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-}
+function salvarCarrinho() { localStorage.setItem("carrinho", JSON.stringify(carrinho)); }
 
 function carregarCarrinhoStorage() {
     const dados = localStorage.getItem("carrinho");
-    if (dados) {
-        carrinho = JSON.parse(dados);
-        atualizarCarrinho();
-    }
+    if (dados) { carrinho = JSON.parse(dados); atualizarCarrinho(); }
 }
 
 function adicionarCarrinhoPorProduto(p) {
-    if (!LOJA_ABERTA) {
-        alert(MENSAGEM_FECHADA); 
-        return;
-    }
+    if (!LOJA_ABERTA) { alert(MENSAGEM_FECHADA); return; }
     const item = carrinho.find(i => i.title === p.title);
     if (item) { item.qtd++; } else { carrinho.push({ ...p, qtd: 1 }); }
-    salvarCarrinho();
-    atualizarCarrinho();
-    mostrarToast();
+    salvarCarrinho(); atualizarCarrinho(); mostrarToast();
 }
 
 function atualizarCarrinho() {
@@ -177,52 +153,41 @@ async function mostrarResumo() {
     const loadingEl = document.getElementById("loading-taxa");
     const resumoEl = document.getElementById("resumo-pedido");
     const formEl = document.getElementById("form-entrega");
-    const modalContent = document.querySelector("#delivery-modal .modal-content");
-
     if (!document.getElementById("rua").value || !document.getElementById("nomeCliente").value) {
-        alert("Por favor, preencha nome e endereço.");
-        return;
+        alert("Por favor, preencha nome e endereço."); return;
     }
-
     formEl.style.display = "none";
     loadingEl.style.display = "flex";
-    if(modalContent) modalContent.scrollTop = 0;
-
     const endereco = `${rua.value}, ${numero.value}, ${bairro.value}, ${cidade.value}`;
-    const timer = new Promise(resolve => setTimeout(resolve, 3000));
-    const calculo = calcularTaxa(endereco);
-
     try {
-        const [taxa] = await Promise.all([calculo, timer]);
+        const taxa = await calcularTaxa(endereco);
         taxaEntregaCalculada = taxa;
         let subtotal = 0;
         carrinho.forEach(i => subtotal += i.price * i.qtd);
-
         document.getElementById("resumo-itens").innerHTML = carrinho.map(i => `<p>• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}</p>`).join("");
         document.getElementById("resumo-taxa").innerText = `Taxa de entrega: R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}`;
         document.getElementById("resumo-total").innerText = `Total: R$ ${(subtotal + taxaEntregaCalculada).toFixed(2).replace(".", ",")}`;
-
         loadingEl.style.display = "none";
         resumoEl.style.display = "block";
-    } catch (error) {
-        loadingEl.style.display = "none";
-        formEl.style.display = "block";
-        alert("Erro no endereço.");
+    } catch (error) { 
+        loadingEl.style.display = "none"; formEl.style.display = "block"; alert("Erro no endereço."); 
     }
 }
 
 // ==================================================
-// FINALIZAR E ENVIAR PARA FIREBASE + WHATSAPP (AJUSTADO)
+// FINALIZAR PEDIDO (FIREBASE + WHATSAPP)
 // ==================================================
 async function finalizarEntrega() {
     if (typeof db === 'undefined') {
-        alert("Erro: Banco de dados não inicializado no HTML.");
-        return;
+        alert("Erro: Banco de dados não inicializado."); return;
     }
 
+    // Pega a observação pelo ID correto: "observacao"
+    const obsCampo = document.getElementById("observacao");
+    const observacao = obsCampo ? obsCampo.value : "Nenhuma";
+
     let subtotal = 0;
-    let msgWhatsApp = "*NOVO PEDIDO - KINGS BURGUER*%0A";
-    msgWhatsApp += " _Prepararemos tudo com muito carinho!_%0A%0A";
+    let msgWhatsApp = " *NOVO PEDIDO *%0A%0A";
     
     const itensPedido = carrinho.map(i => {
         subtotal += i.price * i.qtd;
@@ -231,59 +196,56 @@ async function finalizarEntrega() {
     });
 
     const totalGeral = subtotal + taxaEntregaCalculada;
-    msgWhatsApp += `%0A *Cliente:* ${nomeCliente.value}`;
-    msgWhatsApp += `%0A *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}`;
-    msgWhatsApp += `%0A *Total:* R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
+
+    // Montando o corpo da mensagem
+    msgWhatsApp += `%0A---------------------------%0A`;
+    msgWhatsApp += ` *Subtotal:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += ` *TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += `---------------------------%0A`;
+    msgWhatsApp += ` *Cliente:* ${nomeCliente.value}%0A`;
+    msgWhatsApp += `📍 *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}%0A`;
+    msgWhatsApp += ` *Obs:* ${observacao}%0A%0A`;
+    msgWhatsApp += ` _Prepararemos tudo com muito carinho!_`;
 
     try {
-        // 1. Envia para o Firebase (Painel Pedidos.html)
         await db.ref('pedidos').push({
             cliente: nomeCliente.value,
             endereco: `${rua.value}, ${numero.value} - ${bairro.value}`,
             itens: itensPedido,
+            subtotal: subtotal,
             taxaEntrega: taxaEntregaCalculada,
             total: totalGeral,
+            observacao: observacao,
             data: new Date().toISOString(),
             status: "novo"
         });
         
-        // 2. Limpeza total do sistema local
         carrinho = []; 
         salvarCarrinho(); 
         atualizarCarrinho(); 
         fecharDelivery();
 
-        // 3. Redireciona para o WhatsApp (Aba atual para evitar bloqueio de pop-up)
-        const urlWhatsApp = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
-        window.location.href = urlWhatsApp;
+        // Vai direto para o WhatsApp
+        window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
 
     } catch (error) {
         console.error("Erro Firebase:", error);
-        // Se o Firebase falhar, ainda assim tentamos enviar o WhatsApp
         window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
     }
 }
 
 // ==================================================
-// INICIALIZAÇÃO E FEEDBACK
+// INICIALIZAÇÃO
 // ==================================================
 document.addEventListener("DOMContentLoaded", () => {
-    initSplash();
-    initMenu();
-    carregarStatusLoja();
-    carregarProdutos();
-    carregarBebidas();
-    carregarCarrinhoStorage();
+    initSplash(); initMenu(); carregarStatusLoja();
+    carregarProdutos(); carregarBebidas(); carregarCarrinhoStorage();
 });
 
 function mostrarToast() {
     const toast = document.getElementById("toast");
-    const cart = document.querySelector(".cart");
-    if (!toast || !cart) return;
+    if (!toast) return;
     toast.classList.add("show");
-    cart.classList.add("bounce");
-    setTimeout(() => {
-        toast.classList.remove("show");
-        cart.classList.remove("bounce");
-    }, 2000);
+    setTimeout(() => { toast.classList.remove("show"); }, 2000);
 }
