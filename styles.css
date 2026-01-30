@@ -482,31 +482,28 @@ input, select, textarea {
 /* ============================= */
 /* STATUS DA LOJA (ADICIONADO)   */
 /* ============================= */
+/* ============================= */
+/* STATUS DA LOJA (SÓ TEXTO)     */
+/* ============================= */
 .status {
     display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 14px;
-    border-radius: 50px; /* Estilo pílula */
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     font-weight: 700;
-    margin: 10px 16px; /* Alinhado com o padding das seções */
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    margin: 10px 16px;
+    text-transform: uppercase;
+    background: none !important; /* Remove qualquer fundo */
+    border: none !important;     /* Remove qualquer borda */
+    box-shadow: none !important; /* Remove a sombra */
 }
 
 .status.aberto {
-    background: #e8f5e9; /* Verde clarinho */
-    color: #2e7d32;      /* Verde escuro para leitura */
-    border: 1px solid #c8e6c9;
+    color: #2e7d32; /* Só a cor verde */
 }
 
 .status.fechado {
-    background: #ffebee; /* Vermelho clarinho */
-    color: #c62828;      /* Vermelho escuro */
-    border: 1px solid #ffcdd2;
+    color: #c62828; /* Só a cor vermelha */
 }
+
 #status-loja {
-    background: none !important; /* Remove o laranja */
     display: inline-flex !important;
 }
