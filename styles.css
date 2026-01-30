@@ -515,7 +515,7 @@ input, select, textarea {
     align-items: baseline; /* Alinha os textos pela base (chão da letra) */
     gap: 6px; /* Espaço curto entre o preço novo e o antigo */
     height: 35px; 
-    margin-bottom: 6px;
+    margin-bottom: 10px;
 }
 
 /* PREÇO ATUAL (DESTAQUE) */
@@ -537,11 +537,11 @@ input, select, textarea {
     white-space: nowrap;
 
     /* AJUSTE DE ALTURA: */
-    display: inline-block; /* Necessário para o movimento funcionar */
+    display:inline-block; /* Necessário para o movimento funcionar */
     
     /* Aumente o valor (ex: 2px, 3px) para DESCER o preço riscado */
     /* Diminua ou use negativo (ex: -1px) para SUBIR */
-    transform: translateY(2px); 
+    transform: translateY(8px); 
 }
 
 /* ============================= */
@@ -570,6 +570,7 @@ input, select, textarea {
 .card-produto button:active {
     transform: scale(0.98);
 }
+
 
 
 
