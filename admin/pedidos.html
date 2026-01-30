@@ -58,9 +58,11 @@
             container.prepend(li);
 
             // Alerta Sonoro
-            const som = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
-            som.play().catch(() => console.log("Som aguardando clique na página."));
+            // Som de Campainha de Recepção (mais nítido para cozinha)
+const som = new Audio('https://www.myinstants.com/media/sounds/ding-sound-effect_1.mp3');
+som.play().catch(() => console.log("Aguardando clique para ativar áudio."));
         });
     </script>
 </body>
 </html>
+
