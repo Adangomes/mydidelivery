@@ -495,9 +495,9 @@ input, select, textarea {
     border: none !important;
     padding: 0;
 
-    /* AJUSTE AQUI: Mude o 20px para alinhar perfeitamente com o preço */
-    /* Se precisar descer mais, aumente para 22px ou 25px */
-    margin: 20px 0 0px 16px; 
+    /* [CIMA]: 35px empurra para baixo */
+    /* [ESQUERDA]: 0 cola no canto da tela */
+    margin: 35px 0 10px 0; 
     
     letter-spacing: -0.5px;
 }
@@ -570,6 +570,7 @@ input, select, textarea {
 .card-produto button:active {
     transform: scale(0.98);
 }
+
 
 
 
