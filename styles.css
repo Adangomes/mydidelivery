@@ -479,31 +479,22 @@ input, select, textarea {
     to { transform: rotate(360deg); }
 }
 
-/* ============================= */
-/* STATUS DA LOJA (ADICIONADO)   */
+
 /* ============================= */
 /* ============================= */
 /* STATUS DA LOJA (SÓ TEXTO)     */
-/* ============================= */
 .status {
     display: inline-flex;
-    font-size: 0.85rem;
-    font-weight: 700;
-    margin: 10px 16px;
+    font-size: 0.75rem; /* Menor para ser discreto */
+    font-weight: 800;
     text-transform: uppercase;
-    background: none !important; /* Remove qualquer fundo */
-    border: none !important;     /* Remove qualquer borda */
-    box-shadow: none !important; /* Remove a sombra */
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0; 
+    margin: 5px 0; /* Ajuste para alinhar com a logo */
 }
 
-.status.aberto {
-    color: #2e7d32; /* Só a cor verde */
-}
+.status.aberto { color: #2ecc71; }
+.status.fechado { color: #e74c3c; }
 
-.status.fechado {
-    color: #c62828; /* Só a cor vermelha */
-}
-
-#status-loja {
-    display: inline-flex !important;
-}
