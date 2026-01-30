@@ -11,28 +11,40 @@
         <ul id="pedidos-container"></ul>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyBvf6CW0LKrrD649TM86LgaF6KJj...", // Complete com sua chave da imagem
-        authDomain: "mydi-9402e.firebaseapp.com",
-        databaseURL: "https://mydi-9402e-default-rtdb.firebaseio.com",
-        projectId: "mydi-9402e",
-        storageBucket: "mydi-9402e.firebasestorage.app",
-        messagingSenderId: "599519176551",
-        appId: "1:599519176551:web:e2d7fc63fbe49e2..."
-      };
+<script>
+  // Suas chaves novas do Myproject26
+  const firebaseConfig = {
+    apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
+    authDomain: "myproject26-10f0e.firebaseapp.com",
+    databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com", // Adicionei seu link do banco
+    projectId: "myproject26-10f0e",
+    storageBucket: "myproject26-10f0e.firebasestorage.app",
+    messagingSenderId: "884850608032",
+    appId: "1:884850608032:web:79db6983346c3c20edc6c5",
+    measurementId: "G-GZS299V6HM"
+  };
 
-      // Inicia o Firebase
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.database();
-    </script>
+  // Inicializa o Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
+  // ESCUTADOR DE PEDIDOS (O Espelhamento)
+  db.ref('pedidos').on('child_added', (snapshot) => {
+      const pedido = snapshot.val();
+      console.log("Chegou um pedido novo!", pedido);
+      
+      // Aqui você coloca a função para mostrar na tela e imprimir
+      // alert("Novo Pedido!");
+      // window.print();
+  });
+</script>
     <script src="script.js"></script>
 
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
 </body>
 </html>
+
