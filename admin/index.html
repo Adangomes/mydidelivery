@@ -2,49 +2,87 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Admin</title>
+    <title>Painel Admin - KingsBurguer</title>
+    <style>
+        /* Estilo rápido para os pedidos não ficarem bagunçados */
+        body { font-family: Arial, sans-serif; background: #222; color: white; padding: 20px; }
+        #lista-pedidos { max-width: 600px; margin: 0 auto; }
+        .pedido-card { 
+            background: #333; 
+            border-left: 5px solid #ffcc00; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border-radius: 8px;
+            list-style: none;
+        }
+        .pedido-card h3 { margin: 0 0 10px 0; color: #ffcc00; }
+        .btn-imprimir { 
+            background: #ffcc00; 
+            color: #000; 
+            border: none; 
+            padding: 8px 15px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        /* Esconde o botão na hora da impressão real */
+        @media print { .btn-imprimir, h2 { display: none; } .pedido-card { border: 1px solid #000; color: #000; } }
+    </style>
 </head>
 <body>
 
     <div id="lista-pedidos">
-        <h2>Pedidos Recentes</h2>
-        <ul id="pedidos-container"></ul>
+        <h2>🍔 Pedidos Recentes</h2>
+        <ul id="pedidos-container" style="padding: 0;"></ul>
     </div>
 
-   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<script>
-  // Suas chaves novas do Myproject26
-  const firebaseConfig = {
-    apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
-    authDomain: "myproject26-10f0e.firebaseapp.com",
-    databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com", // Adicionei seu link do banco
-    projectId: "myproject26-10f0e",
-    storageBucket: "myproject26-10f0e.firebasestorage.app",
-    messagingSenderId: "884850608032",
-    appId: "1:884850608032:web:79db6983346c3c20edc6c5",
-    measurementId: "G-GZS299V6HM"
-  };
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
+        authDomain: "myproject26-10f0e.firebaseapp.com",
+        databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
+        projectId: "myproject26-10f0e",
+        storageBucket: "myproject26-10f0e.firebasestorage.app",
+        messagingSenderId: "884850608032",
+        appId: "1:884850608032:web:79db6983346c3c20edc6c5",
+        measurementId: "G-GZS299V6HM"
+      };
 
-  // Inicializa o Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
 
-  // ESCUTADOR DE PEDIDOS (O Espelhamento)
-  db.ref('pedidos').on('child_added', (snapshot) => {
-      const pedido = snapshot.val();
-      console.log("Chegou um pedido novo!", pedido);
-      
-      // Aqui você coloca a função para mostrar na tela e imprimir
-      // alert("Novo Pedido!");
-      // window.print();
-  });
-</script>
+      // ESCUTADOR DE PEDIDOS (Espelhamento)
+      db.ref('pedidos').on('child_added', (snapshot) => {
+          const pedido = snapshot.val();
+          
+          const container = document.getElementById('pedidos-container');
+          
+          // Criamos o HTML do pedido
+          const li = document.createElement('li');
+          li.className = 'pedido-card';
+          li.innerHTML = `
+              <h3>Pedido de: ${pedido.cliente || 'Cliente'}</h3>
+              <p><strong>Itens:</strong> ${pedido.itens || 'Não especificado'}</p>
+              <p><strong>Total:</strong> R$ ${pedido.total || '0,00'}</p>
+              <small>${pedido.data || ''}</small>
+              <br>
+              <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+          `;
+          
+          // Adiciona no topo da lista
+          container.prepend(li);
+
+          // Toca um aviso sonoro
+          const audio = new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3');
+          audio.play().catch(e => console.log("Som bloqueado pelo navegador até você interagir com a página."));
+      });
+    </script>
+
     <script src="script.js"></script>
-
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-    <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
 </body>
 </html>
-
