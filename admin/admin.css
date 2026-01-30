@@ -130,4 +130,50 @@ h2 {
         border: 1px solid #ccc;
         color: black;
     }
+
+}
+
+
+/* Estilo do Card de Pedido */
+.pedido-card { 
+    border-left: 10px solid #e74c3c; 
+    margin-bottom: 20px; 
+    padding: 20px; 
+    background: #fff; 
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+    border-radius: 8px; 
+    list-style: none;
+    animation: piscarBorda 1.5s infinite alternate;
+}
+
+/* Animacao para chamar atencao na cozinha */
+@keyframes piscarBorda {
+    from { border-left-color: #e74c3c; }
+    to { border-left-color: #f1c40f; }
+}
+
+.obs-alerta { 
+    background: #fff3cd; 
+    color: #856404; 
+    padding: 10px; 
+    border-radius: 5px; 
+    font-weight: bold; 
+    margin: 10px 0; 
+    border: 1px solid #ffeeba; 
+}
+
+.total-container { 
+    font-size: 1.5em; 
+    color: #27ae60; 
+    font-weight: bold; 
+    text-align: right; 
+}
+
+.header-status { 
+    background: #2c3e50; 
+    color: white; 
+    padding: 15px; 
+    text-align: center; 
+    border-radius: 8px; 
+    margin-bottom: 20px; 
 }
