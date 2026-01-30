@@ -22,26 +22,18 @@ async function carregarStatusLoja() {
     if (!statusEl) return;
 
     try {
-        // Tentamos carregar o arquivo. 
-        // Se estiver no Netlify, o caminho 'content/status.json' é o mais seguro.
         const res = await fetch('content/status.json');
-        
-        if (!res.ok) throw new Error("Não achei o arquivo JSON");
-
         const data = await res.json();
+        
         LOJA_ABERTA = data.aberto;
-        
-        // Inserimos o texto e as classes que você criou no CSS
-        statusEl.innerHTML = LOJA_ABERTA ? "🟢 ABERTO" : "🔴 FECHADO";
+        // Pega a mensagem do ADM ou usa um padrão se estiver vazio
+        const mensagemADM = data.mensagem || (LOJA_ABERTA ? "🟢 ABERTO" : "🔴 FECHADO");
+
+        statusEl.innerHTML = mensagemADM;
         statusEl.className = "status " + (LOJA_ABERTA ? "aberto" : "fechado");
-        
-        console.log("Status carregado com sucesso:", LOJA_ABERTA);
 
     } catch (e) {
-        console.error("Erro ao carregar status:", e);
-        // Se der erro, mostramos um aviso visual para você saber
-        statusEl.innerHTML = "⚠️ STATUS INDISPONÍVEL";
-        statusEl.style.background = "#eee";
+        console.error("Erro ao carregar status", e);
     }
 }
 // ==================================================
@@ -281,6 +273,7 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
 
 
 
