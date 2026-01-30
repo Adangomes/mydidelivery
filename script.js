@@ -260,6 +260,7 @@ function finalizarEntrega() {
 document.addEventListener("DOMContentLoaded", () => {
     initSplash();
     initMenu();
+    carregarStatusLoja();
     carregarProdutos();
     carregarBebidas();
     carregarCarrinhoStorage();
@@ -276,6 +277,7 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
 
 
 
