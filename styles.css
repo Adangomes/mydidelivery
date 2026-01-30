@@ -498,3 +498,25 @@ input, select, textarea {
 .status.aberto { color: #2ecc71; }
 .status.fechado { color: #e74c3c; }
 
+.price-container {
+    padding: 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.8rem;
+}
+
+.badge-desconto {
+    background: #2ecc71;
+    color: #fff;
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 12px;
+    font-weight: bold;
+}
