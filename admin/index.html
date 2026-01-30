@@ -1,47 +1,12 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Painel Admin - KingsBurguer</title>
-    <link rel="stylesheet" href="admin.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Administrativo - Kings Burguer</title>
+  <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-
-    <div id="lista-pedidos">
-        <h2>🍔 Gestão de Pedidos</h2>
-        <ul id="pedidos-container" style="padding: 0;"></ul>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-    <script>
-      // ... (Suas configurações de Firebase Config aqui) ...
-      firebase.initializeApp(firebaseConfig);
-      const db = firebase.database();
-
-      db.ref('pedidos').on('child_added', (snapshot) => {
-          const pedido = snapshot.val();
-          const container = document.getElementById('pedidos-container');
-          
-          let itensHtml = Array.isArray(pedido.itens) 
-              ? pedido.itens.map(i => `<div class="item-linha"><span>${i.qtd}x ${i.produto}</span> <span>R$ ${(i.precoUn * i.qtd).toFixed(2)}</span></div>`).join('')
-              : pedido.itens;
-          
-          const li = document.createElement('li');
-          li.className = 'pedido-card';
-          li.innerHTML = `
-              <h3>👤 ${pedido.cliente}</h3>
-              <div class="info-entrega">📍 ${pedido.endereco}</div>
-              <div class="itens-lista">${itensHtml}</div>
-              <div class="total-container">TOTAL: R$ ${pedido.total.toFixed(2).replace('.', ',')}</div>
-              <small>⏰ ${new Date(pedido.data).toLocaleTimeString('pt-BR')}</small>
-              <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir Pedido</button>
-          `;
-          
-          container.prepend(li);
-          new Audio('https://www.soundjay.com/buttons/sounds/button-3.mp3').play().catch(() => {});
-      });
-    </script>
+  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
 </body>
 </html>
