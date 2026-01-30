@@ -57,29 +57,37 @@ async function carregarProdutos() {
     const container = document.getElementById("burgers");
     if (!container) return;
 
-    const res = await fetch("/content/produtos.json");
-    const data = await res.json();
-    produtos = data.produtos;
-    container.innerHTML = "";
-    
-    produtos.forEach((p) => {
-        if (p.categoria !== "burger") return;
-        container.appendChild(criarCardProduto(p));
-    });
+    try {
+        const res = await fetch("/content/produtos.json");
+        const data = await res.json();
+        produtos = data.produtos;
+        container.innerHTML = "";
+        
+        produtos.forEach((p) => {
+            if (p.categoria !== "burger") return;
+            container.appendChild(criarCardProduto(p));
+        });
+    } catch (error) {
+        console.error("Erro ao carregar produtos:", error);
+    }
 }
 
 async function carregarBebidas() {
     const container = document.getElementById("bebidas");
     if (!container) return;
 
-    const res = await fetch("/content/produtos.json");
-    const data = await res.json();
-    const bebidas = data.produtos.filter(p => p.categoria === "bebida");
-    container.innerHTML = "";
-    
-    bebidas.forEach((p) => {
-        container.appendChild(criarCardProduto(p));
-    });
+    try {
+        const res = await fetch("/content/produtos.json");
+        const data = await res.json();
+        const bebidas = data.produtos.filter(p => p.categoria === "bebida");
+        container.innerHTML = "";
+        
+        bebidas.forEach((p) => {
+            container.appendChild(criarCardProduto(p));
+        });
+    } catch (error) {
+        console.error("Erro ao carregar bebidas:", error);
+    }
 }
 
 function criarCardProduto(p) {
@@ -204,28 +212,28 @@ async function mostrarResumo() {
 }
 
 // ==================================================
-// FUNÇÃO ATUALIZADA: FINALIZAR E ENVIAR PARA FIREBASE
+// FINALIZAR E ENVIAR PARA FIREBASE
 // ==================================================
 async function finalizarEntrega() {
+    if (typeof db === 'undefined') {
+        alert("Erro: Banco de dados não inicializado no HTML.");
+        return;
+    }
+
     let subtotal = 0;
     let msgWhatsApp = "🍔 *NOVO PEDIDO - KINGS BURGUER*%0A%0A";
     
-    // Preparar dados para o Firebase
     const itensPedido = carrinho.map(i => {
         subtotal += i.price * i.qtd;
         msgWhatsApp += `• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}%0A`;
-        return {
-            produto: i.title,
-            qtd: i.qtd,
-            precoUn: i.price
-        };
+        return { produto: i.title, qtd: i.qtd, precoUn: i.price };
     });
 
     const totalGeral = subtotal + taxaEntregaCalculada;
     msgWhatsApp += `%0A *Cliente:* ${nomeCliente.value}%0A *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}%0A *Total:* R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
 
-    // 1. SALVAR NO FIREBASE (ENVIA PARA O ADM)
     try {
+        // Envia para o Firebase
         await db.ref('pedidos').push({
             cliente: nomeCliente.value,
             endereco: `${rua.value}, ${numero.value} - ${bairro.value}`,
@@ -235,15 +243,13 @@ async function finalizarEntrega() {
             data: new Date().toISOString(),
             status: "novo"
         });
-        console.log("Pedido enviado ao Admin!");
+        console.log("Pedido registrado no sistema!");
     } catch (error) {
-        console.error("Erro ao salvar no Firebase:", error);
+        console.error("Erro Firebase:", error);
     }
 
-    // 2. ABRIR WHATSAPP
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`, "_blank");
     
-    // 3. LIMPAR CARRINHO E RECARREGAR
     carrinho = []; 
     salvarCarrinho(); 
     fecharDelivery();
@@ -272,18 +278,4 @@ function mostrarToast() {
         toast.classList.remove("show");
         cart.classList.remove("bounce");
     }, 2000);
-}
-
-// ==================================================
-// RECEBER PEDIDOS (LÓGICA DO PAINEL ADM)
-// ==================================================
-// Nota: Certifique-se que 'db' (firebase database) está inicializado no seu HTML antes deste script.
-if (typeof db !== 'undefined') {
-    db.ref('pedidos').on('child_added', (snapshot) => {
-        const pedido = snapshot.val();
-        console.log("Novo pedido recebido no painel!", pedido);
-        
-        // Aqui você pode adicionar a lógica de criar um card visual na tela do ADM
-        // window.print(); // Cuidado: isso abrirá a caixa de impressão toda vez que um pedido entrar
-    });
 }
