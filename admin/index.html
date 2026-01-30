@@ -1,29 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
     <title>Painel Admin</title>
-
 </head>
-
 <body>
 
+    <div id="lista-pedidos">
+        <h2>Pedidos Recentes</h2>
+        <ul id="pedidos-container"></ul>
+    </div>
 
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBvf6CW0LKrrD649TM86LgaF6KJj...", // Complete com sua chave da imagem
+        authDomain: "mydi-9402e.firebaseapp.com",
+        databaseURL: "https://mydi-9402e-default-rtdb.firebaseio.com",
+        projectId: "mydi-9402e",
+        storageBucket: "mydi-9402e.firebasestorage.app",
+        messagingSenderId: "599519176551",
+        appId: "1:599519176551:web:e2d7fc63fbe49e2..."
+      };
 
+      // Inicia o Firebase
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+    </script>
 
-
-
-    <!-- Script principal -->
     <script src="script.js"></script>
 
-    <!-- Netlify Identity -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
-    <!-- Netlify CMS -->
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
-
 </body>
-
 </html>
