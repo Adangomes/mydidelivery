@@ -103,17 +103,19 @@ async function carregarBebidas() {
 
         const card = document.createElement("div");
         card.className = "card-produto";
-        card.innerHTML = `
-            <img src="${p.image}">
-            <h3>${p.title}</h3>
-            <p>${p.ingredientes}</p>
-            <div class="price-container">
-                <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
-                ${temDesconto ? `<span class="old-price">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
-                ${temDesconto ? `<span class="badge-desconto">-${porcentagem}%</span>` : ""}
-            </div>
-            <button onclick="adicionarCarrinhoPorProduto(${JSON.stringify(p).replace(/"/g, '&quot;')})">Adicionar</button>
-        `;
+card.innerHTML = `
+    <img src="${p.image}">
+    <div class="card-content">
+        <h3>${p.title}</h3>
+        <p>${p.ingredientes}</p>
+        <div class="price-container">
+            <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
+            ${temDesconto ? `<span class="old-price">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
+            ${temDesconto ? `<span class="badge-desconto">-${porcentagem}%</span>` : ""}
+        </div>
+        <button onclick="adicionarCarrinhoPorProduto(${JSON.stringify(p).replace(/"/g, '&quot;')})">Adicionar</button>
+    </div>
+`;
         container.appendChild(card);
     });
 }
@@ -286,3 +288,4 @@ function mostrarToast() {
         cart.classList.remove("bounce");
     }, 2000);
 }
+
