@@ -212,7 +212,7 @@ async function mostrarResumo() {
 }
 
 // ==================================================
-// FINALIZAR E ENVIAR PARA FIREBASE + WHATSAPP
+// FINALIZAR E ENVIAR PARA FIREBASE + WHATSAPP (AJUSTADO)
 // ==================================================
 async function finalizarEntrega() {
     if (typeof db === 'undefined') {
@@ -221,8 +221,8 @@ async function finalizarEntrega() {
     }
 
     let subtotal = 0;
-    let msgWhatsApp = "🍔 *NOVO PEDIDO - KINGS BURGUER*%0A";
-    msgWhatsApp += "✨ _Prepararemos tudo com muito carinho!_%0A%0A";
+    let msgWhatsApp = "*NOVO PEDIDO - KINGS BURGUER*%0A";
+    msgWhatsApp += " _Prepararemos tudo com muito carinho!_%0A%0A";
     
     const itensPedido = carrinho.map(i => {
         subtotal += i.price * i.qtd;
@@ -231,9 +231,9 @@ async function finalizarEntrega() {
     });
 
     const totalGeral = subtotal + taxaEntregaCalculada;
-    msgWhatsApp += `%0A👤 *Cliente:* ${nomeCliente.value}`;
-    msgWhatsApp += `%0A📍 *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}`;
-    msgWhatsApp += `%0A💰 *Total:* R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
+    msgWhatsApp += `%0A *Cliente:* ${nomeCliente.value}`;
+    msgWhatsApp += `%0A *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}`;
+    msgWhatsApp += `%0A *Total:* R$ ${totalGeral.toFixed(2).replace(".", ",")}`;
 
     try {
         // 1. Envia para o Firebase (Painel Pedidos.html)
@@ -246,24 +246,21 @@ async function finalizarEntrega() {
             data: new Date().toISOString(),
             status: "novo"
         });
-        console.log("Pedido registrado no sistema!");
-
-        // 2. Abre o WhatsApp em nova aba
-        const urlWhatsApp = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
-        window.open(urlWhatsApp, "_blank");
-
-        // 3. Limpeza total sem recarregar a página
+        
+        // 2. Limpeza total do sistema local
         carrinho = []; 
         salvarCarrinho(); 
         atualizarCarrinho(); 
         fecharDelivery();
-        
-        alert("🍔 Pedido recebido! Agora vamos preparar tudo com muito carinho para você.");
+
+        // 3. Redireciona para o WhatsApp (Aba atual para evitar bloqueio de pop-up)
+        const urlWhatsApp = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
+        window.location.href = urlWhatsApp;
 
     } catch (error) {
         console.error("Erro Firebase:", error);
-        // Plano B: Se o Firebase falhar, abre o WhatsApp mesmo assim
-        window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`, "_blank");
+        // Se o Firebase falhar, ainda assim tentamos enviar o WhatsApp
+        window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
     }
 }
 
