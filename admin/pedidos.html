@@ -9,8 +9,35 @@
 <body>
 
     <div id="painel-pedidos">
-        <h2>Novos Pedidos - MYDI DELIVERY</h2>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0;">Novos Pedidos - MYDI DELIVERY</h2>
+            <button onclick="abrirRelatorio()" class="btn-abrir-relatorio">📊 Ver Relatório</button>
+        </div>
         <ul id="pedidos-container"></ul>
+    </div>
+
+    <div id="modal-relatorio">
+        <div class="modal-content">
+            <span class="fechar-modal" onclick="fecharRelatorio()">&times;</span>
+            <h2 style="color: #ffcc00; text-align: center;">RELATÓRIO DE VENDAS</h2>
+            
+            <div class="resumo-caixa">
+                <div>PEDIDOS: <span id="rel-qtd" style="color: #ffcc00; font-weight: bold;">0</span></div>
+                <div>TOTAL: <span id="rel-total" style="color: #27ae60; font-weight: bold;">R$ 0,00</span></div>
+            </div>
+
+            <table class="tab-relatorio">
+                <thead>
+                    <tr>
+                        <th>Hora</th>
+                        <th>Cliente</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-relatorio">
+                    </tbody>
+            </table>
+        </div>
     </div>
 
     <iframe id="iframe-impressao" style="display:none;"></iframe>
@@ -32,6 +59,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // 1. ESCUTA NOVOS PEDIDOS
         db.ref('pedidos').on('child_added', (snapshot) => {
             const pedido = snapshot.val();
             const container = document.getElementById('pedidos-container');
@@ -41,25 +69,28 @@
                 ? pedido.itens.map(i => `<div>${i.qtd}x ${i.produto}</div>`).join('')
                 : pedido.itens;
             
-            // Layout do Painel
             const li = document.createElement('li');
             li.className = 'pedido-card';
+            li.id = `card-${idPedido}`;
             li.innerHTML = `
                 <h3>${pedido.cliente} <span>${new Date().toLocaleTimeString('pt-BR')}</span></h3>
                 <div class="info-entrega"><strong>Endereço:</strong> ${pedido.endereco}</div>
                 <div class="itens-lista"><strong>Itens:</strong><br>${itensHtml}</div>
                 <div class="obs-alerta">OBS: ${pedido.observacao || 'Nenhuma'}</div>
                 <div class="total-container">TOTAL: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}</div>
-                <button class="btn-imprimir" id="btn-${idPedido}">Reimprimir Cupom</button>
+                
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="btn-imprimir" style="flex: 1; margin: 0;" id="btn-print-${idPedido}">🖨️ Reimprimir</button>
+                    <button onclick="concluirPedido('${idPedido}')" style="flex: 1; background: #27ae60; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">✅ Concluir</button>
+                </div>
             `;
 
-            // Layout do Cupom Elgin (MYDI DELIVERY)
+            // Layout do Cupom Elgin
             const cupomParaImpressora = `
                 <div style="font-family: Arial, sans-serif; width: 72mm; color: black; padding: 5px;">
                     <div style="text-align: center;">
                         <h2 style="margin: 0; font-size: 1.5em;">MYDI DELIVERY</h2>
                         <p style="margin: 5px 0;">PEDIDO #${idPedido.slice(-4)}</p>
-                        <p><strong>*** ENTREGA DELIVERY ***</strong></p>
                     </div>
                     <div style="border-top: 1px dashed black; margin: 10px 0;"></div>
                     <strong>CLIENTE:</strong> ${pedido.cliente}<br>
@@ -67,28 +98,76 @@
                     <div style="border-top: 1px dashed black; margin: 10px 0;"></div>
                     <strong>ITENS:</strong><br>${itensHtml}
                     <div style="border-top: 1px dashed black; margin: 10px 0;"></div>
-                    <strong>OBS:</strong> ${pedido.observacao || 'Nenhuma'}<br>
-                    Taxa Entrega: R$ ${(pedido.taxaEntrega || 0).toFixed(2).replace('.', ',')}<br>
-                    <div style="font-size: 1.4em; font-weight: bold; border-top: 1px solid black; margin-top: 5px;">
-                        TOTAL: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}
-                    </div>
-                    <div style="text-align: center; margin-top: 15px; font-size: 0.8em;">
-                        ${new Date().toLocaleString('pt-BR')}
-                    </div>
+                    <strong>TOTAL: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}</strong>
+                    <div style="text-align: center; margin-top: 15px; font-size: 0.8em;">${new Date().toLocaleString('pt-BR')}</div>
                 </div>
             `;
 
             container.prepend(li);
-
-            // Som de telefone tocando (Ring)
+            
+            // Som de alerta
             const toqueTelefone = new Audio('https://www.soundjay.com/phone/phone-calling-1.mp3');
             toqueTelefone.play().catch(() => {});
 
-            li.querySelector(`#btn-${idPedido}`).onclick = () => enviarParaImpressora(cupomParaImpressora);
+            // Ações dos botões
+            li.querySelector(`#btn-print-${idPedido}`).onclick = () => enviarParaImpressora(cupomParaImpressora);
 
             // Impressão Automática
             enviarParaImpressora(cupomParaImpressora);
         });
+
+        // 2. FUNÇÃO CONCLUIR E MOVER PARA RELATÓRIO
+        function concluirPedido(id) {
+            if (confirm("Deseja finalizar este pedido e enviar para o relatório?")) {
+                const refPedido = db.ref('pedidos/' + id);
+                refPedido.once('value').then((snapshot) => {
+                    const dados = snapshot.val();
+                    dados.horaConcluido = new Date().toLocaleTimeString('pt-BR');
+                    
+                    // Salva em 'relatorios' e remove de 'pedidos'
+                    db.ref('relatorios').child(id).set(dados).then(() => {
+                        refPedido.remove().then(() => {
+                            const card = document.getElementById(`card-${id}`);
+                            if (card) card.remove();
+                        });
+                    });
+                });
+            }
+        }
+
+        // 3. FUNÇÕES DO MODAL DE RELATÓRIO
+        function abrirRelatorio() {
+            const tabela = document.getElementById('tabela-relatorio');
+            const totalTexto = document.getElementById('rel-total');
+            const qtdTexto = document.getElementById('rel-qtd');
+            tabela.innerHTML = ''; 
+            
+            let somaTotal = 0;
+            let contador = 0;
+
+            db.ref('relatorios').once('value', (snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    const p = childSnapshot.val();
+                    somaTotal += parseFloat(p.total || 0);
+                    contador++;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${p.horaConcluido || '---'}</td>
+                        <td>${p.cliente}</td>
+                        <td style="color: #27ae60; font-weight: bold;">R$ ${parseFloat(p.total).toFixed(2).replace('.',',')}</td>
+                    `;
+                    tabela.prepend(tr);
+                });
+                totalTexto.innerText = `R$ ${somaTotal.toFixed(2).replace('.', ',')}`;
+                qtdTexto.innerText = contador;
+            });
+            document.getElementById('modal-relatorio').style.display = "block";
+        }
+
+        function fecharRelatorio() {
+            document.getElementById('modal-relatorio').style.display = "none";
+        }
 
         function enviarParaImpressora(htmlCupom) {
             const iframe = document.getElementById('iframe-impressao');
