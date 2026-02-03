@@ -126,3 +126,105 @@ h2 {
         color: black !important; 
     }
 }
+
+
+/* =========================================
+   ESTILOS DO MODAL DE RELATÓRIO
+   ========================================= */
+
+#modal-relatorio {
+    display: none; 
+    position: fixed; 
+    z-index: 999; 
+    left: 0; 
+    top: 0; 
+    width: 100%; 
+    height: 100%; 
+    background-color: rgba(0, 0, 0, 0.9); /* Fundo escurecido */
+    backdrop-filter: blur(5px); /* Efeito de desfoque ao fundo */
+}
+
+.modal-content {
+    background-color: #1e1e1e;
+    margin: 5% auto;
+    padding: 25px;
+    border: 1px solid #ffcc00;
+    width: 90%;
+    max-width: 800px;
+    border-radius: 12px;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 0 30px rgba(255, 204, 0, 0.2);
+}
+
+.fechar-modal {
+    color: #ffcc00;
+    float: right;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 20px;
+}
+
+.fechar-modal:hover {
+    color: #e74c3c;
+}
+
+/* Resumo do Caixa dentro do Modal */
+.resumo-caixa {
+    display: flex; 
+    justify-content: space-around;
+    background: #2a2a2a; 
+    padding: 20px; 
+    border-radius: 8px; 
+    margin: 20px 0;
+    border: 1px solid #333;
+    font-size: 1.1em;
+}
+
+.resumo-caixa div {
+    text-align: center;
+}
+
+/* Tabela de Vendas */
+.tab-relatorio {
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-top: 10px; 
+    color: white;
+}
+
+.tab-relatorio th { 
+    background: #ffcc00; 
+    color: black; 
+    padding: 12px; 
+    text-transform: uppercase;
+    font-size: 0.9em;
+}
+
+.tab-relatorio td { 
+    padding: 12px; 
+    border-bottom: 1px solid #333; 
+    text-align: center; 
+}
+
+.tab-relatorio tr:hover {
+    background: #252525;
+}
+
+/* Botão de abrir relatório no topo */
+.btn-abrir-relatorio {
+    background: #3498db; 
+    color: white; 
+    border: none; 
+    padding: 12px 20px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.btn-abrir-relatorio:hover {
+    background: #2980b9;
+}
