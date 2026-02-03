@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin - Diego Pizzas</title>
+    <title>Painel Admin - MYDI DELIVERY</title>
     <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
     <div id="painel-pedidos">
-        <h2>Novos Pedidos</h2>
+        <h2>Novos Pedidos - MYDI DELIVERY</h2>
         <ul id="pedidos-container"></ul>
     </div>
 
@@ -19,7 +19,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
-        // Sua configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
             authDomain: "myproject26-10f0e.firebaseapp.com",
@@ -33,18 +32,16 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Escuta novos pedidos
         db.ref('pedidos').on('child_added', (snapshot) => {
             const pedido = snapshot.val();
             const container = document.getElementById('pedidos-container');
             const idPedido = snapshot.key;
             
-            // Formata os itens
             let itensHtml = Array.isArray(pedido.itens) 
                 ? pedido.itens.map(i => `<div>${i.qtd}x ${i.produto}</div>`).join('')
                 : pedido.itens;
             
-            // Cria o Card Visual para a tela (Tema Escuro)
+            // Layout do Painel
             const li = document.createElement('li');
             li.className = 'pedido-card';
             li.innerHTML = `
@@ -53,23 +50,22 @@
                 <div class="itens-lista"><strong>Itens:</strong><br>${itensHtml}</div>
                 <div class="obs-alerta">OBS: ${pedido.observacao || 'Nenhuma'}</div>
                 <div class="total-container">TOTAL: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}</div>
-                <button class="btn-imprimir" id="btn-${idPedido}">Reimprimir Pedido</button>
+                <button class="btn-imprimir" id="btn-${idPedido}">Reimprimir Cupom</button>
             `;
 
-            // Monta o HTML do Cupom de Impressão (Estilo Elgin i9 / Delivery)
+            // Layout do Cupom Elgin (MYDI DELIVERY)
             const cupomParaImpressora = `
                 <div style="font-family: Arial, sans-serif; width: 72mm; color: black; padding: 5px;">
                     <div style="text-align: center;">
-                        <h2 style="margin: 0; font-size: 1.5em;">DIEGO PIZZAS</h2>
+                        <h2 style="margin: 0; font-size: 1.5em;">MYDI DELIVERY</h2>
                         <p style="margin: 5px 0;">PEDIDO #${idPedido.slice(-4)}</p>
-                        <p><strong>*** DELIVERY ***</strong></p>
+                        <p><strong>*** ENTREGA DELIVERY ***</strong></p>
                     </div>
                     <div style="border-top: 1px dashed black; margin: 10px 0;"></div>
                     <strong>CLIENTE:</strong> ${pedido.cliente}<br>
                     <strong>ENDEREÇO:</strong> ${pedido.endereco}
                     <div style="border-top: 1px dashed black; margin: 10px 0;"></div>
-                    <strong>ITENS:</strong><br>
-                    ${itensHtml}
+                    <strong>ITENS:</strong><br>${itensHtml}
                     <div style="border-top: 1px dashed black; margin: 10px 0;"></div>
                     <strong>OBS:</strong> ${pedido.observacao || 'Nenhuma'}<br>
                     Taxa Entrega: R$ ${(pedido.taxaEntrega || 0).toFixed(2).replace('.', ',')}<br>
@@ -84,30 +80,21 @@
 
             container.prepend(li);
 
-            // Som de Alerta
-            const som = new Audio('https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg');
-            som.play().catch(() => console.log("Áudio bloqueado. Clique na página uma vez."));
+            // Som de telefone tocando (Ring)
+            const toqueTelefone = new Audio('https://www.soundjay.com/phone/phone-calling-1.mp3');
+            toqueTelefone.play().catch(() => {});
 
-            // Configura botão de reimpressão manual
             li.querySelector(`#btn-${idPedido}`).onclick = () => enviarParaImpressora(cupomParaImpressora);
 
-            // --- IMPRESSÃO AUTOMÁTICA ---
+            // Impressão Automática
             enviarParaImpressora(cupomParaImpressora);
         });
 
-        // Função que envia o comando para o iframe e imprime
         function enviarParaImpressora(htmlCupom) {
             const iframe = document.getElementById('iframe-impressao');
             const doc = iframe.contentWindow.document;
-            
             doc.open();
-            doc.write(`
-                <html>
-                    <body style="margin:0; padding:0;" onload="window.print()">
-                        ${htmlCupom}
-                    </body>
-                </html>
-            `);
+            doc.write(`<html><body style="margin:0;" onload="window.print()">${htmlCupom}</body></html>`);
             doc.close();
         }
     </script>
