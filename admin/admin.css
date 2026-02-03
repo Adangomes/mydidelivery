@@ -14,12 +14,14 @@ h2 {
     margin-bottom: 30px;
 }
 
-#lista-pedidos {
+#pedidos-container {
     max-width: 850px;
     margin: 0 auto;
+    list-style: none;
+    padding: 0;
 }
 
-/* Card do Pedido - VOLTOU AO ESCURO */
+/* Card do Pedido - TEMA ESCURO */
 .pedido-card {
     background: #1e1e1e;
     border-left: 6px solid #ffcc00;
@@ -62,7 +64,7 @@ h2 {
     border: 1px solid #333;
 }
 
-/* Estilo para a Observação dentro do tema escuro */
+/* Estilo para a Observação */
 .obs-alerta { 
     background: #332b00; 
     color: #ffcc00; 
@@ -93,9 +95,34 @@ h2 {
     margin-top: 15px;
 }
 
+/* Esconde o iframe de impressão para não aparecer na tela */
+#iframe-impressao {
+    display: none;
+}
+
+/* Regras de Impressão */
 @media print {
-    .btn-imprimir, h2 { display: none; }
-    body { background: white; color: black; }
-    .pedido-card { border: 1px solid #000; background: white; color: black; box-shadow: none; }
-    .itens-lista { background: white; border: 1px solid #ccc; color: black; }
+    .btn-imprimir, h2 { 
+        display: none !important; 
+    }
+    body { 
+        background: white !important; 
+        color: black !important; 
+        padding: 0; 
+        margin: 0; 
+    }
+    .pedido-card { 
+        border: none !important; 
+        background: white !important; 
+        color: black !important; 
+        box-shadow: none !important; 
+        width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    .itens-lista { 
+        background: white !important; 
+        border: 1px solid #ccc !important; 
+        color: black !important; 
+    }
 }
