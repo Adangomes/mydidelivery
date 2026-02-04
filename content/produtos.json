@@ -65,7 +65,7 @@
         "nome": "Portuguesa",
         "categoria": "pizza",
         "ingredientes": "Mussarela, presunto, ovo, cebola, oregano",
-        "imagem": "imagens/portuguesa.jpg",
+        "imagem": "imagens/pizza.jpg",
         "precos": {
           "Pequena": { "atual": 40.0, "antigo": 45.0 },
           "Media": { "atual": 60.0, "antigo": 0 },
@@ -76,7 +76,7 @@
         "nome": "Bacon",
         "categoria": "pizza",
         "ingredientes": "Mussarela, bacon, tomate, oregano",
-        "imagem": "imagens/bacon.jpg",
+       "imagem": "imagens/pizza.jpg",
         "precos": {
           "Pequena": { "atual": 40.0, "antigo": 0 },
           "Media": { "atual": 60.0, "antigo": 0 },
@@ -87,7 +87,7 @@
         "nome": "Mussarela",
         "categoria": "pizza",
         "ingredientes": "Mussarela, requeijão, cheddar, oregano",
-        "imagem": "imagens/mussarela.jpg",
+        "imagem": "imagens/pizza.jpg",
         "precos": {
           "Pequena": { "atual": 40.0, "antigo": 0 },
           "Media": { "atual": 60.0, "antigo": 0 },
@@ -98,7 +98,7 @@
         "nome": "Frango",
         "categoria": "pizza",
         "ingredientes": "Mussarela, frango, requeijão, oregano",
-        "imagem": "imagens/frango.jpg",
+        "imagem": "imagens/pizza.jpg",
         "precos": {
           "Pequena": { "atual": 40.0, "antigo": 0 },
           "Media": { "atual": 60.0, "antigo": 0 },
@@ -109,7 +109,7 @@
         "nome": "Baiana",
         "categoria": "pizza",
         "ingredientes": "Mussarela, cebola, pimentão, molho de pimenta, calabresa, oregano",
-        "imagem": "imagens/baiana.jpg",
+        "imagem": "imagens/pizza.jpg",
         "precos": {
           "Pequena": { "atual": 40.0, "antigo": 0 },
           "Media": { "atual": 60.0, "antigo": 0 },
@@ -120,7 +120,7 @@
         "nome": "Calabresa",
         "categoria": "pizza",
         "ingredientes": "Mussarela, calabresa, oregano",
-        "imagem": "imagens/calabresa.jpg",
+        "imagem": "imagens/pizza.jpg",
         "precos": {
           "Pequena": { "atual": 40.0, "antigo": 0 },
           "Media": { "atual": 60.0, "antigo": 0 },
@@ -131,7 +131,7 @@
         "nome": "Sensação (Doce)",
         "categoria": "pizza",
         "ingredientes": "Chocolate preto, morango",
-        "imagem": "imagens/sensacao.jpg",
+        "imagem": "imagens/pizza.jpg",
         "precos": {
           "Pequena": { "atual": 40.0, "antigo": 0 },
           "Media": { "atual": 60.0, "antigo": 0 },
