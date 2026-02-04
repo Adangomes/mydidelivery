@@ -101,18 +101,25 @@
 
             <label>Número:</label>
             <input type="text" id="numero" placeholder="123">
+            
+            <label>Ponto de Referência:</label>
+<textarea id="pontoReferencia" placeholder="Ex: casa dos fundos"></textarea>
 
-            <label>Observações:</label>
-            <textarea id="observacao" placeholder="Ex: Casa de fundos"></textarea>
+<label>Observações (Cozinha):</label>
+<textarea id="obsCozinha" placeholder="Ex: Sem cebola"></textarea>
 
-            <label>Pagamento:</label>
-            <select id="pagamento">
-                <option value="">Selecione</option>
-                <option value="Pix">Pix</option>
-                <option value="Dinheiro">Dinheiro</option>
-                <option value="Cartão">Cartão</option>
-            </select>
+<label>Pagamento:</label>
+<select id="pagamento" onchange="if(this.value=='Dinheiro'){document.getElementById('div-troco').style.display='block'}else{document.getElementById('div-troco').style.display='none'}">
+    <option value="">Selecione</option>
+    <option value="Pix">Pix</option>
+    <option value="Dinheiro">Dinheiro</option>
+    <option value="Cartão">Cartão</option>
+</select>
 
+<div id="div-troco" style="display:none; margin-top: 10px;">
+    <label>Precisa de troco para quanto?</label>
+    <input type="text" id="trocoPara" placeholder="Ex: Troco para 50,00">
+</div>
             <div class="buttons">
                 <button onclick="fecharDelivery()">Voltar</button>
                 <button onclick="mostrarResumo()">Próximo</button>
@@ -164,6 +171,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
