@@ -183,14 +183,18 @@ async function finalizarEntrega() {
     }
 
     // Capturando os novos campos
-    const nomeCli = document.getElementById("nomeCliente").value;
-    const cidadeCli = document.getElementById("cidade").value;
-    const bairroCli = document.getElementById("bairro").value;
-    const ruaCli = document.getElementById("rua").value;
-    const numCli = document.getElementById("numero").value;
-    const pagtoCli = document.getElementById("pagamento").value;
-    const obsCampo = document.getElementById("observacao");
-    const observacao = obsCampo ? obsCampo.value : "Nenhuma";
+    // 1. CAPTURA DOS CAMPOS (Substitua aquele bloco por este)
+const nomeCli = document.getElementById("nomeCliente").value;
+const cidadeCli = document.getElementById("cidade").value;
+const bairroCli = document.getElementById("bairro").value;
+const ruaCli = document.getElementById("rua").value;
+const numCli = document.getElementById("numero").value;
+
+// Novos campos que separamos:
+const pontoRef = document.getElementById("pontoReferencia").value || "Não informado";
+const obsCozinha = document.getElementById("obsCozinha").value || "Nenhuma";
+const pagtoCli = document.getElementById("pagamento").value;
+const valorTroco = document.getElementById("trocoPara").value;
 
     // Validação extra de segurança
     if(!pagtoCli) { alert("Escolha a forma de pagamento!"); return; }
@@ -207,17 +211,20 @@ async function finalizarEntrega() {
     const totalGeral = subtotal + taxaEntregaCalculada;
 
     // Montando o corpo da mensagem para o Motoboy
-    msgWhatsApp += `%0A---------------------------%0A`;
-    msgWhatsApp += ` *Subtotal:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += ` *TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += `---------------------------%0A`;
-    msgWhatsApp += ` *Cliente:* ${nomeCli}%0A`;
-    msgWhatsApp += ` *Cidade:* ${cidadeCli}%0A`;
-    msgWhatsApp += ` *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
-    msgWhatsApp += `  *Pagamento:* ${pagtoCli}%0A`; // <--- NOVO
-    msgWhatsApp += ` *Obs:* ${observacao}%0A%0A`;
-    msgWhatsApp += ` _Prepararemos tudo com muito carinho!_`;
+    // Montando o corpo da mensagem para o Motoboy e Cozinha
+msgWhatsApp += `%0A---------------------------%0A`;
+msgWhatsApp += ` *Subtotal:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
+msgWhatsApp += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
+msgWhatsApp += ` *TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
+msgWhatsApp += `---------------------------%0A`;
+msgWhatsApp += ` *Cliente:* ${nomeCli}%0A`;
+msgWhatsApp += ` *Cidade:* ${cidadeCli}%0A`;
+msgWhatsApp += ` *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
+msgWhatsApp += ` *Ref:* ${pontoRef}%0A`; // Ponto de referência para o Motoboy
+msgWhatsApp += ` *Obs Cozinha:* ${obsCozinha}%0A`; // Observações para a Cozinha
+msgWhatsApp += ` *Pagamento:* ${pagtoCli}${valorTroco ? ' (Troco p/ ' + valorTroco + ')' : ''}%0A`;
+msgWhatsApp += `---------------------------%0A%0A`;
+msgWhatsApp += ` _Prepararemos tudo com muito carinho!_`;
 
     try {
         // Enviando para o Firebase com os novos campos para o Painel de Pedidos
@@ -263,5 +270,6 @@ function mostrarToast() {
     toast.classList.add("show");
     setTimeout(() => { toast.classList.remove("show"); }, 2000);
 }
+
 
 
