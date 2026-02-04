@@ -213,9 +213,9 @@ async function finalizarEntrega() {
     msgWhatsApp += ` *TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
     msgWhatsApp += `---------------------------%0A`;
     msgWhatsApp += ` *Cliente:* ${nomeCli}%0A`;
-    msgWhatsApp += `📍 *Cidade:* ${cidadeCli}%0A`;
-    msgWhatsApp += `📍 *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
-    msgWhatsApp += ` 💳 *Pagamento:* ${pagtoCli}%0A`; // <--- NOVO
+    msgWhatsApp += ` *Cidade:* ${cidadeCli}%0A`;
+    msgWhatsApp += ` *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
+    msgWhatsApp += `  *Pagamento:* ${pagtoCli}%0A`; // <--- NOVO
     msgWhatsApp += ` *Obs:* ${observacao}%0A%0A`;
     msgWhatsApp += ` _Prepararemos tudo com muito carinho!_`;
 
@@ -263,4 +263,5 @@ function mostrarToast() {
     toast.classList.add("show");
     setTimeout(() => { toast.classList.remove("show"); }, 2000);
 }
+
 
