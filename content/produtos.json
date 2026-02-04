@@ -12,7 +12,7 @@
       "prices": { "P": 40.0, "M": 60.0, "G": 90.0 },
       "categoria": "pizza",
       "ingredientes": "Mussarela, calabresa, cebola e orégano",
-      "image": "/imagens/calabresa-cebola.jpeg"
+      "image": "/imagens/pizza.jpg"
     },
         {
             "title": "Kings Duplo Bacon",
