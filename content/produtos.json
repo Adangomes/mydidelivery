@@ -1,121 +1,54 @@
 {
-  "produtos": {
-    "burgers": {
-      "b1": {
-        "title": "Kings Burger Tradicional",
-        "price": 19.9,
-        "oldPrice": 24.9,
-        "categoria": "burger",
-        "ingredientes": "Hambúrguer artesanal 140g, duas fatias de queijo e pão brioche",
-        "image": "/imagens/HAMBURGUER.jpg",
-        "id": "b1"
-      },
-      "b2": {
-        "title": "Kings Duplo Bacon",
-        "price": 29.9,
-        "oldPrice": 34.9,
-        "categoria": "burger",
-        "ingredientes": "Dois hambúrgueres artesanais de 100g cada, queijo derretido, bacon crocante e pão brioche",
-        "image": "/imagens/HAMBURGUER.jpg",
-        "id": "b2"
-      },
-      "b3": {
-        "title": "Kings Calabresa",
-        "price": 31,
-        "oldPrice": 0,
-        "categoria": "burger",
-        "ingredientes": "Hambúrguer artesanal 140g, calabresa grelhada, queijo e pão brioche",
-        "image": "/imagens/HAMBURGUER.jpg",
-        "id": "b3"
-      },
-      "b4": {
-        "title": "Kings Burger Classic",
-        "price": 28,
-        "oldPrice": 0,
-        "categoria": "burger",
-        "ingredientes": "Hambúrguer artesanal 150g, queijo prato, pão brioche",
-        "image": "/imagens/HAMBURGUER.jpg",
-        "id": "b4"
-      }
-    },
-    "bebidas": {
-      "be1": {
-        "title": "Coca-Cola Lata",
-        "price": 6.9,
-        "oldPrice": 0,
-        "categoria": "bebida",
-        "ingredientes": "350ml",
-        "image": "/imagens/teste.jpg",
-        "id": "be1"
-      },
-      "be2": {
-        "title": "Guaraná Lata",
-        "price": 6.5,
-        "oldPrice": 0,
-        "categoria": "bebida",
-        "ingredientes": "350ml",
-        "image": "/imagens/teste.jpg",
-        "id": "be2"
-      },
-      "be3": {
-        "title": "Coca-Cola 600ml",
-        "price": 8.5,
-        "oldPrice": 0,
-        "categoria": "bebida",
-        "ingredientes": "600ml",
-        "image": "/imagens/teste.jpg",
-        "id": "be3"
-      }
-    },
-    "pizzas": {
-      "p1": {
-        "nome": "Portuguesa",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, presunto, ovo, cebola, oregano",
-        "imagem": "imagens/pizza.jpg",
-        "id": "p1",
-        "precos": {
-          "Pequena": { "atual": 40 },
-          "Media": { "atual": 60 },
-          "Grande": { "atual": 90 }
+    "produtos": [{
+            "title": "Kings Burger Tradicional",
+            "price": 19.9,
+            "oldPrice": 24.9,
+            "categoria": "burger",
+            "ingredientes": "Hambúrguer artesanal 140g, duas fatias de queijo e pão brioche",
+            "image": "/imagens/kingstradicional.jpeg"
+        },
+        {
+            "title": "Kings Duplo Bacon",
+            "price": 29.9,
+            "categoria": "burger",
+            "ingredientes": "Dois hambúrgueres artesanais de 100g cada, queijo derretido, bacon crocante e pão brioche",
+            "image": "/imagens/kingsduplo.jpeg",
+            "oldPrice": 34.9
+        },
+        {
+            "title": "Kings Calabresa",
+            "price": 31,
+            "categoria": "burger",
+            "ingredientes": "Hambúrguer artesanal 140g, calabresa grelhada, queijo e pão brioche",
+            "image": "/imagens/kingscalabresa.jpeg"
+        },
+        {
+            "title": "Coca-Cola Lata",
+            "price": 6.9,
+            "categoria": "bebida",
+            "ingredientes": "350ml",
+            "image": "/imagens/cocalata.jpeg"
+        },
+        {
+            "title": "Guaraná Lata",
+            "price": 6.5,
+            "categoria": "bebida",
+            "ingredientes": "350ml",
+            "image": "/imagens/guarana.jpeg"
+        },
+        {
+            "title": "Coca-Cola 600ml",
+            "price": 8.5,
+            "categoria": "bebida",
+            "ingredientes": "600ml",
+            "image": "/imagens/coca600.jpg"
+        },
+        {
+            "image": "/imagens/kingsclassic.jpeg",
+            "title": "kings burger classic",
+            "price": 28,
+            "categoria": "burger",
+            "ingredientes": "hamburguer artesanal 150g, queijo prato, pão brioche"
         }
-      },
-      "p2": {
-        "nome": "Bacon",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, bacon, tomate, oregano",
-        "imagem": "imagens/pizza.jpg",
-        "id": "p2",
-        "precos": {
-          "Pequena": { "atual": 40 },
-          "Media": { "atual": 60 },
-          "Grande": { "atual": 90 }
-        }
-      },
-      "p3": {
-        "nome": "Bacon",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, bacon, tomate, oregano",
-        "imagem": "imagens/pizza.jpg",
-        "id": "p1",
-        "precos": {
-          "Pequena": { "atual": 40 },
-          "Media": { "atual": 60 },
-          "Grande": { "atual": 90 }
-        }
-      },
-      "p4": {
-        "nome": "Mussarela",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, requeijão, cheddar, oregano",
-        "imagem": "imagens/pizza.jpg",
-        "id": "p3",
-        "precos": {
-          "Pequena": { "atual": 40 },
-          "Media": { "atual": 60 },
-          "Grande": { "atual": 90 }
-        }
-      }
-    }
-  }
+    ]
 }
