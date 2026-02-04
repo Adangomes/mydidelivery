@@ -5,33 +5,33 @@
         "title": "Kings Burger Tradicional",
         "price": 19.9,
         "oldPrice": 24.9,
-        "categoria": "burgers",
+        "categoria": "burger",
         "ingredientes": "Hambúrguer artesanal 140g, duas fatias de queijo e pão brioche",
-        "image": "/imagens/HAMBURGUER.jpg"
+        "image": "/imagens/kingstradicional.jpeg"
       },
       "b2": {
         "title": "Kings Duplo Bacon",
         "price": 29.9,
         "oldPrice": 34.9,
-        "categoria": "burgers",
+        "categoria": "burger",
         "ingredientes": "Dois hambúrgueres artesanais de 100g cada, queijo derretido, bacon crocante e pão brioche",
-        "image": "/imagens/HAMBURGUER.jpg"
+        "image": "/imagens/kingsduplo.jpeg"
       },
       "b3": {
         "title": "Kings Calabresa",
         "price": 31,
         "oldPrice": 0,
-        "categoria": "burgers",
+        "categoria": "burger",
         "ingredientes": "Hambúrguer artesanal 140g, calabresa grelhada, queijo e pão brioche",
-        "image": "/imagens/HAMBURGUER.jpg"
+        "image": "/imagens/kingscalabresa.jpeg"
       },
       "b4": {
         "title": "Kings Burger Classic",
         "price": 28,
         "oldPrice": 0,
-        "categoria": "burgers",
+        "categoria": "burger",
         "ingredientes": "Hambúrguer artesanal 150g, queijo prato, pão brioche",
-        "image": "/imagens/HAMBURGUER.jpg"
+        "image": "/imagens/kingsclassic.jpeg"
       }
     },
     "bebidas": {
@@ -39,7 +39,7 @@
         "title": "Coca-Cola Lata",
         "price": 6.9,
         "oldPrice": 0,
-        "categoria": "bebidas",
+        "categoria": "bebida",
         "ingredientes": "350ml",
         "image": "/imagens/cocalata.jpeg"
       },
@@ -47,7 +47,7 @@
         "title": "Guaraná Lata",
         "price": 6.5,
         "oldPrice": 0,
-        "categoria": "bebidas",
+        "categoria": "bebida",
         "ingredientes": "350ml",
         "image": "/imagens/guarana.jpeg"
       },
@@ -55,7 +55,7 @@
         "title": "Coca-Cola 600ml",
         "price": 8.5,
         "oldPrice": 0,
-        "categoria": "bebidas",
+        "categoria": "bebida",
         "ingredientes": "600ml",
         "image": "/imagens/coca600.jpg"
       }
@@ -63,7 +63,7 @@
     "pizzas": {
       "p1": {
         "nome": "Portuguesa",
-        "categoria": "pizzas",
+        "categoria": "pizza",
         "ingredientes": "Mussarela, presunto, ovo, cebola, oregano",
         "imagem": "imagens/portuguesa.jpg",
         "precos": {
