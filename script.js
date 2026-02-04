@@ -1,17 +1,15 @@
 // ==================================================
 // CONFIGURAÇÕES GERAIS
 // ==================================================
-const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";  
+const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db677";  
 const RESTAURANTE_COORD = [-49.0716, -26.4856];
 const TAXA_BASE = 5;
 const VALOR_POR_KM = 1.5;
 const WHATSAPP_NUMERO = "5547984196636";
 
-// Cidades permitidas para validação
 const CIDADES_PERMITIDAS = ["Jaraguá do Sul", "Guaramirim", "Schroeder"];
 
 let carrinho = [];
-let produtos = [];
 let taxaEntregaCalculada = 0;
 let LOJA_ABERTA = true; 
 let MENSAGEM_FECHADA = "Loja Fechada no momento.";
@@ -34,40 +32,25 @@ async function carregarStatusLoja() {
 }
 
 // ==================================================
-// MOTOR DE RENDERIZAÇÃO
+// MOTOR DE RENDERIZAÇÃO (FIREBASE)
 // ==================================================
-function initSplash() {
-    const splash = document.getElementById("splash");
-    if (splash) setTimeout(() => { splash.remove(); }, 1500);
-}
-
-function initMenu() {
-    const btn = document.getElementById("hamburger");
-    const menu = document.getElementById("mobile-menu");
-    if (btn && menu) btn.onclick = () => menu.classList.toggle("open");
-}
-
-// Função para carregar os produtos do Firebase conforme a página
 function carregarProdutosDoBanco() {
     const containerBurgers = document.getElementById("burgers");
     const containerBebidas = document.getElementById("bebidas");
-    const containerPizzas = document.getElementById("pizza"); // Certifique-se que o ID no pizzas.html seja 'pizza'
+    const containerPizzas = document.getElementById("pizza");
 
-    // 1. Se estiver na página de BURGERS
     if (containerBurgers) {
         window.db.ref('produtos/burgers').on('value', (snapshot) => {
             exibirProdutos(snapshot.val(), containerBurgers, 'burger');
         });
     }
 
-    // 2. Se estiver na página de BEBIDAS
     if (containerBebidas) {
         window.db.ref('produtos/bebidas').on('value', (snapshot) => {
             exibirProdutos(snapshot.val(), containerBebidas, 'bebida');
         });
     }
 
-    // 3. Se estiver na página de PIZZAS
     if (containerPizzas) {
         window.db.ref('produtos/pizzas').on('value', (snapshot) => {
             exibirProdutos(snapshot.val(), containerPizzas, 'pizza');
@@ -76,8 +59,11 @@ function carregarProdutosDoBanco() {
 }
 
 function exibirProdutos(dados, container, tipo) {
-    if (!dados) return;
-    container.innerHTML = ""; // Limpa antes de carregar
+    if (!dados) {
+        container.innerHTML = "<p>Carregando produtos...</p>";
+        return;
+    }
+    container.innerHTML = ""; 
 
     for (let id in dados) {
         const p = dados[id];
@@ -85,16 +71,15 @@ function exibirProdutos(dados, container, tipo) {
         card.className = "card-produto";
 
         if (tipo === 'pizza') {
-            // Layout para Pizza (Botão para abrir tamanhos)
             card.innerHTML = `
                 <img src="${p.imagem}">
                 <div class="card-content">
                     <h3>${p.nome}</h3>
                     <p>${p.ingredientes || ""}</p>
-                    <button onclick="abrirOpcoesPizza('${id}')" style="background:#ffc107; color:#000;">Escolher Tamanho</button>
+                    <button onclick="abrirOpcoesPizza('${id}')" style="background:#ffc107; color:#000; font-weight:bold; cursor:pointer;">ESCOLHER TAMANHO</button>
                 </div>`;
         } else {
-            // Layout para Burger e Bebida (Igual ao seu original)
+            const preco = p.price || 0;
             const temDesconto = p.oldPrice && p.oldPrice > 0;
             card.innerHTML = `
                 <img src="${p.image}">
@@ -102,18 +87,16 @@ function exibirProdutos(dados, container, tipo) {
                     <h3>${p.title}</h3>
                     <p>${p.ingredientes || ""}</p>
                     <div class="price-container">
-                        <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
-                        ${temDesconto ? `<span class="old-price" style="text-decoration:line-through; color:red; font-size:0.8em; margin-left:5px;">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
+                        <strong>R$ ${preco.toFixed(2).replace(".", ",")}</strong>
+                        ${temDesconto ? `<span style="text-decoration:line-through; color:red; font-size:0.8em; margin-left:5px;">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
                     </div>
-                    <button onclick="adicionarAoCarrinho('${p.title}', ${p.price})">Adicionar</button>
+                    <button onclick="adicionarCarrinhoPorProduto({title: '${p.title}', price: ${preco}})">Adicionar</button>
                 </div>`;
         }
         container.appendChild(card);
     }
 }
 
-// Inicia a chamada
-carregarProdutosDoBanco();
 // ==================================================
 // LÓGICA DO CARRINHO
 // ==================================================
@@ -127,7 +110,7 @@ function carregarCarrinhoStorage() {
 function adicionarCarrinhoPorProduto(p) {
     if (!LOJA_ABERTA) { alert(MENSAGEM_FECHADA); return; }
     const item = carrinho.find(i => i.title === p.title);
-    if (item) { item.qtd++; } else { carrinho.push({ ...p, qtd: 1 }); }
+    if (item) { item.qtd++; } else { carrinho.push({ title: p.title, price: p.price, qtd: 1 }); }
     salvarCarrinho(); atualizarCarrinho(); mostrarToast();
 }
 
@@ -136,43 +119,63 @@ function atualizarCarrinho() {
     if (!box) return;
     box.innerHTML = "";
     let subtotal = 0;
-    carrinho.forEach(i => {
+    carrinho.forEach((i, index) => {
         subtotal += i.price * i.qtd;
-        box.innerHTML += `<div>${i.title} x${i.qtd} <strong>R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}</strong></div>`;
+        box.innerHTML += `
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                <span>${i.title} x${i.qtd}</span>
+                <strong>R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}</strong>
+            </div>`;
     });
     if (document.getElementById("subtotal")) document.getElementById("subtotal").innerText = `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}`;
     if (document.getElementById("total")) document.getElementById("total").innerText = `Total: R$ ${subtotal.toFixed(2).replace(".", ",")}`;
 }
 
 // ==================================================
-// ENTREGA & VALIDAÇÃO DE LOCALIZAÇÃO
+// PIZZAS: ESCOLHA DE TAMANHO
+// ==================================================
+function abrirOpcoesPizza(id) {
+    window.db.ref('produtos/pizzas/' + id).once('value', (snapshot) => {
+        const pizza = snapshot.val();
+        if(!pizza) return;
+
+        let opcoes = Object.keys(pizza.precos); // Pequena, Media, Grande
+        let mensagem = `Escolha o tamanho para ${pizza.nome}:\n\n`;
+        opcoes.forEach(t => {
+            mensagem += `- ${t}: R$ ${pizza.precos[t].atual.toFixed(2).replace(".", ",")}\n`;
+        });
+
+        const escolha = prompt(mensagem);
+        
+        if (escolha) {
+            // Normaliza a escrita (Ex: "media" vira "Media")
+            const tamanhoCerto = opcoes.find(t => t.toLowerCase() === escolha.toLowerCase().trim());
+            
+            if (tamanhoCerto) {
+                const info = pizza.precos[tamanhoCerto];
+                adicionarCarrinhoPorProduto({
+                    title: `${pizza.nome} (${tamanhoCerto})`,
+                    price: info.atual
+                });
+            } else {
+                alert("Tamanho inválido! Digite: Pequena, Media ou Grande.");
+            }
+        }
+    });
+}
+
+// ==================================================
+// ENTREGA & FINALIZAÇÃO
 // ==================================================
 function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
 function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
-function abrirDelivery() { 
-    fecharCarrinho(); 
-    document.getElementById("delivery-modal").style.display = "flex";
-    document.getElementById("form-entrega").style.display = "block";
-    document.getElementById("resumo-pedido").style.display = "none";
-}
+function abrirDelivery() { fecharCarrinho(); document.getElementById("delivery-modal").style.display = "flex"; }
 function fecharDelivery() { document.getElementById("delivery-modal").style.display = "none"; }
 
 async function calcularTaxa(endereco, cidadeSelecionada) {
-    // Adicionamos a cidade e o estado explicitamente na busca para o Geocoder não sair de SC
     const query = `${endereco}, ${cidadeSelecionada}, Santa Catarina, Brasil`;
     const geo = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(query)}&limit=1&apiKey=${GEOAPIFY_KEY}`).then(r => r.json());
-    
     if (!geo.features.length) throw new Error("Endereço não encontrado");
-
-    const localizacao = geo.features[0].properties;
-    
-    // VERIFICAÇÃO DE SEGURANÇA: Se a API retornar uma cidade diferente da selecionada, bloqueia
-    // Comparamos de forma simples removendo acentos e espaços
-    const cidadeApi = localizacao.city || localizacao.town || "";
-    if (!cidadeApi.toLowerCase().includes(cidadeSelecionada.toLowerCase().split(' ')[0])) {
-         throw new Error("O endereço digitado não parece pertencer à cidade selecionada.");
-    }
-
     const destino = geo.features[0].geometry.coordinates;
     const rota = await fetch(`https://api.geoapify.com/v1/routing?waypoints=${RESTAURANTE_COORD[1]},${RESTAURANTE_COORD[0]}|${destino[1]},${destino[0]}&mode=drive&apiKey=${GEOAPIFY_KEY}`).then(r => r.json());
     const km = rota.features[0].properties.distance / 1000;
@@ -188,23 +191,13 @@ async function mostrarResumo() {
     const inputRua = document.getElementById("rua").value;
     const inputNome = document.getElementById("nomeCliente").value;
 
-    // 1. Validação de campos vazios
-    if (!inputRua || !inputNome || !inputCidade) {
-        alert("Por favor, preencha Nome, Cidade e Rua."); return;
-    }
-
-    // 2. Validação de Cidade Permitida (Segurança extra)
-    if (!CIDADES_PERMITIDAS.includes(inputCidade)) {
-        alert("Desculpe, atendemos apenas Jaraguá do Sul, Guaramirim e Schroeder.");
-        return;
-    }
+    if (!inputRua || !inputNome || !inputCidade) { alert("Preencha todos os campos!"); return; }
 
     formEl.style.display = "none";
     loadingEl.style.display = "flex";
 
-    const enderecoCompleto = `${inputRua}, ${document.getElementById("numero").value}, ${document.getElementById("bairro").value}`;
-
     try {
+        const enderecoCompleto = `${inputRua}, ${document.getElementById("numero").value}, ${document.getElementById("bairro").value}`;
         const taxa = await calcularTaxa(enderecoCompleto, inputCidade);
         taxaEntregaCalculada = taxa;
         
@@ -217,142 +210,58 @@ async function mostrarResumo() {
         
         loadingEl.style.display = "none";
         resumoEl.style.display = "block";
-    } catch (error) { 
-        loadingEl.style.display = "none"; 
-        formEl.style.display = "block"; 
-        alert(error.message || "Erro ao calcular endereço. Verifique se a rua está correta."); 
+    } catch (error) {
+        loadingEl.style.display = "none";
+        formEl.style.display = "block";
+        alert("Erro no endereço. Tente novamente.");
     }
 }
 
-// ==================================================
-// FINALIZAR PEDIDO
-// ==================================================
-// ==================================================
-// FINALIZAR PEDIDO (CORRIGIDO)
-// ==================================================
 async function finalizarEntrega() {
-    if (typeof db === 'undefined') { 
-        alert("Erro: Banco de dados não carregado. Verifique sua conexão."); 
-        return; 
-    }
-
-    // Pega o valor do SELECT com id="pagamento"
     const formaPagamento = document.getElementById("pagamento").value;
-    
-    // Validação: Não deixa finalizar sem escolher o pagamento
-    if (!formaPagamento) {
-        alert("Por favor, selecione uma forma de pagamento!");
-        return;
-    }
+    if (!formaPagamento) { alert("Escolha o pagamento!"); return; }
 
-    const observacao = document.getElementById("observacao")?.value || "Nenhuma";
-    const nomeCli = document.getElementById("nomeCliente").value;
-    const cidadeCli = document.getElementById("cidade").value;
-    const ruaCli = document.getElementById("rua").value;
-    const numCli = document.getElementById("numero").value;
-    const bairroCli = document.getElementById("bairro").value;
-
-    let subtotal = 0;
-    // Iniciamos a mensagem do WhatsApp com Codificação correta
-    let msgWhatsApp = "*NOVO PEDIDO - SNOOP LANCHE*%0A%0A";
-    
-    // Monta a lista de itens e calcula subtotal
-    const itensPedido = carrinho.map(i => {
-        subtotal += i.price * i.qtd;
-        msgWhatsApp += `• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}%0A`;
-        return { produto: i.title, qtd: i.qtd, precoUn: i.price };
-    });
-
-    const totalGeral = subtotal + taxaEntregaCalculada;
-
-    // Detalhes de Valores
-    msgWhatsApp += `%0A---------------------------%0A`;
-    msgWhatsApp += `*Subtotal:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += `*Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += `*TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += `---------------------------%0A`;
-    
-    // Detalhes do Cliente e Pagamento
-    msgWhatsApp += `*Pagamento:* ${formaPagamento}%0A`; 
-    msgWhatsApp += `*Cliente:* ${nomeCli}%0A`;
-    msgWhatsApp += `📍 *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli} (${cidadeCli})%0A`;
-    msgWhatsApp += `*Obs:* ${observacao}%0A%0A`;
+    const dadosPedido = {
+        cliente: document.getElementById("nomeCliente").value,
+        cidade: document.getElementById("cidade").value,
+        endereco: `${document.getElementById("rua").value}, ${document.getElementById("numero").value}`,
+        itens: carrinho,
+        total: (carrinho.reduce((a,b) => a + (b.price * b.qtd), 0) + taxaEntregaCalculada),
+        pagamento: formaPagamento,
+        data: new Date().toISOString()
+    };
 
     try {
-        // 1. SALVA NO FIREBASE (PAINEL ADMIN)
-        await db.ref('pedidos').push({
-            cliente: nomeCli,
-            cidade: cidadeCli,
-            endereco: `${ruaCli}, ${numCli} - ${bairroCli}`,
-            itens: itensPedido,
-            subtotal: subtotal,
-            taxaEntrega: taxaEntregaCalculada,
-            total: totalGeral,
-            pagamento: formaPagamento, // Aqui envia PIX, CARTÃO ou DINHEIRO para o painel
-            observacao: observacao,
-            data: new Date().toISOString(),
-            status: "novo"
-        });
-        
-        // 2. LIMPA CARRINHO E FECHA TUDO
-        carrinho = []; 
-        salvarCarrinho(); 
-        atualizarCarrinho(); 
-        fecharDelivery();
-
-        // 3. ENVIA PARA O WHATSAPP
-        window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
-
-    } catch (e) {
-        console.error("Erro ao salvar pedido:", e);
-        // Mesmo se der erro no Firebase, tenta enviar o WhatsApp para você não perder a venda!
-        window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
-    }
+        await window.db.ref('pedidos').push(dadosPedido);
+        let msg = `*NOVO PEDIDO*%0A%0ACliente: ${dadosPedido.cliente}%0ATotal: R$ ${dadosPedido.total.toFixed(2)}%0APagamento: ${formaPagamento}`;
+        window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`;
+        carrinho = []; salvarCarrinho();
+    } catch (e) { alert("Erro ao enviar"); }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    initSplash(); 
-    initMenu(); 
-    carregarStatusLoja();
-    carregarProdutosDoBanco(); // Chama a função nova que lê o Firebase
-    carregarCarrinhoStorage();
-});
+// ==================================================
+// INICIALIZAÇÃO
+// ==================================================
+function initSplash() {
+    const splash = document.getElementById("splash");
+    if (splash) setTimeout(() => { splash.remove(); }, 1500);
+}
+
+function initMenu() {
+    const btn = document.getElementById("hamburger");
+    const menu = document.getElementById("mobile-menu");
+    if (btn && menu) btn.onclick = () => menu.classList.toggle("open");
+}
 
 function mostrarToast() {
     const t = document.getElementById("toast");
     if (t) { t.classList.add("show"); setTimeout(() => { t.classList.remove("show"); }, 2000); }
 }
 
-
-
-function abrirOpcoesPizza(id) {
-    window.db.ref('produtos/pizzas/' + id).once('value', (snapshot) => {
-        const pizza = snapshot.val();
-        if(!pizza) return;
-
-        let mensagem = `Escolha o tamanho para ${pizza.nome}:\n\n`;
-        let opcoes = Object.keys(pizza.precos).join(", ");
-        
-        // Exemplo simples com prompt (depois podemos fazer um modal bonito)
-        const escolha = prompt(`${mensagem} Digite um: ${opcoes}`);
-        
-        if (escolha) {
-            // Busca o tamanho que o usuário digitou
-            const tamanhoNome = Object.keys(pizza.precos).find(t => t.toLowerCase() === escolha.toLowerCase());
-            
-            if (tamanhoNome) {
-                const info = pizza.precos[tamanhoNome];
-                // Adiciona ao carrinho com o nome do tamanho
-                const itemParaCarrinho = {
-                    title: `${pizza.nome} (${tamanhoNome})`,
-                    price: info.atual
-                };
-                adicionarCarrinhoPorProduto(itemParaCarrinho);
-            } else {
-                alert("Tamanho inválido! Digite exatamente como aparece na lista.");
-            }
-        }
-    });
-}
-
-
+document.addEventListener("DOMContentLoaded", () => {
+    initSplash(); 
+    initMenu(); 
+    carregarStatusLoja();
+    carregarProdutosDoBanco();
+    carregarCarrinhoStorage();
+});
