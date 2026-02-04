@@ -208,6 +208,8 @@ async function mostrarResumo() {
 async function finalizarEntrega() {
     if (typeof db === 'undefined') { alert("Erro: Banco de dados."); return; }
 
+    // CAPTURA A FORMA DE PAGAMENTO (Certifique-se que o ID no seu HTML seja 'metodoPagamento')
+    const formaPagamento = document.getElementById("metodoPagamento")?.value || "Não informado";
     const observacao = document.getElementById("observacao")?.value || "Nenhuma";
     const nomeCli = document.getElementById("nomeCliente").value;
     const cidadeCli = document.getElementById("cidade").value;
@@ -231,11 +233,10 @@ async function finalizarEntrega() {
     msgWhatsApp += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
     msgWhatsApp += ` *TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
     msgWhatsApp += `---------------------------%0A`;
+    msgWhatsApp += ` *Pagamento:* ${formaPagamento}%0A`; // <--- Para o WhatsApp
     msgWhatsApp += ` *Cliente:* ${nomeCli}%0A`;
-    msgWhatsApp += `📍 *Cidade:* ${cidadeCli}%0A`;
     msgWhatsApp += `📍 *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
     msgWhatsApp += ` *Obs:* ${observacao}%0A%0A`;
-    msgWhatsApp += ` _Prepararemos tudo com muito carinho!_`;
 
     try {
         await db.ref('pedidos').push({
@@ -246,6 +247,7 @@ async function finalizarEntrega() {
             subtotal: subtotal,
             taxaEntrega: taxaEntregaCalculada,
             total: totalGeral,
+            pagamento: formaPagamento, // <--- ESTA LINHA SALVA NO PAINEL ADMIN
             observacao: observacao,
             data: new Date().toISOString(),
             status: "novo"
@@ -267,3 +269,4 @@ function mostrarToast() {
     const t = document.getElementById("toast");
     if (t) { t.classList.add("show"); setTimeout(() => { t.classList.remove("show"); }, 2000); }
 }
+
