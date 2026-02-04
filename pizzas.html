@@ -17,7 +17,7 @@
         top: 0; left: 0;
         width: 100%; height: 100%;
         background-color: rgba(0, 0, 0, 0.8);
-        display: none; /* Inicia escondido */
+        display: none; 
         justify-content: center;
         align-items: center;
         z-index: 9999;
@@ -73,6 +73,13 @@
         margin-bottom: 10px;
     }
 
+    .instrucao {
+        font-size: 0.85rem;
+        color: #888;
+        margin-bottom: 10px;
+        display: block;
+    }
+
     /* 6. BOTÕES DE TAMANHO (LINHA) */
     .sizes-row {
         display: flex;
@@ -92,35 +99,84 @@
     }
 
     .btn-tamanho-opcional.ativo {
-        border-color: #ffc107; /* Cor de destaque (Amarelo/Dourado) */
+        border-color: #ffc107;
         background: #fffdf5;
     }
 
-    /* 7. GRID DE SABORES (MEIO-A-MEIO) */
+    /* 7. LISTA DE SABORES (HORIZONTAL E VERTICAL AJUSTADOS) */
     .sabores-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
+        display: flex;
+        flex-direction: column; /* Lista vertical */
         gap: 10px;
         margin-top: 10px;
     }
 
     .item-sabor {
-        padding: 10px;
+        display: flex;
+        justify-content: space-between; /* Nome na esquerda, botões na direita */
+        align-items: center;           /* Alinhamento vertical perfeito */
+        padding: 12px 15px;
         border: 1px solid #ddd;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 0.85rem;
-        text-align: center;
+        border-radius: 12px;
         transition: 0.2s;
+        width: 100%;
+        box-sizing: border-box; /* Garante que o padding não quebre a largura */
     }
 
+    /* Estilo do nome da pizza dentro da linha */
+    .sabor-info {
+        flex: 1;
+        text-align: left;
+        font-weight: 500;
+        font-size: 0.95rem;
+        color: #333;
+    }
+
+    /* Destaque quando selecionado (NOME CONTINUA APARECENDO) */
     .item-sabor.selecionado {
-        background: #28a745; /* Verde quando selecionado */
-        color: white;
-        border-color: #28a745;
+        border: 2px solid #28a745;
+        background: #f8fff9;
     }
 
-    /* 8. BOTÃO FINAL ADICIONAR */
+    .item-sabor.selecionado .sabor-info {
+        color: #155724; /* Nome em verde escuro para destaque */
+        font-weight: bold;
+    }
+
+    /* 8. CONTROLES DE FATIAS (+ e -) */
+    .controles-fatias {
+        display: flex;
+        align-items: center;
+        background: #f0f0f0;
+        border-radius: 25px;
+        padding: 3px;
+        margin-left: 10px;
+    }
+
+    .btn-fatia {
+        background: #000;
+        color: #fff;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 20px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 0;
+    }
+
+    .qtd-fatia {
+        min-width: 30px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 16px;
+    }
+
+    /* 9. BOTÃO FINAL ADICIONAR */
     .btn-final-adicionar {
         width: 100%;
         background: #28a745;
@@ -131,39 +187,10 @@
         font-weight: bold;
         font-size: 1rem;
         cursor: pointer;
+        margin-top: 20px;
     }
 
     .btn-final-adicionar:hover { background: #218838; }
-        .controles-fatias {
-    display: flex;
-    align-items: center;
-    background: #f0f0f0;
-    border-radius: 20px;
-    padding: 2px;
-}
-.btn-fatia {
-    background: #000;
-    color: #fff;
-    border: none;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.qtd-fatia {
-    min-width: 25px;
-    text-align: center;
-    font-weight: bold;
-    font-size: 14px;
-}
-.item-sabor.selecionado {
-    border: 2px solid #28a745;
-    background: #f8fff9;
-}
 
 </style>
 
@@ -328,6 +355,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
