@@ -16,27 +16,30 @@
         <ul id="pedidos-container"></ul>
     </div>
 
-    <div id="modal-relatorio">
-        <div class="modal-content">
-            <span class="fechar-modal" onclick="fecharRelatorio()">&times;</span>
+    <div id="modal-relatorio" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);">
+        <div class="modal-content" style="background: #222; margin: 5% auto; padding: 20px; width: 90%; max-width: 600px; border-radius: 10px; color: white;">
+            <span class="fechar-modal" onclick="fecharRelatorio()" style="float: right; cursor: pointer; font-size: 28px;">&times;</span>
             <h2 style="color: #ffcc00; text-align: center;">RELATÓRIO DE VENDAS</h2>
             
-            <div class="resumo-caixa">
+            <div class="resumo-caixa" style="display: flex; justify-content: space-around; background: #333; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
                 <div>PEDIDOS: <span id="rel-qtd" style="color: #ffcc00; font-weight: bold;">0</span></div>
                 <div>TOTAL: <span id="rel-total" style="color: #27ae60; font-weight: bold;">R$ 0,00</span></div>
             </div>
 
-            <table class="tab-relatorio">
-                <thead>
-                    <tr>
-                        <th>Hora</th>
-                        <th>Cliente</th>
-                        <th>Valor</th>
-                    </tr>
-                </thead>
-                <tbody id="tabela-relatorio">
-                    </tbody>
-            </table>
+            <div style="max-height: 300px; overflow-y: auto;">
+                <table class="tab-relatorio" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid #444;">
+                            <th style="text-align: left; padding: 10px;">Hora</th>
+                            <th style="text-align: left; padding: 10px;">Cliente</th>
+                            <th style="text-align: right; padding: 10px;">Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-relatorio"></tbody>
+                </table>
+            </div>
+
+            <button onclick="limparRelatorio()" class="btn-limpar-relatorio">🗑️ Limpar Todos os Registros</button>
         </div>
     </div>
 
@@ -58,6 +61,8 @@
         
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+
+        let carregamentoInicial = true;
 
         // 1. ESCUTA NOVOS PEDIDOS
         db.ref('pedidos').on('child_added', (snapshot) => {
@@ -85,7 +90,6 @@
                 </div>
             `;
 
-            // Layout do Cupom Elgin
             const cupomParaImpressora = `
                 <div style="font-family: Arial, sans-serif; width: 72mm; color: black; padding: 5px;">
                     <div style="text-align: center;">
@@ -105,18 +109,21 @@
 
             container.prepend(li);
             
-            // Som de alerta
-            const toqueTelefone = new Audio('https://www.soundjay.com/phone/phone-calling-1.mp3');
-            toqueTelefone.play().catch(() => {});
+            // Som de alerta (Só toca se não for o carregamento inicial da página)
+            if (!carregamentoInicial) {
+                const toqueTelefone = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3'); // Som mais curto e garantido
+                toqueTelefone.play().catch(e => console.log("Aguardando interação do usuário para tocar som."));
+            }
 
-            // Ações dos botões
             li.querySelector(`#btn-print-${idPedido}`).onclick = () => enviarParaImpressora(cupomParaImpressora);
-
-            // Impressão Automática
-            enviarParaImpressora(cupomParaImpressora);
         });
 
-        // 2. FUNÇÃO CONCLUIR E MOVER PARA RELATÓRIO
+        // Flag para ignorar som nos pedidos que já estavam no banco
+        db.ref('pedidos').once('value', () => {
+            carregamentoInicial = false;
+        });
+
+        // 2. FUNÇÃO CONCLUIR
         function concluirPedido(id) {
             if (confirm("Deseja finalizar este pedido e enviar para o relatório?")) {
                 const refPedido = db.ref('pedidos/' + id);
@@ -124,7 +131,6 @@
                     const dados = snapshot.val();
                     dados.horaConcluido = new Date().toLocaleTimeString('pt-BR');
                     
-                    // Salva em 'relatorios' e remove de 'pedidos'
                     db.ref('relatorios').child(id).set(dados).then(() => {
                         refPedido.remove().then(() => {
                             const card = document.getElementById(`card-${id}`);
@@ -135,7 +141,7 @@
             }
         }
 
-        // 3. FUNÇÕES DO MODAL DE RELATÓRIO
+        // 3. FUNÇÕES DO RELATÓRIO
         function abrirRelatorio() {
             const tabela = document.getElementById('tabela-relatorio');
             const totalTexto = document.getElementById('rel-total');
@@ -152,10 +158,11 @@
                     contador++;
 
                     const tr = document.createElement('tr');
+                    tr.style.borderBottom = "1px solid #333";
                     tr.innerHTML = `
-                        <td>${p.horaConcluido || '---'}</td>
-                        <td>${p.cliente}</td>
-                        <td style="color: #27ae60; font-weight: bold;">R$ ${parseFloat(p.total).toFixed(2).replace('.',',')}</td>
+                        <td style="padding: 8px;">${p.horaConcluido || '---'}</td>
+                        <td style="padding: 8px;">${p.cliente}</td>
+                        <td style="padding: 8px; text-align: right; color: #27ae60; font-weight: bold;">R$ ${parseFloat(p.total).toFixed(2).replace('.',',')}</td>
                     `;
                     tabela.prepend(tr);
                 });
@@ -167,6 +174,15 @@
 
         function fecharRelatorio() {
             document.getElementById('modal-relatorio').style.display = "none";
+        }
+
+        function limparRelatorio() {
+            if (confirm("⚠️ ATENÇÃO: Isso apagará TODOS os dados do relatório permanentemente. Confirmar?")) {
+                db.ref('relatorios').remove().then(() => {
+                    alert("Relatório limpo com sucesso!");
+                    abrirRelatorio(); // Atualiza a tela
+                });
+            }
         }
 
         function enviarParaImpressora(htmlCupom) {
