@@ -282,31 +282,27 @@ function mostrarToast() {
 }
 
 
+
+
 // ==================================================
-// SISTEMA DE PIZZAS (ADICIONAR AO FINAL DO SCRIPT)
-// ==================================================
-// ==================================================
-// LÓGICA DE RENDERIZAÇÃO E MODAL DE PIZZAS
+// SISTEMA DE PIZZAS PROFISSIONAL (SABORES POR FATIA)
 // ==================================================
 
 let pizzaPrincipal = null;
-let saboresSelecionados = [];
+let saboresSelecionados = []; // Agora vai guardar nomes repetidos: ["Calabresa", "Calabresa", "Frango"]
 let tamanhoSelecionado = null;
 let limiteSabores = 1;
 
+// 1. CARREGAR AS PIZZAS NO CONTAINER
 async function carregarPizzas() {
     const container = document.getElementById("pizzas-container");
-    if (!container) return; 
+    if (!container) return;
 
     try {
-        // Busca o seu arquivo JSON
-        const res = await fetch("/content/produtos.json"); 
+        const res = await fetch("content/produtos.json");
         const data = await res.json();
-        
-        // Salva na variável global para o resto do script usar
-        produtos = data.produtos; 
+        produtos = data.produtos; // Sincroniza com a global
 
-        // Filtra só o que é pizza
         const listaPizzas = produtos.filter(p => p.categoria === "pizza");
 
         container.innerHTML = "";
@@ -321,25 +317,23 @@ async function carregarPizzas() {
                     </div>
                 </div>`;
         });
-    } catch (e) {
-        console.error("Erro ao carregar o JSON de pizzas:", e);
-    }
+    } catch (e) { console.error("Erro ao carregar pizzas:", e); }
 }
 
+// 2. ABRIR MODAL
 function abrirModalPizza(nome) {
     pizzaPrincipal = produtos.find(p => p.title === nome);
     if (!pizzaPrincipal) return;
 
-    // Preenche o Modal com as infos do seu JSON
     document.getElementById("modal-pizza-img").src = pizzaPrincipal.image;
     document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
     document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes;
     
-    saboresSelecionados = [pizzaPrincipal.title];
+    // Reset de estado ao abrir
+    saboresSelecionados = [];
     tamanhoSelecionado = null;
     document.getElementById("secao-sabores").style.display = "none";
     
-    // Gera botões de tamanho baseados no seu JSON ("prices": { "P": 40, ... })
     const sizesContainer = document.getElementById("pizza-sizes-container");
     sizesContainer.innerHTML = "";
     
@@ -354,63 +348,96 @@ function abrirModalPizza(nome) {
     document.getElementById("pizza-options-modal").style.display = "flex";
 }
 
+// 3. SELECIONAR TAMANHO E DEFINIR LIMITE
 function selecionarTamanhoPizza(tam, elemento) {
     tamanhoSelecionado = tam;
-    // P = 1 sabor, M = 2 sabores, G = 3 sabores
-    limiteSabores = (tam === "P") ? 1 : (tam === "M") ? 2 : 3;
+    
+    // Regra: P=1 sabor, M=2 sabores, G=3 sabores
+    if(tam === "P") limiteSabores = 1;
+    else if(tam === "M") limiteSabores = 2;
+    else limiteSabores = 3;
 
     document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
     elemento.classList.add("ativo");
 
-    const secao = document.getElementById("secao-sabores");
-    if (limiteSabores > 1) {
-        secao.style.display = "block";
-        renderizarListaSabores();
-    } else {
-        secao.style.display = "none";
-        saboresSelecionados = [pizzaPrincipal.title];
-    }
+    saboresSelecionados = []; // Zera fatias ao trocar tamanho
+    document.getElementById("secao-sabores").style.display = "block";
+    renderizarListaSabores();
 }
 
+// 4. RENDERIZAR LISTA COM CONTADORES (+ e -)
 function renderizarListaSabores() {
     const grid = document.getElementById("lista-sabores-meia");
     grid.innerHTML = "";
     const todasPizzas = produtos.filter(p => p.categoria === "pizza");
 
     todasPizzas.forEach(p => {
-        const ativo = saboresSelecionados.includes(p.title);
+        const qtdDesteSabor = saboresSelecionados.filter(s => s === p.title).length;
+
         const div = document.createElement("div");
-        div.className = `item-sabor ${ativo ? 'selecionado' : ''}`;
-        div.innerHTML = `<span>${p.title}</span>`;
-        div.onclick = () => alternarSabor(p.title);
+        div.className = `item-sabor ${qtdDesteSabor > 0 ? 'selecionado' : ''}`;
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <span>${p.title}</span>
+                <div class="controles-fatias">
+                    <button class="btn-fatia" onclick="removerSabor('${p.title}', event)">-</button>
+                    <span class="qtd-fatia">${qtdDesteSabor}</span>
+                    <button class="btn-fatia" onclick="adicionarSabor('${p.title}', event)">+</button>
+                </div>
+            </div>
+        `;
         grid.appendChild(div);
     });
+
+    // Atualiza texto de instrução
+    const total = saboresSelecionados.length;
+    const instrucao = document.querySelector(".instrucao");
+    if(instrucao) {
+        instrucao.innerHTML = `Fatias selecionadas: <strong>${total} de ${limiteSabores}</strong>`;
+        instrucao.style.color = total === limiteSabores ? "green" : "#888";
+    }
 }
 
-function alternarSabor(nome) {
+// 5. ADICIONAR E REMOVER FATIAS
+function adicionarSabor(nome, event) {
+    event.stopPropagation();
+    if (saboresSelecionados.length < limiteSabores) {
+        saboresSelecionados.push(nome);
+        renderizarListaSabores();
+    } else {
+        alert(`Limite de ${limiteSabores} fatias atingido!`);
+    }
+}
+
+function removerSabor(nome, event) {
+    event.stopPropagation();
     const index = saboresSelecionados.indexOf(nome);
     if (index > -1) {
-        if(saboresSelecionados.length > 1) saboresSelecionados.splice(index, 1);
-    } else {
-        if (saboresSelecionados.length < limiteSabores) {
-            saboresSelecionados.push(nome);
-        } else {
-            alert(`O tamanho ${tamanhoSelecionado} permite apenas ${limiteSabores} sabores!`);
-        }
+        saboresSelecionados.splice(index, 1);
+        renderizarListaSabores();
     }
-    renderizarListaSabores();
 }
 
 function fecharModalPizza() {
     document.getElementById("pizza-options-modal").style.display = "none";
 }
 
+// 6. ADICIONAR AO CARRINHO COM AGRUPAMENTO
 document.getElementById("btn-adicionar-pizza").onclick = () => {
-    if (!tamanhoSelecionado) {
-        alert("Escolha o tamanho primeiro!");
+    if (saboresSelecionados.length < limiteSabores) {
+        alert(`Selecione as ${limiteSabores} fatias para completar sua pizza!`);
         return;
     }
-    const nomeFinal = `Pizza ${tamanhoSelecionado}: ${saboresSelecionados.join(" / ")}`;
+
+    // Agrupa nomes: ["Calabresa", "Calabresa", "Frango"] -> "2x Calabresa / 1x Frango"
+    const contagem = {};
+    saboresSelecionados.forEach(s => contagem[s] = (contagem[s] || 0) + 1);
+    
+    const resumoSabores = Object.entries(contagem)
+        .map(([nome, qtd]) => `${qtd}x ${nome}`)
+        .join(" / ");
+
+    const nomeFinal = `Pizza ${tamanhoSelecionado}: ${resumoSabores}`;
     const precoFinal = pizzaPrincipal.prices[tamanhoSelecionado];
 
     carrinho.push({
@@ -425,5 +452,3 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
     fecharModalPizza();
     if(typeof mostrarToast === "function") mostrarToast();
 };
-
-
