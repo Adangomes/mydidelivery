@@ -61,3 +61,15 @@ collections:
                         name: "G"
                         widget: "number"
                         value_type: "float"
+
+
+                        - name: "configuracoes"
+    label: "Configurações da Loja"
+    files:
+      - file: "content/config.json"
+        label: "Status e Horários"
+        name: "loja_config"
+        fields:
+          - { label: "Loja Aberta?", name: "loja_aberta", widget: "boolean", default: true }
+          - { label: "Mensagem de Loja Fechada", name: "msg_fechado", widget: "string", default: "Desculpe, estamos fechados no momento!" }
+
