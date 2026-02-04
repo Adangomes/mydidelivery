@@ -19,7 +19,7 @@ collections:
             fields:
               - label: "Hambúrgueres"
                 name: "burgers"
-                widget: "map" # O segredo está aqui para manter o b1, b2...
+                widget: "map"
                 fields:
                   - { label: "Nome", name: "title", widget: "string" }
                   - { label: "Preço", name: "price", widget: "number", value_type: "float" }
@@ -45,19 +45,19 @@ collections:
                   - { label: "Categoria", name: "categoria", widget: "hidden", default: "pizza" }
                   - { label: "Ingredientes", name: "ingredientes", widget: "text" }
                   - { label: "Imagem", name: "imagem", widget: "image" }
-                  - label: "Preços", name: "precos", widget: "object", fields:
-                    - label: "Pequena"
-                      name: "Pequena"
-                      widget: "object"
-                      fields: 
-                        - { label: "Atual", name: "atual", widget: "number" }
-                    - label: "Média"
-                      name: "Media"
-                      widget: "object"
-                      fields: 
-                        - { label: "Atual", name: "atual", widget: "number" }
-                    - label: "Grande"
-                      name: "Grande"
-                      widget: "object"
-                      fields: 
-                        - { label: "Atual", name: "atual", widget: "number" }
+                  - label: "Preços"
+                    name: "prices"
+                    widget: "object"
+                    fields:
+                      - label: "Pequena"
+                        name: "P"
+                        widget: "number"
+                        value_type: "float"
+                      - label: "Média"
+                        name: "M"
+                        widget: "number"
+                        value_type: "float"
+                      - label: "Grande"
+                        name: "G"
+                        widget: "number"
+                        value_type: "float"
