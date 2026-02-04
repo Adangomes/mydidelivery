@@ -7,75 +7,57 @@ public_folder: "/imagens"
 
 collections:
   - name: "cardapio"
-    label: "Cardápio Principal"
+    label: "Cardápio Completo"
     files:
       - file: "content/produtos.json"
-        label: "Hambúrgueres e Bebidas"
-        name: "produtos"
+        label: "Categorias de Produtos"
+        name: "produtos_config"
         fields:
-          - label: "Itens"
+          - label: "Produtos"
             name: "produtos"
             widget: "object"
             fields:
               - label: "Hambúrgueres"
                 name: "burgers"
-                widget: "list"
+                widget: "map" # O segredo está aqui para manter o b1, b2...
                 fields:
-                  - { label: "ID (ex: b1)", name: "id", widget: "string" }
                   - { label: "Nome", name: "title", widget: "string" }
                   - { label: "Preço", name: "price", widget: "number", value_type: "float" }
-                  - { label: "Preço Antigo", name: "oldPrice", widget: "number", value_type: "float", required: false }
+                  - { label: "Categoria", name: "categoria", widget: "hidden", default: "burger" }
                   - { label: "Ingredientes", name: "ingredientes", widget: "text" }
                   - { label: "Imagem", name: "image", widget: "image" }
               
               - label: "Bebidas"
                 name: "bebidas"
-                widget: "list"
+                widget: "map"
                 fields:
-                  - { label: "ID (ex: be1)", name: "id", widget: "string" }
                   - { label: "Nome", name: "title", widget: "string" }
                   - { label: "Preço", name: "price", widget: "number", value_type: "float" }
-                  - { label: "Descrição", name: "ingredientes", widget: "string", required: false }
+                  - { label: "Categoria", name: "categoria", widget: "hidden", default: "bebida" }
+                  - { label: "Descrição", name: "ingredientes", widget: "string" }
                   - { label: "Imagem", name: "image", widget: "image" }
 
-      - file: "content/pizzas.json"
-        label: "Pizzas"
-        name: "lista_pizzas"
-        fields:
-          - label: "Pizzas"
-            name: "pizzas"
-            widget: "list"
-            fields:
-              - { label: "ID (ex: p1)", name: "id", widget: "string" }
-              - { label: "Nome da Pizza", name: "nome", widget: "string" }
-              - { label: "Ingredientes", name: "ingredientes", widget: "text" }
-              - { label: "Imagem", name: "imagem", widget: "image" }
-              - label: "Preços por Tamanho"
-                name: "precos"
-                widget: "object"
+              - label: "Pizzas"
+                name: "pizzas"
+                widget: "map"
                 fields:
-                  - label: "Pequena"
-                    name: "Pequena"
-                    widget: "object"
-                    fields:
-                      - { label: "Preço Atual", name: "atual", widget: "number", value_type: "float" }
-                  - label: "Média"
-                    name: "Media"
-                    widget: "object"
-                    fields:
-                      - { label: "Preço Atual", name: "atual", widget: "number", value_type: "float" }
-                  - label: "Grande"
-                    name: "Grande"
-                    widget: "object"
-                    fields:
-                      - { label: "Preço Atual", name: "atual", widget: "number", value_type: "float" }
-
-  - name: "status-loja"
-    label: "Status da Loja"
-    files:
-      - file: "content/status.json"
-        label: "Configuração da Loja"
-        name: "config-loja"
-        fields:
-          - { label: "Aberto", name: "aberto", widget: "boolean" }
-          - { label: "Mensagem do Status", name: "mensagem", widget: "string" }
+                  - { label: "Nome da Pizza", name: "nome", widget: "string" }
+                  - { label: "Categoria", name: "categoria", widget: "hidden", default: "pizza" }
+                  - { label: "Ingredientes", name: "ingredientes", widget: "text" }
+                  - { label: "Imagem", name: "imagem", widget: "image" }
+                  - label: "Preços", name: "precos", widget: "object", fields:
+                    - label: "Pequena"
+                      name: "Pequena"
+                      widget: "object"
+                      fields: 
+                        - { label: "Atual", name: "atual", widget: "number" }
+                    - label: "Média"
+                      name: "Media"
+                      widget: "object"
+                      fields: 
+                        - { label: "Atual", name: "atual", widget: "number" }
+                    - label: "Grande"
+                      name: "Grande"
+                      widget: "object"
+                      fields: 
+                        - { label: "Atual", name: "atual", widget: "number" }
