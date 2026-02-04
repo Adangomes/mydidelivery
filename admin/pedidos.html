@@ -94,8 +94,8 @@
                 <div class="info-obs"><b>💬 Obs:</b> ${p.observacao || 'Nenhuma'}</div>
                 <div class="total">R$ ${parseFloat(p.total || 0).toFixed(2).replace('.',',')}</div>
                 <div class="btn-group">
-                    <button class="btn-cozinha" onclick="imprimir('cozinha', '${id}')">👨‍🍳 Cozinha</button>
-                    <button class="btn-motoboy" onclick="imprimir('motoboy', '${id}')">🛵 Motoboy</button>
+                    <button class="btn-cozinha" onclick="imprimir('cozinha', '${id}')">Cozinha</button>
+                    <button class="btn-motoboy" onclick="imprimir('motoboy', '${id}')">Motoboy</button>
                 </div>
                 <button class="btn-concluir" onclick="concluirPedido('${id}')">✅ Concluir Pedido</button>
             `;
@@ -158,3 +158,4 @@
     </script>
 </body>
 </html>
+
