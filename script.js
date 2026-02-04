@@ -200,26 +200,34 @@ async function finalizarEntrega() {
     }
 
     let subtotal = 0;
-    let msgWhatsApp = " *NOVO PEDIDO*%0A%0A";
+    // Início da Mensagem
+    let msgWhatsApp = " *NOVO PEDIDO* %0A";
+    msgWhatsApp += "---------------------------%0A";
     
     const itensPedido = carrinho.map(i => {
         subtotal += i.price * i.qtd;
-        msgWhatsApp += `• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}%0A`;
+        // Se for pizza, destaca os sabores em negrito
+        let tituloFinal = i.categoria === "pizza" ? `*${i.title}*` : i.title;
+        msgWhatsApp += `• ${i.qtd}x ${tituloFinal}%0A   _R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}_%0A`;
         return { produto: i.title, qtd: i.qtd, precoUn: i.price };
     });
 
     const totalGeral = subtotal + taxaEntregaCalculada;
 
-    // Montando a mensagem (sem o erro de undefined)
-    msgWhatsApp += `%0A---------------------------%0A`;
-    msgWhatsApp += ` *TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += `---------------------------%0A`;
-    msgWhatsApp += ` *Cliente:* ${nomeCli}%0A`;
-    msgWhatsApp += ` *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
-    msgWhatsApp += ` *Ref:* ${pontoRef}%0A`; 
-    msgWhatsApp += ` *Obs Cozinha:* ${obsCozinha}%0A`; 
-    msgWhatsApp += ` *Pagamento:* ${pagtoCli}${valorTroco ? ' (Troco p/ ' + valorTroco + ')' : ''}%0A`;
-    msgWhatsApp += `---------------------------%0A%0A`;
+    msgWhatsApp += "---------------------------%0A";
+    msgWhatsApp += ` *TOTAL: R$ ${totalGeral.toFixed(2).replace(".", ",")}*%0A`;
+    msgWhatsApp += "---------------------------%0A%0A";
+
+    msgWhatsApp += ` *CLIENTE:* ${nomeCli}%0A`;
+    msgWhatsApp += ` *ENTREGA:* ${ruaCli}, ${numCli}%0A`;
+    msgWhatsApp += ` *BAIRRO:* ${bairroCli}%0A`;
+    msgWhatsApp += ` *REF:* _${pontoRef}_%0A%0A`;
+    
+    msgWhatsApp += ` *PAGAMENTO:* ${pagtoCli}%0A`;
+    if(valorTroco) msgWhatsApp += ` *TROCO PARA:* R$ ${valorTroco}%0A`;
+    
+    msgWhatsApp += ` *OBS:* ${obsCozinha}%0A`;
+    msgWhatsApp += "---------------------------";;
 
     try {
         // Envia para o Firebase
@@ -449,4 +457,5 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
     fecharModalPizza();
     if(typeof mostrarToast === "function") mostrarToast();
 };
+
 
