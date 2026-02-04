@@ -275,28 +275,35 @@ function mostrarToast() {
 // ==================================================
 // SISTEMA DE PIZZAS (ADICIONAR AO FINAL DO SCRIPT)
 // ==================================================
+// ==================================================
+// LÓGICA DE RENDERIZAÇÃO E MODAL DE PIZZAS
+// ==================================================
 
 let pizzaPrincipal = null;
 let saboresSelecionados = [];
 let tamanhoSelecionado = null;
 let limiteSabores = 1;
 
-// 1. CARREGAR PIZZAS NA TELA
 async function carregarPizzas() {
     const container = document.getElementById("pizzas-container");
-    if (!container) return;
+    if (!container) return; 
 
     try {
-        const res = await fetch("/content/produtos.json");
+        // Busca o seu arquivo JSON
+        const res = await fetch("/content/produtos.json"); 
         const data = await res.json();
-        const listaPizzas = data.produtos.filter(p => p.categoria === "pizza");
-        produtos = data.produtos; // Atualiza lista global
+        
+        // Salva na variável global para o resto do script usar
+        produtos = data.produtos; 
+
+        // Filtra só o que é pizza
+        const listaPizzas = produtos.filter(p => p.categoria === "pizza");
 
         container.innerHTML = "";
         listaPizzas.forEach(p => {
             container.innerHTML += `
                 <div class="card-produto">
-                    <img src="${p.image}">
+                    <img src="${p.image}" alt="${p.title}">
                     <div class="card-content">
                         <h3>${p.title}</h3>
                         <p>${p.ingredientes}</p>
@@ -304,31 +311,31 @@ async function carregarPizzas() {
                     </div>
                 </div>`;
         });
-    } catch (e) { console.error("Erro pizzas:", e); }
+    } catch (e) {
+        console.error("Erro ao carregar o JSON de pizzas:", e);
+    }
 }
 
-// 2. ABRIR MODAL E CONFIGURAR TAMANHOS
 function abrirModalPizza(nome) {
     pizzaPrincipal = produtos.find(p => p.title === nome);
     if (!pizzaPrincipal) return;
 
-    // Preenche dados do Modal
+    // Preenche o Modal com as infos do seu JSON
     document.getElementById("modal-pizza-img").src = pizzaPrincipal.image;
     document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
     document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes;
     
-    // Reset de estado
     saboresSelecionados = [pizzaPrincipal.title];
     tamanhoSelecionado = null;
     document.getElementById("secao-sabores").style.display = "none";
     
-    // Gera botões de tamanho
+    // Gera botões de tamanho baseados no seu JSON ("prices": { "P": 40, ... })
     const sizesContainer = document.getElementById("pizza-sizes-container");
     sizesContainer.innerHTML = "";
     
     Object.keys(pizzaPrincipal.prices).forEach(tam => {
         const btn = document.createElement("button");
-        btn.className = "btn-tamanho-opcional"; // Certifique-se que esta classe existe no seu CSS
+        btn.className = "btn-tamanho-opcional";
         btn.innerHTML = `<strong>${tam}</strong><br>R$ ${pizzaPrincipal.prices[tam].toFixed(2).replace(".", ",")}`;
         btn.onclick = () => selecionarTamanhoPizza(tam, btn);
         sizesContainer.appendChild(btn);
@@ -337,20 +344,14 @@ function abrirModalPizza(nome) {
     document.getElementById("pizza-options-modal").style.display = "flex";
 }
 
-// 3. LÓGICA DE SELEÇÃO DE TAMANHO
 function selecionarTamanhoPizza(tam, elemento) {
     tamanhoSelecionado = tam;
-    
-    // Regra de sabores por tamanho
-    if(tam === "P") limiteSabores = 1;
-    else if(tam === "M") limiteSabores = 2;
-    else limiteSabores = 3; // Grande/Família
+    // P = 1 sabor, M = 2 sabores, G = 3 sabores
+    limiteSabores = (tam === "P") ? 1 : (tam === "M") ? 2 : 3;
 
-    // Destaque visual
     document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
     elemento.classList.add("ativo");
 
-    // Controle da seção de sabores
     const secao = document.getElementById("secao-sabores");
     if (limiteSabores > 1) {
         secao.style.display = "block";
@@ -361,7 +362,6 @@ function selecionarTamanhoPizza(tam, elemento) {
     }
 }
 
-// 4. SELEÇÃO MEIO-A-MEIO
 function renderizarListaSabores() {
     const grid = document.getElementById("lista-sabores-meia");
     grid.innerHTML = "";
@@ -391,18 +391,15 @@ function alternarSabor(nome) {
     renderizarListaSabores();
 }
 
-// 5. FECHAR MODAL
 function fecharModalPizza() {
     document.getElementById("pizza-options-modal").style.display = "none";
 }
 
-// 6. ADICIONAR AO CARRINHO FINAL
 document.getElementById("btn-adicionar-pizza").onclick = () => {
     if (!tamanhoSelecionado) {
         alert("Escolha o tamanho primeiro!");
         return;
     }
-
     const nomeFinal = `Pizza ${tamanhoSelecionado}: ${saboresSelecionados.join(" / ")}`;
     const precoFinal = pizzaPrincipal.prices[tamanhoSelecionado];
 
@@ -416,6 +413,5 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
     salvarCarrinho();
     atualizarCarrinho();
     fecharModalPizza();
-    mostrarToast();
+    if(typeof mostrarToast === "function") mostrarToast();
 };
-
