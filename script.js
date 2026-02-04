@@ -182,9 +182,18 @@ async function finalizarEntrega() {
         alert("Erro: Banco de dados não inicializado."); return;
     }
 
-    // Pega a observação pelo ID correto: "observacao"
+    // Capturando os novos campos
+    const nomeCli = document.getElementById("nomeCliente").value;
+    const cidadeCli = document.getElementById("cidade").value;
+    const bairroCli = document.getElementById("bairro").value;
+    const ruaCli = document.getElementById("rua").value;
+    const numCli = document.getElementById("numero").value;
+    const pagtoCli = document.getElementById("pagamento").value;
     const obsCampo = document.getElementById("observacao");
     const observacao = obsCampo ? obsCampo.value : "Nenhuma";
+
+    // Validação extra de segurança
+    if(!pagtoCli) { alert("Escolha a forma de pagamento!"); return; }
 
     let subtotal = 0;
     let msgWhatsApp = " *NOVO PEDIDO*%0A%0A";
@@ -197,21 +206,26 @@ async function finalizarEntrega() {
 
     const totalGeral = subtotal + taxaEntregaCalculada;
 
-    // Montando o corpo da mensagem
+    // Montando o corpo da mensagem para o Motoboy
     msgWhatsApp += `%0A---------------------------%0A`;
     msgWhatsApp += ` *Subtotal:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
     msgWhatsApp += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
     msgWhatsApp += ` *TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
     msgWhatsApp += `---------------------------%0A`;
-    msgWhatsApp += ` *Cliente:* ${nomeCliente.value}%0A`;
-    msgWhatsApp += `📍 *Endereço:* ${rua.value}, ${numero.value} - ${bairro.value}%0A`;
+    msgWhatsApp += ` *Cliente:* ${nomeCli}%0A`;
+    msgWhatsApp += `📍 *Cidade:* ${cidadeCli}%0A`;
+    msgWhatsApp += `📍 *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
+    msgWhatsApp += ` 💳 *Pagamento:* ${pagtoCli}%0A`; // <--- NOVO
     msgWhatsApp += ` *Obs:* ${observacao}%0A%0A`;
     msgWhatsApp += ` _Prepararemos tudo com muito carinho!_`;
 
     try {
+        // Enviando para o Firebase com os novos campos para o Painel de Pedidos
         await db.ref('pedidos').push({
-            cliente: nomeCliente.value,
-            endereco: `${rua.value}, ${numero.value} - ${bairro.value}`,
+            cliente: nomeCli,
+            cidade: cidadeCli, // <--- NOVO
+            endereco: `${ruaCli}, ${numCli} - ${bairroCli}`,
+            pagamento: pagtoCli, // <--- NOVO
             itens: itensPedido,
             subtotal: subtotal,
             taxaEntrega: taxaEntregaCalculada,
@@ -226,7 +240,7 @@ async function finalizarEntrega() {
         atualizarCarrinho(); 
         fecharDelivery();
 
-        // Vai direto para o WhatsApp
+        // Abre o WhatsApp com a mensagem formatada
         window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
 
     } catch (error) {
@@ -249,3 +263,4 @@ function mostrarToast() {
     toast.classList.add("show");
     setTimeout(() => { toast.classList.remove("show"); }, 2000);
 }
+
