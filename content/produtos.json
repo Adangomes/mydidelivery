@@ -45,7 +45,7 @@
         "oldPrice": 0,
         "categoria": "bebida",
         "ingredientes": "350ml",
-        "image": "/imagens/cocalata.jpeg",
+        "image": "/imagens/teste.jpg",
         "id": "be1"
       },
       "be2": {
@@ -54,7 +54,7 @@
         "oldPrice": 0,
         "categoria": "bebida",
         "ingredientes": "350ml",
-        "image": "/imagens/guarana.jpeg",
+        "image": "/imagens/teste.jpg",
         "id": "be2"
       },
       "be3": {
@@ -63,7 +63,7 @@
         "oldPrice": 0,
         "categoria": "bebida",
         "ingredientes": "600ml",
-        "image": "/imagens/coca600.jpg",
+        "image": "/imagens/teste.jpg",
         "id": "be3"
       }
     },
