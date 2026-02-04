@@ -6,14 +6,11 @@
     <title>Painel Admin - SNOOP LANCHE</title>
     <link rel="stylesheet" href="admin.css">
 </head>
-<body>
+<body onclick="liberarAudio()">
 
-    <div id="trava-audio" onclick="ativarAudio()" style="position:fixed; top:0; left:0; width:100%; height:60px; background:red; color:white; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:9999; font-weight:bold; font-size:18px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-        ⚠️ CLIQUE AQUI PARA ATIVAR O SOM DO PAINEL
-    </div>
-
-    <header class="admin-header" style="margin-top: 70px;">
-        <h1> Painel <span>SNOOP LANCHE</span></h1>
+    <header class="admin-header">
+        <h1>🔔 Painel <span>SNOOP LANCHE</span></h1>
+        <div id="status-audio" style="font-size: 12px; color: #ffcc00;">⚠️ Clique em qualquer lugar para ativar o som</div>
         <button class="btn-relatorio" onclick="abrirRelatorio()">📊 Ver Relatório</button>
     </header>
 
@@ -23,22 +20,17 @@
         <div class="modal-content">
             <span class="close-modal" onclick="fecharRelatorio()">&times;</span>
             <h2 class="modal-title">HISTÓRICO DE VENDAS</h2>
-            
             <div class="stats-container">
                 <div class="stat-box">PEDIDOS<br><b id="rel-qtd">0</b></div>
                 <div class="stat-box">TOTAL VENDIDO<br><b id="rel-total">R$ 0,00</b></div>
             </div>
-
             <div class="table-wrapper">
                 <table class="table-rel">
-                    <thead>
-                        <tr><th>Hora</th><th>Cliente</th><th>Valor</th></tr>
-                    </thead>
+                    <thead><tr><th>Hora</th><th>Cliente</th><th>Valor</th></tr></thead>
                     <tbody id="tabela-relatorio"></tbody>
                 </table>
             </div>
-            
-            <button class="btn-limpar" onclick="limparRelatorio()">🗑️ LIMPAR TODO HISTÓRICO</button>
+            <button class="btn-limpar" onclick="limparRelatorio()">🗑️ LIMPAR HISTÓRICO</button>
         </div>
     </div>
 
@@ -59,27 +51,23 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
+        
         let prontoParaTocar = false;
+        let audioLiberado = false;
 
-        // FUNÇÃO PARA DESTRAVAR O ÁUDIO
-        function ativarAudio() {
-            // Cria um contexto de áudio para "acordar" o Chrome
-            const context = new AudioContext();
-            if (context.state === 'suspended') context.resume();
-
-            // Tenta tocar o som
-            const somTeste = new Audio('alerta.mpeg');
-            somTeste.play().then(() => {
-                console.log("Áudio liberado com sucesso!");
-                document.getElementById('trava-audio').style.display = 'none'; // Some a barra vermelha
-                prontoParaTocar = true;
-            }).catch(err => {
-                console.error(err);
-                alert("ERRO: O arquivo 'alerta.mpeg' não foi encontrado na pasta ou o nome está errado!");
-            });
+        // Ativa o áudio no primeiro clique na tela
+        function liberarAudio() {
+            if (!audioLiberado) {
+                const dummy = new Audio('alerta.mp3');
+                dummy.volume = 0;
+                dummy.play().then(() => {
+                    audioLiberado = true;
+                    document.getElementById('status-audio').innerHTML = "✅ Som Ativado";
+                    document.getElementById('status-audio').style.color = "#27ae60";
+                }).catch(e => console.log("Arquivo alerta.mp3 não encontrado"));
+            }
         }
 
-        // ESCUTA DE NOVOS PEDIDOS
         db.ref('pedidos').on('child_added', (snap) => {
             const p = snap.val();
             const id = snap.key;
@@ -103,36 +91,30 @@
             `;
             document.getElementById('pedidos-container').prepend(li);
 
-            // TOCAR O SOM
-            if (prontoParaTocar) {
-                const som = new Audio('alerta.mpeg');
-                som.play().catch(e => console.log("Áudio bloqueado pelo navegador"));
+            if (prontoParaTocar && audioLiberado) {
+                new Audio('alerta.mp3').play().catch(e => console.error("Erro ao tocar som"));
             }
         });
 
-        // Só ativa o som para novos pedidos (após 2 segundos da carga inicial)
+        // Libera o som após carregar os pedidos existentes
         db.ref('pedidos').once('value', () => { 
-            setTimeout(() => { if(document.getElementById('trava-audio').style.display === 'none') prontoParaTocar = true; }, 2000); 
+            setTimeout(() => prontoParaTocar = true, 2000); 
         });
 
-        // IMPRESSÃO E RELATÓRIO (Mantidos)
         function imprimir(tipo, id) {
             db.ref('pedidos/'+id).once('value', s => {
                 const p = s.val();
                 let itens = Array.isArray(p.itens) ? p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>') : "Sem itens";
-                let html = '';
-                if(tipo === 'cozinha') {
-                    html = `<div style="width:72mm;font-family:Arial;text-align:center;"><h2>COZINHA</h2><hr><div style="text-align:left;"><b>CLIENTE:</b> ${p.cliente}<br><hr><b>ITENS:</b><br>${itens}<br><hr><b>OBS:</b> ${p.observacao}</div></div>`;
-                } else {
-                    html = `<div style="width:72mm;font-family:Arial;"><center><h2>ENTREGA</h2></center><hr><b>CLIENTE:</b> ${p.cliente}<br><b>ENDEREÇO:</b> ${p.endereco}<br><hr><b>PAGAMENTO:</b> ${p.pagamento || 'A COMBINAR'}<br><b>VALOR: R$ ${parseFloat(p.total).toFixed(2)}</b><br><hr><b>OBS:</b> ${p.observacao}</div>`;
-                }
+                let html = tipo === 'cozinha' ? 
+                    `<div style="width:72mm;font-family:Arial;text-align:center;"><h2>COZINHA</h2><hr><div style="text-align:left;"><b>CLIENTE:</b> ${p.cliente}<br><hr><b>ITENS:</b><br>${itens}<br><hr><b>OBS:</b> ${p.observacao}</div></div>` :
+                    `<div style="width:72mm;font-family:Arial;"><center><h2>ENTREGA</h2></center><hr><b>CLIENTE:</b> ${p.cliente}<br><b>ENDEREÇO:</b> ${p.endereco}<br><hr><b>PAGAMENTO:</b> ${p.pagamento}<br><b>VALOR: R$ ${parseFloat(p.total).toFixed(2)}</b><br><hr><b>OBS:</b> ${p.observacao}</div>`;
                 const doc = document.getElementById('iframe-impressao').contentWindow.document;
                 doc.open(); doc.write(`<html><body style="margin:0;" onload="window.print()">${html}</body></html>`); doc.close();
             });
         }
 
         function concluirPedido(id) {
-            if(confirm("Concluir pedido e enviar para o relatório?")){
+            if(confirm("Concluir pedido?")){
                 const ref = db.ref('pedidos/'+id);
                 ref.once('value', s => {
                     const data = s.val();
@@ -147,20 +129,19 @@
 
         function abrirRelatorio() {
             const lista = document.getElementById('tabela-relatorio');
-            lista.innerHTML = ''; let totalGeral = 0; let contagem = 0;
+            lista.innerHTML = ''; let total = 0; let qtd = 0;
             db.ref('relatorios').once('value', s => {
-                s.forEach(child => {
-                    const r = child.val();
-                    totalGeral += parseFloat(r.total || 0); contagem++;
+                s.forEach(c => {
+                    const r = c.val(); total += parseFloat(r.total || 0); qtd++;
                     lista.innerHTML += `<tr><td>${r.horaFinalizado || '--:--'}</td><td>${r.cliente}</td><td>R$ ${parseFloat(r.total).toFixed(2)}</td></tr>`;
                 });
-                document.getElementById('rel-total').innerText = `R$ ${totalGeral.toFixed(2).replace('.',',')}`;
-                document.getElementById('rel-qtd').innerText = contagem;
+                document.getElementById('rel-total').innerText = `R$ ${total.toFixed(2).replace('.',',')}`;
+                document.getElementById('rel-qtd').innerText = qtd;
                 document.getElementById('modal-relatorio').style.display = 'block';
             });
         }
         function fecharRelatorio() { document.getElementById('modal-relatorio').style.display = 'none'; }
-        function limparRelatorio() { if(confirm("Apagar todo o histórico?")) db.ref('relatorios').remove().then(() => abrirRelatorio()); }
+        function limparRelatorio() { if(confirm("Limpar tudo?")) db.ref('relatorios').remove().then(() => abrirRelatorio()); }
     </script>
 </body>
 </html>
