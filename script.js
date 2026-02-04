@@ -35,25 +35,48 @@ async function carregarStatusLoja() {
 // MOTOR DE RENDERIZAÇÃO (FIREBASE)
 // ==================================================
 function carregarProdutosDoBanco() {
+    if (!window.db) {
+        console.error("Firebase não inicializado! Verifique as chaves no HTML.");
+        return;
+    }
+
     const containerBurgers = document.getElementById("burgers");
     const containerBebidas = document.getElementById("bebidas");
     const containerPizzas = document.getElementById("pizza");
 
+    // BURGERS
     if (containerBurgers) {
         window.db.ref('produtos/burgers').on('value', (snapshot) => {
-            exibirProdutos(snapshot.val(), containerBurgers, 'burger');
+            const dados = snapshot.val();
+            if (dados) {
+                exibirProdutos(dados, containerBurgers, 'burger');
+            } else {
+                containerBurgers.innerHTML = "<p>Nenhum burger encontrado.</p>";
+            }
         });
     }
 
+    // BEBIDAS
     if (containerBebidas) {
         window.db.ref('produtos/bebidas').on('value', (snapshot) => {
-            exibirProdutos(snapshot.val(), containerBebidas, 'bebida');
+            const dados = snapshot.val();
+            if (dados) {
+                exibirProdutos(dados, containerBebidas, 'bebida');
+            } else {
+                containerBebidas.innerHTML = "<p>Nenhuma bebida encontrada.</p>";
+            }
         });
     }
 
+    // PIZZAS
     if (containerPizzas) {
         window.db.ref('produtos/pizzas').on('value', (snapshot) => {
-            exibirProdutos(snapshot.val(), containerPizzas, 'pizza');
+            const dados = snapshot.val();
+            if (dados) {
+                exibirProdutos(dados, containerPizzas, 'pizza');
+            } else {
+                containerPizzas.innerHTML = "<p>Nenhuma pizza encontrada.</p>";
+            }
         });
     }
 }
@@ -139,7 +162,7 @@ function abrirOpcoesPizza(id) {
         const pizza = snapshot.val();
         if(!pizza) return;
 
-        let opcoes = Object.keys(pizza.precos); // Pequena, Media, Grande
+        let opcoes = Object.keys(pizza.precos);
         let mensagem = `Escolha o tamanho para ${pizza.nome}:\n\n`;
         opcoes.forEach(t => {
             mensagem += `- ${t}: R$ ${pizza.precos[t].atual.toFixed(2).replace(".", ",")}\n`;
@@ -148,7 +171,6 @@ function abrirOpcoesPizza(id) {
         const escolha = prompt(mensagem);
         
         if (escolha) {
-            // Normaliza a escrita (Ex: "media" vira "Media")
             const tamanhoCerto = opcoes.find(t => t.toLowerCase() === escolha.toLowerCase().trim());
             
             if (tamanhoCerto) {
@@ -258,10 +280,16 @@ function mostrarToast() {
     if (t) { t.classList.add("show"); setTimeout(() => { t.classList.remove("show"); }, 2000); }
 }
 
+// INICIALIZAÇÃO ÚNICA E SEGURA
 document.addEventListener("DOMContentLoaded", () => {
     initSplash(); 
     initMenu(); 
     carregarStatusLoja();
-    carregarProdutosDoBanco();
+    
+    // Pequeno delay para garantir que o Firebase window.db esteja pronto
+    setTimeout(() => {
+        carregarProdutosDoBanco();
+    }, 500);
+    
     carregarCarrinhoStorage();
 });
