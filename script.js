@@ -272,4 +272,150 @@ function mostrarToast() {
 }
 
 
+// ==================================================
+// SISTEMA DE PIZZAS (ADICIONAR AO FINAL DO SCRIPT)
+// ==================================================
+
+let pizzaPrincipal = null;
+let saboresSelecionados = [];
+let tamanhoSelecionado = null;
+let limiteSabores = 1;
+
+// 1. CARREGAR PIZZAS NA TELA
+async function carregarPizzas() {
+    const container = document.getElementById("pizzas-container");
+    if (!container) return;
+
+    try {
+        const res = await fetch("/content/produtos.json");
+        const data = await res.json();
+        const listaPizzas = data.produtos.filter(p => p.categoria === "pizza");
+        produtos = data.produtos; // Atualiza lista global
+
+        container.innerHTML = "";
+        listaPizzas.forEach(p => {
+            container.innerHTML += `
+                <div class="card-produto">
+                    <img src="${p.image}">
+                    <div class="card-content">
+                        <h3>${p.title}</h3>
+                        <p>${p.ingredientes}</p>
+                        <button onclick="abrirModalPizza('${p.title}')">Escolher Tamanho</button>
+                    </div>
+                </div>`;
+        });
+    } catch (e) { console.error("Erro pizzas:", e); }
+}
+
+// 2. ABRIR MODAL E CONFIGURAR TAMANHOS
+function abrirModalPizza(nome) {
+    pizzaPrincipal = produtos.find(p => p.title === nome);
+    if (!pizzaPrincipal) return;
+
+    // Preenche dados do Modal
+    document.getElementById("modal-pizza-img").src = pizzaPrincipal.image;
+    document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
+    document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes;
+    
+    // Reset de estado
+    saboresSelecionados = [pizzaPrincipal.title];
+    tamanhoSelecionado = null;
+    document.getElementById("secao-sabores").style.display = "none";
+    
+    // Gera botões de tamanho
+    const sizesContainer = document.getElementById("pizza-sizes-container");
+    sizesContainer.innerHTML = "";
+    
+    Object.keys(pizzaPrincipal.prices).forEach(tam => {
+        const btn = document.createElement("button");
+        btn.className = "btn-tamanho-opcional"; // Certifique-se que esta classe existe no seu CSS
+        btn.innerHTML = `<strong>${tam}</strong><br>R$ ${pizzaPrincipal.prices[tam].toFixed(2).replace(".", ",")}`;
+        btn.onclick = () => selecionarTamanhoPizza(tam, btn);
+        sizesContainer.appendChild(btn);
+    });
+
+    document.getElementById("pizza-options-modal").style.display = "flex";
+}
+
+// 3. LÓGICA DE SELEÇÃO DE TAMANHO
+function selecionarTamanhoPizza(tam, elemento) {
+    tamanhoSelecionado = tam;
+    
+    // Regra de sabores por tamanho
+    if(tam === "P") limiteSabores = 1;
+    else if(tam === "M") limiteSabores = 2;
+    else limiteSabores = 3; // Grande/Família
+
+    // Destaque visual
+    document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
+    elemento.classList.add("ativo");
+
+    // Controle da seção de sabores
+    const secao = document.getElementById("secao-sabores");
+    if (limiteSabores > 1) {
+        secao.style.display = "block";
+        renderizarListaSabores();
+    } else {
+        secao.style.display = "none";
+        saboresSelecionados = [pizzaPrincipal.title];
+    }
+}
+
+// 4. SELEÇÃO MEIO-A-MEIO
+function renderizarListaSabores() {
+    const grid = document.getElementById("lista-sabores-meia");
+    grid.innerHTML = "";
+    const todasPizzas = produtos.filter(p => p.categoria === "pizza");
+
+    todasPizzas.forEach(p => {
+        const ativo = saboresSelecionados.includes(p.title);
+        const div = document.createElement("div");
+        div.className = `item-sabor ${ativo ? 'selecionado' : ''}`;
+        div.innerHTML = `<span>${p.title}</span>`;
+        div.onclick = () => alternarSabor(p.title);
+        grid.appendChild(div);
+    });
+}
+
+function alternarSabor(nome) {
+    const index = saboresSelecionados.indexOf(nome);
+    if (index > -1) {
+        if(saboresSelecionados.length > 1) saboresSelecionados.splice(index, 1);
+    } else {
+        if (saboresSelecionados.length < limiteSabores) {
+            saboresSelecionados.push(nome);
+        } else {
+            alert(`O tamanho ${tamanhoSelecionado} permite apenas ${limiteSabores} sabores!`);
+        }
+    }
+    renderizarListaSabores();
+}
+
+// 5. FECHAR MODAL
+function fecharModalPizza() {
+    document.getElementById("pizza-options-modal").style.display = "none";
+}
+
+// 6. ADICIONAR AO CARRINHO FINAL
+document.getElementById("btn-adicionar-pizza").onclick = () => {
+    if (!tamanhoSelecionado) {
+        alert("Escolha o tamanho primeiro!");
+        return;
+    }
+
+    const nomeFinal = `Pizza ${tamanhoSelecionado}: ${saboresSelecionados.join(" / ")}`;
+    const precoFinal = pizzaPrincipal.prices[tamanhoSelecionado];
+
+    carrinho.push({
+        title: nomeFinal,
+        price: precoFinal,
+        qtd: 1,
+        categoria: "pizza"
+    });
+
+    salvarCarrinho();
+    atualizarCarrinho();
+    fecharModalPizza();
+    mostrarToast();
+};
 
