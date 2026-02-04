@@ -194,3 +194,89 @@ function fecharCarrinho() { document.getElementById("cart-modal").style.display 
 
 document.addEventListener("DOMContentLoaded", carregarDadosIniciais);
 
+// ==================================================
+// MENU HAMBURGER MOBILE
+// ==================================================
+const hamburger = document.getElementById("hamburger");
+const mobileMenu = document.getElementById("mobile-menu");
+
+if (hamburger && mobileMenu) {
+    hamburger.addEventListener("click", () => {
+        mobileMenu.classList.toggle("open");
+    });
+
+    // Fecha menu ao clicar em um link
+    mobileMenu.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", () => {
+            mobileMenu.classList.remove("open");
+        });
+    });
+}
+
+// ==================================================
+// CARRINHO
+// ==================================================
+function abrirCarrinho() {
+    document.getElementById("cart-modal").style.display = "flex";
+    atualizarInterfaceCarrinho();
+}
+
+function fecharCarrinho() {
+    document.getElementById("cart-modal").style.display = "none";
+}
+
+// ==================================================
+// DELIVERY
+// ==================================================
+function abrirDelivery() {
+    document.getElementById("cart-modal").style.display = "none";
+    document.getElementById("delivery-modal").style.display = "flex";
+
+    document.getElementById("form-entrega").style.display = "block";
+    document.getElementById("resumo-pedido").style.display = "none";
+}
+
+function fecharDelivery() {
+    document.getElementById("delivery-modal").style.display = "none";
+}
+
+// ==================================================
+// RESUMO DO PEDIDO
+// ==================================================
+function mostrarResumo() {
+    const nome = document.getElementById("nomeCliente").value;
+    const cidade = document.getElementById("cidade").value;
+    const pagamento = document.getElementById("pagamento").value;
+
+    if (!nome || !cidade || !pagamento) {
+        alert("Preencha nome, cidade e pagamento");
+        return;
+    }
+
+    const resumoItens = document.getElementById("resumo-itens");
+    resumoItens.innerHTML = "";
+
+    let total = 0;
+
+    carrinho.forEach(item => {
+        total += item.price;
+        resumoItens.innerHTML += `
+            <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                <span>${item.title}</span>
+                <strong>R$ ${item.price.toFixed(2)}</strong>
+            </div>
+        `;
+    });
+
+    document.getElementById("resumo-taxa").innerText = "Taxa de entrega: R$ 0,00";
+    document.getElementById("resumo-total").innerText = `Total: R$ ${total.toFixed(2)}`;
+
+    document.getElementById("form-entrega").style.display = "none";
+    document.getElementById("resumo-pedido").style.display = "block";
+}
+
+function voltarParaDados() {
+    document.getElementById("resumo-pedido").style.display = "none";
+    document.getElementById("form-entrega").style.display = "block";
+}
+
