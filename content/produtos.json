@@ -7,7 +7,8 @@
         "oldPrice": 24.9,
         "categoria": "burger",
         "ingredientes": "Hambúrguer artesanal 140g, duas fatias de queijo e pão brioche",
-        "image": "/imagens/kingstradicional.jpeg"
+        "image": "/imagens/HAMBURGUER.jpg",
+        "id": "b1"
       },
       "b2": {
         "title": "Kings Duplo Bacon",
@@ -15,23 +16,26 @@
         "oldPrice": 34.9,
         "categoria": "burger",
         "ingredientes": "Dois hambúrgueres artesanais de 100g cada, queijo derretido, bacon crocante e pão brioche",
-        "image": "/imagens/kingsduplo.jpeg"
+        "image": "/imagens/HAMBURGUER.jpg",
+        "id": "b2"
       },
       "b3": {
         "title": "Kings Calabresa",
-        "price": 31.0,
+        "price": 31,
         "oldPrice": 0,
         "categoria": "burger",
         "ingredientes": "Hambúrguer artesanal 140g, calabresa grelhada, queijo e pão brioche",
-        "image": "/imagens/kingscalabresa.jpeg"
+        "image": "/imagens/HAMBURGUER.jpg",
+        "id": "b3"
       },
       "b4": {
         "title": "Kings Burger Classic",
-        "price": 28.0,
+        "price": 28,
         "oldPrice": 0,
         "categoria": "burger",
         "ingredientes": "Hambúrguer artesanal 150g, queijo prato, pão brioche",
-        "image": "/imagens/kingsclassic.jpeg"
+        "image": "/imagens/HAMBURGUER.jpg",
+        "id": "b4"
       }
     },
     "bebidas": {
@@ -41,7 +45,8 @@
         "oldPrice": 0,
         "categoria": "bebida",
         "ingredientes": "350ml",
-        "image": "/imagens/cocalata.jpeg"
+        "image": "/imagens/cocalata.jpeg",
+        "id": "be1"
       },
       "be2": {
         "title": "Guaraná Lata",
@@ -49,7 +54,8 @@
         "oldPrice": 0,
         "categoria": "bebida",
         "ingredientes": "350ml",
-        "image": "/imagens/guarana.jpeg"
+        "image": "/imagens/guarana.jpeg",
+        "id": "be2"
       },
       "be3": {
         "title": "Coca-Cola 600ml",
@@ -57,7 +63,8 @@
         "oldPrice": 0,
         "categoria": "bebida",
         "ingredientes": "600ml",
-        "image": "/imagens/coca600.jpg"
+        "image": "/imagens/coca600.jpg",
+        "id": "be3"
       }
     },
     "pizzas": {
@@ -67,20 +74,38 @@
         "ingredientes": "Mussarela, presunto, ovo, cebola, oregano",
         "imagem": "imagens/pizza.jpg",
         "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 45.0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
+          "Pequena": {
+            "atual": 40,
+            "antigo": 45
+          },
+          "Media": {
+            "atual": 60,
+            "antigo": 0
+          },
+          "Grande": {
+            "atual": 90,
+            "antigo": 0
+          }
         }
       },
       "p2": {
         "nome": "Bacon",
         "categoria": "pizza",
         "ingredientes": "Mussarela, bacon, tomate, oregano",
-       "imagem": "imagens/pizza.jpg",
+        "imagem": "imagens/pizza.jpg",
         "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
+          "Pequena": {
+            "atual": 40,
+            "antigo": 0
+          },
+          "Media": {
+            "atual": 60,
+            "antigo": 0
+          },
+          "Grande": {
+            "atual": 90,
+            "antigo": 0
+          }
         }
       },
       "p3": {
@@ -89,9 +114,18 @@
         "ingredientes": "Mussarela, requeijão, cheddar, oregano",
         "imagem": "imagens/pizza.jpg",
         "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
+          "Pequena": {
+            "atual": 40,
+            "antigo": 0
+          },
+          "Media": {
+            "atual": 60,
+            "antigo": 0
+          },
+          "Grande": {
+            "atual": 90,
+            "antigo": 0
+          }
         }
       },
       "p4": {
@@ -100,9 +134,18 @@
         "ingredientes": "Mussarela, frango, requeijão, oregano",
         "imagem": "imagens/pizza.jpg",
         "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
+          "Pequena": {
+            "atual": 40,
+            "antigo": 0
+          },
+          "Media": {
+            "atual": 60,
+            "antigo": 0
+          },
+          "Grande": {
+            "atual": 90,
+            "antigo": 0
+          }
         }
       },
       "p5": {
@@ -111,9 +154,18 @@
         "ingredientes": "Mussarela, cebola, pimentão, molho de pimenta, calabresa, oregano",
         "imagem": "imagens/pizza.jpg",
         "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
+          "Pequena": {
+            "atual": 40,
+            "antigo": 0
+          },
+          "Media": {
+            "atual": 60,
+            "antigo": 0
+          },
+          "Grande": {
+            "atual": 90,
+            "antigo": 0
+          }
         }
       },
       "p6": {
@@ -122,9 +174,18 @@
         "ingredientes": "Mussarela, calabresa, oregano",
         "imagem": "imagens/pizza.jpg",
         "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
+          "Pequena": {
+            "atual": 40,
+            "antigo": 0
+          },
+          "Media": {
+            "atual": 60,
+            "antigo": 0
+          },
+          "Grande": {
+            "atual": 90,
+            "antigo": 0
+          }
         }
       },
       "p7": {
@@ -133,9 +194,18 @@
         "ingredientes": "Chocolate preto, morango",
         "imagem": "imagens/pizza.jpg",
         "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
+          "Pequena": {
+            "atual": 40,
+            "antigo": 0
+          },
+          "Media": {
+            "atual": 60,
+            "antigo": 0
+          },
+          "Grande": {
+            "atual": 90,
+            "antigo": 0
+          }
         }
       }
     }
