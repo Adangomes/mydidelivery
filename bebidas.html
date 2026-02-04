@@ -15,7 +15,7 @@
 
 <body>
 
-    
+
 
     <!-- LOADING TAXA -->
     <div id="loading-taxa" style="display:none" class="loading">
@@ -28,15 +28,15 @@
 
         <!-- HEADER -->
         <header class="header">
-            <div class="logo">SNOOP LANCHE</div>
+            <div class="logo">KINGS BURGUER</div>
             <div id="status-loja" class="status"></div>
 
             <button class="hamburger" id="hamburger">&#9776;</button>
+
             <nav class="menu" id="mobile-menu">
-                <a href="index.html">BURGUER</a>
+                <a href="index.html">HAMBÚRGUERES</a>
                 <a href="bebidas.html">BEBIDAS</a>
                 <a href="contato.html">CONTATO</a>
-                <a href="pizzas.html">PIZZAS</a>
             </nav>
 
             <div class="cart" onclick="abrirCarrinho()">🛒</div>
@@ -80,109 +80,94 @@
     <!-- ===================== -->
     <!-- MODAL ENTREGA -->
     <div id="delivery-modal" style="display:none;">
-    <div class="delivery-box">
-        
-        <div id="form-entrega">
-            <h2>Informações de Entrega</h2>
+        <div class="delivery-box">
 
-            <label>Nome:</label>
-            <input type="text" id="nomeCliente" placeholder="Seu nome">
+            <div id="form-entrega">
+                <h2>Informações de Entrega</h2>
 
-            <label>Cidade:</label>
-            <select id="cidade">
+                <label>Nome:</label>
+                <input type="text" id="nomeCliente" placeholder="Seu nome">
+
+                <label>Cidade:</label>
+                <select id="cidade">
                 <option value="">Selecione</option>
                 <option value="Jaraguá do Sul">Jaraguá do Sul</option>
                 <option value="Guaramirim">Guaramirim</option>
-                <option value="Guaramirim">Schroeder</option>
             </select>
 
-            <label>Bairro:</label>
-            <input type="text" id="bairro" placeholder="Ex: Centro">
+                <label>Bairro:</label>
+                <input type="text" id="bairro" placeholder="Ex: Centro">
 
-            <label>Rua:</label>
-            <input type="text" id="rua" placeholder="Nome da rua">
+                <label>Rua:</label>
+                <input type="text" id="rua" placeholder="Nome da rua">
 
-            <label>Número:</label>
-            <input type="text" id="numero" placeholder="123">
+                <label>Número:</label>
+                <input type="text" id="numero" placeholder="123">
 
-            <label>Observações:</label>
-            <textarea id="observacao" placeholder="Ex: Casa de fundos"></textarea>
+                <label>Observações:</label>
+                <textarea id="observacao" placeholder="Ex: Casa de fundos"></textarea>
 
-            <label>Pagamento:</label>
-            <select id="pagamento">
+                <label>Pagamento:</label>
+                <select id="pagamento">
                 <option value="">Selecione</option>
                 <option value="Pix">Pix</option>
                 <option value="Dinheiro">Dinheiro</option>
                 <option value="Cartão">Cartão</option>
             </select>
 
-            <div class="buttons">
-                <button onclick="fecharDelivery()">Voltar</button>
-                <button onclick="mostrarResumo()">Próximo</button>
+                <div class="buttons">
+                    <button onclick="fecharDelivery()">Voltar</button>
+                    <button onclick="mostrarResumo()">Próximo</button>
+                </div>
             </div>
-        </div>
 
-        <div id="resumo-pedido" style="display:none;">
-            <h2 style="margin-bottom: 15px;">Resumo do Pedido</h2>
-            <div id="resumo-itens" style="font-size: 0.9rem; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;"></div>
-            <p id="resumo-taxa" style="font-weight: 500; margin-bottom: 5px;"></p>
-            <p id="resumo-total" style="font-size: 1.2rem; font-weight: 700; color: #111;"></p>
+            <div id="resumo-pedido" style="display:none;">
+                <h2 style="margin-bottom: 15px;">Resumo do Pedido</h2>
+                <div id="resumo-itens" style="font-size: 0.9rem; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;"></div>
+                <p id="resumo-taxa" style="font-weight: 500; margin-bottom: 5px;"></p>
+                <p id="resumo-total" style="font-size: 1.2rem; font-weight: 700; color: #111;"></p>
 
-            <div class="buttons" style="margin-top: 20px;">
-                <button onclick="voltarParaDados()">Voltar</button>
-                <button onclick="finalizarEntrega()">Finalizar Pedido</button>
+                <div class="buttons" style="margin-top: 20px;">
+                    <button onclick="voltarParaDados()">Voltar</button>
+                    <button onclick="finalizarEntrega()">Finalizar Pedido</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div id="loading-taxa" style="display:none;">
-    <div class="spinner"></div>
-    <p style="font-weight: 600; color: #fff;">Calculando taxa...</p>
-</div>
+    <div id="loading-taxa" style="display:none;">
+        <div class="spinner"></div>
+        <p style="font-weight: 600; color: #fff;">Calculando taxa...</p>
+    </div>
 
     <!-- TOAST CENTRAL -->
     <div id="toast" class="toast">
-    ✅ Produto adicionado ao carrinho
-</div>
+        ✅ Produto adicionado ao carrinho
+    </div>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
-    authDomain: "myproject26-10f0e.firebaseapp.com",
-    databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
-    projectId: "myproject26-10f0e",
-    storageBucket: "myproject26-10f0e.firebasestorage.app",
-    messagingSenderId: "884850608032",
-    appId: "1:884850608032:web:79db6983346c3c20edc6c5"
-  };
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
+            authDomain: "myproject26-10f0e.firebaseapp.com",
+            databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
+            projectId: "myproject26-10f0e",
+            storageBucket: "myproject26-10f0e.firebasestorage.app",
+            messagingSenderId: "884850608032",
+            appId: "1:884850608032:web:79db6983346c3c20edc6c5"
+        };
 
-  firebase.initializeApp(firebaseConfig);
-  // CRIAMOS A VARIÁVEL 'db' GLOBAL PARA O SCRIPT.JS USAR
-  window.db = firebase.database(); 
-</script>
+        firebase.initializeApp(firebaseConfig);
+        // CRIAMOS A VARIÁVEL 'db' GLOBAL PARA O SCRIPT.JS USAR
+        window.db = firebase.database();
+    </script>
 
-<script src="script.js"></script>
+    <script src="script.js"></script>
 
     <!-- SCRIPT PRINCIPAL -->
     <script src="script.js"></script>
 
 </body>
+
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
