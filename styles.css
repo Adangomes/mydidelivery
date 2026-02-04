@@ -369,7 +369,4 @@ body {
     font-weight: 600;
 }
 
-#splash {
-    /* ... seus outros estilos ... */
-    transition: opacity 0.5s ease; /* Adicione esta linha */
-}
+
