@@ -36,23 +36,20 @@ async function carregarStatusLoja() {
 // ==================================================
 function carregarProdutosDoBanco() {
     if (!window.db) {
-        console.error("Firebase não inicializado! Verifique as chaves no HTML.");
+        console.error("Firebase não inicializado!");
         return;
     }
 
     const containerBurgers = document.getElementById("burgers");
     const containerBebidas = document.getElementById("bebidas");
-    const containerPizzas = document.getElementById("pizza");
+    // Aqui estava o erro: Procuro por 'pizza' ou 'pizzaS'
+    const containerPizzas = document.getElementById("pizza") || document.getElementById("pizzaS");
 
     // BURGERS
     if (containerBurgers) {
         window.db.ref('produtos/burgers').on('value', (snapshot) => {
             const dados = snapshot.val();
-            if (dados) {
-                exibirProdutos(dados, containerBurgers, 'burger');
-            } else {
-                containerBurgers.innerHTML = "<p>Nenhum burger encontrado.</p>";
-            }
+            exibirProdutos(dados, containerBurgers, 'burger');
         });
     }
 
@@ -60,11 +57,7 @@ function carregarProdutosDoBanco() {
     if (containerBebidas) {
         window.db.ref('produtos/bebidas').on('value', (snapshot) => {
             const dados = snapshot.val();
-            if (dados) {
-                exibirProdutos(dados, containerBebidas, 'bebida');
-            } else {
-                containerBebidas.innerHTML = "<p>Nenhuma bebida encontrada.</p>";
-            }
+            exibirProdutos(dados, containerBebidas, 'bebida');
         });
     }
 
@@ -72,11 +65,7 @@ function carregarProdutosDoBanco() {
     if (containerPizzas) {
         window.db.ref('produtos/pizzas').on('value', (snapshot) => {
             const dados = snapshot.val();
-            if (dados) {
-                exibirProdutos(dados, containerPizzas, 'pizza');
-            } else {
-                containerPizzas.innerHTML = "<p>Nenhuma pizza encontrada.</p>";
-            }
+            exibirProdutos(dados, containerPizzas, 'pizza');
         });
     }
 }
@@ -293,3 +282,4 @@ document.addEventListener("DOMContentLoaded", () => {
     
     carregarCarrinhoStorage();
 });
+
