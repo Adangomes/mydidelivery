@@ -10,7 +10,10 @@
 
     <header class="admin-header">
         <h1>Painel <span>SNOOP LANCHE</span></h1>
-        <button class="btn-relatorio" onclick="abrirRelatorio()">📊 Ver Relatório</button>
+        <div style="display: flex; gap: 10px;">
+            <button class="btn-relatorio" style="background: #444; color: white;" onclick="testarSom()">🔊 Testar Som</button>
+            <button class="btn-relatorio" onclick="abrirRelatorio()">📊 Ver Relatório</button>
+        </div>
     </header>
 
     <ul id="pedidos-container"></ul>
@@ -57,6 +60,20 @@
         const db = firebase.database();
         let prontoParaTocar = false;
 
+        // --- DESBLOQUEIO DE ÁUDIO ---
+        // Essencial para navegadores bloquearem o som no Netlify
+        document.body.addEventListener('click', function() {
+            const context = new AudioContext();
+            if (context.state === 'suspended') context.resume();
+            console.log("Áudio autorizado pelo usuário");
+        }, { once: true });
+
+        function testarSom() {
+            const audio = new Audio('alerta.mpeg');
+            audio.play().catch(e => alert("Clique na tela antes para o som funcionar!"));
+        }
+
+        // --- ESCUTA DE NOVOS PEDIDOS ---
         db.ref('pedidos').on('child_added', (snap) => {
             const p = snap.val();
             const id = snap.key;
@@ -80,13 +97,19 @@
             `;
             document.getElementById('pedidos-container').prepend(li);
 
+            // Tocar som se não for a carga inicial
             if (prontoParaTocar) {
-                new Audio('https://www.soundjay.com/phone/sounds/phone-calling-1.mp3').play().catch(() => {});
+                const som = new Audio('alerta.mpeg');
+                som.play().catch(err => console.log("Áudio bloqueado: Interaja com a página primeiro."));
             }
         });
 
-        db.ref('pedidos').once('value', () => { setTimeout(() => prontoParaTocar = true, 2000); });
+        // Evita que todos os pedidos antigos toquem som ao abrir a página
+        db.ref('pedidos').once('value', () => { 
+            setTimeout(() => prontoParaTocar = true, 2000); 
+        });
 
+        // --- IMPRESSÃO ---
         function imprimir(tipo, id) {
             db.ref('pedidos/'+id).once('value', s => {
                 const p = s.val();
@@ -117,6 +140,7 @@
             });
         }
 
+        // --- RELATÓRIO E CONCLUSÃO ---
         function concluirPedido(id) {
             if(confirm("Concluir pedido e enviar para o relatório?")){
                 const ref = db.ref('pedidos/'+id);
@@ -153,11 +177,10 @@
         function fecharRelatorio() { document.getElementById('modal-relatorio').style.display = 'none'; }
 
         function limparRelatorio() {
-            if(confirm("Apagar todo o histórico permanentemente?")) {
+            if(confirm("Deseja apagar TODO o histórico? Esta ação não pode ser desfeita.")) {
                 db.ref('relatorios').remove().then(() => abrirRelatorio());
             }
         }
     </script>
 </body>
 </html>
-
