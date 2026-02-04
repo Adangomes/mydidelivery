@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin - MYDI DELIVERY</title>
+    <style>
+        :root { --primary: #ffcc00; --success: #27ae60; --info: #3498db; --warning: #f39c12; --danger: #e74c3c; --bg: #121212; --card: #1e1e1e; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
+        #pedidos-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 0; list-style: none; }
+        .pedido-card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; position: relative; }
+        .pedido-card h3 { margin: 0 0 10px 0; color: var(--primary); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .info { margin: 8px 0; font-size: 14px; }
+        .itens-box { background: #2a2a2a; padding: 12px; border-radius: 8px; margin: 15px 0; font-size: 14px; line-height: 1.6; }
+        .total { font-size: 22px; font-weight: bold; color: var(--success); margin: 10px 0; text-align: right; }
+        .btn-group { display: flex; gap: 8px; margin-top: 15px; }
+        button { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: 0.2s; }
+        .btn-cozinha { background: var(--warning); color: white; padding: 10px; flex: 1; }
+        .btn-motoboy { background: var(--info); color: white; padding: 10px; flex: 1; }
+        .btn-concluir { background: var(--success); color: white; width: 100%; padding: 12px; margin-top: 10px; font-size: 16px; }
+        .badge-pagamento { background: #444; color: var(--primary); padding: 3px 8px; border-radius: 4px; font-size: 12px; }
+        
+        /* Modal Relatório */
+        .modal { display:none; position: fixed; z-index: 1000; left:0; top:0; width:100%; height:100%; background: rgba(0,0,0,0.9); }
+        .modal-content { background: #1a1a1a; margin: 5% auto; padding: 25px; width: 90%; max-width: 600px; border-radius: 15px; border: 1px solid #333; }
+    </style>
     
 </head>
 <body>
@@ -140,3 +160,4 @@
     </script>
 </body>
 </html>
+
