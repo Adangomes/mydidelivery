@@ -218,3 +218,75 @@ document.addEventListener("DOMContentLoaded", async () => {
     const salvos = localStorage.getItem("carrinho");
     if (salvos) { carrinho = JSON.parse(salvos); atualizarCarrinho(); }
 });
+async function abrirOpcoesPizza(id) {
+    // Busca a pizza clicada nos seus dados
+    const pizzaOriginal = todasPizzas[id];
+    
+    // Reseta as escolhas para uma nova pizza
+    tamanhoSelecionado = null;
+    saboresSelecionados = [pizzaOriginal]; 
+    
+    // Preenche o modal (HTML)
+    document.getElementById("modal-pizza-img").src = pizzaOriginal.imagem;
+    document.getElementById("pizza-modal-title").innerText = pizzaOriginal.nome;
+    document.getElementById("pizza-modal-desc").innerText = pizzaOriginal.ingredientes;
+    document.getElementById("secao-sabores").style.display = "none";
+
+    // Mostra o Modal
+    document.getElementById("pizza-options-modal").style.display = "flex";
+}
+// Gerencia a troca de tamanho e define o limite (1, 2 ou 3)
+function selecionarTamanho(tamanho, pizzaOriginal, event) {
+    tamanhoSelecionado = tamanho;
+    saboresSelecionados = [pizzaOriginal]; 
+    
+    if (tamanho === "P") limiteSabores = 1;
+    else if (tamanho === "M") limiteSabores = 2;
+    else if (tamanho === "G") limiteSabores = 3;
+
+    document.querySelectorAll('.btn-size-opt').forEach(btn => btn.classList.remove('selected'));
+    if(event) event.currentTarget.classList.add('selected');
+
+    document.getElementById("secao-sabores").style.display = "block";
+    renderizarSaboresPremium();
+}
+
+// Renderiza os cards com as fotos e o check verde
+function renderizarSaboresPremium() {
+    const container = document.getElementById("lista-sabores-meia");
+    const alerta = document.getElementById("alerta-limite");
+    container.innerHTML = "";
+    
+    Object.keys(todasPizzas).forEach(id => {
+        const p = todasPizzas[id];
+        const selecionada = saboresSelecionados.find(s => s.id === p.id);
+        
+        const card = document.createElement("div");
+        card.className = `card-sabor-premium ${selecionada ? 'selected' : ''}`;
+        card.innerHTML = `
+            <img src="${p.imagem}">
+            <span>${p.nome}</span>
+            <div class="check-icon">✓</div>
+        `;
+
+        card.onclick = () => {
+            const index = saboresSelecionados.findIndex(s => s.id === p.id);
+            if (index > -1) {
+                if (saboresSelecionados.length > 1) {
+                    saboresSelecionados.splice(index, 1);
+                    alerta.style.display = "none";
+                }
+            } else {
+                if (saboresSelecionados.length < limiteSabores) {
+                    saboresSelecionados.push(p);
+                    alerta.style.display = "none";
+                } else {
+                    alerta.innerText = `O tamanho ${tamanhoSelecionado} permite apenas ${limiteSabores} sabor(es).`;
+                    alerta.style.display = "block";
+                }
+            }
+            renderizarSaboresPremium();
+        };
+        container.appendChild(card);
+    });
+}
