@@ -15,29 +15,42 @@ let limiteSabores = 1;
 // ==================================================
 // 1. CARREGAMENTO (SEM TRAVAR O SPLASH)
 // ==================================================
+// ==================================================
+// 1. CARREGAMENTO (SPLASH NUNCA TRAVA)
+// ==================================================
 async function carregarDadosIniciais() {
-    try {
-        const resStatus = await fetch('content/status.json');
-        const dataStatus = await resStatus.json();
-        
-        const resProdutos = await fetch('content/produtos.json');
-        const data = await resProdutos.json();
-        todasPizzas = data.produtos.pizzas || {};
+    const splash = document.getElementById("loading-taxa");
 
-        const container = document.getElementById("pizzaS") || document.getElementById("pizza");
-        if (container) exibirProdutos(todasPizzas, container);
-
-        // ESCONDE O SPLASH (Ajustado para o ID padrão do seu HTML)
-        const splash = document.getElementById("loading-taxa");
+    // 🔥 FORÇA SAÍDA DO SPLASH EM 2.5s (SEGURANÇA)
+    setTimeout(() => {
         if (splash) splash.style.display = "none";
+    }, 2500);
 
-    } catch (e) { 
+    try {
+        const resStatus = await fetch('content/status.json', { cache: "no-store" });
+        await resStatus.json();
+
+        const resProdutos = await fetch('content/produtos.json', { cache: "no-store" });
+        const data = await resProdutos.json();
+
+        todasPizzas = data.produtos?.pizzas || {};
+
+        const container =
+            document.getElementById("pizzaS") ||
+            document.getElementById("pizza");
+
+        if (container && Object.keys(todasPizzas).length > 0) {
+            exibirProdutos(todasPizzas, container);
+        }
+
+    } catch (e) {
         console.error("Erro no carregamento:", e);
-        // Mesmo com erro, tira o splash pro cara ver o site
-        const splash = document.getElementById("loading-taxa");
+    } finally {
+        // 🔥 GARANTE QUE O SPLASH SOME
         if (splash) splash.style.display = "none";
     }
 }
+
 
 function exibirProdutos(dadosObjeto, container) {
     container.innerHTML = ""; 
@@ -180,3 +193,4 @@ function abrirCarrinho() { document.getElementById("cart-modal").style.display =
 function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
 
 document.addEventListener("DOMContentLoaded", carregarDadosIniciais);
+
