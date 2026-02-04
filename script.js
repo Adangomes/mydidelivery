@@ -311,8 +311,11 @@ async function finalizarEntrega() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    initSplash(); initMenu(); carregarStatusLoja();
-    carregarProdutos(); carregarBebidas(); carregarCarrinhoStorage();
+    initSplash(); 
+    initMenu(); 
+    carregarStatusLoja();
+    carregarProdutosDoBanco(); // Chama a função nova que lê o Firebase
+    carregarCarrinhoStorage();
 });
 
 function mostrarToast() {
@@ -322,5 +325,34 @@ function mostrarToast() {
 
 
 
+function abrirOpcoesPizza(id) {
+    window.db.ref('produtos/pizzas/' + id).once('value', (snapshot) => {
+        const pizza = snapshot.val();
+        if(!pizza) return;
+
+        let mensagem = `Escolha o tamanho para ${pizza.nome}:\n\n`;
+        let opcoes = Object.keys(pizza.precos).join(", ");
+        
+        // Exemplo simples com prompt (depois podemos fazer um modal bonito)
+        const escolha = prompt(`${mensagem} Digite um: ${opcoes}`);
+        
+        if (escolha) {
+            // Busca o tamanho que o usuário digitou
+            const tamanhoNome = Object.keys(pizza.precos).find(t => t.toLowerCase() === escolha.toLowerCase());
+            
+            if (tamanhoNome) {
+                const info = pizza.precos[tamanhoNome];
+                // Adiciona ao carrinho com o nome do tamanho
+                const itemParaCarrinho = {
+                    title: `${pizza.nome} (${tamanhoNome})`,
+                    price: info.atual
+                };
+                adicionarCarrinhoPorProduto(itemParaCarrinho);
+            } else {
+                alert("Tamanho inválido! Digite exatamente como aparece na lista.");
+            }
+        }
+    });
+}
 
 
