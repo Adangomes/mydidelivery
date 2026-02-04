@@ -266,3 +266,149 @@ h2 {
     margin-top: 20px;
     width: 100%;
 }
+
+:root { 
+    --primary: #ffcc00; 
+    --success: #27ae60; 
+    --info: #3498db; 
+    --warning: #f39c12; 
+    --danger: #e74c3c; 
+    --bg: #121212; 
+    --card: #1e1e1e; 
+}
+
+body { 
+    font-family: 'Segoe UI', Arial, sans-serif; 
+    background: var(--bg); 
+    color: white; 
+    margin: 0; 
+    padding: 20px; 
+}
+
+.admin-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 30px; 
+}
+
+.admin-header h1 span { color: var(--primary); }
+
+#pedidos-container { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); 
+    gap: 20px; 
+    padding: 0; 
+    list-style: none; 
+}
+
+/* Card de Pedido */
+.pedido-card { 
+    background: var(--card); 
+    border: 1px solid #333; 
+    padding: 20px; 
+    border-radius: 12px; 
+    position: relative; 
+    border-top: 5px solid var(--primary);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+}
+
+.pedido-card h3 { 
+    margin: 0 0 10px 0; 
+    color: var(--primary); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    border-bottom: 1px solid #333; 
+    padding-bottom: 10px; 
+}
+
+.info { margin: 8px 0; font-size: 14px; }
+.info-obs { margin: 8px 0; font-size: 14px; color: var(--danger); }
+
+.itens-box { 
+    background: #2a2a2a; 
+    padding: 12px; 
+    border-radius: 8px; 
+    margin: 15px 0; 
+    font-size: 14px; 
+    line-height: 1.6; 
+    border-left: 4px solid var(--primary); 
+}
+
+.total { 
+    font-size: 22px; 
+    font-weight: bold; 
+    color: var(--success); 
+    margin: 10px 0; 
+    text-align: right; 
+}
+
+.badge-pagamento { 
+    background: #fff; 
+    color: #000; 
+    padding: 4px 12px; 
+    border-radius: 20px; 
+    font-size: 12px; 
+    font-weight: 900; 
+}
+
+/* Botões */
+.btn-group { display: flex; gap: 8px; margin-top: 15px; }
+button { 
+    cursor: pointer; 
+    border: none; 
+    border-radius: 6px; 
+    font-weight: bold; 
+    transition: 0.2s; 
+    text-transform: uppercase; 
+}
+
+.btn-relatorio { background: var(--primary); color: #000; padding: 10px 20px; }
+.btn-cozinha { background: var(--warning); color: white; padding: 10px; flex: 1; }
+.btn-motoboy { background: var(--info); color: white; padding: 10px; flex: 1; }
+.btn-concluir { background: var(--success); color: white; width: 100%; padding: 12px; margin-top: 10px; font-size: 16px; }
+.btn-limpar { background: var(--danger); color: white; width: 100%; padding: 12px; margin-top: 20px; border-radius: 8px; }
+
+/* Modal Relatório */
+.modal { 
+    display:none; 
+    position: fixed; 
+    z-index: 1000; 
+    left:0; top:0; 
+    width:100%; height:100%; 
+    background: rgba(0,0,0,0.9); 
+}
+
+.modal-content { 
+    background: #1a1a1a; 
+    margin: 5% auto; 
+    padding: 25px; 
+    width: 90%; 
+    max-width: 650px; 
+    border-radius: 15px; 
+    border: 1px solid #333; 
+}
+
+.close-modal { float:right; cursor:pointer; font-size:28px; color: white; }
+.modal-title { text-align:center; color: var(--primary); margin-top: 0; }
+
+.stats-container { 
+    display:flex; 
+    justify-content: space-around; 
+    background:#222; 
+    padding:15px; 
+    border-radius:10px; 
+    margin: 15px 0; 
+}
+
+.stat-box { text-align:center; font-size: 14px; }
+.stat-box b { font-size: 20px; display: block; margin-top: 5px; }
+#rel-total { color: var(--success); }
+
+.table-wrapper { max-height:350px; overflow-y:auto; }
+.table-rel { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 14px; }
+.table-rel th { text-align: left; border-bottom: 2px solid #333; padding: 10px; color: var(--primary); }
+.table-rel td { padding: 10px; border-bottom: 1px solid #333; }
+
+iframe { display: none; }
