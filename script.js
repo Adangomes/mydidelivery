@@ -13,12 +13,14 @@ const WHATSAPP_NUMERO = "5547984196636";
 let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
 let produtos = {};
 let todasPizzas = {};
-let saboresSelecionados = [];
+
+let pizzaSelecionada = null;
 let tamanhoSelecionado = null;
+let saboresSelecionados = [];
 let limiteSabores = 1;
 
 // ==================================================
-// SPLASH — SEGURO (NÃO TRAVA NADA)
+// SPLASH (NUNCA TRAVA)
 // ==================================================
 function matarSplash() {
     const splash = document.getElementById("loading-taxa");
@@ -28,74 +30,49 @@ function matarSplash() {
     splash.style.pointerEvents = "none";
 
     setTimeout(() => {
-        splash.style.display = "none";
         splash.remove();
+        document.body.style.overflow = "auto";
     }, 300);
-
-    document.body.style.overflow = "auto";
 }
 
 // ==================================================
-// MENU HAMBURGER
+// MENU MOBILE
 // ==================================================
 function iniciarMenuMobile() {
-    const hamburger = document.getElementById("hamburger");
+    const btn = document.getElementById("hamburger");
     const menu = document.getElementById("mobile-menu");
+    if (!btn || !menu) return;
 
-    if (!hamburger || !menu) return;
-
-    hamburger.addEventListener("click", () => {
-        menu.classList.toggle("active");
-    });
+    btn.onclick = () => menu.classList.toggle("active");
 }
 
 // ==================================================
-// CARRINHO
+// PRODUTOS SIMPLES (BURGER / BEBIDAS)
 // ==================================================
-function abrirCarrinho() {
-    document.getElementById("cart-modal").style.display = "flex";
-    renderizarCarrinho();
-}
-
-function fecharCarrinho() {
-    document.getElementById("cart-modal").style.display = "none";
-}
-
-function renderizarCarrinho() {
-    const container = document.getElementById("cart-items");
-    const subtotalEl = document.getElementById("subtotal");
-    const totalEl = document.getElementById("total");
-
-    if (!container) return;
-
+function exibirProdutos(lista, container) {
     container.innerHTML = "";
-    let subtotal = 0;
 
-    carrinho.forEach((item, index) => {
-        subtotal += item.price;
+    Object.values(lista).forEach(p => {
         container.innerHTML += `
-            <div class="cart-item">
-                <span>${item.title}</span>
-                <strong>R$ ${item.price.toFixed(2)}</strong>
-                <button onclick="removerItem(${index})">❌</button>
+            <div class="card-produto">
+                <img src="${p.image}">
+                <div class="card-content">
+                    <h3>${p.title}</h3>
+                    <p>${p.ingredientes || ""}</p>
+                    <strong>R$ ${p.price.toFixed(2)}</strong>
+                    <button onclick="adicionarAoCarrinho('${p.title}', ${p.price})">
+                        ADICIONAR
+                    </button>
+                </div>
             </div>
         `;
     });
-
-    subtotalEl.innerText = `Subtotal: R$ ${subtotal.toFixed(2)}`;
-    totalEl.innerText = `Total: R$ ${subtotal.toFixed(2)}`;
-}
-
-function removerItem(index) {
-    carrinho.splice(index, 1);
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-    renderizarCarrinho();
 }
 
 // ==================================================
-// PRODUTOS (BURGER / BEBIDAS)
+// PIZZAS (CARD ESPECIAL → MODAL)
 // ==================================================
-function exibirProdutos(lista, container) {
+function exibirPizzas(lista, container) {
     container.innerHTML = "";
 
     Object.keys(lista).forEach(id => {
@@ -106,10 +83,9 @@ function exibirProdutos(lista, container) {
                 <img src="${p.imagem}">
                 <div class="card-content">
                     <h3>${p.nome}</h3>
-                    <p>${p.descricao || ""}</p>
-                    <strong>R$ ${p.preco.toFixed(2)}</strong>
-                    <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})">
-                        ADICIONAR
+                    <p>${p.ingredientes}</p>
+                    <button onclick="abrirOpcoesPizza('${id}')">
+                        ESCOLHER
                     </button>
                 </div>
             </div>
@@ -117,38 +93,25 @@ function exibirProdutos(lista, container) {
     });
 }
 
-function adicionarAoCarrinho(nome, preco) {
-    carrinho.push({ title: nome, price: preco });
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-
-    const toast = document.getElementById("toast");
-    if (toast) {
-        toast.classList.add("show");
-        setTimeout(() => toast.classList.remove("show"), 2000);
-    }
-}
-
 // ==================================================
-// PIZZAS (MODAL)
+// MODAL DE PIZZA
 // ==================================================
 function abrirOpcoesPizza(id) {
-    const pizza = todasPizzas[id];
-    if (!pizza) return;
-
-    saboresSelecionados = [pizza];
+    pizzaSelecionada = todasPizzas[id];
+    saboresSelecionados = [pizzaSelecionada];
     tamanhoSelecionado = null;
 
-    document.getElementById("modal-pizza-img").src = pizza.imagem;
-    document.getElementById("pizza-modal-title").innerText = pizza.nome;
-    document.getElementById("pizza-modal-desc").innerText = pizza.ingredientes || "";
+    document.getElementById("pizza-modal-title").innerText = pizzaSelecionada.nome;
+    document.getElementById("pizza-modal-desc").innerText = pizzaSelecionada.ingredientes;
+    document.getElementById("modal-pizza-img").src = pizzaSelecionada.imagem;
 
     const sizes = document.getElementById("pizza-sizes-container");
     sizes.innerHTML = "";
 
-    Object.keys(pizza.precos).forEach(t => {
+    Object.keys(pizzaSelecionada.precos).forEach(t => {
         sizes.innerHTML += `
             <button class="btn-size-opt" onclick="selecionarTamanho('${t}', this)">
-                ${t} - R$ ${pizza.precos[t].atual}
+                ${t} - R$ ${pizzaSelecionada.precos[t].atual}
             </button>
         `;
     });
@@ -158,9 +121,10 @@ function abrirOpcoesPizza(id) {
 
 function selecionarTamanho(t, el) {
     tamanhoSelecionado = t;
-    limiteSabores = t === "P" ? 1 : t === "M" ? 2 : 3;
+    limiteSabores = t === "Pequena" ? 1 : t === "Media" ? 2 : 3;
 
-    document.querySelectorAll(".btn-size-opt").forEach(b => b.classList.remove("selected"));
+    document.querySelectorAll(".btn-size-opt")
+        .forEach(b => b.classList.remove("selected"));
     el.classList.add("selected");
 
     renderizarSaboresMeia();
@@ -174,6 +138,7 @@ function renderizarSaboresMeia() {
 
     Object.values(todasPizzas).forEach(p => {
         const ativo = saboresSelecionados.some(s => s.nome === p.nome);
+
         lista.innerHTML += `
             <div class="card-sabor-meia ${ativo ? "selected" : ""}"
                  onclick="toggleSabor('${p.nome}')">
@@ -196,18 +161,26 @@ function toggleSabor(nome) {
     renderizarSaboresMeia();
 }
 
+// ==================================================
+// CARRINHO
+// ==================================================
+function adicionarAoCarrinho(nome, preco) {
+    carrinho.push({ title: nome, price: preco });
+    localStorage.setItem("carrinho", JSON.stringify(carrinho));
+}
+
 document.getElementById("btn-adicionar-pizza")?.addEventListener("click", () => {
     if (!tamanhoSelecionado) {
-        alert("Selecione o tamanho!");
+        alert("Selecione o tamanho da pizza");
         return;
     }
 
     const nomes = saboresSelecionados.map(s => s.nome).join(" / ");
-    const precos = saboresSelecionados.map(s => s.precos[tamanhoSelecionado].atual);
+    const valores = saboresSelecionados.map(s => s.precos[tamanhoSelecionado].atual);
 
     carrinho.push({
         title: `Pizza ${tamanhoSelecionado} (${nomes})`,
-        price: Math.max(...precos)
+        price: Math.max(...valores)
     });
 
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
@@ -215,18 +188,24 @@ document.getElementById("btn-adicionar-pizza")?.addEventListener("click", () => 
 });
 
 // ==================================================
-// FINALIZAR NO WHATSAPP
+// FINALIZAR → WHATSAPP
 // ==================================================
 function finalizarEntrega() {
-    let msg = "*Pedido Snoop Lanche*%0A%0A";
+    let msg = "*🍔 NOVO PEDIDO*\n\n";
+    let total = 0;
 
     carrinho.forEach(i => {
-        msg += `- ${i.title} (R$ ${i.price.toFixed(2)})%0A`;
+        msg += `• ${i.title} - R$ ${i.price.toFixed(2)}\n`;
+        total += i.price;
     });
 
+    msg += `\n💰 Total: R$ ${total.toFixed(2)}`;
+
     localStorage.removeItem("carrinho");
-    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`, "_blank");
-    location.reload();
+    window.open(
+        `https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`,
+        "_blank"
+    );
 }
 
 // ==================================================
@@ -237,30 +216,27 @@ async function carregarDadosIniciais() {
         const res = await fetch("content/produtos.json", { cache: "no-store" });
         const data = await res.json();
 
-        produtos = data?.produtos || {};
+        produtos = data.produtos || {};
         todasPizzas = produtos.pizzas || {};
 
-        if (document.getElementById("burgers") && produtos.hamburgers) {
-            exibirProdutos(produtos.hamburgers, document.getElementById("burgers"));
-        }
+        if (produtos.burgers)
+            exibirProdutos(produtos.burgers, document.getElementById("burgers"));
 
-        if (document.getElementById("bebidas") && produtos.bebidas) {
+        if (produtos.bebidas)
             exibirProdutos(produtos.bebidas, document.getElementById("bebidas"));
-        }
 
-        if (document.getElementById("pizza") && todasPizzas) {
-            exibirProdutos(todasPizzas, document.getElementById("pizza"));
-        }
+        if (todasPizzas)
+            exibirPizzas(todasPizzas, document.getElementById("pizza"));
 
     } catch (e) {
-        console.error("Erro ao carregar produtos:", e);
+        console.error("Erro ao carregar produtos", e);
     } finally {
         matarSplash();
     }
 }
 
 // ==================================================
-// INIT GLOBAL
+// INIT
 // ==================================================
 document.addEventListener("DOMContentLoaded", () => {
     iniciarMenuMobile();
