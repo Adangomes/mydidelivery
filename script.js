@@ -19,6 +19,29 @@ let tamanhoSelecionado = null;
 let limiteSabores = 1;
 
 // ==================================================
+// LÓGICA DO SPLASH INTELIGENTE
+// ==================================================
+function gerenciarSplash() {
+    const splash = document.getElementById("splash");
+    if (!splash) return;
+
+    const jaViuSplash = sessionStorage.getItem("splashVisualizado");
+
+    if (jaViuSplash) {
+        splash.style.display = "none";
+    } else {
+        // Primeira vez: Mostra por 2.5s e marca como visto
+        setTimeout(() => {
+            splash.style.opacity = "0";
+            setTimeout(() => {
+                splash.style.display = "none";
+                sessionStorage.setItem("splashVisualizado", "true");
+            }, 500); 
+        }, 2500);
+    }
+}
+
+// ==================================================
 // CARREGAMENTO DE DADOS
 // ==================================================
 async function carregarDadosIniciais() {
@@ -33,7 +56,6 @@ async function carregarDadosIniciais() {
         const data = await resProdutos.json();
         const categorias = data.produtos;
 
-        // Salva as pizzas na variável global para o sistema meia-a-meia usar depois
         todasPizzas = categorias.pizzas || {};
 
         if (categorias.burgers) exibirProdutos(categorias.burgers, document.getElementById("burgers"), 'burger');
@@ -93,18 +115,15 @@ function abrirOpcoesPizza(id) {
     const pizzaOriginal = todasPizzas[id];
     if (!pizzaOriginal) return;
 
-    // Reset de Estado
     tamanhoSelecionado = null;
     saboresSelecionados = [pizzaOriginal]; 
     
-    // UI Reset
     document.getElementById("modal-pizza-img").src = pizzaOriginal.imagem;
     document.getElementById("pizza-modal-title").innerText = pizzaOriginal.nome;
     document.getElementById("pizza-modal-desc").innerText = pizzaOriginal.ingredientes;
     document.getElementById("secao-sabores").style.display = "none";
     document.getElementById("alerta-limite").style.display = "none";
 
-    // Criar Botões de Tamanho dinamicamente
     const containerTamanhos = document.getElementById("pizza-sizes-container");
     containerTamanhos.innerHTML = "";
     Object.keys(pizzaOriginal.precos).forEach(t => {
@@ -172,10 +191,8 @@ function renderizarSaboresPremium() {
     });
 }
 
-// Botão Adicionar do Modal
 document.getElementById("btn-adicionar-pizza").onclick = () => {
     if (!tamanhoSelecionado) { alert("Escolha o tamanho!"); return; }
-    
     const precos = saboresSelecionados.map(s => s.precos[tamanhoSelecionado].atual);
     const precoFinal = Math.max(...precos);
     const nomes = saboresSelecionados.map(s => s.nome).join(" / ");
@@ -184,14 +201,13 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
         title: `Pizza ${tamanhoSelecionado} (${nomes})`,
         price: precoFinal
     });
-    
     fecharModalPizza();
 };
 
 function fecharModalPizza() { document.getElementById("pizza-options-modal").style.display = "none"; }
 
 // ==================================================
-// CARRINHO E FINALIZAÇÃO
+// CARRINHO E UI
 // ==================================================
 function adicionarCarrinhoPorProduto(p) {
     if (!LOJA_ABERTA) { alert(MENSAGEM_FECHADA); return; }
@@ -216,72 +232,26 @@ function atualizarCarrinho() {
 }
 
 function salvarCarrinho() { localStorage.setItem("carrinho", JSON.stringify(carrinho)); }
-
-// ==================================================
-// INICIALIZAÇÃO
-// ==================================================
-document.addEventListener("DOMContentLoaded", async () => {
-    await carregarDadosIniciais();
-    
-    // Fecha splash
-    const splash = document.getElementById("splash");
-    if (splash) setTimeout(() => { splash.style.display = "none"; }, 1500);
-
-    // Hamburguer
-    const btn = document.getElementById("hamburger");
-    if (btn) btn.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
-
-    // Recupera carrinho
-    const salvos = localStorage.getItem("carrinho");
-    if (salvos) { carrinho = JSON.parse(salvos); atualizarCarrinho(); }
-});
-
 function mostrarToast() { const t = document.getElementById("toast"); if (t) { t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2000); } }
 
 // ==================================================
-// UI E INICIALIZAÇÃO (COM SPLASH INTELIGENTE)
+// INICIALIZAÇÃO ÚNICA
 // ==================================================
-
-function gerenciarSplash() {
-    const splash = document.getElementById("splash");
-    if (!splash) return;
-
-    // Verifica se o usuário já viu o splash nesta sessão
-    const jaViuSplash = sessionStorage.getItem("splashVisualizado");
-
-    if (jaViuSplash) {
-        // Se já viu, remove o splash imediatamente sem animação
-        splash.style.display = "none";
-    } else {
-        // Se é a primeira vez, mostra e depois marca como "visto"
-        setTimeout(() => {
-            splash.style.opacity = "0"; // Faz um efeito de sumir suave
-            setTimeout(() => {
-                splash.style.display = "none";
-                sessionStorage.setItem("splashVisualizado", "true");
-            }, 500); // Tempo para o fade-out terminar
-        }, 2500); // Tempo que o logo fica na tela
-    }
-}
-
 document.addEventListener("DOMContentLoaded", async () => {
-    // 1. Inicia o Splash inteligente
+    // 1. Splash Primeiro
     gerenciarSplash();
 
-    // 2. Carrega os dados do cardápio
+    // 2. Dados
     await carregarDadosIniciais();
-    
-    // 3. Configura Menu Mobile
-    const btn = document.getElementById("hamburger");
-    if (btn) btn.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
 
-    // 4. Recupera o carrinho do LocalStorage (isso mantém os itens mesmo mudando de página)
+    // 3. UI Events
+    const btnHam = document.getElementById("hamburger");
+    if (btnHam) btnHam.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
+
+    // 4. Recovery
     const salvos = localStorage.getItem("carrinho");
     if (salvos) { 
         carrinho = JSON.parse(salvos); 
         atualizarCarrinho(); 
     }
 });
-
-
-
