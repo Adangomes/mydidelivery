@@ -19,7 +19,7 @@ let tamanhoSelecionado = null;
 let limiteSabores = 1;
 
 // ==================================================
-// LÓGICA DO SPLASH INTELIGENTE
+// LÓGICA DO SPLASH INTELIGENTE (CORRIGIDA)
 // ==================================================
 function gerenciarSplash() {
     const splash = document.getElementById("splash");
@@ -30,7 +30,7 @@ function gerenciarSplash() {
     if (jaViuSplash) {
         splash.style.display = "none";
     } else {
-        // Primeira vez: Mostra por 2.5s e marca como visto
+        // Garante que o splash suma após 3 segundos independente de qualquer erro
         setTimeout(() => {
             splash.style.opacity = "0";
             setTimeout(() => {
@@ -191,20 +191,27 @@ function renderizarSaboresPremium() {
     });
 }
 
-document.getElementById("btn-adicionar-pizza").onclick = () => {
-    if (!tamanhoSelecionado) { alert("Escolha o tamanho!"); return; }
-    const precos = saboresSelecionados.map(s => s.precos[tamanhoSelecionado].atual);
-    const precoFinal = Math.max(...precos);
-    const nomes = saboresSelecionados.map(s => s.nome).join(" / ");
+// Botão Adicionar do Modal
+const btnAddPizza = document.getElementById("btn-adicionar-pizza");
+if(btnAddPizza) {
+    btnAddPizza.onclick = () => {
+        if (!tamanhoSelecionado) { alert("Escolha o tamanho!"); return; }
+        const precos = saboresSelecionados.map(s => s.precos[tamanhoSelecionado].atual);
+        const precoFinal = Math.max(...precos);
+        const nomes = saboresSelecionados.map(s => s.nome).join(" / ");
 
-    adicionarCarrinhoPorProduto({
-        title: `Pizza ${tamanhoSelecionado} (${nomes})`,
-        price: precoFinal
-    });
-    fecharModalPizza();
-};
+        adicionarCarrinhoPorProduto({
+            title: `Pizza ${tamanhoSelecionado} (${nomes})`,
+            price: precoFinal
+        });
+        fecharModalPizza();
+    };
+}
 
-function fecharModalPizza() { document.getElementById("pizza-options-modal").style.display = "none"; }
+function fecharModalPizza() { 
+    const modal = document.getElementById("pizza-options-modal");
+    if(modal) modal.style.display = "none"; 
+}
 
 // ==================================================
 // CARRINHO E UI
@@ -235,20 +242,20 @@ function salvarCarrinho() { localStorage.setItem("carrinho", JSON.stringify(carr
 function mostrarToast() { const t = document.getElementById("toast"); if (t) { t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2000); } }
 
 // ==================================================
-// INICIALIZAÇÃO ÚNICA
+// INICIALIZAÇÃO ÚNICA (ORDEM CORRIGIDA)
 // ==================================================
-document.addEventListener("DOMContentLoaded", async () => {
-    // 1. Splash Primeiro
+document.addEventListener("DOMContentLoaded", () => {
+    // 1. Splash roda primeiro e de forma independente
     gerenciarSplash();
 
-    // 2. Dados
-    await carregarDadosIniciais();
+    // 2. Carrega os dados (sem 'await' no topo para não travar a tela)
+    carregarDadosIniciais();
 
-    // 3. UI Events
+    // 3. Eventos de UI
     const btnHam = document.getElementById("hamburger");
     if (btnHam) btnHam.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
 
-    // 4. Recovery
+    // 4. Recupera carrinho
     const salvos = localStorage.getItem("carrinho");
     if (salvos) { 
         carrinho = JSON.parse(salvos); 
