@@ -4,50 +4,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Admin - MYDI DELIVERY</title>
-    <link rel="stylesheet" href="admin.css">
-    <style>
-        /* Estilos rápidos para os novos botões */
-        .btn-cozinha { background: #f39c12 !important; color: white !important; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-motoboy { background: #3498db !important; color: white !important; border: none; padding: 10px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-limpar-relatorio { background-color: #e74c3c; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; width: 100%; }
-        .pedido-card { border: 1px solid #444; background: #222; color: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; list-style: none; }
-        .info-entrega { margin: 5px 0; font-size: 0.9em; }
-        .total-container { font-weight: bold; color: #27ae60; font-size: 1.2em; margin-top: 10px; }
-    </style>
+    
 </head>
 <body>
 
-    <div id="painel-pedidos">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="margin: 0;">Novos Pedidos - MYDI DELIVERY</h2>
-            <button onclick="abrirRelatorio()" class="btn-abrir-relatorio" style="padding: 10px 20px; cursor: pointer; background: #ffcc00; border: none; font-weight: bold; border-radius: 5px;">📊 Ver Relatório</button>
-        </div>
-        <ul id="pedidos-container" style="padding: 0;"></ul>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h1 style="margin:0;">🔔 Painel <span style="color:var(--primary)">Pedidos</span></h1>
+        <button onclick="abrirRelatorio()" style="background:var(--primary); padding:10px 20px; border-radius:5px;">📊 Relatório</button>
     </div>
 
-    <div id="modal-relatorio" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9);">
-        <div class="modal-content" style="background: #1a1a1a; margin: 2% auto; padding: 25px; width: 90%; max-width: 600px; border-radius: 12px; color: white;">
-            <span class="fechar-modal" onclick="fecharRelatorio()" style="float: right; cursor: pointer; font-size: 30px; color: #ffcc00;">&times;</span>
-            <h2 style="color: #ffcc00; text-align: center;">RELATÓRIO DE VENDAS</h2>
-            
-            <div class="resumo-caixa" style="display: flex; justify-content: space-around; background: #222; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #333;">
-                <div>PEDIDOS: <span id="rel-qtd" style="color: #ffcc00; font-weight: bold;">0</span></div>
-                <div>TOTAL: <span id="rel-total" style="color: #27ae60; font-weight: bold;">R$ 0,00</span></div>
-            </div>
+    <ul id="pedidos-container"></ul>
 
-            <div style="max-height: 350px; overflow-y: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid #444; color: #ffcc00;">
-                            <th style="text-align: left; padding: 5px;">Hora</th>
-                            <th style="text-align: left; padding: 5px;">Cliente</th>
-                            <th style="text-align: right; padding: 5px;">Valor</th>
-                        </tr>
-                    </thead>
+    <div id="modal-relatorio" class="modal">
+        <div class="modal-content">
+            <span onclick="fecharRelatorio()" style="float:right; cursor:pointer; font-size:28px;">&times;</span>
+            <h2 style="text-align:center; color:var(--primary);">RESUMO DE VENDAS</h2>
+            <div style="display:flex; justify-content: space-around; background:#222; padding:15px; border-radius:10px; margin-bottom:20px;">
+                <div style="text-align:center">PEDIDOS<br><b id="rel-qtd">0</b></div>
+                <div style="text-align:center">TOTAL<br><b id="rel-total" style="color:var(--success)">R$ 0,00</b></div>
+            </div>
+            <div style="max-height:300px; overflow-y:auto;">
+                <table style="width:100%; border-collapse: collapse; font-size:14px;">
                     <tbody id="tabela-relatorio"></tbody>
                 </table>
             </div>
-            <button onclick="limparRelatorio()" class="btn-limpar-relatorio">🗑️ LIMPAR HISTÓRICO</button>
+            <button onclick="limparRelatorio()" style="background:var(--danger); color:white; width:100%; padding:10px; margin-top:20px; border-radius:5px;">🗑️ APAGAR TUDO</button>
         </div>
     </div>
 
@@ -66,98 +47,74 @@
             messagingSenderId: "884850608032",
             appId: "1:884850608032:web:79db6983346c3c20edc6c5"
         };
-        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        let paginaCarregada = false;
+        let ready = false;
 
-        // ESCUTA NOVOS PEDIDOS
-        db.ref('pedidos').on('child_added', (snapshot) => {
-            const pedido = snapshot.val();
-            const idPedido = snapshot.key;
-            const container = document.getElementById('pedidos-container');
-            
-            let itensHtml = Array.isArray(pedido.itens) 
-                ? pedido.itens.map(i => `<div>${i.qtd}x ${i.produto}</div>`).join('')
-                : pedido.itens;
-
+        db.ref('pedidos').on('child_added', (snap) => {
+            const p = snap.val();
+            const id = snap.key;
             const li = document.createElement('li');
             li.className = 'pedido-card';
-            li.id = `card-${idPedido}`;
+            li.id = `card-${id}`;
+            
+            let itensHtml = Array.isArray(p.itens) ? p.itens.map(i => `• ${i.qtd}x ${i.produto}`).join('<br>') : p.itens;
+
             li.innerHTML = `
-                <h3>${pedido.cliente} <span style="font-size: 0.6em; float: right;">${new Date().toLocaleTimeString('pt-BR')}</span></h3>
-                <div class="info-entrega"><strong>📍 Endereço:</strong> ${pedido.endereco}</div>
-                <div class="info-entrega"><strong>💳 Pagamento:</strong> <span style="color: #ffcc00; font-weight: bold;">${pedido.pagamento || 'Não informado'}</span></div>
-                <div class="itens-lista" style="background: #333; padding: 10px; border-radius: 5px; margin: 10px 0;"><strong>🍴 Itens:</strong><br>${itensHtml}</div>
-                <div class="obs-alerta" style="color: #e74c3c;">⚠️ OBS: ${pedido.observacao || 'Nenhuma'}</div>
-                <div class="total-container">TOTAL: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}</div>
-                
-                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px;">
-                    <button class="btn-cozinha" style="flex: 1;" id="btn-coz-${idPedido}">👨‍🍳 Cozinha</button>
-                    <button class="btn-motoboy" style="flex: 1;" id="btn-mot-${idPedido}">🛵 Motoboy</button>
-                    <button onclick="concluirPedido('${idPedido}')" style="width: 100%; background: #27ae60; color: white; border: none; padding: 12px; border-radius: 5px; font-weight: bold; cursor: pointer;">✅ Concluir Pedido</button>
+                <h3>${p.cliente} <span class="badge-pagamento">${p.pagamento || 'A combinar'}</span></h3>
+                <div class="info"><b>📍 Endereço:</b> ${p.endereco}</div>
+                <div class="itens-box">${itensHtml}</div>
+                <div class="info" style="color:var(--danger)"><b>💬 Obs:</b> ${p.observacao || 'Nenhuma'}</div>
+                <div class="total">R$ ${parseFloat(p.total || 0).toFixed(2).replace('.',',')}</div>
+                <div class="btn-group">
+                    <button class="btn-cozinha" onclick="imprimir('cozinha', '${id}')">👨‍🍳 Cozinha</button>
+                    <button class="btn-motoboy" onclick="imprimir('motoboy', '${id}')">🛵 Motoboy</button>
                 </div>
+                <button class="btn-concluir" onclick="concluirPedido('${id}')">✅ Concluir</button>
             `;
+            document.getElementById('pedidos-container').prepend(li);
 
-            container.prepend(li);
-
-            // Som de Telefone
-            if (paginaCarregada) {
-                const somAlerta = new Audio('https://www.soundjay.com/phone/sounds/phone-calling-1.mp3');
-                somAlerta.play().catch(() => { console.log("Som bloqueado pelo navegador. Clique na página."); });
+            if (ready) {
+                new Audio('https://www.soundjay.com/phone/sounds/phone-calling-1.mp3').play().catch(()=>{});
             }
-
-            // Impressão COZINHA
-            li.querySelector(`#btn-coz-${idPedido}`).onclick = () => {
-                const htmlCozinha = `
-                    <div style="font-family: Arial; width: 72mm; text-align: center;">
-                        <h2 style="margin:0;">COZINHA - #...${idPedido.slice(-4)}</h2>
-                        <hr>
-                        <div style="text-align: left; font-size: 1.1em;">
-                            <strong>CLIENTE:</strong> ${pedido.cliente}<br><br>
-                            <strong>ITENS:</strong><br>
-                            ${itensHtml}
-                            <br>
-                            <strong>OBS:</strong> ${pedido.observacao || 'Nenhuma'}
-                        </div>
-                        <hr>
-                        <span>${new Date().toLocaleTimeString()}</span>
-                    </div>
-                `;
-                enviarParaImpressora(htmlCozinha);
-            };
-
-            // Impressão MOTOBOY
-            li.querySelector(`#btn-mot-${idPedido}`).onclick = () => {
-                const htmlMotoboy = `
-                    <div style="font-family: Arial; width: 72mm;">
-                        <center><h2 style="margin:0;">ENTREGA</h2></center>
-                        <hr>
-                        <strong>CLIENTE:</strong> ${pedido.cliente}<br>
-                        <strong>ENDEREÇO:</strong> ${pedido.endereco}<br>
-                        <hr>
-                        <strong>PAGAMENTO:</strong> ${pedido.pagamento || 'A combinar'}<br>
-                        <strong style="font-size: 1.3em;">VALOR: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}</strong>
-                        <hr>
-                        <strong>OBS:</strong> ${pedido.observacao || ''}
-                    </div>
-                `;
-                enviarParaImpressora(htmlMotoboy);
-            };
         });
 
-        // Delay para o som não tocar no carregamento inicial
-        db.ref('pedidos').once('value', () => { setTimeout(() => { paginaCarregada = true; }, 2000); });
+        db.ref('pedidos').once('value', () => { setTimeout(() => ready = true, 2000); });
+
+        function imprimir(tipo, id) {
+            db.ref('pedidos/'+id).once('value', s => {
+                const p = s.val();
+                let itens = Array.isArray(p.itens) ? p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>') : p.itens;
+                let html = '';
+
+                if(tipo === 'cozinha') {
+                    html = `<div style="width:72mm;font-family:Arial;text-align:center;">
+                        <h3>PEDIDO COZINHA</h3><hr>
+                        <div style="text-align:left;"><b>CLIENTE:</b> ${p.cliente}<br><br><b>ITENS:</b><br>${itens}<br><br><b>OBS:</b> ${p.observacao}</div>
+                    </div>`;
+                } else {
+                    html = `<div style="width:72mm;font-family:Arial;">
+                        <center><h2>SAÍDA ENTREGA</h2></center><hr>
+                        <b>CLIENTE:</b> ${p.cliente}<br><b>ENDEREÇO:</b> ${p.endereco}<br><hr>
+                        <b>PAGAMENTO:</b> ${p.pagamento || 'A combinar'}<br>
+                        <b>VALOR: R$ ${parseFloat(p.total).toFixed(2)}</b><br>
+                        <b>OBS:</b> ${p.observacao}
+                    </div>`;
+                }
+                const doc = document.getElementById('iframe-impressao').contentWindow.document;
+                doc.open(); doc.write(`<html><body style="margin:0;" onload="window.print()">${html}</body></html>`); doc.close();
+            });
+        }
 
         function concluirPedido(id) {
-            if (confirm("Deseja finalizar este pedido?")) {
-                const ref = db.ref('pedidos/' + id);
-                ref.once('value').then(snap => {
-                    const d = snap.val();
-                    d.horaConcluido = new Date().toLocaleTimeString('pt-BR');
-                    db.ref('relatorios').child(id).set(d).then(() => {
+            if(confirm("Finalizar pedido?")){
+                const ref = db.ref('pedidos/'+id);
+                ref.once('value', s => {
+                    const data = s.val();
+                    data.horaConcluido = new Date().toLocaleTimeString();
+                    db.ref('relatorios').child(id).set(data).then(() => {
                         ref.remove();
-                        document.getElementById(`card-${id}`).remove();
+                        document.getElementById('card-'+id).remove();
                     });
                 });
             }
@@ -165,44 +122,21 @@
 
         function abrirRelatorio() {
             const tab = document.getElementById('tabela-relatorio');
-            tab.innerHTML = '';
-            let total = 0, qtd = 0;
-            db.ref('relatorios').once('value', snap => {
-                snap.forEach(child => {
-                    const p = child.val();
-                    total += parseFloat(p.total || 0);
-                    qtd++;
-                    tab.innerHTML += `
-                        <tr style="border-bottom: 1px solid #333;">
-                            <td style="padding:8px;">${p.horaConcluido || '--:--'}</td>
-                            <td style="padding:8px;">${p.cliente}</td>
-                            <td style="color:#27ae60; text-align:right; padding:8px;">R$ ${parseFloat(p.total || 0).toFixed(2).replace('.',',')}</td>
-                        </tr>`;
+            tab.innerHTML = ''; let total = 0, qtd = 0;
+            db.ref('relatorios').once('value', s => {
+                s.forEach(c => {
+                    const p = c.val();
+                    total += parseFloat(p.total || 0); qtd++;
+                    tab.innerHTML += `<tr style="border-bottom:1px solid #333;"><td style="padding:8px;">${p.horaConcluido}</td><td>${p.cliente}</td><td style="text-align:right;">R$ ${parseFloat(p.total).toFixed(2)}</td></tr>`;
                 });
-                document.getElementById('rel-total').innerText = `R$ ${total.toFixed(2).replace('.', ',')}`;
+                document.getElementById('rel-total').innerText = `R$ ${total.toFixed(2)}`;
                 document.getElementById('rel-qtd').innerText = qtd;
             });
-            document.getElementById('modal-relatorio').style.display = "block";
+            document.getElementById('modal-relatorio').style.display = 'block';
         }
 
-        function fecharRelatorio() { document.getElementById('modal-relatorio').style.display = "none"; }
-
-        function limparRelatorio() {
-            if (confirm("⚠️ ATENÇÃO: Deseja apagar TODO o histórico?")) {
-                db.ref('relatorios').remove().then(() => {
-                    alert("Relatório limpo!");
-                    abrirRelatorio();
-                });
-            }
-        }
-
-        function enviarParaImpressora(html) {
-            const iframe = document.getElementById('iframe-impressao');
-            const doc = iframe.contentWindow.document;
-            doc.open();
-            doc.write(`<html><body style="margin:0;" onload="window.print()">${html}</body></html>`);
-            doc.close();
-        }
+        function fecharRelatorio() { document.getElementById('modal-relatorio').style.display = 'none'; }
+        function limparRelatorio() { if(confirm("Apagar histórico?")) db.ref('relatorios').remove().then(() => abrirRelatorio()); }
     </script>
 </body>
 </html>
