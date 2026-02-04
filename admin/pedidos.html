@@ -3,32 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin</title>
-    <style>
-        :root { --primary: #ffcc00; --success: #27ae60; --info: #3498db; --warning: #f39c12; --danger: #e74c3c; --bg: #121212; --card: #1e1e1e; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: white; margin: 0; padding: 20px; }
-        #pedidos-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; padding: 0; list-style: none; }
-        .pedido-card { background: var(--card); border: 1px solid #333; padding: 20px; border-radius: 12px; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.5); border-top: 5px solid var(--primary); }
-        .pedido-card h3 { margin: 0 0 10px 0; color: var(--primary); display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        .info { margin: 8px 0; font-size: 14px; }
-        .itens-box { background: #2a2a2a; padding: 12px; border-radius: 8px; margin: 15px 0; font-size: 14px; line-height: 1.6; border-left: 4px solid var(--primary); }
-        .total { font-size: 22px; font-weight: bold; color: var(--success); margin: 10px 0; text-align: right; }
-        .btn-group { display: flex; gap: 8px; margin-top: 15px; }
-        button { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: 0.2s; text-transform: uppercase; }
-        .btn-cozinha { background: var(--warning); color: white; padding: 10px; flex: 1; }
-        .btn-motoboy { background: var(--info); color: white; padding: 10px; flex: 1; }
-        .btn-concluir { background: var(--success); color: white; width: 100%; padding: 12px; margin-top: 10px; font-size: 16px; }
-        .badge-pagamento { background: #fff; color: #000; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 900; }
-        iframe { display: none; }
-    </style>
+    <title>Painel Admin - SNOOP LANCHE</title>
+    <link rel="stylesheet" href="admin.css">
 </head>
 <body>
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-        <h1 style="margin:0;"> Painel <span style="color:var(--primary)">SNOOP LANCHE</span></h1>
-    </div>
+    <header class="admin-header">
+        <h1>🔔 Painel <span>SNOOP LANCHE</span></h1>
+        <button class="btn-relatorio" onclick="abrirRelatorio()">📊 Ver Relatório</button>
+    </header>
 
     <ul id="pedidos-container"></ul>
+
+    <div id="modal-relatorio" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="fecharRelatorio()">&times;</span>
+            <h2 class="modal-title">HISTÓRICO DE VENDAS</h2>
+            
+            <div class="stats-container">
+                <div class="stat-box">PEDIDOS<br><b id="rel-qtd">0</b></div>
+                <div class="stat-box">TOTAL VENDIDO<br><b id="rel-total">R$ 0,00</b></div>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="table-rel">
+                    <thead>
+                        <tr><th>Hora</th><th>Cliente</th><th>Valor</th></tr>
+                    </thead>
+                    <tbody id="tabela-relatorio"></tbody>
+                </table>
+            </div>
+            
+            <button class="btn-limpar" onclick="limparRelatorio()">🗑️ LIMPAR TODO HISTÓRICO</button>
+        </div>
+    </div>
+
     <iframe id="iframe-impressao"></iframe>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -55,13 +64,13 @@
             li.className = 'pedido-card';
             li.id = `card-${id}`;
             
-            let itensHtml = Array.isArray(p.itens) ? p.itens.map(i => `• ${i.qtd}x ${i.produto}`).join('<br>') : "Erro ao carregar itens";
+            let itensHtml = Array.isArray(p.itens) ? p.itens.map(i => `• ${i.qtd}x ${i.produto}`).join('<br>') : "Erro nos itens";
 
             li.innerHTML = `
                 <h3>${p.cliente} <span class="badge-pagamento">${p.pagamento || 'NÃO INFORMADO'}</span></h3>
                 <div class="info"><b>📍 Endereço:</b> ${p.endereco}</div>
                 <div class="itens-box">${itensHtml}</div>
-                <div class="info" style="color:var(--danger)"><b>💬 Obs:</b> ${p.observacao || 'Nenhuma'}</div>
+                <div class="info-obs"><b>💬 Obs:</b> ${p.observacao || 'Nenhuma'}</div>
                 <div class="total">R$ ${parseFloat(p.total || 0).toFixed(2).replace('.',',')}</div>
                 <div class="btn-group">
                     <button class="btn-cozinha" onclick="imprimir('cozinha', '${id}')">👨‍🍳 Cozinha</button>
@@ -88,7 +97,6 @@
                     html = `<div style="width:72mm;font-family:Arial;text-align:center;">
                         <h2>COZINHA</h2><hr>
                         <div style="text-align:left;">
-                            <b>PEDIDO:</b> ${id.substring(0,5)}<br>
                             <b>CLIENTE:</b> ${p.cliente}<br><hr>
                             <b>ITENS:</b><br>${itens}<br><hr>
                             <b>OBS:</b> ${p.observacao}
@@ -110,13 +118,45 @@
         }
 
         function concluirPedido(id) {
-            if(confirm("Deseja concluir o pedido?")){
-                db.ref('pedidos/'+id).remove().then(() => {
-                    document.getElementById('card-'+id).remove();
+            if(confirm("Concluir pedido e enviar para o relatório?")){
+                const ref = db.ref('pedidos/'+id);
+                ref.once('value', s => {
+                    const data = s.val();
+                    data.horaFinalizado = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
+                    db.ref('relatorios').child(id).set(data).then(() => {
+                        ref.remove();
+                        document.getElementById('card-'+id).remove();
+                    });
                 });
+            }
+        }
+
+        function abrirRelatorio() {
+            const lista = document.getElementById('tabela-relatorio');
+            lista.innerHTML = ''; 
+            let totalGeral = 0; 
+            let contagem = 0;
+
+            db.ref('relatorios').once('value', s => {
+                s.forEach(child => {
+                    const r = child.val();
+                    totalGeral += parseFloat(r.total || 0);
+                    contagem++;
+                    lista.innerHTML += `<tr><td>${r.horaFinalizado || '--:--'}</td><td>${r.cliente}</td><td>R$ ${parseFloat(r.total).toFixed(2)}</td></tr>`;
+                });
+                document.getElementById('rel-total').innerText = `R$ ${totalGeral.toFixed(2).replace('.',',')}`;
+                document.getElementById('rel-qtd').innerText = contagem;
+                document.getElementById('modal-relatorio').style.display = 'block';
+            });
+        }
+
+        function fecharRelatorio() { document.getElementById('modal-relatorio').style.display = 'none'; }
+
+        function limparRelatorio() {
+            if(confirm("Apagar todo o histórico permanentemente?")) {
+                db.ref('relatorios').remove().then(() => abrirRelatorio());
             }
         }
     </script>
 </body>
 </html>
-
