@@ -47,55 +47,73 @@ function initMenu() {
     if (btn && menu) btn.onclick = () => menu.classList.toggle("open");
 }
 
-function carregarProdutos() {
-    const container = document.getElementById('pizza'); // Onde os cards aparecem
-    if (!container) return;
+// Função para carregar os produtos do Firebase conforme a página
+function carregarProdutosDoBanco() {
+    const containerBurgers = document.getElementById("burgers");
+    const containerBebidas = document.getElementById("bebidas");
+    const containerPizzas = document.getElementById("pizza"); // Certifique-se que o ID no pizzas.html seja 'pizza'
 
-    // 1. CARREGAR BURGERS
-    db.ref('produtos/burgers').on('value', (snapshot) => {
-        exibirCards(snapshot.val(), 'burger');
-    });
+    // 1. Se estiver na página de BURGERS
+    if (containerBurgers) {
+        window.db.ref('produtos/burgers').on('value', (snapshot) => {
+            exibirProdutos(snapshot.val(), containerBurgers, 'burger');
+        });
+    }
 
-    // 2. CARREGAR BEBIDAS
-    db.ref('produtos/bebidas').on('value', (snapshot) => {
-        exibirCards(snapshot.val(), 'bebida');
-    });
+    // 2. Se estiver na página de BEBIDAS
+    if (containerBebidas) {
+        window.db.ref('produtos/bebidas').on('value', (snapshot) => {
+            exibirProdutos(snapshot.val(), containerBebidas, 'bebida');
+        });
+    }
 
-    // 3. CARREGAR PIZZAS
-    db.ref('produtos/pizzas').on('value', (snapshot) => {
-        exibirCards(snapshot.val(), 'pizza');
-    });
-}
-
-function exibirCards(itens, categoria) {
-    const container = document.getElementById('pizza');
-    if (!itens) return;
-
-    for (let id in itens) {
-        const item = itens[id];
-        
-        // Se for pizza, o botão abre o Modal de Tamanhos
-        if (categoria === 'pizza') {
-            container.innerHTML += `
-                <div class="card-item">
-                    <img src="${item.imagem}">
-                    <h3>${item.nome}</h3>
-                    <p>${item.ingredientes}</p>
-                    <button onclick="abrirOpcoesPizza('${id}')">Ver Tamanhos</button>
-                </div>`;
-        } else {
-            // Layout para Burger e Bebida (Preço Único)
-            container.innerHTML += `
-                <div class="card-item">
-                    <img src="${item.image}">
-                    <h3>${item.title}</h3>
-                    <p>${item.ingredientes}</p>
-                    <span class="price">R$ ${item.price.toFixed(2)}</span>
-                    <button onclick="adicionarAoCarrinho('${item.title}', ${item.price})">Adicionar</button>
-                </div>`;
-        }
+    // 3. Se estiver na página de PIZZAS
+    if (containerPizzas) {
+        window.db.ref('produtos/pizzas').on('value', (snapshot) => {
+            exibirProdutos(snapshot.val(), containerPizzas, 'pizza');
+        });
     }
 }
+
+function exibirProdutos(dados, container, tipo) {
+    if (!dados) return;
+    container.innerHTML = ""; // Limpa antes de carregar
+
+    for (let id in dados) {
+        const p = dados[id];
+        const card = document.createElement("div");
+        card.className = "card-produto";
+
+        if (tipo === 'pizza') {
+            // Layout para Pizza (Botão para abrir tamanhos)
+            card.innerHTML = `
+                <img src="${p.imagem}">
+                <div class="card-content">
+                    <h3>${p.nome}</h3>
+                    <p>${p.ingredientes || ""}</p>
+                    <button onclick="abrirOpcoesPizza('${id}')" style="background:#ffc107; color:#000;">Escolher Tamanho</button>
+                </div>`;
+        } else {
+            // Layout para Burger e Bebida (Igual ao seu original)
+            const temDesconto = p.oldPrice && p.oldPrice > 0;
+            card.innerHTML = `
+                <img src="${p.image}">
+                <div class="card-content">
+                    <h3>${p.title}</h3>
+                    <p>${p.ingredientes || ""}</p>
+                    <div class="price-container">
+                        <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
+                        ${temDesconto ? `<span class="old-price" style="text-decoration:line-through; color:red; font-size:0.8em; margin-left:5px;">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
+                    </div>
+                    <button onclick="adicionarAoCarrinho('${p.title}', ${p.price})">Adicionar</button>
+                </div>`;
+        }
+        container.appendChild(card);
+    }
+}
+
+// Inicia a chamada
+carregarProdutosDoBanco();
 // ==================================================
 // LÓGICA DO CARRINHO
 // ==================================================
@@ -301,6 +319,7 @@ function mostrarToast() {
     const t = document.getElementById("toast");
     if (t) { t.classList.add("show"); setTimeout(() => { t.classList.remove("show"); }, 2000); }
 }
+
 
 
 
