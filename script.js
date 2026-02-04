@@ -205,11 +205,24 @@ async function mostrarResumo() {
 // ==================================================
 // FINALIZAR PEDIDO
 // ==================================================
+// ==================================================
+// FINALIZAR PEDIDO (CORRIGIDO)
+// ==================================================
 async function finalizarEntrega() {
-    if (typeof db === 'undefined') { alert("Erro: Banco de dados."); return; }
+    if (typeof db === 'undefined') { 
+        alert("Erro: Banco de dados não carregado. Verifique sua conexão."); 
+        return; 
+    }
 
-    // CAPTURA A FORMA DE PAGAMENTO (Certifique-se que o ID no seu HTML seja 'metodoPagamento')
-    const formaPagamento = document.getElementById("pagamento")?.value || "Não informado";
+    // Pega o valor do SELECT com id="pagamento"
+    const formaPagamento = document.getElementById("pagamento").value;
+    
+    // Validação: Não deixa finalizar sem escolher o pagamento
+    if (!formaPagamento) {
+        alert("Por favor, selecione uma forma de pagamento!");
+        return;
+    }
+
     const observacao = document.getElementById("observacao")?.value || "Nenhuma";
     const nomeCli = document.getElementById("nomeCliente").value;
     const cidadeCli = document.getElementById("cidade").value;
@@ -218,8 +231,10 @@ async function finalizarEntrega() {
     const bairroCli = document.getElementById("bairro").value;
 
     let subtotal = 0;
-    let msgWhatsApp = " *NOVO PEDIDO*%0A%0A";
+    // Iniciamos a mensagem do WhatsApp com Codificação correta
+    let msgWhatsApp = "*NOVO PEDIDO - SNOOP LANCHE*%0A%0A";
     
+    // Monta a lista de itens e calcula subtotal
     const itensPedido = carrinho.map(i => {
         subtotal += i.price * i.qtd;
         msgWhatsApp += `• ${i.qtd}x ${i.title} - R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}%0A`;
@@ -228,17 +243,21 @@ async function finalizarEntrega() {
 
     const totalGeral = subtotal + taxaEntregaCalculada;
 
+    // Detalhes de Valores
     msgWhatsApp += `%0A---------------------------%0A`;
-    msgWhatsApp += ` *Subtotal:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += ` *TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += `*Subtotal:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += `*Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += `*TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
     msgWhatsApp += `---------------------------%0A`;
-    msgWhatsApp += ` *Pagamento:* ${formaPagamento}%0A`; // <--- Para o WhatsApp
-    msgWhatsApp += ` *Cliente:* ${nomeCli}%0A`;
-    msgWhatsApp += `📍 *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
-    msgWhatsApp += ` *Obs:* ${observacao}%0A%0A`;
+    
+    // Detalhes do Cliente e Pagamento
+    msgWhatsApp += `*Pagamento:* ${formaPagamento}%0A`; 
+    msgWhatsApp += `*Cliente:* ${nomeCli}%0A`;
+    msgWhatsApp += `📍 *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli} (${cidadeCli})%0A`;
+    msgWhatsApp += `*Obs:* ${observacao}%0A%0A`;
 
     try {
+        // 1. SALVA NO FIREBASE (PAINEL ADMIN)
         await db.ref('pedidos').push({
             cliente: nomeCli,
             cidade: cidadeCli,
@@ -247,15 +266,24 @@ async function finalizarEntrega() {
             subtotal: subtotal,
             taxaEntrega: taxaEntregaCalculada,
             total: totalGeral,
-            pagamento: formaPagamento, // <--- ESTA LINHA SALVA NO PAINEL ADMIN
+            pagamento: formaPagamento, // Aqui envia PIX, CARTÃO ou DINHEIRO para o painel
             observacao: observacao,
             data: new Date().toISOString(),
             status: "novo"
         });
         
-        carrinho = []; salvarCarrinho(); atualizarCarrinho(); fecharDelivery();
+        // 2. LIMPA CARRINHO E FECHA TUDO
+        carrinho = []; 
+        salvarCarrinho(); 
+        atualizarCarrinho(); 
+        fecharDelivery();
+
+        // 3. ENVIA PARA O WHATSAPP
         window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
+
     } catch (e) {
+        console.error("Erro ao salvar pedido:", e);
+        // Mesmo se der erro no Firebase, tenta enviar o WhatsApp para você não perder a venda!
         window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
     }
 }
@@ -269,5 +297,6 @@ function mostrarToast() {
     const t = document.getElementById("toast");
     if (t) { t.classList.add("show"); setTimeout(() => { t.classList.remove("show"); }, 2000); }
 }
+
 
 
