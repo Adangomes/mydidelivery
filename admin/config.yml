@@ -49,21 +49,11 @@ collections:
                     name: "prices"
                     widget: "object"
                     fields:
-                      - label: "Pequena"
-                        name: "P"
-                        widget: "number"
-                        value_type: "float"
-                      - label: "Média"
-                        name: "M"
-                        widget: "number"
-                        value_type: "float"
-                      - label: "Grande"
-                        name: "G"
-                        widget: "number"
-                        value_type: "float"
+                      - { label: "Pequena", name: "P", widget: "number", value_type: "float" }
+                      - { label: "Média", name: "M", widget: "number", value_type: "float" }
+                      - { label: "Grande", name: "G", widget: "number", value_type: "float" }
 
-
-                        - name: "configuracoes"
+  - name: "configuracoes"
     label: "Configurações da Loja"
     files:
       - file: "content/config.json"
@@ -72,4 +62,3 @@ collections:
         fields:
           - { label: "Loja Aberta?", name: "loja_aberta", widget: "boolean", default: true }
           - { label: "Mensagem de Loja Fechada", name: "msg_fechado", widget: "string", default: "Desculpe, estamos fechados no momento!" }
-
