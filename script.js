@@ -6,107 +6,52 @@ const RESTAURANTE_COORD = [-49.0716, -26.4856];
 const TAXA_BASE = 5;
 const VALOR_POR_KM = 1.5;
 const WHATSAPP_NUMERO = "5547984196636";
-
-let carrinho = [];
+let carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
 let todasPizzas = {}; 
 let saboresSelecionados = [];
 let tamanhoSelecionado = null;
 let limiteSabores = 1;
 let LOJA_ABERTA = true; 
-let MENSAGEM_FECHADA = "Loja Fechada no momento.";
 
 // ==================================================
-// 1. LÓGICA DO SPLASH (CORRIGIDA)
-// ==================================================
-function gerenciarSplash() {
-    const splash = document.getElementById("splash");
-    if (!splash) return;
-
-    if (sessionStorage.getItem("splashVisualizado")) {
-        splash.style.display = "none";
-    } else {
-        setTimeout(() => {
-            splash.style.opacity = "0";
-            setTimeout(() => {
-                splash.style.display = "none";
-                sessionStorage.setItem("splashVisualizado", "true");
-            }, 500); 
-        }, 2500);
-    }
-}
-
-// ==================================================
-// 2. CARREGAMENTO DE DADOS (PIZZAS VOLTANDO)
+// 1. CARREGAMENTO INICIAL
 // ==================================================
 async function carregarDadosIniciais() {
     try {
         const resStatus = await fetch('content/status.json');
         const dataStatus = await resStatus.json();
         LOJA_ABERTA = dataStatus.aberto;
-        MENSAGEM_FECHADA = dataStatus.mensagem;
         atualizarInterfaceStatus(dataStatus);
 
         const resProdutos = await fetch('content/produtos.json');
         const data = await resProdutos.json();
-        
-        // Salva as pizzas no objeto global
         todasPizzas = data.produtos.pizzas || {};
 
-        // RENDERIZAÇÃO COM MULTIPLOS IDs POSSÍVEIS (Evita sumir)
-        if (data.produtos.burgers) exibirProdutos(data.produtos.burgers, document.getElementById("burgers"), 'burger');
-        if (data.produtos.bebidas) exibirProdutos(data.produtos.bebidas, document.getElementById("bebidas"), 'bebida');
-        
-        // Tenta encontrar o container de pizza por vários IDs comuns
-        const pizzaContainer = document.getElementById("pizza") || document.getElementById("pizzaS") || document.getElementById("pizzas");
-        if (data.produtos.pizzas) exibirProdutos(data.produtos.pizzas, pizzaContainer, 'pizza');
-
-    } catch (e) { 
-        console.error("Erro ao carregar dados.", e); 
-    }
+        const container = document.getElementById("pizzaS") || document.getElementById("pizza");
+        exibirProdutos(todasPizzas, container);
+    } catch (e) { console.error("Erro ao carregar dados.", e); }
 }
 
-function atualizarInterfaceStatus(data) {
-    const statusEl = document.getElementById("status-loja");
-    if (statusEl) {
-        statusEl.innerHTML = data.mensagem; 
-        statusEl.className = "status " + (LOJA_ABERTA ? "aberto" : "fechado");
-    }
-}
-
-function exibirProdutos(dadosObjeto, container, tipo) {
+function exibirProdutos(dadosObjeto, container) {
     if (!container || !dadosObjeto) return;
     container.innerHTML = ""; 
-
     Object.keys(dadosObjeto).forEach((id) => {
         const p = dadosObjeto[id];
         const card = document.createElement("div");
         card.className = "card-produto";
-
-        if (tipo === 'pizza') {
-            card.innerHTML = `
-                <img src="${p.imagem}">
-                <div class="card-content">
-                    <h3>${p.nome}</h3>
-                    <p>${p.ingredientes || ""}</p>
-                    <button class="btn-escolher" onclick="abrirOpcoesPizza('${id}')">ESCOLHER</button>
-                </div>`;
-        } else {
-            const preco = p.price || 0;
-            card.innerHTML = `
-                <img src="${p.image}">
-                <div class="card-content">
-                    <h3>${p.title}</h3>
-                    <p>${p.ingredientes || ""}</p>
-                    <div class="price-container"><strong>R$ ${preco.toFixed(2).replace(".", ",")}</strong></div>
-                    <button onclick="adicionarSimples('${p.title}', ${preco})">Adicionar</button>
-                </div>`;
-        }
+        card.innerHTML = `
+            <img src="${p.imagem}">
+            <div class="card-content">
+                <h3>${p.nome}</h3>
+                <p>${p.ingredientes || ""}</p>
+                <button class="btn-escolher" onclick="abrirOpcoesPizza('${id}')">ESCOLHER</button>
+            </div>`;
         container.appendChild(card);
     });
 }
 
 // ==================================================
-// 3. LÓGICA DO MODAL (ESCOLHA DE TAMANHO E SABORES)
+// 2. LÓGICA DO MODAL DE PIZZAS (MEIA-A-MEIA)
 // ==================================================
 function abrirOpcoesPizza(id) {
     const pizzaOriginal = todasPizzas[id];
@@ -117,10 +62,7 @@ function abrirOpcoesPizza(id) {
     
     document.getElementById("modal-pizza-img").src = pizzaOriginal.imagem;
     document.getElementById("pizza-modal-title").innerText = pizzaOriginal.nome;
-    
-    const desc = document.getElementById("pizza-modal-desc");
-    if(desc) desc.innerText = pizzaOriginal.ingredientes || "";
-
+    document.getElementById("pizza-modal-desc").innerText = pizzaOriginal.ingredientes || "";
     document.getElementById("secao-sabores").style.display = "none";
 
     const containerTamanhos = document.getElementById("pizza-sizes-container");
@@ -159,19 +101,19 @@ function renderizarSaboresMeia() {
         const selecionada = saboresSelecionados.find(s => s.nome === p.nome);
         
         const card = document.createElement("div");
-        card.className = `card-sabor-premium ${selecionada ? 'selected' : ''}`;
+        card.className = `card-sabor-meia ${selecionada ? 'selected' : ''}`;
         card.innerHTML = `
-            <img src="${p.imagem}">
-            <span>${p.nome}</span>
-            <div class="check-icon">${selecionada ? '✓' : ''}</div>
+            <div style="display:flex; flex-direction:column; flex:1;">
+                <span style="font-size: 0.95rem; font-weight: 700;">${p.nome}</span>
+                <small style="font-size: 0.75rem; color: #666;">${p.ingredientes || ""}</small>
+            </div>
+            <div class="check-icon">${selecionada ? '●' : '○'}</div>
         `;
 
         card.onclick = () => {
             const index = saboresSelecionados.findIndex(s => s.nome === p.nome);
             if (index > -1) {
-                if (saboresSelecionados.length > 1) {
-                    saboresSelecionados.splice(index, 1);
-                }
+                if (saboresSelecionados.length > 1) saboresSelecionados.splice(index, 1);
             } else if (saboresSelecionados.length < limiteSabores) {
                 saboresSelecionados.push(p);
             }
@@ -182,70 +124,124 @@ function renderizarSaboresMeia() {
 }
 
 // ==================================================
-// 4. CARRINHO
+// 3. CARRINHO E INTERFACE
 // ==================================================
-function adicionarSimples(titulo, preco) {
-    if (!LOJA_ABERTA) return alert(MENSAGEM_FECHADA);
-    carrinho.push({ title: titulo, price: preco, qtd: 1 });
-    atualizarTudo();
+function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; atualizarInterfaceCarrinho(); }
+function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
+function abrirDelivery() { 
+    if(carrinho.length === 0) return alert("Seu carrinho está vazio!");
+    fecharCarrinho();
+    document.getElementById("delivery-modal").style.display = "flex"; 
 }
+function fecharDelivery() { document.getElementById("delivery-modal").style.display = "none"; }
 
 const btnAddPizza = document.getElementById("btn-adicionar-pizza");
 if (btnAddPizza) {
     btnAddPizza.onclick = () => {
-        if (!tamanhoSelecionado) return alert("Escolha o tamanho primeiro!");
+        if (!tamanhoSelecionado) return alert("Escolha o tamanho!");
         const nomes = saboresSelecionados.map(s => s.nome).join(" / ");
         const precos = saboresSelecionados.map(s => s.precos[tamanhoSelecionado].atual);
         const precoFinal = Math.max(...precos);
 
-        carrinho.push({
-            title: `Pizza ${tamanhoSelecionado} (${nomes})`,
-            price: precoFinal,
-            qtd: 1
-        });
-        
-        fecharModalPizza();
+        carrinho.push({ title: `Pizza ${tamanhoSelecionado} (${nomes})`, price: precoFinal, qtd: 1 });
+        document.getElementById("pizza-options-modal").style.display = "none";
         atualizarTudo();
     };
 }
 
 function atualizarTudo() {
-    atualizarCarrinho();
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
-    mostrarToast();
+    atualizarInterfaceCarrinho();
+    const toast = document.getElementById("toast");
+    if (toast) { toast.classList.add("show"); setTimeout(() => toast.classList.remove("show"), 2000); }
 }
 
-function atualizarCarrinho() {
+function atualizarInterfaceCarrinho() {
     const box = document.getElementById("cart-items");
-    let subtotal = 0;
-    if (box) {
-        box.innerHTML = "";
-        carrinho.forEach(i => {
-            subtotal += i.price * i.qtd;
-            box.innerHTML += `<div class="item-carrinho" style="display:flex; justify-content:space-between;"><span>${i.title} x${i.qtd}</span><strong>R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}</strong></div>`;
+    let soma = 0;
+    if (!box) return;
+    box.innerHTML = "";
+    carrinho.forEach((item, index) => {
+        soma += item.price * item.qtd;
+        box.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span>${item.title}</span>
+            <strong>R$ ${item.price.toFixed(2)} <button onclick="removerItem(${index})" style="background:none; border:none; color:red;">🗑️</button></strong>
+        </div>`;
+    });
+    const totalEl = document.getElementById("total");
+    if(totalEl) totalEl.innerText = `Total: R$ ${soma.toFixed(2).replace(".", ",")}`;
+}
+
+function removerItem(index) { carrinho.splice(index, 1); atualizarTudo(); }
+
+// ==================================================
+// 4. FINALIZAR (FIREBASE + WHATSAPP)
+// ==================================================
+function finalizarEntrega() {
+    const nome = document.getElementById("nomeCliente").value;
+    const cidade = document.getElementById("cidade").value;
+    const bairro = document.getElementById("bairro").value;
+    const rua = document.getElementById("rua").value;
+    const numero = document.getElementById("numero").value;
+    const pag = document.getElementById("pagamento").value;
+    const obs = document.getElementById("observacao").value;
+
+    if (!nome || !cidade || !rua || !pag) return alert("Preencha os campos obrigatórios!");
+
+    let totalGeral = 0;
+    carrinho.forEach(item => totalGeral += item.price * item.qtd);
+
+    // 1. Criar objeto do pedido para o Firebase
+    const pedidoFirebase = {
+        cliente: nome,
+        endereco: { cidade, bairro, rua, numero },
+        pagamento: pag,
+        observacao: obs,
+        itens: carrinho,
+        total: totalGeral,
+        data: new Date().toLocaleString('pt-BR'),
+        status: "pendente"
+    };
+
+    // 2. Salvar no Firebase (Caminho 'pedidos')
+    const novoPedidoRef = window.db.ref('pedidos').push();
+    novoPedidoRef.set(pedidoFirebase)
+        .then(() => {
+            // 3. Após salvar com sucesso, gerar mensagem para WhatsApp
+            let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n\n`;
+            msg += `*Cliente:* ${nome}\n`;
+            msg += `*Endereço:* ${rua}, ${numero} - ${bairro}, ${cidade}\n`;
+            msg += `*Pagamento:* ${pag}\n`;
+            if(obs) msg += `*Obs:* ${obs}\n\n`;
+            msg += `*ITENS:*\n`;
+            
+            carrinho.forEach(item => {
+                msg += `- ${item.qtd}x ${item.title}: R$ ${(item.price * item.qtd).toFixed(2)}\n`;
+            });
+
+            msg += `\n*TOTAL: R$ ${totalGeral.toFixed(2)}*`;
+
+            // Limpar dados e enviar
+            localStorage.removeItem("carrinho");
+            carrinho = [];
+            window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`, '_blank');
+            location.reload();
+        })
+        .catch((error) => {
+            console.error("Erro ao salvar pedido:", error);
+            alert("Erro ao processar pedido. Tente novamente.");
         });
-    }
-    const totalFormatado = subtotal.toFixed(2).replace(".", ",");
-    if (document.getElementById("subtotal")) document.getElementById("subtotal").innerText = `Subtotal: R$ ${totalFormatado}`;
-    if (document.getElementById("total")) document.getElementById("total").innerText = `Total: R$ ${totalFormatado}`;
 }
 
 function fecharModalPizza() { document.getElementById("pizza-options-modal").style.display = "none"; }
-function mostrarToast() { const t = document.getElementById("toast"); if (t) { t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2000); } }
+function atualizarInterfaceStatus(data) {
+    const el = document.getElementById("status-loja");
+    if (el) { el.innerText = data.aberto ? "ABERTO" : "FECHADO"; el.className = "status " + (data.aberto ? "aberto" : "fechado"); }
+}
 
-// ==================================================
-// INICIALIZAÇÃO
-// ==================================================
 document.addEventListener("DOMContentLoaded", () => {
-    gerenciarSplash();
     carregarDadosIniciais();
-    
+    atualizarInterfaceCarrinho();
     const btnHam = document.getElementById("hamburger");
     if (btnHam) btnHam.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
-
-    const salvos = localStorage.getItem("carrinho");
-    if (salvos) { 
-        carrinho = JSON.parse(salvos); 
-        atualizarCarrinho(); 
-    }
 });
