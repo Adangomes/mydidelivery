@@ -253,13 +253,17 @@ async function finalizarEntrega() {
         atualizarCarrinho(); 
         fecharDelivery();
 
-        // --- AQUI É ONDE ELE ABRE O WHATSAPP AUTOMÁTICO ---
-        window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
+       // 2. PREPARA O ENVIO (A parte que você vai substituir)
+        const numeroLimpo = WHATSAPP_NUMERO.replace(/\D/g, ''); 
+
+        // 3. DISPARA O WHATSAPP (O comando definitivo)
+        window.location.href = `https://api.whatsapp.com/send?phone=${numeroLimpo}&text=${msgWhatsApp}`;
 
     } catch (error) {
         console.error("Erro Firebase:", error);
-        // Mesmo com erro no banco, abre o Zap para não perder a venda
-        window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
+        // Mesmo se o banco falhar, o cliente consegue enviar o pedido
+        const numeroLimpo = WHATSAPP_NUMERO.replace(/\D/g, '');
+        window.location.href = `https://api.whatsapp.com/send?phone=${numeroLimpo}&text=${msgWhatsApp}`;
     }
 }
 
@@ -457,5 +461,6 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
     fecharModalPizza();
     if(typeof mostrarToast === "function") mostrarToast();
 };
+
 
 
