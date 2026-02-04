@@ -259,9 +259,17 @@ msgWhatsApp += ` _Prepararemos tudo com muito carinho!_`;
 // ==================================================
 // INICIALIZAÇÃO
 // ==================================================
+// ==================================================
+// INICIALIZAÇÃO (CORRIGIDO)
+// ==================================================
 document.addEventListener("DOMContentLoaded", () => {
-    initSplash(); initMenu(); carregarStatusLoja();
-    carregarProdutos(); carregarBebidas(); carregarCarrinhoStorage();
+    initSplash(); 
+    initMenu(); 
+    carregarStatusLoja();
+    carregarProdutos(); 
+    carregarBebidas(); 
+    carregarPizzas(); // <--- FALTAVA ESSA LINHA PARA AS PIZZAS APARECEREM
+    carregarCarrinhoStorage();
 });
 
 function mostrarToast() {
@@ -415,3 +423,4 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
     fecharModalPizza();
     if(typeof mostrarToast === "function") mostrarToast();
 };
+
