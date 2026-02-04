@@ -228,3 +228,25 @@ h2 {
 .btn-abrir-relatorio:hover {
     background: #2980b9;
 }
+/* Botão de Limpar Relatório */
+.btn-limpar-relatorio {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 100%;
+}
+
+.btn-limpar-relatorio:hover {
+    background-color: #c0392b;
+}
+
+/* Ajuste no modal para comportar o botão */
+.modal-content {
+    max-height: 80vh;
+    overflow-y: auto;
+}
