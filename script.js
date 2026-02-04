@@ -47,51 +47,55 @@ function initMenu() {
     if (btn && menu) btn.onclick = () => menu.classList.toggle("open");
 }
 
-async function carregarProdutos() {
-    const container = document.getElementById("burgers");
+function carregarProdutos() {
+    const container = document.getElementById('pizza'); // Onde os cards aparecem
     if (!container) return;
-    try {
-        const res = await fetch("/content/produtos.json");
-        const data = await res.json();
-        produtos = data.produtos;
-        container.innerHTML = "";
-        produtos.forEach((p) => {
-            if (p.categoria === "burger") container.appendChild(criarCardProduto(p));
-        });
-    } catch (e) { console.error("Erro produtos:", e); }
+
+    // 1. CARREGAR BURGERS
+    db.ref('produtos/burgers').on('value', (snapshot) => {
+        exibirCards(snapshot.val(), 'burger');
+    });
+
+    // 2. CARREGAR BEBIDAS
+    db.ref('produtos/bebidas').on('value', (snapshot) => {
+        exibirCards(snapshot.val(), 'bebida');
+    });
+
+    // 3. CARREGAR PIZZAS
+    db.ref('produtos/pizzas').on('value', (snapshot) => {
+        exibirCards(snapshot.val(), 'pizza');
+    });
 }
 
-async function carregarBebidas() {
-    const container = document.getElementById("bebidas");
-    if (!container) return;
-    try {
-        const res = await fetch("/content/produtos.json");
-        const data = await res.json();
-        const bebidas = data.produtos.filter(p => p.categoria === "bebida");
-        container.innerHTML = "";
-        bebidas.forEach((p) => { container.appendChild(criarCardProduto(p)); });
-    } catch (e) { console.error("Erro bebidas:", e); }
-}
+function exibirCards(itens, categoria) {
+    const container = document.getElementById('pizza');
+    if (!itens) return;
 
-function criarCardProduto(p) {
-    const temDesconto = p.oldPrice && p.oldPrice > p.price;
-    const card = document.createElement("div");
-    card.className = "card-produto";
-    card.innerHTML = `
-        <img src="${p.image}">
-        <div class="card-content">
-            <h3>${p.title}</h3>
-            <p>${p.ingredientes || ""}</p>
-            <div class="price-container">
-                <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
-                ${temDesconto ? `<span class="old-price">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
-            </div>
-            <button onclick="adicionarCarrinhoPorProduto(${JSON.stringify(p).replace(/"/g, '&quot;')})">Adicionar</button>
-        </div>
-    `;
-    return card;
+    for (let id in itens) {
+        const item = itens[id];
+        
+        // Se for pizza, o botão abre o Modal de Tamanhos
+        if (categoria === 'pizza') {
+            container.innerHTML += `
+                <div class="card-item">
+                    <img src="${item.imagem}">
+                    <h3>${item.nome}</h3>
+                    <p>${item.ingredientes}</p>
+                    <button onclick="abrirOpcoesPizza('${id}')">Ver Tamanhos</button>
+                </div>`;
+        } else {
+            // Layout para Burger e Bebida (Preço Único)
+            container.innerHTML += `
+                <div class="card-item">
+                    <img src="${item.image}">
+                    <h3>${item.title}</h3>
+                    <p>${item.ingredientes}</p>
+                    <span class="price">R$ ${item.price.toFixed(2)}</span>
+                    <button onclick="adicionarAoCarrinho('${item.title}', ${item.price})">Adicionar</button>
+                </div>`;
+        }
+    }
 }
-
 // ==================================================
 // LÓGICA DO CARRINHO
 // ==================================================
@@ -297,6 +301,7 @@ function mostrarToast() {
     const t = document.getElementById("toast");
     if (t) { t.classList.add("show"); setTimeout(() => { t.classList.remove("show"); }, 2000); }
 }
+
 
 
 
