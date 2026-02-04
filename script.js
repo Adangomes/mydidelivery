@@ -230,14 +230,16 @@ msgWhatsApp += ` _Prepararemos tudo com muito carinho!_`;
         // Enviando para o Firebase com os novos campos para o Painel de Pedidos
         await db.ref('pedidos').push({
             cliente: nomeCli,
-            cidade: cidadeCli, // <--- NOVO
+            cidade: cidadeCli,
             endereco: `${ruaCli}, ${numCli} - ${bairroCli}`,
-            pagamento: pagtoCli, // <--- NOVO
+            referencia: pontoRef,      // <-- ESSA ENTROU AGORA
+            obs_cozinha: obsCozinha,   // <-- ESSA CORRIGIU O ERRO
+            pagamento: pagtoCli,
+            troco: valorTroco || "Não necessário", // <-- ESSA ENTROU AGORA
             itens: itensPedido,
             subtotal: subtotal,
             taxaEntrega: taxaEntregaCalculada,
             total: totalGeral,
-            observacao: observacao,
             data: new Date().toISOString(),
             status: "novo"
         });
@@ -423,4 +425,5 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
     fecharModalPizza();
     if(typeof mostrarToast === "function") mostrarToast();
 };
+
 
