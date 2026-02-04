@@ -209,7 +209,7 @@ async function finalizarEntrega() {
     if (typeof db === 'undefined') { alert("Erro: Banco de dados."); return; }
 
     // CAPTURA A FORMA DE PAGAMENTO (Certifique-se que o ID no seu HTML seja 'metodoPagamento')
-    const formaPagamento = document.getElementById("metodoPagamento")?.value || "Não informado";
+    const formaPagamento = document.getElementById("pagamento")?.value || "Não informado";
     const observacao = document.getElementById("observacao")?.value || "Nenhuma";
     const nomeCli = document.getElementById("nomeCliente").value;
     const cidadeCli = document.getElementById("cidade").value;
@@ -269,4 +269,5 @@ function mostrarToast() {
     const t = document.getElementById("toast");
     if (t) { t.classList.add("show"); setTimeout(() => { t.classList.remove("show"); }, 2000); }
 }
+
 
