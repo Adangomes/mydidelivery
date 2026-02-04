@@ -16,7 +16,7 @@ let LOJA_ABERTA = true;
 let MENSAGEM_FECHADA = "Loja Fechada no momento.";
 
 // ==================================================
-// 1. LÓGICA DO SPLASH (NÃO TRAVA)
+// 1. LÓGICA DO SPLASH (CORRIGIDA)
 // ==================================================
 function gerenciarSplash() {
     const splash = document.getElementById("splash");
@@ -36,7 +36,7 @@ function gerenciarSplash() {
 }
 
 // ==================================================
-// 2. CARREGAMENTO DE DADOS
+// 2. CARREGAMENTO DE DADOS (PIZZAS VOLTANDO)
 // ==================================================
 async function carregarDadosIniciais() {
     try {
@@ -49,11 +49,16 @@ async function carregarDadosIniciais() {
         const resProdutos = await fetch('content/produtos.json');
         const data = await resProdutos.json();
         
+        // Salva as pizzas no objeto global
         todasPizzas = data.produtos.pizzas || {};
 
+        // RENDERIZAÇÃO COM MULTIPLOS IDs POSSÍVEIS (Evita sumir)
         if (data.produtos.burgers) exibirProdutos(data.produtos.burgers, document.getElementById("burgers"), 'burger');
         if (data.produtos.bebidas) exibirProdutos(data.produtos.bebidas, document.getElementById("bebidas"), 'bebida');
-        if (data.produtos.pizzas) exibirProdutos(data.produtos.pizzas, document.getElementById("pizza"), 'pizza');
+        
+        // Tenta encontrar o container de pizza por vários IDs comuns
+        const pizzaContainer = document.getElementById("pizza") || document.getElementById("pizzaS") || document.getElementById("pizzas");
+        if (data.produtos.pizzas) exibirProdutos(data.produtos.pizzas, pizzaContainer, 'pizza');
 
     } catch (e) { 
         console.error("Erro ao carregar dados.", e); 
@@ -107,16 +112,17 @@ function abrirOpcoesPizza(id) {
     const pizzaOriginal = todasPizzas[id];
     if (!pizzaOriginal) return;
 
-    // Reset para abertura
     tamanhoSelecionado = null;
     saboresSelecionados = [pizzaOriginal]; 
     
     document.getElementById("modal-pizza-img").src = pizzaOriginal.imagem;
     document.getElementById("pizza-modal-title").innerText = pizzaOriginal.nome;
-    document.getElementById("secao-sabores").style.display = "none";
-    document.getElementById("alerta-limite").style.display = "none";
+    
+    const desc = document.getElementById("pizza-modal-desc");
+    if(desc) desc.innerText = pizzaOriginal.ingredientes || "";
 
-    // Gerar botões de Tamanho (P, M, G) com preços
+    document.getElementById("secao-sabores").style.display = "none";
+
     const containerTamanhos = document.getElementById("pizza-sizes-container");
     containerTamanhos.innerHTML = "";
 
@@ -134,24 +140,18 @@ function abrirOpcoesPizza(id) {
 
 function selecionarTamanho(tamanho, event) {
     tamanhoSelecionado = tamanho;
-    
-    // Define limite de sabores
-    if (tamanho === "P") limiteSabores = 1;
-    else if (tamanho === "M") limiteSabores = 2;
-    else if (tamanho === "G") limiteSabores = 3;
+    limiteSabores = (tamanho === "P") ? 1 : (tamanho === "M") ? 2 : 3;
 
-    // Estiliza botão selecionado
     document.querySelectorAll('.btn-size-opt').forEach(btn => btn.classList.remove('selected'));
     event.currentTarget.classList.add('selected');
 
-    // Mostra lista de sabores para escolher
     document.getElementById("secao-sabores").style.display = "block";
     renderizarSaboresMeia();
 }
 
 function renderizarSaboresMeia() {
     const container = document.getElementById("lista-sabores-meia");
-    const alerta = document.getElementById("alerta-limite");
+    if(!container) return;
     container.innerHTML = "";
     
     Object.keys(todasPizzas).forEach(id => {
@@ -171,16 +171,9 @@ function renderizarSaboresMeia() {
             if (index > -1) {
                 if (saboresSelecionados.length > 1) {
                     saboresSelecionados.splice(index, 1);
-                    alerta.style.display = "none";
                 }
-            } else {
-                if (saboresSelecionados.length < limiteSabores) {
-                    saboresSelecionados.push(p);
-                    alerta.style.display = "none";
-                } else {
-                    alerta.innerText = `O tamanho ${tamanhoSelecionado} permite apenas ${limiteSabores} sabores.`;
-                    alerta.style.display = "block";
-                }
+            } else if (saboresSelecionados.length < limiteSabores) {
+                saboresSelecionados.push(p);
             }
             renderizarSaboresMeia();
         };
@@ -201,10 +194,9 @@ const btnAddPizza = document.getElementById("btn-adicionar-pizza");
 if (btnAddPizza) {
     btnAddPizza.onclick = () => {
         if (!tamanhoSelecionado) return alert("Escolha o tamanho primeiro!");
-        
         const nomes = saboresSelecionados.map(s => s.nome).join(" / ");
         const precos = saboresSelecionados.map(s => s.precos[tamanhoSelecionado].atual);
-        const precoFinal = Math.max(...precos); // Cobrar pela mais cara
+        const precoFinal = Math.max(...precos);
 
         carrinho.push({
             title: `Pizza ${tamanhoSelecionado} (${nomes})`,
@@ -226,11 +218,13 @@ function atualizarTudo() {
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
     let subtotal = 0;
-    if (box) box.innerHTML = "";
-    carrinho.forEach(i => {
-        subtotal += i.price * i.qtd;
-        if (box) box.innerHTML += `<div class="item-carrinho"><span>${i.title} x${i.qtd}</span><strong>R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}</strong></div>`;
-    });
+    if (box) {
+        box.innerHTML = "";
+        carrinho.forEach(i => {
+            subtotal += i.price * i.qtd;
+            box.innerHTML += `<div class="item-carrinho" style="display:flex; justify-content:space-between;"><span>${i.title} x${i.qtd}</span><strong>R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}</strong></div>`;
+        });
+    }
     const totalFormatado = subtotal.toFixed(2).replace(".", ",");
     if (document.getElementById("subtotal")) document.getElementById("subtotal").innerText = `Subtotal: R$ ${totalFormatado}`;
     if (document.getElementById("total")) document.getElementById("total").innerText = `Total: R$ ${totalFormatado}`;
