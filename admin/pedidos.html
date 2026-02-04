@@ -8,14 +8,14 @@
 </head>
 <body>
 
-    <div id="container-ativacao" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:10000; display:flex; align-items:center; justify-content:center;">
-        <button onclick="ativarSomEDestravar()" style="padding:25px 50px; font-size:22px; background:#ffcc00; color:#000; border:none; border-radius:10px; font-weight:bold; cursor:pointer; box-shadow:0 0 20px rgba(255,204,0,0.5);">
-            🔊 CLIQUE AQUI PARA LIGAR O SOM
+    <div id="container-ativacao" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; display:flex; align-items:center; justify-content:center;">
+        <button onclick="ativarSomEDestravar()" style="padding:30px 60px; font-size:24px; background:#ffcc00; color:#000; border:none; border-radius:15px; font-weight:bold; cursor:pointer; box-shadow:0 0 30px rgba(255,204,0,0.4);">
+            🔊 CLIQUE PARA LIGAR O SOM
         </button>
     </div>
 
     <header class="admin-header">
-        <h1>🔔 Painel <span>SNOOP LANCHE</span></h1>
+        <h1>Painel <span>SNOOP LANCHE</span></h1>
         <button class="btn-relatorio" onclick="abrirRelatorio()">📊 Ver Relatório</button>
     </header>
 
@@ -60,23 +60,24 @@
         let prontoParaTocar = false;
         let audioLiberado = false;
 
-        // ESSA FUNÇÃO É O GATILHO DO SOM
+        // FUNÇÃO QUE ATIVA O SOM USANDO 'alert.mpeg'
         function ativarSomEDestravar() {
-            const context = new AudioContext();
+            const context = new (window.AudioContext || window.webkitAudioContext)();
             if (context.state === 'suspended') context.resume();
 
-            // Tenta tocar o arquivo
-            const somTeste = new Audio('alerta.mp3');
+            const somTeste = new Audio('alert.mpeg');
             somTeste.play().then(() => {
                 audioLiberado = true;
                 prontoParaTocar = true;
-                document.getElementById('container-ativacao').style.display = 'none'; // Some a tela de bloqueio
-                console.log("Som liberado com sucesso!");
+                document.getElementById('container-ativacao').style.display = 'none';
+                console.log("Som 'alert.mpeg' carregado com sucesso!");
             }).catch(e => {
-                alert("ERRO: O navegador não achou o arquivo 'alerta.mp3'. Verifique se ele está na pasta do site!");
+                console.error(e);
+                alert("ERRO: Não achei o arquivo 'alert.mpeg'. Verifique se ele subiu para o Netlify com esse nome exato.");
             });
         }
 
+        // ESCUTA NOVOS PEDIDOS
         db.ref('pedidos').on('child_added', (snap) => {
             const p = snap.val();
             const id = snap.key;
@@ -100,19 +101,19 @@
             `;
             document.getElementById('pedidos-container').prepend(li);
 
-            // TOCA O SOM SOMENTE SE O BOTÃO FOI CLICADO
+            // TOCA O SOM 'alert.mpeg'
             if (prontoParaTocar && audioLiberado) {
-                const notificacao = new Audio('alerta.mp3');
-                notificacao.play().catch(e => console.log("Erro ao tocar"));
+                const notificacao = new Audio('alert.mpeg');
+                notificacao.play().catch(e => console.log("Erro ao tocar som de novo pedido."));
             }
         });
 
-        // Só libera o som para NOVOS pedidos após o carregamento inicial
+        // Carregamento inicial
         db.ref('pedidos').once('value', () => { 
             setTimeout(() => { if(audioLiberado) prontoParaTocar = true; }, 2000); 
         });
 
-        // (As funções de imprimir e relatório continuam iguais abaixo)
+        // FUNÇÕES DE IMPRESSÃO E RELATÓRIO
         function imprimir(tipo, id) {
             db.ref('pedidos/'+id).once('value', s => {
                 const p = s.val();
@@ -124,6 +125,7 @@
                 doc.open(); doc.write(`<html><body style="margin:0;" onload="window.print()">${html}</body></html>`); doc.close();
             });
         }
+
         function concluirPedido(id) {
             if(confirm("Concluir pedido?")){
                 const ref = db.ref('pedidos/'+id);
@@ -137,6 +139,7 @@
                 });
             }
         }
+
         function abrirRelatorio() {
             const lista = document.getElementById('tabela-relatorio');
             lista.innerHTML = ''; let total = 0; let qtd = 0;
@@ -151,7 +154,7 @@
             });
         }
         function fecharRelatorio() { document.getElementById('modal-relatorio').style.display = 'none'; }
-        function limparRelatorio() { if(confirm("Limpar tudo?")) db.ref('relatorios').remove().then(() => abrirRelatorio()); }
+        function limparRelatorio() { if(confirm("Limpar todo o histórico?")) db.ref('relatorios').remove().then(() => abrirRelatorio()); }
     </script>
 </body>
 </html>
