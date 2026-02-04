@@ -13,52 +13,40 @@ let tamanhoSelecionado = null;
 let limiteSabores = 1;
 
 // ==================================================
-// 1. FORÇAR SAÍDA DO SPLASH (ANTI-TRAVAMENTO)
-// ==================================================
-function esconderSplash() {
-    const splash = document.getElementById("loading-taxa"); // Ou o ID do seu Splash
-    if (splash) splash.style.display = "none";
-    
-    // Se você tiver um overlay de loading geral, escondemos aqui
-    const loadingGeral = document.querySelector(".loading");
-    if (loadingGeral) loadingGeral.style.display = "none";
-}
-
-// ==================================================
-// 2. CARREGAMENTO COM TIMEOUT (MÁXIMO 3 SEGUNDOS)
+// 1. CARREGAMENTO (SEM TRAVAR O SPLASH)
 // ==================================================
 async function carregarDadosIniciais() {
-    // Garante que o Splash suma depois de 3 segundos, mesmo se o JSON falhar
-    setTimeout(esconderSplash, 3000);
-
     try {
         const resStatus = await fetch('content/status.json');
         const dataStatus = await resStatus.json();
-        atualizarInterfaceStatus(dataStatus);
-
+        
         const resProdutos = await fetch('content/produtos.json');
         const data = await resProdutos.json();
         todasPizzas = data.produtos.pizzas || {};
 
         const container = document.getElementById("pizzaS") || document.getElementById("pizza");
         if (container) exibirProdutos(todasPizzas, container);
-        
-        esconderSplash(); // Tudo deu certo, esconde antes dos 3s
+
+        // ESCONDE O SPLASH (Ajustado para o ID padrão do seu HTML)
+        const splash = document.getElementById("loading-taxa");
+        if (splash) splash.style.display = "none";
+
     } catch (e) { 
         console.error("Erro no carregamento:", e);
-        esconderSplash(); 
+        // Mesmo com erro, tira o splash pro cara ver o site
+        const splash = document.getElementById("loading-taxa");
+        if (splash) splash.style.display = "none";
     }
 }
 
 function exibirProdutos(dadosObjeto, container) {
-    if (!container) return;
     container.innerHTML = ""; 
     Object.keys(dadosObjeto).forEach((id) => {
         const p = dadosObjeto[id];
         const card = document.createElement("div");
         card.className = "card-produto";
         card.innerHTML = `
-            <img src="${p.imagem || ''}" onerror="this.src='img/placeholder.png'">
+            <img src="${p.imagem}">
             <div class="card-content">
                 <h3>${p.nome}</h3>
                 <p>${p.ingredientes || ""}</p>
@@ -69,7 +57,7 @@ function exibirProdutos(dadosObjeto, container) {
 }
 
 // ==================================================
-// 3. MODAL E MEIA-A-MEIA
+// 2. MODAL DAS PIZZAS
 // ==================================================
 function abrirOpcoesPizza(id) {
     const pizza = todasPizzas[id];
@@ -128,12 +116,8 @@ function renderizarSaboresMeia() {
 }
 
 // ==================================================
-// 4. CARRINHO E WHATSAPP/FIREBASE
+// 3. CARRINHO E ENVIO (FIREBASE + ZAP)
 // ==================================================
-function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; atualizarInterfaceCarrinho(); }
-function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
-function fecharModalPizza() { document.getElementById("pizza-options-modal").style.display = "none"; }
-
 const btnAdd = document.getElementById("btn-adicionar-pizza");
 if (btnAdd) {
     btnAdd.onclick = () => {
@@ -141,14 +125,10 @@ if (btnAdd) {
         const nomes = saboresSelecionados.map(s => s.nome).join(" / ");
         const precos = saboresSelecionados.map(s => s.precos[tamanhoSelecionado].atual);
         carrinho.push({ title: `Pizza ${tamanhoSelecionado} (${nomes})`, price: Math.max(...precos), qtd: 1 });
-        fecharModalPizza();
-        atualizarTudo();
+        document.getElementById("pizza-options-modal").style.display = "none";
+        localStorage.setItem("carrinho", JSON.stringify(carrinho));
+        atualizarInterfaceCarrinho();
     };
-}
-
-function atualizarTudo() {
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-    atualizarInterfaceCarrinho();
 }
 
 function atualizarInterfaceCarrinho() {
@@ -158,45 +138,45 @@ function atualizarInterfaceCarrinho() {
     box.innerHTML = "";
     carrinho.forEach((item, i) => {
         soma += item.price;
-        box.innerHTML += `<div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+        box.innerHTML += `<div style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding:5px;">
             <span>${item.title}</span>
             <button onclick="removerItem(${i})">🗑️</button>
         </div>`;
     });
-    document.getElementById("total").innerText = `Total: R$ ${soma.toFixed(2)}`;
+    const totalEl = document.getElementById("total");
+    if (totalEl) totalEl.innerText = `Total: R$ ${soma.toFixed(2)}`;
 }
 
-function removerItem(i) { carrinho.splice(i, 1); atualizarTudo(); }
+function removerItem(i) { 
+    carrinho.splice(i, 1); 
+    localStorage.setItem("carrinho", JSON.stringify(carrinho)); 
+    atualizarInterfaceCarrinho(); 
+}
 
 function finalizarEntrega() {
-    const dados = {
-        nome: document.getElementById("nomeCliente")?.value,
-        cidade: document.getElementById("cidade")?.value,
-        rua: document.getElementById("rua")?.value,
-        pag: document.getElementById("pagamento")?.value
-    };
+    const nome = document.getElementById("nomeCliente")?.value;
+    const pag = document.getElementById("pagamento")?.value;
+    if (!nome || !pag) return alert("Preencha os dados!");
 
-    if (!dados.nome || !dados.cidade || !dados.rua) return alert("Preencha tudo!");
+    const pedido = { cliente: nome, itens: carrinho, data: new Date().toLocaleString() };
 
     if (window.db) {
-        window.db.ref('pedidos').push({...dados, itens: carrinho, data: new Date().toLocaleString()})
-        .then(() => enviarZap(dados));
+        window.db.ref('pedidos').push(pedido).then(() => enviarZap(nome));
     } else {
-        enviarZap(dados);
+        enviarZap(nome);
     }
 }
 
-function enviarZap(d) {
-    let msg = `*Pedido Snoop Lanche*\nCliente: ${d.nome}\nItens:\n`;
+function enviarZap(nome) {
+    let msg = `*Pedido Snoop Lanche*\nCliente: ${nome}\n`;
     carrinho.forEach(i => msg += `- ${i.title}\n`);
     localStorage.removeItem("carrinho");
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${encodeURIComponent(msg)}`);
     location.reload();
 }
 
-function atualizarInterfaceStatus(data) {
-    const el = document.getElementById("status-loja");
-    if (el) el.innerText = data.aberto ? "ABERTO" : "FECHADO";
-}
+function fecharModalPizza() { document.getElementById("pizza-options-modal").style.display = "none"; }
+function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; atualizarInterfaceCarrinho(); }
+function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
 
 document.addEventListener("DOMContentLoaded", carregarDadosIniciais);
