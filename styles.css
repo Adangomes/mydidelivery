@@ -369,4 +369,11 @@ body {
     font-weight: 600;
 }
 
+/* COMPATIBILIDADE MENU (active + open) */
+.menu.active,
+.menu.open {
+    display: flex;
+    flex-direction: column;
+}
+
 
