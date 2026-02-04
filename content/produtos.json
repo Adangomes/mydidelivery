@@ -1,226 +1,118 @@
 {
-  "produtos": {
-    "burgers": {
-      "b1": {
-        "title": "Kings Burger Tradicional",
-        "price": 19.9,
-        "oldPrice": 24.9,
-        "categoria": "burger",
-        "ingredientes": "Hambúrguer artesanal 140g, duas fatias de queijo e pão brioche",
-        "image": "/imagens/kingstradicional.jpeg"
-      },
-      "b2": {
-        "title": "Kings Duplo Bacon",
-        "price": 29.9,
-        "oldPrice": 34.9,
-        "categoria": "burger",
-        "ingredientes": "Dois hambúrgueres artesanais de 100g cada, queijo derretido, bacon crocante e pão brioche",
-        "image": "/imagens/kingsduplo.jpeg"
-      },
-      "b3": {
-        "title": "Kings Calabresa",
-        "price": 31,
-        "oldPrice": 0,
-        "categoria": "burger",
-        "ingredientes": "Hambúrguer artesanal 140g, calabresa grelhada, queijo e pão brioche",
-        "image": "/imagens/kingscalabresa.jpeg"
-      },
-      "b4": {
-        "title": "Kings Burger Classic",
-        "price": 28,
-        "oldPrice": 0,
-        "categoria": "burger",
-        "ingredientes": "Hambúrguer artesanal 150g, queijo prato, pão brioche",
-        "image": "/imagens/kingsclassic.jpeg"
-      }
+  "produtos": [
+    {
+      "title": "Pizza Portuguesa (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Mussarela, presunto, ovo, cebola e orégano",
+      "image": "/imagens/pizza.jpg"
     },
-    "bebidas": {
-      "be1": {
-        "title": "Coca-Cola Lata",
-        "price": 6.9,
-        "oldPrice": 0,
-        "categoria": "bebida",
-        "ingredientes": "350ml",
-        "image": "/imagens/cocalata.jpeg"
-      },
-      "be2": {
-        "title": "Guaraná Lata",
-        "price": 6.5,
-        "oldPrice": 0,
-        "categoria": "bebida",
-        "ingredientes": "350ml",
-        "image": "/imagens/guarana.jpeg"
-      },
-      "be3": {
-        "title": "Coca-Cola 600ml",
-        "price": 8.5,
-        "oldPrice": 0,
-        "categoria": "bebida",
-        "ingredientes": "600ml",
-        "image": "/imagens/coca600.jpg"
-      }
+    {
+      "title": "Pizza Bacon (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Mussarela, bacon, tomate e orégano",
+      "image": "/imagens/pizza.jpg"
     },
-    "pizzas": {
-      "p1": {
-        "nome": "Portuguesa",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, presunto, ovo, cebola, oregano",
-        "imagem": "imagens/portuguesa.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 45.0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p2": {
-        "nome": "Bacon",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, bacon, tomate, oregano",
-        "imagem": "imagens/bacon.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p3": {
-        "nome": "Mussarela",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, requeijão, cheddar, oregano",
-        "imagem": "imagens/mussarela.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p4": {
-        "nome": "Frango",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, frango, requeijão, oregano",
-        "imagem": "imagens/frango.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p5": {
-        "nome": "Baiana",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, cebola, pimentão, molho de pimenta, calabresa, oregano",
-        "imagem": "imagens/baiana.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p6": {
-        "nome": "Calabresa",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, calabresa, oregano",
-        "imagem": "imagens/calabresa.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p7": {
-        "nome": "Calabresa c/ Cebola",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, calabresa, cebola, oregano",
-        "imagem": "imagens/calabresa_cebola.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p8": {
-        "nome": "Kartofel",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, batata, bacon, requeijão, oregano",
-        "imagem": "imagens/kartofel.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p9": {
-        "nome": "Lombo Canadense",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, lombo canadense, requeijão, oregano",
-        "imagem": "imagens/lombo.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p10": {
-        "nome": "Toscana",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, bacon, calabresa, oregano",
-        "imagem": "imagens/toscana.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p11": {
-        "nome": "Havaiana (Doce)",
-        "categoria": "pizza",
-        "ingredientes": "Chocolate branco, abacaxi, morango",
-        "imagem": "imagens/havaiana.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p12": {
-        "nome": "Brasileira (Doce)",
-        "categoria": "pizza",
-        "ingredientes": "Chocolate preto, abacaxi, morango",
-        "imagem": "imagens/brasileira.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p13": {
-        "nome": "Sensação (Doce)",
-        "categoria": "pizza",
-        "ingredientes": "Chocolate preto, morango",
-        "imagem": "imagens/sensacao.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      },
-      "p14": {
-        "nome": "Banana Nevada (Doce)",
-        "categoria": "pizza",
-        "ingredientes": "Chocolate branco, banana, canela",
-        "imagem": "imagens/banana_nevada.jpg",
-        "precos": {
-          "Pequena": { "atual": 40.0, "antigo": 0 },
-          "Media": { "atual": 60.0, "antigo": 0 },
-          "Grande": { "atual": 90.0, "antigo": 0 }
-        }
-      }
+    {
+      "title": "Pizza Mussarela (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Mussarela, requeijão, cheddar e orégano",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Frango (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Mussarela, frango, requeijão e orégano",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Baiana (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Mussarela, cebola, pimentão, molho de pimenta, calabresa e orégano",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Calabresa (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Mussarela, calabresa e orégano",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Calabresa c/ Cebola (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Mussarela, calabresa, cebola e orégano",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Kartofel (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Mussarela, batata, bacon, requeijão e orégano",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Lombo Canadense (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Mussarela, lombo canadense, requeijão e orégano",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Toscana (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Mussarela, bacon, calabresa e orégano",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Havaiana - Doce (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Chocolate branco, abacaxi e morango",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Brasileira - Doce (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Chocolate preto, abacaxi e morango",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Sensação - Doce (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Chocolate preto e morango",
+      "image": "/imagens/pizza.jpg"
+    },
+    {
+      "title": "Pizza Banana Nevada - Doce (G)",
+      "price": 90.0,
+      "oldPrice": 100.0,
+      "categoria": "pizza",
+      "ingredientes": "Chocolate branco, banana e canela",
+      "image": "/imagens/pizza.jpg"
     }
-  },
-  "configuracoes": {
-    "promocaoGlobalG": {
-      "ativa": false,
-      "valorDesconto": 10.0
-    }
-  }
+  ]
 }
+
+
