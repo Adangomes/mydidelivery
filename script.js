@@ -182,22 +182,22 @@ async function finalizarEntrega() {
         alert("Erro: Banco de dados não inicializado."); return;
     }
 
-    // Capturando os novos campos
-    // 1. CAPTURA DOS CAMPOS (Substitua aquele bloco por este)
-const nomeCli = document.getElementById("nomeCliente").value;
-const cidadeCli = document.getElementById("cidade").value;
-const bairroCli = document.getElementById("bairro").value;
-const ruaCli = document.getElementById("rua").value;
-const numCli = document.getElementById("numero").value;
+    // --- PARTE QUE PRECISA MEXER (CAPTURA BLINDADA) ---
+    // Usamos o ?.value e o || "" para NUNCA retornar undefined
+    const nomeCli    = document.getElementById("nomeCliente")?.value || "Não informado";
+    const cidadeCli  = document.getElementById("cidade")?.value || "";
+    const bairroCli  = document.getElementById("bairro")?.value || "";
+    const ruaCli     = document.getElementById("rua")?.value || "";
+    const numCli     = document.getElementById("numero")?.value || "";
+    const pontoRef   = document.getElementById("pontoReferencia")?.value || "Não informado";
+    const obsCozinha = document.getElementById("obsCozinha")?.value || "Nenhuma";
+    const pagtoCli   = document.getElementById("pagamento")?.value || "Não informado";
+    const valorTroco = document.getElementById("trocoPara")?.value || "";
 
-// Novos campos que separamos:
-const pontoRef = document.getElementById("pontoReferencia").value || "Não informado";
-const obsCozinha = document.getElementById("obsCozinha").value || "Nenhuma";
-const pagtoCli = document.getElementById("pagamento").value;
-const valorTroco = document.getElementById("trocoPara").value;
-
-    // Validação extra de segurança
-    if(!pagtoCli) { alert("Escolha a forma de pagamento!"); return; }
+    // Validação de segurança
+    if(!document.getElementById("pagamento")?.value) { 
+        alert("Escolha a forma de pagamento!"); return; 
+    }
 
     let subtotal = 0;
     let msgWhatsApp = " *NOVO PEDIDO*%0A%0A";
@@ -210,32 +210,27 @@ const valorTroco = document.getElementById("trocoPara").value;
 
     const totalGeral = subtotal + taxaEntregaCalculada;
 
-    // Montando o corpo da mensagem para o Motoboy
-    // Montando o corpo da mensagem para o Motoboy e Cozinha
-msgWhatsApp += `%0A---------------------------%0A`;
-msgWhatsApp += ` *Subtotal:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
-msgWhatsApp += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
-msgWhatsApp += ` *TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
-msgWhatsApp += `---------------------------%0A`;
-msgWhatsApp += ` *Cliente:* ${nomeCli}%0A`;
-msgWhatsApp += ` *Cidade:* ${cidadeCli}%0A`;
-msgWhatsApp += ` *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
-msgWhatsApp += ` *Ref:* ${pontoRef}%0A`; // Ponto de referência para o Motoboy
-msgWhatsApp += ` *Obs Cozinha:* ${obsCozinha}%0A`; // Observações para a Cozinha
-msgWhatsApp += ` *Pagamento:* ${pagtoCli}${valorTroco ? ' (Troco p/ ' + valorTroco + ')' : ''}%0A`;
-msgWhatsApp += `---------------------------%0A%0A`;
-msgWhatsApp += ` _Prepararemos tudo com muito carinho!_`;
+    // Montando a mensagem (sem o erro de undefined)
+    msgWhatsApp += `%0A---------------------------%0A`;
+    msgWhatsApp += ` *TOTAL:* R$ ${totalGeral.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += `---------------------------%0A`;
+    msgWhatsApp += ` *Cliente:* ${nomeCli}%0A`;
+    msgWhatsApp += ` *Endereço:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
+    msgWhatsApp += ` *Ref:* ${pontoRef}%0A`; 
+    msgWhatsApp += ` *Obs Cozinha:* ${obsCozinha}%0A`; 
+    msgWhatsApp += ` *Pagamento:* ${pagtoCli}${valorTroco ? ' (Troco p/ ' + valorTroco + ')' : ''}%0A`;
+    msgWhatsApp += `---------------------------%0A%0A`;
 
     try {
-        // Enviando para o Firebase com os novos campos para o Painel de Pedidos
+        // Envia para o Firebase
         await db.ref('pedidos').push({
             cliente: nomeCli,
             cidade: cidadeCli,
             endereco: `${ruaCli}, ${numCli} - ${bairroCli}`,
-            referencia: pontoRef,      // <-- ESSA ENTROU AGORA
-            obs_cozinha: obsCozinha,   // <-- ESSA CORRIGIU O ERRO
+            referencia: pontoRef,
+            obs_cozinha: obsCozinha,
             pagamento: pagtoCli,
-            troco: valorTroco || "Não necessário", // <-- ESSA ENTROU AGORA
+            troco: valorTroco || "Não necessário",
             itens: itensPedido,
             subtotal: subtotal,
             taxaEntrega: taxaEntregaCalculada,
@@ -244,16 +239,18 @@ msgWhatsApp += ` _Prepararemos tudo com muito carinho!_`;
             status: "novo"
         });
         
+        // Limpa o carrinho antes de sair
         carrinho = []; 
         salvarCarrinho(); 
         atualizarCarrinho(); 
         fecharDelivery();
 
-        // Abre o WhatsApp com a mensagem formatada
+        // --- AQUI É ONDE ELE ABRE O WHATSAPP AUTOMÁTICO ---
         window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
 
     } catch (error) {
         console.error("Erro Firebase:", error);
+        // Mesmo com erro no banco, abre o Zap para não perder a venda
         window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msgWhatsApp}`;
     }
 }
@@ -452,3 +449,4 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
     fecharModalPizza();
     if(typeof mostrarToast === "function") mostrarToast();
 };
+
