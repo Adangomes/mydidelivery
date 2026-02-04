@@ -16,20 +16,20 @@
         <ul id="pedidos-container"></ul>
     </div>
 
-    <div id="modal-relatorio" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8);">
-        <div class="modal-content" style="background: #222; margin: 5% auto; padding: 20px; width: 90%; max-width: 600px; border-radius: 10px; color: white;">
-            <span class="fechar-modal" onclick="fecharRelatorio()" style="float: right; cursor: pointer; font-size: 28px;">&times;</span>
-            <h2 style="color: #ffcc00; text-align: center;">RELATÓRIO DE VENDAS</h2>
+    <div id="modal-relatorio" style="display:none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(5px);">
+        <div class="modal-content" style="background: #1a1a1a; margin: 2% auto; padding: 25px; width: 90%; max-width: 600px; border-radius: 12px; color: white; border: 1px solid #333;">
+            <span class="fechar-modal" onclick="fecharRelatorio()" style="float: right; cursor: pointer; font-size: 30px; color: #ffcc00;">&times;</span>
+            <h2 style="color: #ffcc00; text-align: center; margin-bottom: 20px;">RELATÓRIO DE VENDAS</h2>
             
-            <div class="resumo-caixa" style="display: flex; justify-content: space-around; background: #333; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                <div>PEDIDOS: <span id="rel-qtd" style="color: #ffcc00; font-weight: bold;">0</span></div>
-                <div>TOTAL: <span id="rel-total" style="color: #27ae60; font-weight: bold;">R$ 0,00</span></div>
+            <div class="resumo-caixa" style="display: flex; justify-content: space-around; background: #222; padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 1px solid #444;">
+                <div style="text-align: center;">PEDIDOS<br><span id="rel-qtd" style="color: #ffcc00; font-size: 24px; font-weight: bold;">0</span></div>
+                <div style="text-align: center;">TOTAL ACUMULADO<br><span id="rel-total" style="color: #27ae60; font-size: 24px; font-weight: bold;">R$ 0,00</span></div>
             </div>
 
-            <div style="max-height: 300px; overflow-y: auto;">
-                <table class="tab-relatorio" style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid #444;">
+            <div style="max-height: 350px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="position: sticky; top: 0; background: #1a1a1a;">
+                        <tr style="border-bottom: 2px solid #ffcc00;">
                             <th style="text-align: left; padding: 10px;">Hora</th>
                             <th style="text-align: left; padding: 10px;">Cliente</th>
                             <th style="text-align: right; padding: 10px;">Valor</th>
@@ -39,7 +39,7 @@
                 </table>
             </div>
 
-            <button onclick="limparRelatorio()" class="btn-limpar-relatorio">🗑️ Limpar Todos os Registros</button>
+            <button onclick="limparRelatorio()" class="btn-limpar-relatorio">🗑️ LIMPAR RELATÓRIO COMPLETAMENTE</button>
         </div>
     </div>
 
@@ -62,7 +62,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let carregamentoInicial = true;
+        let paginaCarregada = false;
 
         // 1. ESCUTA NOVOS PEDIDOS
         db.ref('pedidos').on('child_added', (snapshot) => {
@@ -85,57 +85,53 @@
                 <div class="total-container">TOTAL: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}</div>
                 
                 <div style="display: flex; gap: 10px; margin-top: 15px;">
-                    <button class="btn-imprimir" style="flex: 1; margin: 0;" id="btn-print-${idPedido}">🖨️ Reimprimir</button>
+                    <button class="btn-imprimir" style="flex: 1; margin: 0;" id="btn-print-${idPedido}">🖨️ Imprimir</button>
                     <button onclick="concluirPedido('${idPedido}')" style="flex: 1; background: #27ae60; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">✅ Concluir</button>
-                </div>
-            `;
-
-            const cupomParaImpressora = `
-                <div style="font-family: Arial, sans-serif; width: 72mm; color: black; padding: 5px;">
-                    <div style="text-align: center;">
-                        <h2 style="margin: 0; font-size: 1.5em;">MYDI DELIVERY</h2>
-                        <p style="margin: 5px 0;">PEDIDO #${idPedido.slice(-4)}</p>
-                    </div>
-                    <div style="border-top: 1px dashed black; margin: 10px 0;"></div>
-                    <strong>CLIENTE:</strong> ${pedido.cliente}<br>
-                    <strong>ENDEREÇO:</strong> ${pedido.endereco}
-                    <div style="border-top: 1px dashed black; margin: 10px 0;"></div>
-                    <strong>ITENS:</strong><br>${itensHtml}
-                    <div style="border-top: 1px dashed black; margin: 10px 0;"></div>
-                    <strong>TOTAL: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}</strong>
-                    <div style="text-align: center; margin-top: 15px; font-size: 0.8em;">${new Date().toLocaleString('pt-BR')}</div>
                 </div>
             `;
 
             container.prepend(li);
             
-            // Som de alerta (Só toca se não for o carregamento inicial da página)
-            if (!carregamentoInicial) {
-                const toqueTelefone = new Audio('https://www.soundjay.com/buttons/beep-01a.mp3'); // Som mais curto e garantido
-                toqueTelefone.play().catch(e => console.log("Aguardando interação do usuário para tocar som."));
+            // SOM CHAMATIVO (Telefone Antigo)
+            if (paginaCarregada) {
+                // Som de campainha de telefone/orelhão
+                const somAlerta = new Audio('https://www.soundjay.com/phone/sounds/phone-calling-1.mp3');
+                somAlerta.play().catch(e => console.log("Clique na página para ativar o som."));
             }
 
-            li.querySelector(`#btn-print-${idPedido}`).onclick = () => enviarParaImpressora(cupomParaImpressora);
+            // Ação de Impressão Manual
+            const layoutCupom = `
+                <div style="font-family: monospace; width: 72mm; padding: 5px;">
+                    <center><h2>MYDI DELIVERY</h2></center>
+                    <hr>
+                    <b>CLIENTE:</b> ${pedido.cliente}<br>
+                    <b>ENDEREÇO:</b> ${pedido.endereco}<br>
+                    <hr>
+                    <b>ITENS:</b><br>${itensHtml}
+                    <hr>
+                    <b>TOTAL: R$ ${(pedido.total || 0).toFixed(2).replace('.', ',')}</b>
+                </div>
+            `;
+            li.querySelector(`#btn-print-${idPedido}`).onclick = () => enviarParaImpressora(layoutCupom);
         });
 
-        // Flag para ignorar som nos pedidos que já estavam no banco
+        // Marca que a carga inicial terminou para não tocar som em pedidos velhos
         db.ref('pedidos').once('value', () => {
-            carregamentoInicial = false;
+            setTimeout(() => { paginaCarregada = true; }, 2000);
         });
 
         // 2. FUNÇÃO CONCLUIR
         function concluirPedido(id) {
-            if (confirm("Deseja finalizar este pedido e enviar para o relatório?")) {
+            if (confirm("Concluir este pedido? Ele irá para o relatório.")) {
                 const refPedido = db.ref('pedidos/' + id);
                 refPedido.once('value').then((snapshot) => {
                     const dados = snapshot.val();
                     dados.horaConcluido = new Date().toLocaleTimeString('pt-BR');
                     
                     db.ref('relatorios').child(id).set(dados).then(() => {
-                        refPedido.remove().then(() => {
-                            const card = document.getElementById(`card-${id}`);
-                            if (card) card.remove();
-                        });
+                        refPedido.remove();
+                        const card = document.getElementById(`card-${id}`);
+                        if (card) card.remove();
                     });
                 });
             }
@@ -160,11 +156,11 @@
                     const tr = document.createElement('tr');
                     tr.style.borderBottom = "1px solid #333";
                     tr.innerHTML = `
-                        <td style="padding: 8px;">${p.horaConcluido || '---'}</td>
-                        <td style="padding: 8px;">${p.cliente}</td>
-                        <td style="padding: 8px; text-align: right; color: #27ae60; font-weight: bold;">R$ ${parseFloat(p.total).toFixed(2).replace('.',',')}</td>
+                        <td style="padding: 10px;">${p.horaConcluido || '---'}</td>
+                        <td style="padding: 10px;">${p.cliente}</td>
+                        <td style="padding: 10px; text-align: right; color: #27ae60; font-weight: bold;">R$ ${parseFloat(p.total).toFixed(2).replace('.',',')}</td>
                     `;
-                    tabela.prepend(tr);
+                    tabela.appendChild(tr);
                 });
                 totalTexto.innerText = `R$ ${somaTotal.toFixed(2).replace('.', ',')}`;
                 qtdTexto.innerText = contador;
@@ -177,10 +173,10 @@
         }
 
         function limparRelatorio() {
-            if (confirm("⚠️ ATENÇÃO: Isso apagará TODOS os dados do relatório permanentemente. Confirmar?")) {
+            if (confirm("Deseja APAGAR TODO o histórico de vendas? Esta ação não pode ser desfeita.")) {
                 db.ref('relatorios').remove().then(() => {
-                    alert("Relatório limpo com sucesso!");
-                    abrirRelatorio(); // Atualiza a tela
+                    alert("Relatório limpo!");
+                    abrirRelatorio();
                 });
             }
         }
@@ -189,7 +185,7 @@
             const iframe = document.getElementById('iframe-impressao');
             const doc = iframe.contentWindow.document;
             doc.open();
-            doc.write(`<html><body style="margin:0;" onload="window.print()">${htmlCupom}</body></html>`);
+            doc.write(`<html><body onload="window.print()">${htmlCupom}</body></html>`);
             doc.close();
         }
     </script>
