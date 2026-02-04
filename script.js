@@ -237,3 +237,51 @@ document.addEventListener("DOMContentLoaded", async () => {
 });
 
 function mostrarToast() { const t = document.getElementById("toast"); if (t) { t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2000); } }
+
+// ==================================================
+// UI E INICIALIZAÇÃO (COM SPLASH INTELIGENTE)
+// ==================================================
+
+function gerenciarSplash() {
+    const splash = document.getElementById("splash");
+    if (!splash) return;
+
+    // Verifica se o usuário já viu o splash nesta sessão
+    const jaViuSplash = sessionStorage.getItem("splashVisualizado");
+
+    if (jaViuSplash) {
+        // Se já viu, remove o splash imediatamente sem animação
+        splash.style.display = "none";
+    } else {
+        // Se é a primeira vez, mostra e depois marca como "visto"
+        setTimeout(() => {
+            splash.style.opacity = "0"; // Faz um efeito de sumir suave
+            setTimeout(() => {
+                splash.style.display = "none";
+                sessionStorage.setItem("splashVisualizado", "true");
+            }, 500); // Tempo para o fade-out terminar
+        }, 2500); // Tempo que o logo fica na tela
+    }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+    // 1. Inicia o Splash inteligente
+    gerenciarSplash();
+
+    // 2. Carrega os dados do cardápio
+    await carregarDadosIniciais();
+    
+    // 3. Configura Menu Mobile
+    const btn = document.getElementById("hamburger");
+    if (btn) btn.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
+
+    // 4. Recupera o carrinho do LocalStorage (isso mantém os itens mesmo mudando de página)
+    const salvos = localStorage.getItem("carrinho");
+    if (salvos) { 
+        carrinho = JSON.parse(salvos); 
+        atualizarCarrinho(); 
+    }
+});
+
+
+
