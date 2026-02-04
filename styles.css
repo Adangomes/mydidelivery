@@ -357,3 +357,14 @@ body {
 }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+.alerta-erro {
+    background: #fff5f5;
+    color: #c0392b;
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    border: 1px solid #ebccd1;
+    margin-top: 10px;
+    text-align: center;
+    font-weight: 600;
+}
