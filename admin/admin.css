@@ -250,3 +250,19 @@ h2 {
     max-height: 80vh;
     overflow-y: auto;
 }
+
+/* Botões de impressão específicos */
+.btn-cozinha { background: #f39c12 !important; color: white !important; }
+.btn-motoboy { background: #3498db !important; color: white !important; }
+
+.btn-limpar-relatorio {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 20px;
+    width: 100%;
+}
