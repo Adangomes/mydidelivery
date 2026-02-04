@@ -13,29 +13,37 @@ let LOJA_ABERTA = true;
 let MENSAGEM_FECHADA = "Loja Fechada no momento.";
 
 // ==================================================
-// STATUS E PRODUTOS (Lendo dos arquivos do Admin/Git)
+// STATUS E PRODUTOS (Lendo por Categorias)
 // ==================================================
 async function carregarDadosIniciais() {
     try {
-        // Carrega Status
+        // 1. Carrega Status
         const resStatus = await fetch('content/status.json');
         const dataStatus = await resStatus.json();
         LOJA_ABERTA = dataStatus.aberto;
         MENSAGEM_FECHADA = dataStatus.mensagem;
         atualizarInterfaceStatus(dataStatus);
 
-        // Carrega Burgers e Bebidas
+        // 2. Carrega Todo o Cardápio (JSON com Categorias)
         const resProdutos = await fetch('content/produtos.json');
-        const dadosProdutos = await resProdutos.json();
-        if (dadosProdutos.burgers) exibirProdutos(dadosProdutos.burgers, document.getElementById("burgers"), 'burger');
-        if (dadosProdutos.bebidas) exibirProdutos(dadosProdutos.bebidas, document.getElementById("bebidas"), 'bebida');
+        const data = await resProdutos.json();
+        
+        // Acessando a estrutura: data.produtos.burgers...
+        const categorias = data.produtos;
 
-        // Carrega Pizzas
-        const resPizzas = await fetch('content/pizzas.json');
-        const dadosPizzas = await resPizzas.json();
-        if (dadosPizzas.pizzas) exibirProdutos(dadosPizzas.pizzas, document.getElementById("pizza") || document.getElementById("pizzaS"), 'pizza');
+        if (categorias.burgers) {
+            exibirProdutos(categorias.burgers, document.getElementById("burgers"), 'burger');
+        }
+        if (categorias.bebidas) {
+            exibirProdutos(categorias.bebidas, document.getElementById("bebidas"), 'bebida');
+        }
+        if (categorias.pizzas) {
+            exibirProdutos(categorias.pizzas, document.getElementById("pizza") || document.getElementById("pizzaS"), 'pizza');
+        }
 
-    } catch (e) { console.error("Erro ao carregar dados do Git:", e); }
+    } catch (e) { 
+        console.error("Erro ao carregar dados. Verifique a pasta content/ e o formato do JSON.", e); 
+    }
 }
 
 function atualizarInterfaceStatus(data) {
@@ -46,22 +54,26 @@ function atualizarInterfaceStatus(data) {
     }
 }
 
-function exibirProdutos(dados, container, tipo) {
-    if (!container || !dados) return;
+function exibirProdutos(dadosObjeto, container, tipo) {
+    if (!container || !dadosObjeto) return;
     container.innerHTML = ""; 
 
-    dados.forEach((p, index) => {
+    // Converte o objeto de categorias (b1, b2, p1...) em Array para o loop
+    const lista = Object.keys(dadosObjeto).map(key => {
+        return { id: key, ...dadosObjeto[key] };
+    });
+
+    lista.forEach((p) => {
         const card = document.createElement("div");
         card.className = "card-produto";
 
         if (tipo === 'pizza') {
-            const pizzaId = p.id || `pizza-${index}`;
             card.innerHTML = `
                 <img src="${p.imagem}">
                 <div class="card-content">
                     <h3>${p.nome}</h3>
                     <p>${p.ingredientes || ""}</p>
-                    <button onclick="abrirOpcoesPizza('${pizzaId}')" style="background:#ffc107; color:#000; font-weight:bold; cursor:pointer;">ESCOLHER TAMANHO</button>
+                    <button onclick="abrirOpcoesPizza('${p.id}')" style="background:#ffc107; color:#000; font-weight:bold; cursor:pointer;">ESCOLHER TAMANHO</button>
                 </div>`;
         } else {
             const preco = p.price || 0;
@@ -86,14 +98,19 @@ function exibirProdutos(dados, container, tipo) {
 // PIZZAS: ESCOLHA DE TAMANHO
 // ==================================================
 async function abrirOpcoesPizza(id) {
-    const res = await fetch('content/pizzas.json');
+    const res = await fetch('content/produtos.json');
     const data = await res.json();
-    const pizza = data.pizzas.find(p => p.id === id);
+    // Busca dentro da categoria pizzas do seu JSON
+    const pizza = data.produtos.pizzas[id];
+    
     if(!pizza) return;
 
     let opcoes = Object.keys(pizza.precos);
     let mensagem = `Escolha o tamanho para ${pizza.nome}:\n\n`;
-    opcoes.forEach(t => { mensagem += `- ${t}: R$ ${pizza.precos[t].atual.toFixed(2).replace(".", ",")}\n`; });
+    opcoes.forEach(t => { 
+        const valor = pizza.precos[t].atual;
+        mensagem += `- ${t}: R$ ${valor.toFixed(2).replace(".", ",")}\n`; 
+    });
 
     const escolha = prompt(mensagem);
     if (escolha) {
@@ -114,8 +131,12 @@ function adicionarCarrinhoPorProduto(p) {
     if (!LOJA_ABERTA) { alert(MENSAGEM_FECHADA); return; }
     const item = carrinho.find(i => i.title === p.title);
     if (item) { item.qtd++; } else { carrinho.push({ title: p.title, price: p.price, qtd: 1 }); }
-    atualizarCarrinho(); mostrarToast();
+    atualizarCarrinho(); 
+    salvarCarrinho();
+    mostrarToast();
 }
+
+function salvarCarrinho() { localStorage.setItem("carrinho", JSON.stringify(carrinho)); }
 
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
@@ -123,7 +144,7 @@ function atualizarCarrinho() {
     if (box) box.innerHTML = "";
     carrinho.forEach(i => {
         subtotal += i.price * i.qtd;
-        if (box) box.innerHTML += `<div class="item-carrinho"><span>${i.title} x${i.qtd}</span><strong>R$ ${(i.price * i.qtd).toFixed(2)}</strong></div>`;
+        if (box) box.innerHTML += `<div class="item-carrinho" style="display:flex; justify-content:space-between; margin-bottom:5px;"><span>${i.title} x${i.qtd}</span><strong>R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}</strong></div>`;
     });
     const totalFormatado = subtotal.toFixed(2).replace(".", ",");
     if (document.getElementById("subtotal")) document.getElementById("subtotal").innerText = `Subtotal: R$ ${totalFormatado}`;
@@ -131,15 +152,16 @@ function atualizarCarrinho() {
 }
 
 // ==================================================
-// FINALIZAÇÃO (ENVIANDO PARA FIREBASE E PEDIDOS.HTML)
+// FINALIZAÇÃO (FIREBASE PARA PEDIDOS.HTML)
 // ==================================================
 async function finalizarEntrega() {
     const formaPagamento = document.getElementById("pagamento").value;
-    if (!formaPagamento) { alert("Escolha o pagamento!"); return; }
+    const nomeClie = document.getElementById("nomeCliente").value;
+    if (!formaPagamento || !nomeClie) { alert("Preencha seu nome e pagamento!"); return; }
 
     const subtotal = carrinho.reduce((a, b) => a + (b.price * b.qtd), 0);
     const dadosPedido = {
-        cliente: document.getElementById("nomeCliente").value,
+        cliente: nomeClie,
         cidade: document.getElementById("cidade").value,
         bairro: document.getElementById("bairro").value,
         rua: document.getElementById("rua").value,
@@ -153,36 +175,25 @@ async function finalizarEntrega() {
     };
 
     try {
-        // ENVIO PARA O FIREBASE (Onde o pedidos.html vai ler)
         if (window.db) {
             await window.db.ref('pedidos').push(dadosPedido);
         }
 
-        // REDIRECIONAMENTO WHATSAPP
-        let msg = `*NOVO PEDIDO - KINGS BURGUER*%0A%0A*Cliente:* ${dadosPedido.cliente}%0A*Endereço:* ${dadosPedido.rua}, ${dadosPedido.numero} - ${dadosPedido.bairro}%0A%0A*Itens:*%0A${carrinho.map(i => `- ${i.qtd}x ${i.title}`).join('%0A')}%0A%0A*Total:* R$ ${dadosPedido.total.toFixed(2)}%0A*Pagamento:* ${formaPagamento}`;
+        let msg = `*NOVO PEDIDO*%0A%0A*Cliente:* ${dadosPedido.cliente}%0A*Total:* R$ ${dadosPedido.total.toFixed(2)}%0A*Pagamento:* ${formaPagamento}`;
         window.location.href = `https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`;
         
         carrinho = [];
         localStorage.removeItem("carrinho");
-    } catch (e) { 
-        console.error(e);
-        alert("Erro ao enviar pedido. Verifique sua internet."); 
-    }
+    } catch (e) { alert("Erro ao enviar pedido."); }
 }
 
 // ==================================================
-// FUNÇÕES DE UI E INICIALIZAÇÃO
-// ==================================================
-// ==================================================
-// FUNÇÕES DE UI E INICIALIZAÇÃO
+// UI E INICIALIZAÇÃO (DESTRAVANDO SPLASH)
 // ==================================================
 function fecharSplash() {
     const splash = document.getElementById("splash");
     if (splash) {
-        // Aguarda 1.5 segundos para o cliente ver sua logo e retira o splash
-        setTimeout(() => {
-            splash.style.display = "none";
-        }, 1500);
+        setTimeout(() => { splash.style.display = "none"; }, 1500);
     }
 }
 
@@ -192,25 +203,18 @@ function abrirDelivery() { fecharCarrinho(); document.getElementById("delivery-m
 function fecharDelivery() { document.getElementById("delivery-modal").style.display = "none"; }
 function mostrarToast() { const t = document.getElementById("toast"); if (t) { t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2000); } }
 
-// ESTA É A PARTE QUE DESTRAVA TUDO
 document.addEventListener("DOMContentLoaded", async () => {
-    // 1. Carrega os produtos e status primeiro
+    // 1. Carrega os dados primeiro
     await carregarDadosIniciais();
     
-    // 2. Destrava a tela (Splash)
+    // 2. Tira o splash
     fecharSplash();
 
-    // 3. Configura o menu mobile
-    const btnHamburguer = document.getElementById("hamburger");
-    if (btnHamburguer) {
-        btnHamburguer.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
-    }
+    // 3. Menu Mobile
+    const btn = document.getElementById("hamburger");
+    if (btn) btn.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
 
-    // 4. Carrega o carrinho do navegador (se houver)
-    const dadosSalvos = localStorage.getItem("carrinho");
-    if (dadosSalvos) {
-        carrinho = JSON.parse(dadosSalvos);
-        atualizarCarrinho();
-    }
+    // 4. Recupera carrinho
+    const salvos = localStorage.getItem("carrinho");
+    if (salvos) { carrinho = JSON.parse(salvos); atualizarCarrinho(); }
 });
-
