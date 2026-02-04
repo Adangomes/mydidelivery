@@ -12,25 +12,21 @@ let taxaEntregaCalculada = 0;
 let LOJA_ABERTA = true; 
 let MENSAGEM_FECHADA = "Loja Fechada no momento.";
 
-// Estados para o Sistema de Pizza Meia-a-Meia
 let todasPizzas = {}; 
 let saboresSelecionados = [];
 let tamanhoSelecionado = null;
 let limiteSabores = 1;
 
 // ==================================================
-// LÓGICA DO SPLASH INTELIGENTE (CORRIGIDA)
+// LÓGICA DO SPLASH INTELIGENTE
 // ==================================================
 function gerenciarSplash() {
     const splash = document.getElementById("splash");
     if (!splash) return;
-
     const jaViuSplash = sessionStorage.getItem("splashVisualizado");
-
     if (jaViuSplash) {
         splash.style.display = "none";
     } else {
-        // Garante que o splash suma após 3 segundos independente de qualquer erro
         setTimeout(() => {
             splash.style.opacity = "0";
             setTimeout(() => {
@@ -42,7 +38,7 @@ function gerenciarSplash() {
 }
 
 // ==================================================
-// CARREGAMENTO DE DADOS
+// CARREGAMENTO DE DADOS (MELHORADO)
 // ==================================================
 async function carregarDadosIniciais() {
     try {
@@ -54,16 +50,16 @@ async function carregarDadosIniciais() {
 
         const resProdutos = await fetch('content/produtos.json');
         const data = await resProdutos.json();
-        const categorias = data.produtos;
+        
+        // CORREÇÃO AQUI: Salva no objeto global 'todasPizzas'
+        todasPizzas = data.produtos.pizzas || {};
 
-        todasPizzas = categorias.pizzas || {};
-
-        if (categorias.burgers) exibirProdutos(categorias.burgers, document.getElementById("burgers"), 'burger');
-        if (categorias.bebidas) exibirProdutos(categorias.bebidas, document.getElementById("bebidas"), 'bebida');
-        if (categorias.pizzas) exibirProdutos(categorias.pizzas, document.getElementById("pizza") || document.getElementById("pizzaS"), 'pizza');
+        if (data.produtos.burgers) exibirProdutos(data.produtos.burgers, document.getElementById("burgers"), 'burger');
+        if (data.produtos.bebidas) exibirProdutos(data.produtos.bebidas, document.getElementById("bebidas"), 'bebida');
+        if (data.produtos.pizzas) exibirProdutos(data.produtos.pizzas, document.getElementById("pizza") || document.getElementById("pizzaS"), 'pizza');
 
     } catch (e) { 
-        console.error("Erro ao carregar dados.", e); 
+        console.error("Erro ao carregar dados. Verifique os arquivos JSON.", e); 
     }
 }
 
@@ -78,13 +74,11 @@ function atualizarInterfaceStatus(data) {
 function exibirProdutos(dadosObjeto, container, tipo) {
     if (!container || !dadosObjeto) return;
     container.innerHTML = ""; 
-
     const lista = Object.keys(dadosObjeto).map(key => ({ id: key, ...dadosObjeto[key] }));
 
     lista.forEach((p) => {
         const card = document.createElement("div");
         card.className = "card-produto";
-
         if (tipo === 'pizza') {
             card.innerHTML = `
                 <img src="${p.imagem}">
@@ -109,11 +103,22 @@ function exibirProdutos(dadosObjeto, container, tipo) {
 }
 
 // ==================================================
-// LÓGICA DO MODAL DE PIZZA (MEIA-A-MEIA)
+// MODAL DE PIZZA (CORREÇÃO DE ABERTURA)
 // ==================================================
 function abrirOpcoesPizza(id) {
+    console.log("Tentando abrir pizza ID:", id); // LOG DE DEBUG
     const pizzaOriginal = todasPizzas[id];
-    if (!pizzaOriginal) return;
+    
+    if (!pizzaOriginal) {
+        alert("Erro: Dados da pizza não carregados. Tente atualizar a página.");
+        return;
+    }
+
+    const modal = document.getElementById("pizza-options-modal");
+    if (!modal) {
+        alert("Erro: Modal não encontrado no HTML.");
+        return;
+    }
 
     tamanhoSelecionado = null;
     saboresSelecionados = [pizzaOriginal]; 
@@ -134,13 +139,12 @@ function abrirOpcoesPizza(id) {
         containerTamanhos.appendChild(btn);
     });
 
-    document.getElementById("pizza-options-modal").style.display = "flex";
+    modal.style.display = "flex";
 }
 
 function selecionarTamanho(tamanho, pizzaOriginal, event) {
     tamanhoSelecionado = tamanho;
     saboresSelecionados = [pizzaOriginal]; 
-    
     if (tamanho === "P") limiteSabores = 1;
     else if (tamanho === "M") limiteSabores = 2;
     else if (tamanho === "G") limiteSabores = 3;
@@ -160,7 +164,6 @@ function renderizarSaboresPremium() {
     Object.keys(todasPizzas).forEach(id => {
         const p = todasPizzas[id];
         const selecionada = saboresSelecionados.find(s => s.id === p.id);
-        
         const card = document.createElement("div");
         card.className = `card-sabor-premium ${selecionada ? 'selected' : ''}`;
         card.innerHTML = `
@@ -168,7 +171,6 @@ function renderizarSaboresPremium() {
             <span>${p.nome}</span>
             <div class="check-icon">✓</div>
         `;
-
         card.onclick = () => {
             const index = saboresSelecionados.findIndex(s => s.id === p.id);
             if (index > -1) {
@@ -199,11 +201,7 @@ if(btnAddPizza) {
         const precos = saboresSelecionados.map(s => s.precos[tamanhoSelecionado].atual);
         const precoFinal = Math.max(...precos);
         const nomes = saboresSelecionados.map(s => s.nome).join(" / ");
-
-        adicionarCarrinhoPorProduto({
-            title: `Pizza ${tamanhoSelecionado} (${nomes})`,
-            price: precoFinal
-        });
+        adicionarCarrinhoPorProduto({ title: `Pizza ${tamanhoSelecionado} (${nomes})`, price: precoFinal });
         fecharModalPizza();
     };
 }
@@ -214,15 +212,13 @@ function fecharModalPizza() {
 }
 
 // ==================================================
-// CARRINHO E UI
+// CARRINHO E INICIALIZAÇÃO
 // ==================================================
 function adicionarCarrinhoPorProduto(p) {
     if (!LOJA_ABERTA) { alert(MENSAGEM_FECHADA); return; }
     const item = carrinho.find(i => i.title === p.title);
     if (item) { item.qtd++; } else { carrinho.push({ title: p.title, price: p.price, qtd: 1 }); }
-    atualizarCarrinho(); 
-    salvarCarrinho();
-    mostrarToast();
+    atualizarCarrinho(); salvarCarrinho(); mostrarToast();
 }
 
 function atualizarCarrinho() {
@@ -241,24 +237,11 @@ function atualizarCarrinho() {
 function salvarCarrinho() { localStorage.setItem("carrinho", JSON.stringify(carrinho)); }
 function mostrarToast() { const t = document.getElementById("toast"); if (t) { t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2000); } }
 
-// ==================================================
-// INICIALIZAÇÃO ÚNICA (ORDEM CORRIGIDA)
-// ==================================================
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Splash roda primeiro e de forma independente
     gerenciarSplash();
-
-    // 2. Carrega os dados (sem 'await' no topo para não travar a tela)
     carregarDadosIniciais();
-
-    // 3. Eventos de UI
     const btnHam = document.getElementById("hamburger");
     if (btnHam) btnHam.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
-
-    // 4. Recupera carrinho
     const salvos = localStorage.getItem("carrinho");
-    if (salvos) { 
-        carrinho = JSON.parse(salvos); 
-        atualizarCarrinho(); 
-    }
+    if (salvos) { carrinho = JSON.parse(salvos); atualizarCarrinho(); }
 });
