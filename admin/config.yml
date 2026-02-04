@@ -19,7 +19,8 @@ collections:
             fields:
               - label: "Hambúrgueres"
                 name: "burgers"
-                widget: "map"
+                widget: "list" # Trocado de map para list
+                summary: '{{title}}'
                 fields:
                   - { label: "Nome", name: "title", widget: "string" }
                   - { label: "Preço", name: "price", widget: "number", value_type: "float" }
@@ -29,7 +30,8 @@ collections:
               
               - label: "Bebidas"
                 name: "bebidas"
-                widget: "map"
+                widget: "list" # Trocado de map para list
+                summary: '{{title}}'
                 fields:
                   - { label: "Nome", name: "title", widget: "string" }
                   - { label: "Preço", name: "price", widget: "number", value_type: "float" }
@@ -39,7 +41,8 @@ collections:
 
               - label: "Pizzas"
                 name: "pizzas"
-                widget: "map"
+                widget: "list" # Trocado de map para list
+                summary: '{{nome}}'
                 fields:
                   - { label: "Nome da Pizza", name: "nome", widget: "string" }
                   - { label: "Categoria", name: "categoria", widget: "hidden", default: "pizza" }
