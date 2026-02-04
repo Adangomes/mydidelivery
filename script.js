@@ -173,14 +173,44 @@ async function finalizarEntrega() {
 // ==================================================
 // FUNÇÕES DE UI E INICIALIZAÇÃO
 // ==================================================
+// ==================================================
+// FUNÇÕES DE UI E INICIALIZAÇÃO
+// ==================================================
+function fecharSplash() {
+    const splash = document.getElementById("splash");
+    if (splash) {
+        // Aguarda 1.5 segundos para o cliente ver sua logo e retira o splash
+        setTimeout(() => {
+            splash.style.display = "none";
+        }, 1500);
+    }
+}
+
 function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
 function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
 function abrirDelivery() { fecharCarrinho(); document.getElementById("delivery-modal").style.display = "flex"; }
 function fecharDelivery() { document.getElementById("delivery-modal").style.display = "none"; }
 function mostrarToast() { const t = document.getElementById("toast"); if (t) { t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2000); } }
 
-document.addEventListener("DOMContentLoaded", () => {
-    carregarDadosIniciais();
+// ESTA É A PARTE QUE DESTRAVA TUDO
+document.addEventListener("DOMContentLoaded", async () => {
+    // 1. Carrega os produtos e status primeiro
+    await carregarDadosIniciais();
+    
+    // 2. Destrava a tela (Splash)
+    fecharSplash();
+
+    // 3. Configura o menu mobile
     const btnHamburguer = document.getElementById("hamburger");
-    if (btnHamburguer) btnHamburguer.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
+    if (btnHamburguer) {
+        btnHamburguer.onclick = () => document.getElementById("mobile-menu").classList.toggle("open");
+    }
+
+    // 4. Carrega o carrinho do navegador (se houver)
+    const dadosSalvos = localStorage.getItem("carrinho");
+    if (dadosSalvos) {
+        carrinho = JSON.parse(dadosSalvos);
+        atualizarCarrinho();
+    }
 });
+
