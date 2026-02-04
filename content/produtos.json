@@ -73,19 +73,11 @@
         "categoria": "pizza",
         "ingredientes": "Mussarela, presunto, ovo, cebola, oregano",
         "imagem": "imagens/pizza.jpg",
+        "id": "p1",
         "precos": {
-          "Pequena": {
-            "atual": 40,
-            "antigo": 45
-          },
-          "Media": {
-            "atual": 60,
-            "antigo": 0
-          },
-          "Grande": {
-            "atual": 90,
-            "antigo": 0
-          }
+          "Pequena": { "atual": 40 },
+          "Media": { "atual": 60 },
+          "Grande": { "atual": 90 }
         }
       },
       "p2": {
@@ -93,19 +85,11 @@
         "categoria": "pizza",
         "ingredientes": "Mussarela, bacon, tomate, oregano",
         "imagem": "imagens/pizza.jpg",
+        "id": "p2",
         "precos": {
-          "Pequena": {
-            "atual": 40,
-            "antigo": 0
-          },
-          "Media": {
-            "atual": 60,
-            "antigo": 0
-          },
-          "Grande": {
-            "atual": 90,
-            "antigo": 0
-          }
+          "Pequena": { "atual": 40 },
+          "Media": { "atual": 60 },
+          "Grande": { "atual": 90 }
         }
       },
       "p3": {
@@ -113,99 +97,11 @@
         "categoria": "pizza",
         "ingredientes": "Mussarela, requeijão, cheddar, oregano",
         "imagem": "imagens/pizza.jpg",
+        "id": "p3",
         "precos": {
-          "Pequena": {
-            "atual": 40,
-            "antigo": 0
-          },
-          "Media": {
-            "atual": 60,
-            "antigo": 0
-          },
-          "Grande": {
-            "atual": 90,
-            "antigo": 0
-          }
-        }
-      },
-      "p4": {
-        "nome": "Frango",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, frango, requeijão, oregano",
-        "imagem": "imagens/pizza.jpg",
-        "precos": {
-          "Pequena": {
-            "atual": 40,
-            "antigo": 0
-          },
-          "Media": {
-            "atual": 60,
-            "antigo": 0
-          },
-          "Grande": {
-            "atual": 90,
-            "antigo": 0
-          }
-        }
-      },
-      "p5": {
-        "nome": "Baiana",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, cebola, pimentão, molho de pimenta, calabresa, oregano",
-        "imagem": "imagens/pizza.jpg",
-        "precos": {
-          "Pequena": {
-            "atual": 40,
-            "antigo": 0
-          },
-          "Media": {
-            "atual": 60,
-            "antigo": 0
-          },
-          "Grande": {
-            "atual": 90,
-            "antigo": 0
-          }
-        }
-      },
-      "p6": {
-        "nome": "Calabresa",
-        "categoria": "pizza",
-        "ingredientes": "Mussarela, calabresa, oregano",
-        "imagem": "imagens/pizza.jpg",
-        "precos": {
-          "Pequena": {
-            "atual": 40,
-            "antigo": 0
-          },
-          "Media": {
-            "atual": 60,
-            "antigo": 0
-          },
-          "Grande": {
-            "atual": 90,
-            "antigo": 0
-          }
-        }
-      },
-      "p7": {
-        "nome": "Sensação (Doce)",
-        "categoria": "pizza",
-        "ingredientes": "Chocolate preto, morango",
-        "imagem": "imagens/pizza.jpg",
-        "precos": {
-          "Pequena": {
-            "atual": 40,
-            "antigo": 0
-          },
-          "Media": {
-            "atual": 60,
-            "antigo": 0
-          },
-          "Grande": {
-            "atual": 90,
-            "antigo": 0
-          }
+          "Pequena": { "atual": 40 },
+          "Media": { "atual": 60 },
+          "Grande": { "atual": 90 }
         }
       }
     }
