@@ -65,6 +65,21 @@ async function carregarProdutos() {
     } catch (error) { console.error("Erro produtos:", error); }
 }
 
+async function carregarDogs() {
+    const container = document.getElementById("dogs"); // Precisa ter esse ID no HTML
+    if (!container) return;
+    try {
+        const res = await fetch("/content/produtos.json");
+        const data = await res.json();
+        const lista = data.produtos;
+        container.innerHTML = "";
+        lista.forEach((p) => {
+            if (p.categoria !== "dog") return; // Filtra apenas categoria dog
+            container.appendChild(criarCardProduto(p));
+        });
+    } catch (error) { console.error("Erro dogs:", error); }
+}
+
 async function carregarBebidas() {
     const container = document.getElementById("bebidas");
     if (!container) return;
@@ -461,6 +476,7 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
     fecharModalPizza();
     if(typeof mostrarToast === "function") mostrarToast();
 };
+
 
 
 
