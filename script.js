@@ -539,31 +539,32 @@ function configurarModalPizza(modal) {
 }
 
 // 3. CONFIGURAÇÃO ESPECÍFICA PARA PORÇÕES
-function configurarModalPorcao(modal) {
-    document.getElementById("modal-img-custom").src = itemAtual.image;
-    document.getElementById("modal-titulo-custom").innerText = itemAtual.title;
-    document.getElementById("modal-desc-custom").innerText = itemAtual.ingredientes;
-    
-    opcaoSelecionada = null;
-    const container = document.getElementById("container-tamanhos-custom");
-    container.innerHTML = "";
-    
-    Object.keys(itemAtual.prices).forEach(chave => {
-        const btn = document.createElement("button");
-        btn.className = "btn-tamanho-opcional";
-        let label = (chave === "P") ? "600g" : (chave === "G" ? "1kg" : chave);
-        btn.innerHTML = `<strong>${label}</strong><br>R$ ${itemAtual.prices[chave].toFixed(2).replace(".", ",")}`;
-        
-        btn.onclick = () => {
-            opcaoSelecionada = chave;
-            container.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
-            btn.classList.add("ativo");
-        };
-        container.appendChild(btn);
-    });
+async function carregarPorcoes() {
+    const grid = document.getElementById("porcoes"); 
+    if (!grid) return;
 
-    modal.style.display = "flex";
-    document.getElementById("btn-confirmar-custom").onclick = adicionarPorcaoAoCarrinho;
+    try {
+        const res = await fetch("content/produtos.json");
+        const data = await res.json();
+        window.produtos = data.produtos; 
+
+        const itens = window.produtos.filter(p => p.categoria === "porcao");
+
+        grid.innerHTML = "";
+        itens.forEach(p => {
+            grid.innerHTML += `
+                <div class="card-produto">
+                    <img src="${p.image}" alt="${p.title}">
+                    <div class="card-content">
+                        <h3>${p.title}</h3>
+                        <p>${p.ingredientes}</p>
+                        <button class="btn-vermelho" onclick="abrirModalOpcoes('${p.title}')">
+                            ESCOLHER TAMANHO
+                        </button>
+                    </div>
+                </div>`;
+        });
+    } catch (e) { console.error("Erro ao carregar porções:", e); }
 }
 
 // 4. ADICIONAR PORÇÃO AO CARRINHO (SISTEMA DE PESO)
@@ -597,3 +598,4 @@ function fecharModalCustom() {
     const m = document.getElementById("modal-opcoes-custom");
     if(m) m.style.display = "none"; 
 }
+
