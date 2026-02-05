@@ -116,27 +116,29 @@
 <!-- MODAL DE PORÇÕES -->
 <div id="porcao-modal" class="modal-custom-full">
     <div class="modal-custom-container">
-
         <button onclick="fecharModalPorcao()" class="btn-fechar-modal">✕</button>
-
         <div class="modal-header-img">
             <img id="modal-porcao-img" src="" alt="Porção">
         </div>
-
         <div class="modal-details">
             <h2 id="porcao-modal-title"></h2>
             <p id="porcao-modal-desc"></p>
-
             <div class="secao-titulo">Escolha o Tamanho</div>
             <div id="porcao-sizes-container" class="sizes-row"></div>
         </div>
-
         <div style="padding:15px;">
-            <button id="btn-adicionar-porcao" class="btn-final-adicionar">
+            <button onclick="adicionarPorcaoAoCarrinho()" class="btn-final-adicionar">
                 ADICIONAR AO CARRINHO
             </button>
         </div>
+    </div>
+</div>
 
+<div id="cart-modal" style="display:none;">
+    <div class="cart-box">
+        <div class="cart-header"><h2>Meu Carrinho</h2><button onclick="fecharCarrinho()">X</button></div>
+        <div id="cart-items"></div> <div id="total"></div>
+        <button onclick="abrirDelivery()">Finalizar</button>
     </div>
 </div>
 
@@ -158,6 +160,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
