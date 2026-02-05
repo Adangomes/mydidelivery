@@ -4,11 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SNOOP LANCHE - Porções</title>
-    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
     <link rel="stylesheet" href="styles.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Ajustes específicos para o modal de porções carregar corretamente */
+        /* Estilos específicos para o Modal de Porções */
         .modal-pizza-full {
             position: fixed;
             top: 0; left: 0;
@@ -48,7 +47,7 @@
         .sizes-row { display: flex; gap: 10px; justify-content: space-between; }
         .btn-tamanho-opcional { flex: 1; padding: 10px; border: 2px solid #eee; border-radius: 12px; background: white; cursor: pointer; text-align: center; }
         .btn-tamanho-opcional.ativo { border-color: #ffc107; background: #fffdf5; font-weight: bold; }
-        .btn-final-adicionar { width: 100%; background: #28a745; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .btn-final-adicionar { width: 100%; background: #28a745; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 15px;}
     </style>
 </head>
 <body>
@@ -93,10 +92,17 @@
                 <p id="porcao-modal-desc"></p>
                 <div class="secao-titulo">Escolha o Tamanho</div>
                 <div id="porcao-sizes-container" class="sizes-row"></div>
-            </div>
-            <div style="padding: 15px;">
                 <button id="btn-confirmar-porcao" class="btn-final-adicionar">ADICIONAR AO CARRINHO</button>
             </div>
+        </div>
+    </div>
+
+    <div id="cart-modal" style="display:none;" class="modal-pizza-full">
+        <div class="modal-pizza-container" style="padding: 20px;">
+            <h2>Meu Carrinho</h2>
+            <div id="cart-items"></div>
+            <p id="total">Total: R$ 0,00</p>
+            <button onclick="fecharCarrinho()" class="btn-vermelho">Continuar Comprando</button>
         </div>
     </div>
 
@@ -104,42 +110,40 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
-            authDomain: "myproject26-10f0e.firebaseapp.com",
-            databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
-            projectId: "myproject26-10f0e",
-            storageBucket: "myproject26-10f0e.firebasestorage.app",
-            messagingSenderId: "884850608032",
-            appId: "1:884850608032:web:79db6983346c3c20edc6c5"
-        };
-        firebase.initializeApp(firebaseConfig);
-        window.db = firebase.database();
-
-        let porcaoSelecionada = null;
-        let tamanhoSelecionado = null;
+        let porcaoAtual = null;
+        let pesoSelecionado = null;
         window.carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 
-        // MENU HAMBURGER FUNCIONANDO
-        const hamburger = document.getElementById("hamburger");
-        const mobileMenu = document.getElementById("mobile-menu");
-        if(hamburger) {
-            hamburger.onclick = () => mobileMenu.classList.toggle("active");
-        }
+        // Inicializa Menu e Carrinho
+        document.addEventListener("click", function(e) {
+            const ham = document.getElementById("hamburger");
+            const menu = document.getElementById("mobile-menu");
+            if (ham && ham.contains(e.target)) menu.classList.toggle("active");
+            else if (menu && !menu.contains(e.target)) menu.classList.remove("active");
+        });
 
-        // CARREGAR PORÇÕES
-        async function carregar() {
+        window.abrirCarrinho = () => {
+            const modal = document.getElementById("cart-modal");
+            if (modal) {
+                modal.style.display = "flex";
+                if (typeof atualizarCarrinho === "function") atualizarCarrinho();
+            }
+        };
+        window.fecharCarrinho = () => document.getElementById("cart-modal").style.display = "none";
+
+        // Carrega Porções
+        async function carregarPorcoes() {
+            const grid = document.getElementById("porcoes-container");
             try {
-                const res = await fetch("content/produtos.json");
+                const res = await fetch("content/produtos.json?v=" + Date.now());
                 const data = await res.json();
-                const porcoes = data.produtos.filter(p => p.categoria === "porcao");
-                window.todosProdutos = data.produtos;
-                const grid = document.getElementById("porcoes-container");
-                if(!grid) return;
+                const lista = data.produtos.filter(p => p.categoria === "porcao");
+                window.produtosPorcoes = lista;
+
                 grid.innerHTML = "";
-                porcoes.forEach(p => {
+                lista.forEach(p => {
                     grid.innerHTML += `
-                        <div class="card-produto" onclick="abrirModalPorcao('${p.title}')" style="cursor:pointer">
+                        <div class="card-produto" onclick="abrirModalPorcao('${p.title}')">
                             <img src="${p.image}">
                             <div class="card-content">
                                 <h3>${p.title}</h3>
@@ -151,74 +155,57 @@
             } catch (e) { console.error(e); }
         }
 
-        // ABRIR MODAL
         window.abrirModalPorcao = (nome) => {
-            porcaoSelecionada = window.todosProdutos.find(p => p.title === nome);
-            document.getElementById("modal-porcao-img").src = porcaoSelecionada.image;
-            document.getElementById("porcao-modal-title").innerText = porcaoSelecionada.title;
-            document.getElementById("porcao-modal-desc").innerText = porcaoSelecionada.ingredientes;
-            const sizesContainer = document.getElementById("porcao-sizes-container");
-            sizesContainer.innerHTML = "";
-            tamanhoSelecionado = null;
-            Object.keys(porcaoSelecionada.prices).forEach(tam => {
+            porcaoAtual = window.produtosPorcoes.find(p => p.title === nome);
+            document.getElementById("modal-porcao-img").src = porcaoAtual.image;
+            document.getElementById("porcao-modal-title").innerText = porcaoAtual.title;
+            document.getElementById("porcao-modal-desc").innerText = porcaoAtual.ingredientes;
+
+            const container = document.getElementById("porcao-sizes-container");
+            container.innerHTML = "";
+            pesoSelecionado = null;
+
+            Object.keys(porcaoAtual.prices).forEach(chave => {
                 const btn = document.createElement("button");
                 btn.className = "btn-tamanho-opcional";
-                let label = (tam === "P") ? "600g" : (tam === "G" ? "1kg" : tam);
-                btn.innerHTML = `<strong>${label}</strong><br>R$ ${porcaoSelecionada.prices[tam].toFixed(2).replace(".", ",")}`;
+                let label = (chave === "P") ? "600g" : (chave === "G" ? "1kg" : chave);
+                btn.innerHTML = `<strong>${label}</strong><br>R$ ${porcaoAtual.prices[chave].toFixed(2).replace(".", ",")}`;
                 btn.onclick = (e) => {
                     e.stopPropagation();
-                    tamanhoSelecionado = tam;
-                    document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
+                    pesoSelecionado = chave;
+                    container.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
                     btn.classList.add("ativo");
                 };
-                sizesContainer.appendChild(btn);
+                container.appendChild(btn);
             });
             document.getElementById("porcao-options-modal").style.display = "flex";
-        }
+        };
 
         window.fecharModalPorcao = () => document.getElementById("porcao-options-modal").style.display = "none";
 
-        // ADICIONAR COM SEU TOAST DO CSS
-        document.getElementById("btn-confirmar-porcao").onclick = function() {
-            if (!tamanhoSelecionado) { alert("Selecione um tamanho!"); return; }
-            const pesoFinal = (tamanhoSelecionado === "P") ? "600g" : "1kg";
+        document.getElementById("btn-confirmar-porcao").onclick = () => {
+            if (!pesoSelecionado) return alert("Selecione o peso!");
+            
+            const pesoTexto = (pesoSelecionado === "P") ? "600g" : "1kg";
             window.carrinho.push({
-                title: `${porcaoSelecionada.title} (${pesoFinal})`,
-                price: porcaoSelecionada.prices[tamanhoSelecionado],
+                title: `${porcaoAtual.title} (${pesoTexto})`,
+                price: porcaoAtual.prices[pesoSelecionado],
                 qtd: 1
             });
+
             localStorage.setItem('carrinho', JSON.stringify(window.carrinho));
-            
             fecharModalPorcao();
             
-            // LOGICA PARA O SEU TOAST .show
             const toast = document.getElementById("toast-geral");
             toast.classList.add("show");
-            setTimeout(() => { toast.classList.remove("show"); }, 3000);
+            setTimeout(() => toast.classList.remove("show"), 3000);
             
-            if(typeof atualizarCarrinho === "function") atualizarCarrinho();
+            if (typeof atualizarCarrinho === "function") atualizarCarrinho();
         };
 
-        carregar();
+        carregarPorcoes();
     </script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
-            authDomain: "myproject26-10f0e.firebaseapp.com",
-            databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
-            projectId: "myproject26-10f0e",
-            storageBucket: "myproject26-10f0e.firebasestorage.app",
-            messagingSenderId: "884850608032",
-            appId: "1:884850608032:web:79db6983346c3c20edc6c5"
-        };
-        firebase.initializeApp(firebaseConfig);
-        window.db = firebase.database();
-    </script>
-
+    
     <script src="script.js"></script>
 </body>
 </html>
-
