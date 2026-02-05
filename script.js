@@ -482,28 +482,60 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
 // ==================================================
 // SISTEMA DE PORÇÕES (REUTILIZANDO O MODAL SEM MOSTRAR 'PIZZA')
 // ==================================================
+// ==================================================
+// SISTEMA DE PORÇÕES (VISUAL IGUAL AOS BURGERS)
+// ==================================================
 
 let porcaoAtual = null;
 let pesoSelecionado = null;
 
+// 1. CARREGAR PORÇÕES (COM O MESMO CARD DOS BURGERS)
+async function carregarPorcoes() {
+    const grid = document.getElementById("porcoes"); // Seu ID
+    if (!grid) return;
+
+    try {
+        const res = await fetch("content/produtos.json");
+        const data = await res.json();
+        const itens = data.produtos.filter(p => p.categoria === "porcao");
+
+        grid.innerHTML = "";
+        itens.forEach(p => {
+            // Pega o preço da porção de 600g (P) para o card
+            const precoBase = p.prices && p.prices["P"] ? p.prices["P"] : 0;
+            
+            grid.innerHTML += `
+                <div class="card-produto">
+                    <img src="${p.image}" alt="${p.title}">
+                    <div class="card-content">
+                        <h3>${p.title}</h3>
+                        <p>${p.ingredientes}</p>
+                        <div class="preco-container">
+                            <span class="preco">A partir de R$ ${precoBase.toFixed(2).replace(".", ",")}</span>
+                        </div>
+                        <button onclick="abrirModalPorcao('${p.title}')">Escolher Peso</button>
+                    </div>
+                </div>`;
+        });
+    } catch (e) { console.error("Erro ao carregar porções:", e); }
+}
+
+// 2. ABRIR MODAL DA PORÇÃO (REUTILIZANDO O MODAL SEM PARECER PIZZA)
 function abrirModalPorcao(nome) {
-    // 1. Busca a porção no seu JSON
     porcaoAtual = produtos.find(p => p.title === nome);
     if (!porcaoAtual) return;
 
-    // 2. Limpa e Troca os textos do Modal (O usuário só vê o nome da Porção)
     document.getElementById("modal-pizza-img").src = porcaoAtual.image;
     document.getElementById("pizza-modal-title").innerText = porcaoAtual.title;
     document.getElementById("pizza-modal-desc").innerText = porcaoAtual.ingredientes;
     
-    // 3. SEGREDO: Esconde a lista de sabores de pizza e as instruções de fatias
+    // ESCONDE elementos exclusivos de pizza
     if (document.getElementById("secao-sabores")) {
         document.getElementById("secao-sabores").style.display = "none";
     }
     const instrucaoPizza = document.querySelector(".instrucao");
     if (instrucaoPizza) instrucaoPizza.style.display = "none";
 
-    // 4. Cria os botões de peso (Tradução Visual: P -> 600g | G -> 1kg)
     pesoSelecionado = null;
     const containerTamanhos = document.getElementById("pizza-sizes-container");
     containerTamanhos.innerHTML = "";
@@ -512,7 +544,7 @@ function abrirModalPorcao(nome) {
         const btn = document.createElement("button");
         btn.className = "btn-tamanho-opcional";
 
-        // Aqui é onde a "mágica" acontece: o cliente vê o peso, não a letra
+        // Tradução Visual: P -> 600g | G -> 1kg
         let textoExibicao = (chave === "P") ? "600g" : "1kg";
 
         btn.innerHTML = `<strong>${textoExibicao}</strong><br>R$ ${porcaoAtual.prices[chave].toFixed(2).replace(".", ",")}`;
@@ -526,14 +558,15 @@ function abrirModalPorcao(nome) {
         containerTamanhos.appendChild(btn);
     });
 
-    // 5. Mostra o modal (que agora só tem cara de porção)
     document.getElementById("pizza-options-modal").style.display = "flex";
 
-    // 6. Muda o comando do botão "Adicionar" para a lógica de porção
-    document.getElementById("btn-adicionar-pizza").innerText = "Adicionar ao Carrinho";
-    document.getElementById("btn-adicionar-pizza").onclick = adicionarPorcaoAoCarrinho;
+    // Ajusta o botão de confirmação
+    const btnAdd = document.getElementById("btn-adicionar-pizza");
+    btnAdd.innerText = "Adicionar ao Carrinho";
+    btnAdd.onclick = adicionarPorcaoAoCarrinho;
 }
 
+// 3. MANDAR A PORÇÃO PARA O CARRINHO
 function adicionarPorcaoAoCarrinho() {
     if (!pesoSelecionado) {
         alert("Por favor, selecione o peso (600g ou 1kg)!");
@@ -553,10 +586,10 @@ function adicionarPorcaoAoCarrinho() {
     salvarCarrinho();
     atualizarCarrinho();
     
-    // Fecha o modal
     document.getElementById("pizza-options-modal").style.display = "none";
     if(typeof mostrarToast === "function") mostrarToast();
 }
+
 
 
 
