@@ -136,19 +136,24 @@ function adicionarCarrinhoPorProduto(p) {
 // LÓGICA DO CARRINHO (ATUALIZAR E REMOVER) - REVISADA
 // ==================================================
 
+// ==================================================
+// CONTROLE DO CARRINHO (ATUALIZAR E REMOVER)
+// ==================================================
+
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
     if (!box) return;
     
-    // 1. Limpa o HTML antes de desenhar (isso evita a duplicação)
+    // 1. Limpa o HTML antes de desenhar
     box.innerHTML = ""; 
     let valorTotal = 0;
 
-    // 2. Sincroniza os dados
-    carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
+    // 2. Pega os dados mais recentes do LocalStorage
+    // Usamos window.carrinho para garantir sincronia total
+    window.carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
 
     // 3. Desenha os itens
-    carrinho.forEach((i, index) => {
+    window.carrinho.forEach((i, index) => {
         const valorItem = i.price * i.qtd;
         valorTotal += valorItem;
         
@@ -170,6 +175,25 @@ function atualizarCarrinho() {
         totalEl.innerText = `Total: R$ ${valorTotal.toFixed(2).replace(".", ",")}`;
     }
 }
+
+// ESTA FUNÇÃO PRECISA ESTAR AQUI PARA O BOTÃO (X) FUNCIONAR
+window.removerItem = function(index) {
+    // 1. Carrega a lista do banco local
+    let lista = JSON.parse(localStorage.getItem("carrinho")) || [];
+    
+    // 2. Remove o item pelo índice
+    lista.splice(index, 1);
+    
+    // 3. Salva a lista atualizada de volta no banco local
+    localStorage.setItem("carrinho", JSON.stringify(lista));
+    
+    // 4. Sincroniza a variável global
+    window.carrinho = lista;
+    if (typeof carrinho !== 'undefined') carrinho = lista;
+
+    // 5. Manda atualizar a tela na hora
+    atualizarCarrinho();
+};
 // AQUI É O CARRINHO
 
 
@@ -637,6 +661,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
