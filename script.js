@@ -294,6 +294,7 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarStatusLoja();
     carregarProdutos();
     carregarDogs();
+    carregarPorcoes();
     carregarBebidas(); 
     carregarPizzas(); // <--- FALTAVA ESSA LINHA PARA AS PIZZAS APARECEREM
     carregarCarrinhoStorage();
@@ -589,6 +590,7 @@ function adicionarPorcaoAoCarrinho() {
     document.getElementById("pizza-options-modal").style.display = "none";
     if(typeof mostrarToast === "function") mostrarToast();
 }
+
 
 
 
