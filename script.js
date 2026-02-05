@@ -479,6 +479,84 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
 };
 
 
+// ==================================================
+// SISTEMA DE PORÇÕES (REUTILIZANDO O MODAL SEM MOSTRAR 'PIZZA')
+// ==================================================
+
+let porcaoAtual = null;
+let pesoSelecionado = null;
+
+function abrirModalPorcao(nome) {
+    // 1. Busca a porção no seu JSON
+    porcaoAtual = produtos.find(p => p.title === nome);
+    if (!porcaoAtual) return;
+
+    // 2. Limpa e Troca os textos do Modal (O usuário só vê o nome da Porção)
+    document.getElementById("modal-pizza-img").src = porcaoAtual.image;
+    document.getElementById("pizza-modal-title").innerText = porcaoAtual.title;
+    document.getElementById("pizza-modal-desc").innerText = porcaoAtual.ingredientes;
+    
+    // 3. SEGREDO: Esconde a lista de sabores de pizza e as instruções de fatias
+    if (document.getElementById("secao-sabores")) {
+        document.getElementById("secao-sabores").style.display = "none";
+    }
+    const instrucaoPizza = document.querySelector(".instrucao");
+    if (instrucaoPizza) instrucaoPizza.style.display = "none";
+
+    // 4. Cria os botões de peso (Tradução Visual: P -> 600g | G -> 1kg)
+    pesoSelecionado = null;
+    const containerTamanhos = document.getElementById("pizza-sizes-container");
+    containerTamanhos.innerHTML = "";
+    
+    Object.keys(porcaoAtual.prices).forEach(chave => {
+        const btn = document.createElement("button");
+        btn.className = "btn-tamanho-opcional";
+
+        // Aqui é onde a "mágica" acontece: o cliente vê o peso, não a letra
+        let textoExibicao = (chave === "P") ? "600g" : "1kg";
+
+        btn.innerHTML = `<strong>${textoExibicao}</strong><br>R$ ${porcaoAtual.prices[chave].toFixed(2).replace(".", ",")}`;
+        
+        btn.onclick = () => {
+            pesoSelecionado = chave;
+            document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
+            btn.classList.add("ativo");
+        };
+        
+        containerTamanhos.appendChild(btn);
+    });
+
+    // 5. Mostra o modal (que agora só tem cara de porção)
+    document.getElementById("pizza-options-modal").style.display = "flex";
+
+    // 6. Muda o comando do botão "Adicionar" para a lógica de porção
+    document.getElementById("btn-adicionar-pizza").innerText = "Adicionar ao Carrinho";
+    document.getElementById("btn-adicionar-pizza").onclick = adicionarPorcaoAoCarrinho;
+}
+
+function adicionarPorcaoAoCarrinho() {
+    if (!pesoSelecionado) {
+        alert("Por favor, selecione o peso (600g ou 1kg)!");
+        return;
+    }
+
+    const valor = porcaoAtual.prices[pesoSelecionado];
+    const rotuloPeso = (pesoSelecionado === "P") ? "600g" : "1kg";
+    
+    carrinho.push({
+        title: `${porcaoAtual.title} (${rotuloPeso})`,
+        price: valor,
+        qtd: 1,
+        categoria: "porcao"
+    });
+
+    salvarCarrinho();
+    atualizarCarrinho();
+    
+    // Fecha o modal
+    document.getElementById("pizza-options-modal").style.display = "none";
+    if(typeof mostrarToast === "function") mostrarToast();
+}
 
 
 
