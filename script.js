@@ -487,106 +487,118 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
 // SISTEMA DE PORÇÕES (VISUAL IGUAL AOS BURGERS)
 // ==================================================
 // VARIÁVEIS GLOBAIS PARA CONTROLE
-let itemAtual = null;
-let opcaoSelecionada = null;
+// ==================================================
+// SISTEMA DE PORÇÕES (REUTILIZANDO MODAL DA PIZZA)
+// ==================================================
 
-// 1. CARREGAR PORÇÕES
+let porcaoAtual = null;
+let pesoSelecionado = null;
+
+// 1. CARREGAR PORÇÕES NO CARD-PRODUTO
 async function carregarPorcoes() {
-    const grid = document.getElementById("porcoes-grid");
+    const grid = document.getElementById("porcoes"); // Use o seu ID da div de porções
     if (!grid) return;
 
     try {
         const res = await fetch("content/produtos.json");
         const data = await res.json();
-        const itens = data.produtos.filter(p => p.categoria === "porcao");
+        
+        // Sincroniza a variável 'produtos' global para que o find funcione
+        produtos = data.produtos; 
+
+        const itens = produtos.filter(p => p.categoria === "porcao");
 
         grid.innerHTML = "";
         itens.forEach(p => {
-            const precoBase = p.prices && p.prices["P"] ? p.prices["P"] : 0;
-            
             grid.innerHTML += `
                 <div class="card-produto">
                     <img src="${p.image}" alt="${p.title}">
                     <div class="card-content">
                         <h3>${p.title}</h3>
                         <p>${p.ingredientes}</p>
-                        <div class="preco-container">
-                            <span class="preco">A partir de R$ ${precoBase.toFixed(2).replace(".", ",")}</span>
-                        </div>
-                        <button onclick="abrirModalOpcoes('${p.title}')">Escolher Peso</button>
+                        <button class="btn-vermelho" onclick="abrirModalPorcao('${p.title}')">
+                            ESCOLHER TAMANHO
+                        </button>
                     </div>
                 </div>`;
         });
-        
-        // Salva os produtos globalmente para o modal achar depois
-        window.todosProdutos = data.produtos;
     } catch (e) { console.error("Erro ao carregar porções:", e); }
 }
 
-// 2. ABRIR MODAL GENÉRICO
-function abrirModalOpcoes(nome) {
-    // Busca o produto na lista global
-    itemAtual = window.todosProdutos.find(p => p.title === nome);
-    if (!itemAtual) return;
+// 2. ABRIR MODAL (USANDO OS IDs DO MODAL DE PIZZA)
+function abrirModalPorcao(nome) {
+    porcaoAtual = produtos.find(p => p.title === nome);
+    if (!porcaoAtual) return;
 
-    // Preenche o Modal
-    document.getElementById("modal-img-custom").src = itemAtual.image;
-    document.getElementById("modal-titulo-custom").innerText = itemAtual.title;
-    document.getElementById("modal-desc-custom").innerText = itemAtual.ingredientes;
+    // USANDO OS IDs DO SEU MODAL DE PIZZA QUE JÁ FUNCIONA
+    document.getElementById("modal-pizza-img").src = porcaoAtual.image;
+    document.getElementById("pizza-modal-title").innerText = porcaoAtual.title;
+    document.getElementById("pizza-modal-desc").innerText = porcaoAtual.ingredientes;
     
-    opcaoSelecionada = null;
-    const container = document.getElementById("container-tamanhos-custom");
-    container.innerHTML = "";
+    // ESCONDE A PARTE DE SABORES (Porção não escolhe sabores/fatias)
+    const secaoSabores = document.getElementById("secao-sabores");
+    if(secaoSabores) secaoSabores.style.display = "none";
     
-    // Gera botões de peso (P = 600g, G = 1kg)
-    Object.keys(itemAtual.prices).forEach(chave => {
+    const instrucao = document.querySelector(".instrucao");
+    if(instrucao) instrucao.style.display = "none";
+
+    pesoSelecionado = null;
+    const containerTamanhos = document.getElementById("pizza-sizes-container");
+    containerTamanhos.innerHTML = "";
+    
+    // GERA BOTÕES (P=600g, G=1kg)
+    Object.keys(porcaoAtual.prices).forEach(chave => {
         const btn = document.createElement("button");
         btn.className = "btn-tamanho-opcional";
+        
+        // Tradução visual profissional
         let label = (chave === "P") ? "600g" : (chave === "G" ? "1kg" : chave);
 
-        btn.innerHTML = `<strong>${label}</strong><br>R$ ${itemAtual.prices[chave].toFixed(2).replace(".", ",")}`;
+        btn.innerHTML = `<strong>${label}</strong><br>R$ ${porcaoAtual.prices[chave].toFixed(2).replace(".", ",")}`;
         
         btn.onclick = () => {
-            opcaoSelecionada = chave;
+            pesoSelecionado = chave;
             document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
             btn.classList.add("ativo");
         };
-        container.appendChild(btn);
+        
+        containerTamanhos.appendChild(btn);
     });
 
-    document.getElementById("modal-opcoes-custom").style.display = "flex";
-    document.getElementById("btn-confirmar-custom").onclick = adicionarOpcaoAoCarrinho;
+    // ABRE O MODAL DE PIZZA (Mas com dados de porção)
+    document.getElementById("pizza-options-modal").style.display = "flex";
+
+    // RECONFIGURA O BOTÃO DE ADICIONAR PARA USAR A FUNÇÃO DE PORÇÃO
+    const btnAdd = document.getElementById("btn-adicionar-pizza");
+    btnAdd.innerText = "ADICIONAR AO CARRINHO";
+    btnAdd.onclick = adicionarPorcaoAoCarrinho;
 }
 
-// 3. FECHAR MODAL
-function fecharModalCustom() {
-    document.getElementById("modal-opcoes-custom").style.display = "none";
-}
-
-// 4. ADICIONAR AO CARRINHO
-function adicionarOpcaoAoCarrinho() {
-    if (!opcaoSelecionada) {
-        alert("Selecione um peso antes de adicionar!");
+// 3. ADICIONAR AO CARRINHO
+function adicionarPorcaoAoCarrinho() {
+    if (!pesoSelecionado) {
+        alert("Por favor, selecione o tamanho (600g ou 1kg)!");
         return;
     }
 
-    const valor = itemAtual.prices[opcaoSelecionada];
-    const pesoTexto = (opcaoSelecionada === "P") ? "600g" : "1kg";
+    const valor = porcaoAtual.prices[pesoSelecionado];
+    const textoPeso = (pesoSelecionado === "P") ? "600g" : (pesoSelecionado === "G" ? "1kg" : pesoSelecionado);
     
-    // Supondo que seu array de carrinho se chame 'carrinho'
     carrinho.push({
-        title: `${itemAtual.title} (${pesoTexto})`,
+        title: `${porcaoAtual.title} (${textoPeso})`,
         price: valor,
         qtd: 1,
         categoria: "porcao"
     });
 
-    if(window.salvarCarrinho) salvarCarrinho();
-    if(window.atualizarCarrinho) atualizarCarrinho();
+    salvarCarrinho();
+    atualizarCarrinho();
     
-    fecharModalCustom();
-    alert("Adicionado ao carrinho!");
+    // FECHA O MODAL
+    document.getElementById("pizza-options-modal").style.display = "none";
+    if(typeof mostrarToast === "function") mostrarToast();
 }
 
 // Inicializa ao carregar a página
 document.addEventListener("DOMContentLoaded", carregarPorcoes);
+
