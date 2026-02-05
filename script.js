@@ -139,12 +139,15 @@ function adicionarCarrinhoPorProduto(p) {
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
     if (!box) return;
-    box.innerHTML = "";
+    
+    // 1. Limpa o HTML antes de desenhar (isso evita a duplicação)
+    box.innerHTML = ""; 
     let valorTotal = 0;
 
-    // Sincroniza a variável 'carrinho' com o localStorage
+    // 2. Sincroniza os dados
     carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
 
+    // 3. Desenha os itens
     carrinho.forEach((i, index) => {
         const valorItem = i.price * i.qtd;
         valorTotal += valorItem;
@@ -153,7 +156,7 @@ function atualizarCarrinho() {
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
                 <div style="flex: 1;">
                     <span style="font-weight: bold; display: block; font-size: 0.9rem;">${i.title}</span>
-                    <small style="color: #666;">${i.qtd}x R$ ${i.price.toFixed(2).replace(".", ",")}</small>
+                    <small style="color: #111; font-weight: 700;">${i.qtd}x R$ ${i.price.toFixed(2).replace(".", ",")}</small>
                 </div>
                 <div style="display: flex; align-items: center;">
                     <button onclick="removerItem(${index})" style="background: #ff4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-weight: bold;">✕</button>
@@ -161,23 +164,12 @@ function atualizarCarrinho() {
             </div>`;
     });
 
-    // Atualiza o Total no rodapé do modal
+    // 4. Atualiza o Total final
     const totalEl = document.getElementById("total");
     if (totalEl) {
         totalEl.innerText = `Total: R$ ${valorTotal.toFixed(2).replace(".", ",")}`;
     }
 }
-
-window.removerItem = function(index) {
-    let listaAtual = JSON.parse(localStorage.getItem("carrinho")) || [];
-    listaAtual.splice(index, 1);
-    
-    carrinho = listaAtual;
-    window.carrinho = listaAtual;
-    localStorage.setItem("carrinho", JSON.stringify(listaAtual));
-    
-    atualizarCarrinho();
-};
 // AQUI É O CARRINHO
 
 
@@ -645,6 +637,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
