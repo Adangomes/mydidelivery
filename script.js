@@ -516,6 +516,48 @@ window.fecharCarrinho = function() {
 
 // --- LÓGICA DAS PORÇÕES ---
 
+// --- VARIÁVEIS GLOBAIS ---
+let porcaoAtual = null;
+let pesoSelecionado = null;
+window.carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+// --- 1. FUNÇÕES DE INTERFACE (MENU E CARRINHO) ---
+const hamburger = document.getElementById("hamburger");
+const mobileMenu = document.getElementById("mobile-menu");
+
+if (hamburger) {
+    hamburger.onclick = (e) => {
+        e.stopPropagation();
+        mobileMenu.classList.toggle("active");
+    };
+}
+
+// Fecha menu ao clicar fora
+document.addEventListener("click", (e) => {
+    if (mobileMenu && !mobileMenu.contains(e.target) && e.target !== hamburger) {
+        mobileMenu.classList.remove("active");
+    }
+});
+
+// Função para abrir o carrinho
+window.abrirCarrinho = function() {
+    const cartModal = document.getElementById("cart-modal");
+    if (cartModal) {
+        cartModal.style.display = "flex";
+        // Tenta rodar a atualização visual do carrinho que está no seu script.js
+        if (typeof atualizarCarrinho === "function") atualizarCarrinho();
+    } else {
+        // Caso o modal do carrinho não esteja no HTML dessa página, redireciona ou avisa
+        console.log("Modal do carrinho não encontrado nesta página.");
+    }
+};
+
+window.fecharCarrinho = function() {
+    const cartModal = document.getElementById("cart-modal");
+    if (cartModal) cartModal.style.display = "none";
+};
+
+// --- 2. CARREGAR PRODUTOS (PORÇÕES) ---
 async function carregarPorcoes() {
     const grid = document.getElementById("porcoes-container");
     if (!grid) return;
@@ -524,11 +566,12 @@ async function carregarPorcoes() {
         const res = await fetch("content/produtos.json?v=" + Date.now());
         const data = await res.json();
         const listaPorcoes = data.produtos.filter(p => p.categoria === "porcao");
+        window.produtosPorcoes = listaPorcoes;
 
         grid.innerHTML = "";
         listaPorcoes.forEach(p => {
             grid.innerHTML += `
-                <div class="card-produto" onclick="abrirModalPorcao('${p.title}')">
+                <div class="card-produto" onclick="abrirModalPorcao('${p.title}')" style="cursor:pointer">
                     <img src="${p.image}" alt="${p.title}">
                     <div class="card-content">
                         <h3>${p.title}</h3>
@@ -537,11 +580,10 @@ async function carregarPorcoes() {
                     </div>
                 </div>`;
         });
-        window.produtosPorcoes = listaPorcoes;
     } catch (e) { console.error("Erro ao carregar porções:", e); }
 }
 
-// Tornar a função global para o onclick do card funcionar
+// --- 3. LÓGICA DO MODAL DE OPÇÕES ---
 window.abrirModalPorcao = function(nome) {
     porcaoAtual = window.produtosPorcoes.find(p => p.title === nome);
     if (!porcaoAtual) return;
@@ -570,16 +612,18 @@ window.abrirModalPorcao = function(nome) {
     });
 
     document.getElementById("porcao-options-modal").style.display = "flex";
-}
+};
 
 window.fecharModalPorcao = function() {
     document.getElementById("porcao-options-modal").style.display = "none";
-}
+};
 
-// BOTÃO ADICIONAR (COM TOAST DISCRETO)
-const btnAddPorcao = document.getElementById("btn-adicionar-porcao");
-if (btnAddPorcao) {
-    btnAddPorcao.onclick = function() {
+// --- 4. BOTÃO ADICIONAR COM SEU TOAST ---
+// Verificamos os dois IDs possíveis para não dar erro
+const btnAdd = document.getElementById("btn-confirmar-porcao") || document.getElementById("btn-adicionar-porcao");
+
+if (btnAdd) {
+    btnAdd.onclick = function() {
         if (!pesoSelecionado) {
             alert("Por favor, selecione o peso da porção!");
             return;
@@ -587,9 +631,6 @@ if (btnAddPorcao) {
 
         const valor = porcaoAtual.prices[pesoSelecionado];
         const pesoTexto = (pesoSelecionado === "P") ? "600g" : "1kg";
-
-        // Adiciona ao carrinho (Garante que o array existe)
-        if (!window.carrinho) window.carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 
         window.carrinho.push({
             title: `${porcaoAtual.title} (${pesoTexto})`,
@@ -600,7 +641,7 @@ if (btnAddPorcao) {
 
         localStorage.setItem('carrinho', JSON.stringify(window.carrinho));
         
-        // Tenta rodar funções do script.js se existirem
+        // Atualiza o visual se a função existir no seu script.js
         if(typeof atualizarCarrinho === "function") atualizarCarrinho();
         
         fecharModalPorcao();
@@ -614,5 +655,6 @@ if (btnAddPorcao) {
     };
 }
 
-// Inicia
+// Inicia a carga quando a página abre
 document.addEventListener("DOMContentLoaded", carregarPorcoes);
+
