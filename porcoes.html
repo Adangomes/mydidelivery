@@ -113,24 +113,37 @@
         <footer class="footer"><p>Sistema Desenvolvido por Adan Gomes</p></footer>
     </div>
 
-    <div id="modal-opcoes-custom" class="modal-custom-full">
-        <div class="modal-custom-container">
-            <button onclick="fecharModalCustom()" class="btn-fechar-modal">✕</button>
-            <div class="modal-header-img">
-                <img id="modal-img-custom" src="" alt="Produto">
-            </div>
-            <div class="modal-details">
-                <h2 id="modal-titulo-custom">Nome</h2>
-                <p id="modal-desc-custom">Descrição...</p>
-                
-                <div class="secao-titulo">Escolha o Peso</div>
-                <div id="container-tamanhos-custom" class="sizes-row"></div>
-            </div>
-            <div style="padding: 15px;">
-                <button id="btn-confirmar-custom" class="btn-final-adicionar">ADICIONAR AO CARRINHO</button>
-            </div>
-        </div>
+    <!-- MODAL DE PORÇÕES -->
+<div id="porcao-modal" class="modal-pizza-full" style="display:none;">
+  <div class="modal-pizza-container">
+
+    <button class="btn-fechar-modal" onclick="fecharModalPorcao()">✕</button>
+
+    <div class="pizza-header-img">
+      <img id="porcao-img" src="" alt="Porção">
     </div>
+
+    <div class="pizza-details">
+      <h2 id="porcao-nome">Nome da Porção</h2>
+      <p id="porcao-desc">Descrição da porção</p>
+
+      <div class="secao-titulo">Quantidade</div>
+
+      <div style="display:flex; justify-content:center; gap:15px; margin-top:10px;">
+        <button class="btn-fatia" onclick="alterarQtdPorcao(-1)">-</button>
+        <span id="qtd-porcao" style="font-size:18px;font-weight:bold;">1</span>
+        <button class="btn-fatia" onclick="alterarQtdPorcao(1)">+</button>
+      </div>
+    </div>
+
+    <div class="pizza-footer" style="padding:15px;">
+      <button class="btn-final-adicionar" onclick="adicionarPorcaoCarrinho()">
+        ADICIONAR AO CARRINHO
+      </button>
+    </div>
+
+  </div>
+</div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
@@ -150,4 +163,5 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
