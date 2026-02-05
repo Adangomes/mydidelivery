@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="styles.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Estilos específicos para o Modal de Porções */
+        /* Apenas estilos estruturais do modal que são específicos desta tela */
         .modal-pizza-full {
             position: fixed;
             top: 0; left: 0;
@@ -52,9 +52,7 @@
 </head>
 <body>
 
-    <div id="splash" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#000; z-index:10000; display:flex; justify-content:center; align-items:center; color:#fff;">
-        <h2>Carregando Porções...</h2>
-    </div>
+    <div id="splash" style="display: none;"></div>
 
     <div id="menu">
         <header class="header">
@@ -118,6 +116,11 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     
     <script>
+        let porcaoAtual = null;
+        let pesoSelecionado = null;
+        window.produtosPorcoes = [];
+
+        // Inicializa Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
             authDomain: "myproject26-10f0e.firebaseapp.com",
@@ -130,13 +133,84 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         window.db = firebase.database();
 
-        // DESTRAVAR SPLASH
-        window.addEventListener("load", () => {
-            setTimeout(() => {
-                const splash = document.getElementById("splash");
-                if(splash) splash.style.display = "none";
-            }, 1000);
-        });
+        // Funções do Modal (Globais)
+        window.fecharModalPorcao = () => document.getElementById("porcao-options-modal").style.display = "none";
+
+        window.abrirModalPorcao = function(nome) {
+            porcaoAtual = window.produtosPorcoes.find(p => p.title === nome);
+            if (!porcaoAtual) return;
+
+            document.getElementById("modal-porcao-img").src = porcaoAtual.image;
+            document.getElementById("porcao-modal-title").innerText = porcaoAtual.title;
+            document.getElementById("porcao-modal-desc").innerText = porcaoAtual.ingredientes;
+
+            const container = document.getElementById("porcao-sizes-container");
+            container.innerHTML = "";
+            pesoSelecionado = null;
+
+            Object.keys(porcaoAtual.prices).forEach(chave => {
+                const btn = document.createElement("button");
+                btn.className = "btn-tamanho-opcional";
+                let label = (chave === "P") ? "600g" : (chave === "G" ? "1kg" : chave);
+                btn.innerHTML = `<strong>${label}</strong><br>R$ ${porcaoAtual.prices[chave].toFixed(2).replace(".", ",")}`;
+                
+                btn.onclick = (e) => {
+                    e.stopPropagation();
+                    pesoSelecionado = chave;
+                    container.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
+                    btn.classList.add("ativo");
+                };
+                container.appendChild(btn);
+            });
+            document.getElementById("porcao-options-modal").style.display = "flex";
+        };
+
+        // Carregar do JSON
+        async function carregarPorcoes() {
+            const grid = document.getElementById("porcoes-container");
+            try {
+                const res = await fetch("content/produtos.json?v=" + Date.now());
+                const data = await res.json();
+                window.produtosPorcoes = data.produtos.filter(p => p.categoria === "porcao");
+
+                grid.innerHTML = "";
+                window.produtosPorcoes.forEach(p => {
+                    grid.innerHTML += `
+                        <div class="card-produto" onclick="abrirModalPorcao('${p.title}')">
+                            <img src="${p.image}">
+                            <div class="card-content">
+                                <h3>${p.title}</h3>
+                                <p>${p.ingredientes}</p>
+                                <button class="btn-vermelho">ESCOLHER TAMANHO</button>
+                            </div>
+                        </div>`;
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        // Lógica Adicionar + Toast + Fechar Modal
+        document.getElementById("btn-confirmar-porcao").onclick = function() {
+            if (!pesoSelecionado) return alert("Selecione um tamanho!");
+
+            const pesoTexto = (pesoSelecionado === "P") ? "600g" : "1kg";
+            let carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+            carrinho.push({
+                title: `${porcaoAtual.title} (${pesoTexto})`,
+                price: porcaoAtual.prices[pesoSelecionado],
+                qtd: 1
+            });
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+
+            // Ações de fechamento e feedback
+            fecharModalPorcao();
+            const toast = document.getElementById("toast-geral");
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 2500);
+
+            if (typeof atualizarCarrinho === "function") atualizarCarrinho();
+        };
+
+        carregarPorcoes();
     </script>
     
     <script src="script.js"></script>
