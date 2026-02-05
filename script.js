@@ -558,18 +558,6 @@ window.fecharCarrinho = function() {
 };
 
 // --- 2. CARREGAR PRODUTOS (PORÇÕES) ---
-// --- CONFIGURAÇÃO FIREBASE ---
-const firebaseConfig = {
-    apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
-    authDomain: "myproject26-10f0e.firebaseapp.com",
-    databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
-    projectId: "myproject26-10f0e",
-    storageBucket: "myproject26-10f0e.firebasestorage.app",
-    messagingSenderId: "884850608032",
-    appId: "1:884850608032:web:79db6983346c3c20edc6c5"
-};
-firebase.initializeApp(firebaseConfig);
-window.db = firebase.database();
 
 // --- VARIÁVEIS GLOBAIS ---
 let porcaoAtual = null;
@@ -712,3 +700,4 @@ if (btnAdd) {
 
 // Inicia a carga quando a página abre
 document.addEventListener("DOMContentLoaded", carregarPorcoes);
+
