@@ -128,21 +128,62 @@ function adicionarCarrinhoPorProduto(p) {
     salvarCarrinho(); atualizarCarrinho(); mostrarToast();
 }
 
+// ==================================================
+// LÓGICA DO CARRINHO (ATUALIZAR E REMOVER)
+// ==================================================
+
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
     if (!box) return;
     box.innerHTML = "";
     let subtotal = 0;
-    carrinho.forEach(i => {
-        subtotal += i.price * i.qtd;
-        box.innerHTML += `<div>${i.title} x${i.qtd} <strong>R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}</strong></div>`;
+
+    // Sincroniza as variáveis (usa a que tiver dados ou array vazio)
+    let itensParaRenderizar = (carrinho && carrinho.length > 0) ? carrinho : (window.carrinho || []);
+
+    itensParaRenderizar.forEach((i, index) => {
+        const valorItem = i.price * i.qtd;
+        subtotal += valorItem;
+        
+        box.innerHTML += `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
+                <div style="flex: 1;">
+                    <span style="font-weight: bold; display: block; font-size: 0.9rem;">${i.title}</span>
+                    <small style="color: #666;">${i.qtd}x R$ ${i.price.toFixed(2).replace(".", ",")}</small>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <strong style="white-space: nowrap;">R$ ${valorItem.toFixed(2).replace(".", ",")}</strong>
+                    <button onclick="removerItem(${index})" style="background: #ff4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-weight: bold;">✕</button>
+                </div>
+            </div>`;
     });
+
+    // Atualiza os textos de preço no modal
     const subtotalEl = document.getElementById("subtotal");
     if (subtotalEl) subtotalEl.innerText = `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}`;
+    
     const totalEl = document.getElementById("total");
     if (totalEl) totalEl.innerText = `Total: R$ ${subtotal.toFixed(2).replace(".", ",")}`;
 }
 
+// FUNÇÃO GLOBAL PARA REMOVER ITEM
+window.removerItem = function(index) {
+    // 1. Pega a lista atualizada
+    let listaAtual = (carrinho && carrinho.length > 0) ? carrinho : (window.carrinho || []);
+    
+    // 2. Remove o item do array
+    listaAtual.splice(index, 1);
+    
+    // 3. Sincroniza as variáveis globais para não dar conflito
+    carrinho = listaAtual;
+    window.carrinho = listaAtual;
+
+    // 4. Salva no banco de dados local (localStorage)
+    localStorage.setItem("carrinho", JSON.stringify(listaAtual));
+
+    // 5. Atualiza a tela imediatamente
+    atualizarCarrinho();
+};
 // ==================================================
 // ENTREGA & MODAIS
 // ==================================================
@@ -604,3 +645,4 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
