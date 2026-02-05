@@ -16,17 +16,13 @@ collections:
           - label: "Lista Geral de Produtos"
             name: "produtos"
             widget: "list"
-            summary: '{{title}} ({{categoria}})'
+            summary: '{{fields.title}} ({{fields.categoria}})'
             fields:
               - { label: "Nome", name: "title", widget: "string" }
               - { label: "Categoria", name: "categoria", widget: "select", options: ["burger", "bebida", "pizza", "porcao", "dog"] }
               - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text" }
               - { label: "Imagem", name: "image", widget: "image" }
-              
-              # PREÇO SIMPLES (Para Burger, Dog e Bebida)
               - { label: "Preço Único (Burger/Dog/Bebida)", name: "price", widget: "number", value_type: "float", required: false }
-              
-              # PREÇOS MÚLTIPLOS (Para Pizza e Porção)
               - label: "Preços por Tamanho (Pizza/Porção)"
                 name: "prices"
                 widget: "object"
@@ -36,6 +32,13 @@ collections:
                   - { label: "Média (Só Pizza)", name: "M", widget: "number", value_type: "float", required: false }
                   - { label: "Grande / 1kg", name: "G", widget: "number", value_type: "float", required: false }
 
+  # AQUI ESTAVA O ERRO - AGORA CORRIGIDO
   - name: "configuracoes"
     label: "Configurações da Loja"
-    # ... resto do seu código de config ...
+    files:
+      - file: "content/status.json"
+        label: "Status da Loja"
+        name: "status_loja"
+        fields:
+          - { label: "Loja Aberta?", name: "aberto", widget: "boolean", default: true }
+          - { label: "Mensagem Fechado", name: "mensagem", widget: "string" }
