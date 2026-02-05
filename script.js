@@ -132,18 +132,22 @@ function adicionarCarrinhoPorProduto(p) {
 // LÓGICA DO CARRINHO (ATUALIZAR E REMOVER)
 // ==================================================
 
+// ==================================================
+// LÓGICA DO CARRINHO (ATUALIZAR E REMOVER) - REVISADA
+// ==================================================
+
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
     if (!box) return;
     box.innerHTML = "";
-    let subtotal = 0;
+    let valorTotal = 0;
 
-    // Sincroniza as variáveis (usa a que tiver dados ou array vazio)
-    let itensParaRenderizar = (carrinho && carrinho.length > 0) ? carrinho : (window.carrinho || []);
+    // Sincroniza a variável 'carrinho' com o que está no localStorage ou window
+    carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
 
-    itensParaRenderizar.forEach((i, index) => {
+    carrinho.forEach((i, index) => {
         const valorItem = i.price * i.qtd;
-        subtotal += valorItem;
+        valorTotal += valorItem;
         
         box.innerHTML += `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #eee; padding-bottom: 8px;">
@@ -158,32 +162,37 @@ function atualizarCarrinho() {
             </div>`;
     });
 
-    // Atualiza os textos de preço no modal
-    const subtotalEl = document.getElementById("subtotal");
-    if (subtotalEl) subtotalEl.innerText = `Subtotal: R$ ${subtotal.toFixed(2).replace(".", ",")}`;
-    
+    // Atualiza apenas o Total (removido a duplicação de subtotal)
     const totalEl = document.getElementById("total");
-    if (totalEl) totalEl.innerText = `Total: R$ ${subtotal.toFixed(2).replace(".", ",")}`;
+    if (totalEl) {
+        totalEl.innerText = `Total: R$ ${valorTotal.toFixed(2).replace(".", ",")}`;
+    }
 }
 
 // FUNÇÃO GLOBAL PARA REMOVER ITEM
 window.removerItem = function(index) {
-    // 1. Pega a lista atualizada
-    let listaAtual = (carrinho && carrinho.length > 0) ? carrinho : (window.carrinho || []);
+    // 1. Pega a lista do localStorage
+    let listaAtual = JSON.parse(localStorage.getItem("carrinho")) || [];
     
-    // 2. Remove o item do array
+    // 2. Remove o item específico
     listaAtual.splice(index, 1);
     
-    // 3. Sincroniza as variáveis globais para não dar conflito
+    // 3. Atualiza as variáveis na memória
     carrinho = listaAtual;
     window.carrinho = listaAtual;
 
-    // 4. Salva no banco de dados local (localStorage)
+    // 4. Salva no localStorage
     localStorage.setItem("carrinho", JSON.stringify(listaAtual));
 
-    // 5. Atualiza a tela imediatamente
+    // 5. Atualiza a tela
     atualizarCarrinho();
 };
+// AQUI É O CARRINHO
+
+
+
+
+//
 // ==================================================
 // ENTREGA & MODAIS
 // ==================================================
@@ -645,4 +654,5 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
