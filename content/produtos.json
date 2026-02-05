@@ -17,18 +17,18 @@
       },
       "categoria": "pizza",
       "ingredientes": "Mussarela, calabresa, cebola e orégano",
-      "image": "/imagens/pizza.jgp"
+      "image": "/imagens/pizza.jpg"
     },
     {
-  "title": "Batata frita",
-  "prices": {
-    "P": 30.0,
-    "G": 40.0
-  },
-  "categoria": "porcao",
-  "ingredientes": "batata frita",
-  "image": "/imagens/pizza.jpg"
-}
+      "title": "Batata frita",
+      "prices": {
+        "P": 30.0,
+        "G": 40.0
+      },
+      "categoria": "porcao",
+      "ingredientes": "batata frita",
+      "image": "/imagens/pizza.jpg"
+    },
     {
       "title": "Kings Duplo Bacon",
       "price": 29.9,
@@ -70,14 +70,14 @@
       "price": 8.5,
       "categoria": "bebida",
       "ingredientes": "600ml",
-      "image": "/imagens/teste.jpg" 
+      "image": "/imagens/teste.jpg"
     },
     {
-      "image": "/imagens/teste.jpg",
       "title": "kings burger classic",
       "price": 28,
       "categoria": "burger",
-      "ingredientes": "hamburguer artesanal 150g, queijo prato, pão brioche"
+      "ingredientes": "hamburguer artesanal 150g, queijo prato, pão brioche",
+      "image": "/imagens/teste.jpg"
     }
   ]
 }
