@@ -489,15 +489,40 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
 let porcaoAtual = null;
 let pesoSelecionado = null;
 
-// CARREGAR PORÇÕES
+// --- FUNÇÕES DE INTERFACE (MENU E CARRINHO) ---
+const btnHamburger = document.getElementById("hamburger");
+const menuLateral = document.getElementById("mobile-menu");
+
+if (btnHamburger) {
+    btnHamburger.onclick = (e) => {
+        e.stopPropagation();
+        menuLateral.classList.toggle("active");
+    };
+}
+
+// Abre o carrinho (chamado pelo ícone 🛒 no HTML)
+window.abrirCarrinho = function() {
+    const cartModal = document.getElementById("cart-modal");
+    if (cartModal) {
+        cartModal.style.display = "flex";
+        if (typeof atualizarCarrinho === "function") atualizarCarrinho();
+    }
+};
+
+window.fecharCarrinho = function() {
+    const cartModal = document.getElementById("cart-modal");
+    if (cartModal) cartModal.style.display = "none";
+};
+
+// --- LÓGICA DAS PORÇÕES ---
+
 async function carregarPorcoes() {
     const grid = document.getElementById("porcoes-container");
     if (!grid) return;
 
     try {
-        const res = await fetch("content/produtos.json");
+        const res = await fetch("content/produtos.json?v=" + Date.now());
         const data = await res.json();
-        // Filtra só porções
         const listaPorcoes = data.produtos.filter(p => p.categoria === "porcao");
 
         grid.innerHTML = "";
@@ -512,22 +537,19 @@ async function carregarPorcoes() {
                     </div>
                 </div>`;
         });
-        // Salva a lista completa no window para busca rápida
         window.produtosPorcoes = listaPorcoes;
     } catch (e) { console.error("Erro ao carregar porções:", e); }
 }
 
-// ABRIR O MODAL
-function abrirModalPorcao(nome) {
+// Tornar a função global para o onclick do card funcionar
+window.abrirModalPorcao = function(nome) {
     porcaoAtual = window.produtosPorcoes.find(p => p.title === nome);
     if (!porcaoAtual) return;
 
-    // Preenche imagem, título e descrição
     document.getElementById("modal-porcao-img").src = porcaoAtual.image;
     document.getElementById("porcao-modal-title").innerText = porcaoAtual.title;
     document.getElementById("porcao-modal-desc").innerText = porcaoAtual.ingredientes;
 
-    // Gera botões de tamanho/peso
     const containerTamanhos = document.getElementById("porcao-sizes-container");
     containerTamanhos.innerHTML = "";
     pesoSelecionado = null;
@@ -535,16 +557,12 @@ function abrirModalPorcao(nome) {
     Object.keys(porcaoAtual.prices).forEach(chave => {
         const btn = document.createElement("button");
         btn.className = "btn-tamanho-opcional";
-        
-        // Se for P vira 600g, se for G vira 1kg
         let label = (chave === "P") ? "600g" : (chave === "G" ? "1kg" : chave);
-        
         btn.innerHTML = `<strong>${label}</strong><br>R$ ${porcaoAtual.prices[chave].toFixed(2).replace(".", ",")}`;
         
         btn.onclick = (e) => {
-            e.stopPropagation(); // Evita bugar o clique
+            e.stopPropagation();
             pesoSelecionado = chave;
-            // Remove 'ativo' dos outros e coloca nesse
             containerTamanhos.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
             btn.classList.add("ativo");
         };
@@ -554,34 +572,47 @@ function abrirModalPorcao(nome) {
     document.getElementById("porcao-options-modal").style.display = "flex";
 }
 
-function fecharModalPorcao() {
+window.fecharModalPorcao = function() {
     document.getElementById("porcao-options-modal").style.display = "none";
 }
 
-// BOTÃO ADICIONAR
-document.getElementById("btn-adicionar-porcao").onclick = function() {
-    if (!pesoSelecionado) {
-        alert("Por favor, selecione o peso da porção!");
-        return;
-    }
+// BOTÃO ADICIONAR (COM TOAST DISCRETO)
+const btnAddPorcao = document.getElementById("btn-adicionar-porcao");
+if (btnAddPorcao) {
+    btnAddPorcao.onclick = function() {
+        if (!pesoSelecionado) {
+            alert("Por favor, selecione o peso da porção!");
+            return;
+        }
 
-    const valor = porcaoAtual.prices[pesoSelecionado];
-    const pesoTexto = (pesoSelecionado === "P") ? "600g" : "1kg";
+        const valor = porcaoAtual.prices[pesoSelecionado];
+        const pesoTexto = (pesoSelecionado === "P") ? "600g" : "1kg";
 
-    // Adiciona ao carrinho global (o mesmo das pizzas e bebidas)
-    carrinho.push({
-        title: `${porcaoAtual.title} (${pesoTexto})`,
-        price: valor,
-        qtd: 1,
-        categoria: "porcao"
-    });
+        // Adiciona ao carrinho (Garante que o array existe)
+        if (!window.carrinho) window.carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 
-    if(typeof salvarCarrinho === "function") salvarCarrinho();
-    if(typeof atualizarCarrinho === "function") atualizarCarrinho();
-    
-    fecharModalPorcao();
-    if(typeof mostrarToast === "function") mostrarToast();
-};
+        window.carrinho.push({
+            title: `${porcaoAtual.title} (${pesoTexto})`,
+            price: valor,
+            qtd: 1,
+            categoria: "porcao"
+        });
 
-// Chama a carga inicial
+        localStorage.setItem('carrinho', JSON.stringify(window.carrinho));
+        
+        // Tenta rodar funções do script.js se existirem
+        if(typeof atualizarCarrinho === "function") atualizarCarrinho();
+        
+        fecharModalPorcao();
+
+        // MOSTRA SEU TOAST DISCRETO (.toast .show)
+        const toast = document.getElementById("toast-geral");
+        if (toast) {
+            toast.classList.add("show");
+            setTimeout(() => toast.classList.remove("show"), 3000);
+        }
+    };
+}
+
+// Inicia
 document.addEventListener("DOMContentLoaded", carregarPorcoes);
