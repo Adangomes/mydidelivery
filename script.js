@@ -492,6 +492,9 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
 // ==================================================
 // SISTEMA DE PORÇÕES (FOCO TOTAL NO SEU MODAL CUSTOM)
 // ==================================================
+// ==================================================
+// SISTEMA DE PORÇÕES (VERSÃO FINAL ATUALIZADA)
+// ==================================================
 
 let itemAtual = null;
 let opcaoSelecionada = null; 
@@ -502,10 +505,14 @@ async function carregarPorcoes() {
     if (!grid) return;
 
     try {
-        const res = await fetch("content/produtos.json");
+        // Busca os dados do JSON
+        const res = await fetch("content/produtos.json?v=" + Date.now()); // v= evita cache
         const data = await res.json();
+        
+        // Define a lista global para o modal conseguir encontrar o item depois
         window.produtos = data.produtos; 
 
+        // Filtra apenas porções
         const itens = window.produtos.filter(p => p.categoria === "porcao");
 
         grid.innerHTML = "";
@@ -522,23 +529,32 @@ async function carregarPorcoes() {
                     </div>
                 </div>`;
         });
-    } catch (e) { console.error("Erro ao carregar porções:", e); }
+    } catch (e) { 
+        console.error("Erro ao carregar porções:", e); 
+    }
 }
 
 // 2. FUNÇÃO QUE CHAMA O MODAL
 function abrirModalOpcoes(nome) {
+    // Busca o item na lista que carregamos no Passo 1
     itemAtual = window.produtos ? window.produtos.find(p => p.title === nome) : null;
-    if (!itemAtual) return;
+    
+    if (!itemAtual) {
+        alert("Erro: Produto não encontrado no banco de dados.");
+        return;
+    }
 
     const modalPorcao = document.getElementById("modal-opcoes-custom");
     if (modalPorcao) {
         configurarModalPorcao(modalPorcao);
+    } else {
+        console.error("ID 'modal-opcoes-custom' não encontrado no seu HTML de porções.");
     }
 }
 
-// 3. CONFIGURAÇÃO DO MODAL (IGUAL AO DA PIZZA, MAS PARA PORÇÃO)
+// 3. CONFIGURAÇÃO DO MODAL (ESTILO PIZZA)
 function configurarModalPorcao(modal) {
-    // Preenche Imagem, Título e Descrição
+    // Preenche Imagem, Título e Descrição usando os IDs do seu HTML
     document.getElementById("modal-img-custom").src = itemAtual.image;
     document.getElementById("modal-titulo-custom").innerText = itemAtual.title;
     document.getElementById("modal-desc-custom").innerText = itemAtual.ingredientes;
@@ -547,7 +563,7 @@ function configurarModalPorcao(modal) {
     const container = document.getElementById("container-tamanhos-custom");
     container.innerHTML = "";
     
-    // Gera os botões de 600g e 1kg (P e G)
+    // Gera os botões de 600g e 1kg (baseado nas chaves P e G do seu JSON)
     Object.keys(itemAtual.prices).forEach(chave => {
         const btn = document.createElement("button");
         btn.className = "btn-tamanho-opcional";
@@ -566,23 +582,29 @@ function configurarModalPorcao(modal) {
         container.appendChild(btn);
     });
 
-    // EXIBE O MODAL
+    // EXIBE O MODAL NA TELA
     modal.style.display = "flex";
 
-    // Atribui a função ao botão de adicionar
-    document.getElementById("btn-confirmar-custom").onclick = adicionarPorcaoAoCarrinho;
+    // Atribui a função de salvar ao botão verde
+    const btnConfirmar = document.getElementById("btn-confirmar-custom");
+    if(btnConfirmar) {
+        btnConfirmar.onclick = adicionarPorcaoAoCarrinho;
+    }
 }
 
 // 4. ADICIONAR AO CARRINHO
 function adicionarPorcaoAoCarrinho() {
     if (!opcaoSelecionada) {
-        alert("Por favor, selecione o peso!");
+        alert("Por favor, selecione o peso antes de adicionar!");
         return;
     }
 
     const valor = itemAtual.prices[opcaoSelecionada];
     const textoPeso = (opcaoSelecionada === "P") ? "600g" : "1kg";
     
+    // Cria o objeto para o carrinho (Verifique se a variável 'carrinho' já existe globalmente)
+    if (typeof carrinho === 'undefined') window.carrinho = [];
+
     carrinho.push({
         title: `${itemAtual.title} (${textoPeso})`,
         price: valor,
@@ -590,15 +612,24 @@ function adicionarPorcaoAoCarrinho() {
         categoria: "porcao"
     });
 
-    salvarCarrinho();
-    atualizarCarrinho();
+    // Funções auxiliares (Certifique-se que elas existam no seu script.js principal)
+    if(typeof salvarCarrinho === "function") salvarCarrinho();
+    if(typeof atualizarCarrinho === "function") atualizarCarrinho();
+    
     fecharModalCustom();
+    
     if(typeof mostrarToast === "function") mostrarToast();
 }
 
-// 5. FECHAR
+// 5. FUNÇÃO PARA FECHAR O MODAL
 function fecharModalCustom() { 
     const m = document.getElementById("modal-opcoes-custom");
     if(m) m.style.display = "none"; 
 }
+
+// 6. INICIALIZAÇÃO AUTOMÁTICA
+document.addEventListener("DOMContentLoaded", () => {
+    carregarPorcoes();
+});
+
 
