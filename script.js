@@ -558,6 +558,61 @@ window.fecharCarrinho = function() {
 };
 
 // --- 2. CARREGAR PRODUTOS (PORÇÕES) ---
+// --- CONFIGURAÇÃO FIREBASE ---
+const firebaseConfig = {
+    apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
+    authDomain: "myproject26-10f0e.firebaseapp.com",
+    databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
+    projectId: "myproject26-10f0e",
+    storageBucket: "myproject26-10f0e.firebasestorage.app",
+    messagingSenderId: "884850608032",
+    appId: "1:884850608032:web:79db6983346c3c20edc6c5"
+};
+firebase.initializeApp(firebaseConfig);
+window.db = firebase.database();
+
+// --- VARIÁVEIS GLOBAIS ---
+let porcaoAtual = null;
+let pesoSelecionado = null;
+window.carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+
+// --- 1. FUNÇÕES DE INTERFACE (MENU E CARRINHO) ---
+const hamburger = document.getElementById("hamburger");
+const mobileMenu = document.getElementById("mobile-menu");
+
+if (hamburger) {
+    hamburger.onclick = (e) => {
+        e.stopPropagation();
+        mobileMenu.classList.toggle("active");
+    };
+}
+
+// Fecha menu ao clicar fora
+document.addEventListener("click", (e) => {
+    if (mobileMenu && !mobileMenu.contains(e.target) && e.target !== hamburger) {
+        mobileMenu.classList.remove("active");
+    }
+});
+
+// Função para abrir o carrinho
+window.abrirCarrinho = function() {
+    const cartModal = document.getElementById("cart-modal");
+    if (cartModal) {
+        cartModal.style.display = "flex";
+        // Tenta rodar a atualização visual do carrinho que está no seu script.js
+        if (typeof atualizarCarrinho === "function") atualizarCarrinho();
+    } else {
+        // Caso o modal do carrinho não esteja no HTML dessa página, redireciona ou avisa
+        console.log("Modal do carrinho não encontrado nesta página.");
+    }
+};
+
+window.fecharCarrinho = function() {
+    const cartModal = document.getElementById("cart-modal");
+    if (cartModal) cartModal.style.display = "none";
+};
+
+// --- 2. CARREGAR PRODUTOS (PORÇÕES) ---
 async function carregarPorcoes() {
     const grid = document.getElementById("porcoes-container");
     if (!grid) return;
@@ -657,4 +712,3 @@ if (btnAdd) {
 
 // Inicia a carga quando a página abre
 document.addEventListener("DOMContentLoaded", carregarPorcoes);
-
