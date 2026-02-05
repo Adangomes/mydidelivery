@@ -487,7 +487,7 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
 // MODAL DE PORÇÕES
 // ===============================
 let porcaoSelecionada = null;
-let tamanhoPorcao = null;
+let tamanhoPorcaoSelecionado = null;
 
 // CARREGAR PORÇÕES
 async function carregarPorcoes() {
@@ -498,32 +498,27 @@ async function carregarPorcoes() {
     const data = await res.json();
     produtos = data.produtos;
 
-    const listaPorcoes = produtos.filter(p => p.categoria === "porcao");
+    const porcoes = produtos.filter(p => p.categoria === "porcao");
 
     container.innerHTML = "";
 
-    listaPorcoes.forEach(p => {
+    porcoes.forEach(p => {
         container.innerHTML += `
-            <div class="card-produto">
+            <div class="card-produto" onclick="abrirModalPorcao('${p.title}')">
                 <img src="${p.image}">
                 <div class="card-content">
                     <h3>${p.title}</h3>
-                    <p>${p.ingredientes || ""}</p>
-                    <button onclick="abrirModalPorcao('${p.title}')">
-                        Escolher Tamanho
-                    </button>
+                    <p>${p.ingredientes}</p>
                 </div>
             </div>
         `;
     });
 }
 
-// ABRIR MODAL PORÇÃO
+// ABRIR MODAL
 function abrirModalPorcao(nome) {
     porcaoSelecionada = produtos.find(p => p.title === nome);
     if (!porcaoSelecionada) return;
-
-    tamanhoPorcao = null;
 
     document.getElementById("modal-porcao-img").src = porcaoSelecionada.image;
     document.getElementById("porcao-modal-title").innerText = porcaoSelecionada.title;
@@ -531,37 +526,42 @@ function abrirModalPorcao(nome) {
 
     const sizes = document.getElementById("porcao-sizes-container");
     sizes.innerHTML = "";
+    tamanhoPorcaoSelecionado = null;
 
     Object.keys(porcaoSelecionada.prices).forEach(tam => {
         const btn = document.createElement("button");
         btn.className = "btn-tamanho-opcional";
         btn.innerHTML = `<strong>${tam}</strong><br>R$ ${porcaoSelecionada.prices[tam].toFixed(2).replace(".", ",")}`;
-        btn.onclick = () => {
-            tamanhoPorcao = tam;
-            document.querySelectorAll("#porcao-sizes-container .btn-tamanho-opcional")
-                .forEach(b => b.classList.remove("ativo"));
-            btn.classList.add("ativo");
-        };
+        btn.onclick = () => selecionarTamanhoPorcao(tam, btn);
         sizes.appendChild(btn);
     });
 
     document.getElementById("porcao-modal").style.display = "flex";
 }
 
+// SELECIONAR TAMANHO
+function selecionarTamanhoPorcao(tam, btn) {
+    tamanhoPorcaoSelecionado = tam;
+    document.querySelectorAll("#porcao-sizes-container button")
+        .forEach(b => b.classList.remove("ativo"));
+    btn.classList.add("ativo");
+}
+
+// FECHAR MODAL
 function fecharModalPorcao() {
     document.getElementById("porcao-modal").style.display = "none";
 }
 
-// ADICIONAR PORÇÃO AO CARRINHO
+// ADICIONAR AO CARRINHO
 document.getElementById("btn-adicionar-porcao").onclick = () => {
-    if (!tamanhoPorcao) {
-        alert("Selecione um tamanho");
+    if (!tamanhoPorcaoSelecionado) {
+        alert("Escolha um tamanho!");
         return;
     }
 
     carrinho.push({
-        title: `${porcaoSelecionada.title} (${tamanhoPorcao})`,
-        price: porcaoSelecionada.prices[tamanhoPorcao],
+        title: `${porcaoSelecionada.title} (${tamanhoPorcaoSelecionado})`,
+        price: porcaoSelecionada.prices[tamanhoPorcaoSelecionado],
         qtd: 1,
         categoria: "porcao"
     });
@@ -569,5 +569,5 @@ document.getElementById("btn-adicionar-porcao").onclick = () => {
     salvarCarrinho();
     atualizarCarrinho();
     fecharModalPorcao();
-    if (typeof mostrarToast === "function") mostrarToast();
 };
+
