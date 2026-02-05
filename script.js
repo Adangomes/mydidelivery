@@ -486,164 +486,40 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
 // ===============================
 // MODAL DE PORÇÕES
 // ===============================
-let porcaoAtual = null;
-let pesoSelecionado = null;
-
-// --- FUNÇÕES DE INTERFACE (MENU E CARRINHO) ---
-const btnHamburger = document.getElementById("hamburger");
-const menuLateral = document.getElementById("mobile-menu");
-
-if (btnHamburger) {
-    btnHamburger.onclick = (e) => {
-        e.stopPropagation();
-        menuLateral.classList.toggle("active");
-    };
-}
-
-// Abre o carrinho (chamado pelo ícone 🛒 no HTML)
-window.abrirCarrinho = function() {
-    const cartModal = document.getElementById("cart-modal");
-    if (cartModal) {
-        cartModal.style.display = "flex";
-        if (typeof atualizarCarrinho === "function") atualizarCarrinho();
-    }
-};
-
-window.fecharCarrinho = function() {
-    const cartModal = document.getElementById("cart-modal");
-    if (cartModal) cartModal.style.display = "none";
-};
-
-// --- LÓGICA DAS PORÇÕES ---
-
 // --- VARIÁVEIS GLOBAIS ---
 let porcaoAtual = null;
 let pesoSelecionado = null;
 window.carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
 
-// --- 1. FUNÇÕES DE INTERFACE (MENU E CARRINHO) ---
-const hamburger = document.getElementById("hamburger");
-const mobileMenu = document.getElementById("mobile-menu");
-
-if (hamburger) {
-    hamburger.onclick = (e) => {
-        e.stopPropagation();
-        mobileMenu.classList.toggle("active");
-    };
-}
-
-// Fecha menu ao clicar fora
-document.addEventListener("click", (e) => {
-    if (mobileMenu && !mobileMenu.contains(e.target) && e.target !== hamburger) {
-        mobileMenu.classList.remove("active");
-    }
-});
-
-// Função para abrir o carrinho
-window.abrirCarrinho = function() {
-    const cartModal = document.getElementById("cart-modal");
-    if (cartModal) {
-        cartModal.style.display = "flex";
-        // Tenta rodar a atualização visual do carrinho que está no seu script.js
-        if (typeof atualizarCarrinho === "function") atualizarCarrinho();
-    } else {
-        // Caso o modal do carrinho não esteja no HTML dessa página, redireciona ou avisa
-        console.log("Modal do carrinho não encontrado nesta página.");
-    }
-};
-
-window.fecharCarrinho = function() {
-    const cartModal = document.getElementById("cart-modal");
-    if (cartModal) cartModal.style.display = "none";
-};
-
-// --- 2. CARREGAR PRODUTOS (PORÇÕES) ---
-
-// --- VARIÁVEIS GLOBAIS ---
-let porcaoAtual = null;
-let pesoSelecionado = null;
-window.carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-
-// --- 1. FUNÇÕES DE INTERFACE (MENU E CARRINHO) ---
-const hamburger = document.getElementById("hamburger");
-const mobileMenu = document.getElementById("mobile-menu");
-
-if (hamburger) {
-    hamburger.onclick = (e) => {
-        e.stopPropagation();
-        mobileMenu.classList.toggle("active");
-    };
-}
-
-// Fecha menu ao clicar fora
-document.addEventListener("click", (e) => {
-    if (mobileMenu && !mobileMenu.contains(e.target) && e.target !== hamburger) {
-        mobileMenu.classList.remove("active");
-    }
-});
-
-// Função para abrir o carrinho
-window.abrirCarrinho = function() {
-    const cartModal = document.getElementById("cart-modal");
-    if (cartModal) {
-        cartModal.style.display = "flex";
-        // Tenta rodar a atualização visual do carrinho que está no seu script.js
-        if (typeof atualizarCarrinho === "function") atualizarCarrinho();
-    } else {
-        // Caso o modal do carrinho não esteja no HTML dessa página, redireciona ou avisa
-        console.log("Modal do carrinho não encontrado nesta página.");
-    }
-};
-
-window.fecharCarrinho = function() {
-    const cartModal = document.getElementById("cart-modal");
-    if (cartModal) cartModal.style.display = "none";
-};
-
-// --- 2. CARREGAR PRODUTOS (PORÇÕES) ---
-// Variáveis de controle
-let porcaoAtual = null;
-let pesoSelecionado = null;
-window.carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-
-// --- FUNÇÕES DE INTERFACE (MENU E CARRINHO) ---
-// Usando delegação de evento para garantir que funcione mesmo se o DOM demorar
+// --- 1. INTERFACE ---
 document.addEventListener("click", function(e) {
     const hamburger = document.getElementById("hamburger");
     const mobileMenu = document.getElementById("mobile-menu");
     const cartBtn = e.target.closest(".cart");
 
-    // Lógica do Hamburger
     if (hamburger && hamburger.contains(e.target)) {
         mobileMenu.classList.toggle("active");
-    } 
-    // Fechar menu ao clicar fora
-    else if (mobileMenu && !mobileMenu.contains(e.target) && mobileMenu.classList.contains("active")) {
+    } else if (mobileMenu && !mobileMenu.contains(e.target) && mobileMenu.classList.contains("active")) {
         mobileMenu.classList.remove("active");
     }
 
-    // Lógica do Carrinho (se clicar no ícone 🛒)
-    if (cartBtn) {
-        window.abrirCarrinho();
-    }
+    if (cartBtn) window.abrirCarrinho();
 });
 
 window.abrirCarrinho = function() {
-    const cartModal = document.getElementById("cart-modal");
-    if (cartModal) {
-        cartModal.style.display = "flex";
+    const modal = document.getElementById("cart-modal");
+    if (modal) {
+        modal.style.display = "flex";
         if (typeof atualizarCarrinho === "function") atualizarCarrinho();
-    } else {
-        console.warn("Modal do carrinho não encontrado. Verifique se o ID 'cart-modal' existe no script.js ou index.");
     }
 };
 
-window.fecharCarrinho = function() {
-    const cartModal = document.getElementById("cart-modal");
-    if (cartModal) cartModal.style.display = "none";
+window.fecharCarrinho = () => {
+    const modal = document.getElementById("cart-modal");
+    if (modal) modal.style.display = "none";
 };
 
-// --- LÓGICA DAS PORÇÕES ---
+// --- 2. CARREGAR PORÇÕES ---
 async function carregarPorcoes() {
     const grid = document.getElementById("porcoes-container");
     if (!grid) return;
@@ -651,14 +527,14 @@ async function carregarPorcoes() {
     try {
         const res = await fetch("content/produtos.json?v=" + Date.now());
         const data = await res.json();
-        const listaPorcoes = data.produtos.filter(p => p.categoria === "porcao");
-        window.produtosPorcoes = listaPorcoes;
+        const lista = data.produtos.filter(p => p.categoria === "porcao");
+        window.produtosPorcoes = lista;
 
         grid.innerHTML = "";
-        listaPorcoes.forEach(p => {
+        lista.forEach(p => {
             grid.innerHTML += `
                 <div class="card-produto" onclick="abrirModalPorcao('${p.title}')" style="cursor:pointer">
-                    <img src="${p.image}" alt="${p.title}">
+                    <img src="${p.image}">
                     <div class="card-content">
                         <h3>${p.title}</h3>
                         <p>${p.ingredientes}</p>
@@ -666,7 +542,7 @@ async function carregarPorcoes() {
                     </div>
                 </div>`;
         });
-    } catch (e) { console.error("Erro ao carregar porções:", e); }
+    } catch (e) { console.error("Erro ao carregar:", e); }
 }
 
 window.abrirModalPorcao = function(nome) {
@@ -677,8 +553,8 @@ window.abrirModalPorcao = function(nome) {
     document.getElementById("porcao-modal-title").innerText = porcaoAtual.title;
     document.getElementById("porcao-modal-desc").innerText = porcaoAtual.ingredientes;
 
-    const containerTamanhos = document.getElementById("porcao-sizes-container");
-    containerTamanhos.innerHTML = "";
+    const container = document.getElementById("porcao-sizes-container");
+    container.innerHTML = "";
     pesoSelecionado = null;
 
     Object.keys(porcaoAtual.prices).forEach(chave => {
@@ -690,24 +566,22 @@ window.abrirModalPorcao = function(nome) {
         btn.onclick = (e) => {
             e.stopPropagation();
             pesoSelecionado = chave;
-            containerTamanhos.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
+            container.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
             btn.classList.add("ativo");
         };
-        containerTamanhos.appendChild(btn);
+        container.appendChild(btn);
     });
 
     document.getElementById("porcao-options-modal").style.display = "flex";
 };
 
-window.fecharModalPorcao = function() {
-    document.getElementById("porcao-options-modal").style.display = "none";
-};
+window.fecharModalPorcao = () => document.getElementById("porcao-options-modal").style.display = "none";
 
 // Botão Adicionar
 const btnFinal = document.getElementById("btn-confirmar-porcao");
 if (btnFinal) {
     btnFinal.onclick = function() {
-        if (!pesoSelecionado) { alert("Selecione o peso!"); return; }
+        if (!pesoSelecionado) return alert("Selecione o peso!");
 
         const pesoTexto = (pesoSelecionado === "P") ? "600g" : "1kg";
         window.carrinho.push({
@@ -720,7 +594,6 @@ if (btnFinal) {
         fecharModalPorcao();
         if (typeof atualizarCarrinho === "function") atualizarCarrinho();
 
-        // SEU TOAST CSS
         const toast = document.getElementById("toast-geral");
         if (toast) {
             toast.classList.add("show");
@@ -731,5 +604,3 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
-
-
