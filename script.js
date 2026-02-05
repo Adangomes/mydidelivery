@@ -491,25 +491,31 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
 // SISTEMA DE PORÇÕES (REUTILIZANDO MODAL DA PIZZA)
 // ==================================================
 
+// ==================================================
+// SISTEMA DE PORÇÕES (ID: porcoes)
+// ==================================================
+
 let porcaoAtual = null;
 let pesoSelecionado = null;
 
-// 1. CARREGAR PORÇÕES NO CARD-PRODUTO
+// 1. CARREGAR PORÇÕES NA VITRINE
 async function carregarPorcoes() {
-    const grid = document.getElementById("porcoes"); // Use o seu ID da div de porções
+    const grid = document.getElementById("porcoes"); // <--- SEU ID AQUI
     if (!grid) return;
 
     try {
         const res = await fetch("content/produtos.json");
         const data = await res.json();
         
-        // Sincroniza a variável 'produtos' global para que o find funcione
+        // Sincroniza a variável global 'produtos'
         produtos = data.produtos; 
 
+        // Filtra apenas porções
         const itens = produtos.filter(p => p.categoria === "porcao");
 
         grid.innerHTML = "";
         itens.forEach(p => {
+            // Criamos o card idêntico aos outros, sem o "A partir de" para ficar limpo
             grid.innerHTML += `
                 <div class="card-produto">
                     <img src="${p.image}" alt="${p.title}">
@@ -525,17 +531,17 @@ async function carregarPorcoes() {
     } catch (e) { console.error("Erro ao carregar porções:", e); }
 }
 
-// 2. ABRIR MODAL (USANDO OS IDs DO MODAL DE PIZZA)
+// 2. ABRIR MODAL (REUTILIZANDO OS IDs DA PIZZA)
 function abrirModalPorcao(nome) {
     porcaoAtual = produtos.find(p => p.title === nome);
     if (!porcaoAtual) return;
 
-    // USANDO OS IDs DO SEU MODAL DE PIZZA QUE JÁ FUNCIONA
+    // Preenche o modal de pizza com dados da porção
     document.getElementById("modal-pizza-img").src = porcaoAtual.image;
     document.getElementById("pizza-modal-title").innerText = porcaoAtual.title;
     document.getElementById("pizza-modal-desc").innerText = porcaoAtual.ingredientes;
     
-    // ESCONDE A PARTE DE SABORES (Porção não escolhe sabores/fatias)
+    // Limpa seleções anteriores e esconde partes da pizza
     const secaoSabores = document.getElementById("secao-sabores");
     if(secaoSabores) secaoSabores.style.display = "none";
     
@@ -546,12 +552,11 @@ function abrirModalPorcao(nome) {
     const containerTamanhos = document.getElementById("pizza-sizes-container");
     containerTamanhos.innerHTML = "";
     
-    // GERA BOTÕES (P=600g, G=1kg)
+    // Gera os botões de 600g e 1kg
     Object.keys(porcaoAtual.prices).forEach(chave => {
         const btn = document.createElement("button");
         btn.className = "btn-tamanho-opcional";
         
-        // Tradução visual profissional
         let label = (chave === "P") ? "600g" : (chave === "G" ? "1kg" : chave);
 
         btn.innerHTML = `<strong>${label}</strong><br>R$ ${porcaoAtual.prices[chave].toFixed(2).replace(".", ",")}`;
@@ -565,10 +570,10 @@ function abrirModalPorcao(nome) {
         containerTamanhos.appendChild(btn);
     });
 
-    // ABRE O MODAL DE PIZZA (Mas com dados de porção)
+    // Abre o modal
     document.getElementById("pizza-options-modal").style.display = "flex";
 
-    // RECONFIGURA O BOTÃO DE ADICIONAR PARA USAR A FUNÇÃO DE PORÇÃO
+    // Configura o botão de adicionar
     const btnAdd = document.getElementById("btn-adicionar-pizza");
     btnAdd.innerText = "ADICIONAR AO CARRINHO";
     btnAdd.onclick = adicionarPorcaoAoCarrinho;
@@ -577,7 +582,7 @@ function abrirModalPorcao(nome) {
 // 3. ADICIONAR AO CARRINHO
 function adicionarPorcaoAoCarrinho() {
     if (!pesoSelecionado) {
-        alert("Por favor, selecione o tamanho (600g ou 1kg)!");
+        alert("Por favor, selecione o tamanho!");
         return;
     }
 
@@ -594,11 +599,6 @@ function adicionarPorcaoAoCarrinho() {
     salvarCarrinho();
     atualizarCarrinho();
     
-    // FECHA O MODAL
     document.getElementById("pizza-options-modal").style.display = "none";
     if(typeof mostrarToast === "function") mostrarToast();
 }
-
-// Inicializa ao carregar a página
-document.addEventListener("DOMContentLoaded", carregarPorcoes);
-
