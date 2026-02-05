@@ -486,29 +486,25 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
 // ===============================
 // MODAL DE PORÇÕES
 // ===============================
-// Garante que o carrinho exista ao carregar a página
-if (!window.carrinho) window.carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
-let porcaoSelecionada = null;
-let tamanhoPorcaoSelecionado = null;
+let porcaoAtual = null;
+let pesoSelecionado = null;
 
 // CARREGAR PORÇÕES
 async function carregarPorcoes() {
-    const container = document.getElementById("porcoes");
-    if (!container) return;
+    const grid = document.getElementById("porcoes-container");
+    if (!grid) return;
 
     try {
         const res = await fetch("content/produtos.json");
         const data = await res.json();
-        window.produtos = data.produtos; // Salva globalmente
+        // Filtra só porções
+        const listaPorcoes = data.produtos.filter(p => p.categoria === "porcao");
 
-        const porcoes = window.produtos.filter(p => p.categoria === "porcao");
-
-        container.innerHTML = "";
-        porcoes.forEach(p => {
-            // Adicionado o onclick no card
-            container.innerHTML += `
+        grid.innerHTML = "";
+        listaPorcoes.forEach(p => {
+            grid.innerHTML += `
                 <div class="card-produto" onclick="abrirModalPorcao('${p.title}')">
-                    <img src="${p.image}">
+                    <img src="${p.image}" alt="${p.title}">
                     <div class="card-content">
                         <h3>${p.title}</h3>
                         <p>${p.ingredientes}</p>
@@ -516,68 +512,76 @@ async function carregarPorcoes() {
                     </div>
                 </div>`;
         });
-    } catch (e) { console.error("Erro ao carregar porções", e); }
+        // Salva a lista completa no window para busca rápida
+        window.produtosPorcoes = listaPorcoes;
+    } catch (e) { console.error("Erro ao carregar porções:", e); }
 }
 
-// ABRIR MODAL
+// ABRIR O MODAL
 function abrirModalPorcao(nome) {
-    porcaoSelecionada = window.produtos.find(p => p.title === nome);
-    if (!porcaoSelecionada) return;
+    porcaoAtual = window.produtosPorcoes.find(p => p.title === nome);
+    if (!porcaoAtual) return;
 
-    document.getElementById("modal-porcao-img").src = porcaoSelecionada.image;
-    document.getElementById("porcao-modal-title").innerText = porcaoSelecionada.title;
-    document.getElementById("porcao-modal-desc").innerText = porcaoSelecionada.ingredientes;
+    // Preenche imagem, título e descrição
+    document.getElementById("modal-porcao-img").src = porcaoAtual.image;
+    document.getElementById("porcao-modal-title").innerText = porcaoAtual.title;
+    document.getElementById("porcao-modal-desc").innerText = porcaoAtual.ingredientes;
 
-    const sizes = document.getElementById("porcao-sizes-container");
-    sizes.innerHTML = "";
-    tamanhoPorcaoSelecionado = null;
+    // Gera botões de tamanho/peso
+    const containerTamanhos = document.getElementById("porcao-sizes-container");
+    containerTamanhos.innerHTML = "";
+    pesoSelecionado = null;
 
-    Object.keys(porcaoSelecionada.prices).forEach(tam => {
+    Object.keys(porcaoAtual.prices).forEach(chave => {
         const btn = document.createElement("button");
         btn.className = "btn-tamanho-opcional";
-        // Tradução visual: P -> 600g, G -> 1kg (se quiser)
-        let label = (tam === "P") ? "600g" : (tam === "G" ? "1kg" : tam);
         
-        btn.innerHTML = `<strong>${label}</strong><br>R$ ${porcaoSelecionada.prices[tam].toFixed(2).replace(".", ",")}`;
+        // Se for P vira 600g, se for G vira 1kg
+        let label = (chave === "P") ? "600g" : (chave === "G" ? "1kg" : chave);
+        
+        btn.innerHTML = `<strong>${label}</strong><br>R$ ${porcaoAtual.prices[chave].toFixed(2).replace(".", ",")}`;
+        
         btn.onclick = (e) => {
-            e.stopPropagation(); // Não fecha o modal
-            selecionarTamanhoPorcao(tam, btn);
+            e.stopPropagation(); // Evita bugar o clique
+            pesoSelecionado = chave;
+            // Remove 'ativo' dos outros e coloca nesse
+            containerTamanhos.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
+            btn.classList.add("ativo");
         };
-        sizes.appendChild(btn);
+        containerTamanhos.appendChild(btn);
     });
 
-    document.getElementById("porcao-modal").style.display = "flex";
-}
-
-function selecionarTamanhoPorcao(tam, btn) {
-    tamanhoPorcaoSelecionado = tam;
-    document.querySelectorAll("#porcao-sizes-container button").forEach(b => b.classList.remove("ativo"));
-    btn.classList.add("ativo");
+    document.getElementById("porcao-options-modal").style.display = "flex";
 }
 
 function fecharModalPorcao() {
-    document.getElementById("porcao-modal").style.display = "none";
+    document.getElementById("porcao-options-modal").style.display = "none";
 }
 
-// ADICIONAR AO CARRINHO (Função ligada ao botão)
-function adicionarPorcaoAoCarrinho() {
-    if (!tamanhoPorcaoSelecionado) {
-        alert("Escolha um tamanho primeiro!");
+// BOTÃO ADICIONAR
+document.getElementById("btn-adicionar-porcao").onclick = function() {
+    if (!pesoSelecionado) {
+        alert("Por favor, selecione o peso da porção!");
         return;
     }
 
-    window.carrinho.push({
-        title: `${porcaoSelecionada.title} (${tamanhoPorcaoSelecionado === "P" ? "600g" : "1kg"})`,
-        price: porcaoSelecionada.prices[tamanhoPorcaoSelecionado],
+    const valor = porcaoAtual.prices[pesoSelecionado];
+    const pesoTexto = (pesoSelecionado === "P") ? "600g" : "1kg";
+
+    // Adiciona ao carrinho global (o mesmo das pizzas e bebidas)
+    carrinho.push({
+        title: `${porcaoAtual.title} (${pesoTexto})`,
+        price: valor,
         qtd: 1,
         categoria: "porcao"
     });
 
-    if (typeof salvarCarrinho === "function") salvarCarrinho();
-    if (typeof atualizarCarrinho === "function") atualizarCarrinho();
+    if(typeof salvarCarrinho === "function") salvarCarrinho();
+    if(typeof atualizarCarrinho === "function") atualizarCarrinho();
+    
     fecharModalPorcao();
-}
+    if(typeof mostrarToast === "function") mostrarToast();
+};
 
-// Inicializa quando a página carregar
+// Chama a carga inicial
 document.addEventListener("DOMContentLoaded", carregarPorcoes);
-
