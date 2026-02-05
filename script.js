@@ -142,7 +142,7 @@ function atualizarCarrinho() {
     box.innerHTML = "";
     let valorTotal = 0;
 
-    // Sincroniza a variável 'carrinho' com o que está no localStorage ou window
+    // Sincroniza a variável 'carrinho' com o localStorage
     carrinho = JSON.parse(localStorage.getItem("carrinho")) || [];
 
     carrinho.forEach((i, index) => {
@@ -155,36 +155,27 @@ function atualizarCarrinho() {
                     <span style="font-weight: bold; display: block; font-size: 0.9rem;">${i.title}</span>
                     <small style="color: #666;">${i.qtd}x R$ ${i.price.toFixed(2).replace(".", ",")}</small>
                 </div>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                    <strong style="white-space: nowrap;">R$ ${valorItem.toFixed(2).replace(".", ",")}</strong>
+                <div style="display: flex; align-items: center;">
                     <button onclick="removerItem(${index})" style="background: #ff4444; color: white; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-weight: bold;">✕</button>
                 </div>
             </div>`;
     });
 
-    // Atualiza apenas o Total (removido a duplicação de subtotal)
+    // Atualiza o Total no rodapé do modal
     const totalEl = document.getElementById("total");
     if (totalEl) {
         totalEl.innerText = `Total: R$ ${valorTotal.toFixed(2).replace(".", ",")}`;
     }
 }
 
-// FUNÇÃO GLOBAL PARA REMOVER ITEM
 window.removerItem = function(index) {
-    // 1. Pega a lista do localStorage
     let listaAtual = JSON.parse(localStorage.getItem("carrinho")) || [];
-    
-    // 2. Remove o item específico
     listaAtual.splice(index, 1);
     
-    // 3. Atualiza as variáveis na memória
     carrinho = listaAtual;
     window.carrinho = listaAtual;
-
-    // 4. Salva no localStorage
     localStorage.setItem("carrinho", JSON.stringify(listaAtual));
-
-    // 5. Atualiza a tela
+    
     atualizarCarrinho();
 };
 // AQUI É O CARRINHO
@@ -654,5 +645,6 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
