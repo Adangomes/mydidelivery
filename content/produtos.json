@@ -20,6 +20,16 @@
       "image": "/imagens/pizza.jgp"
     },
     {
+  "title": "Batata frita",
+  "prices": {
+    "P": 30.0,
+    "G": 40.0
+  },
+  "categoria": "porcao",
+  "ingredientes": "batata frita",
+  "image": "/imagens/pizza.jpg"
+}
+    {
       "title": "Kings Duplo Bacon",
       "price": 29.9,
       "oldPrice": 34.9,
