@@ -495,24 +495,21 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
 // ==================================================
 // SISTEMA DE PORÇÕES (VERSÃO FINAL ATUALIZADA)
 // ==================================================
-
+// VARIÁVEIS GLOBAIS
 let itemAtual = null;
 let opcaoSelecionada = null; 
+if (typeof carrinho === 'undefined') window.carrinho = [];
 
-// 1. CARREGAR OS PRODUTOS NA TELA
+// 1. CARREGAR PORÇÕES NA TELA
 async function carregarPorcoes() {
     const grid = document.getElementById("porcoes"); 
     if (!grid) return;
 
     try {
-        // Busca os dados do JSON
-        const res = await fetch("content/produtos.json?v=" + Date.now()); // v= evita cache
+        const res = await fetch("content/produtos.json?v=" + Date.now());
         const data = await res.json();
-        
-        // Define a lista global para o modal conseguir encontrar o item depois
         window.produtos = data.produtos; 
 
-        // Filtra apenas porções
         const itens = window.produtos.filter(p => p.categoria === "porcao");
 
         grid.innerHTML = "";
@@ -529,82 +526,53 @@ async function carregarPorcoes() {
                     </div>
                 </div>`;
         });
-    } catch (e) { 
-        console.error("Erro ao carregar porções:", e); 
-    }
+    } catch (e) { console.error("Erro ao carregar porções:", e); }
 }
 
-// 2. FUNÇÃO QUE CHAMA O MODAL
+// 2. ABRIR MODAL DE PORÇÃO
 function abrirModalOpcoes(nome) {
-    // Busca o item na lista que carregamos no Passo 1
     itemAtual = window.produtos ? window.produtos.find(p => p.title === nome) : null;
-    
-    if (!itemAtual) {
-        alert("Erro: Produto não encontrado no banco de dados.");
-        return;
-    }
+    if (!itemAtual) return;
 
-    const modalPorcao = document.getElementById("modal-opcoes-custom");
-    if (modalPorcao) {
-        configurarModalPorcao(modalPorcao);
-    } else {
-        console.error("ID 'modal-opcoes-custom' não encontrado no seu HTML de porções.");
-    }
-}
-
-// 3. CONFIGURAÇÃO DO MODAL (ESTILO PIZZA)
-function configurarModalPorcao(modal) {
-    // Preenche Imagem, Título e Descrição usando os IDs do seu HTML
-    document.getElementById("modal-img-custom").src = itemAtual.image;
-    document.getElementById("modal-titulo-custom").innerText = itemAtual.title;
-    document.getElementById("modal-desc-custom").innerText = itemAtual.ingredientes;
-    
-    opcaoSelecionada = null;
-    const container = document.getElementById("container-tamanhos-custom");
-    container.innerHTML = "";
-    
-    // Gera os botões de 600g e 1kg (baseado nas chaves P e G do seu JSON)
-    Object.keys(itemAtual.prices).forEach(chave => {
-        const btn = document.createElement("button");
-        btn.className = "btn-tamanho-opcional";
+    const modal = document.getElementById("modal-opcoes-custom");
+    if (modal) {
+        document.getElementById("modal-img-custom").src = itemAtual.image;
+        document.getElementById("modal-titulo-custom").innerText = itemAtual.title;
+        document.getElementById("modal-desc-custom").innerText = itemAtual.ingredientes;
         
-        let label = (chave === "P") ? "600g" : (chave === "G" ? "1kg" : chave);
-
-        btn.innerHTML = `<strong>${label}</strong><br>R$ ${itemAtual.prices[chave].toFixed(2).replace(".", ",")}`;
+        opcaoSelecionada = null;
+        const container = document.getElementById("container-tamanhos-custom");
+        container.innerHTML = "";
         
-        btn.onclick = () => {
-            opcaoSelecionada = chave;
-            // Remove classe ativo dos outros e coloca neste
-            container.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
-            btn.classList.add("ativo");
-        };
-        
-        container.appendChild(btn);
-    });
+        Object.keys(itemAtual.prices).forEach(chave => {
+            const btn = document.createElement("button");
+            btn.className = "btn-tamanho-opcional";
+            let label = (chave === "P") ? "600g" : (chave === "G" ? "1kg" : chave);
+            btn.innerHTML = `<strong>${label}</strong><br>R$ ${itemAtual.prices[chave].toFixed(2).replace(".", ",")}`;
+            
+            btn.onclick = () => {
+                opcaoSelecionada = chave;
+                container.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
+                btn.classList.add("ativo");
+            };
+            container.appendChild(btn);
+        });
 
-    // EXIBE O MODAL NA TELA
-    modal.style.display = "flex";
-
-    // Atribui a função de salvar ao botão verde
-    const btnConfirmar = document.getElementById("btn-confirmar-custom");
-    if(btnConfirmar) {
-        btnConfirmar.onclick = adicionarPorcaoAoCarrinho;
+        modal.style.display = "flex";
+        document.getElementById("btn-confirmar-custom").onclick = adicionarPorcaoAoCarrinho;
     }
 }
 
-// 4. ADICIONAR AO CARRINHO
+// 3. ADICIONAR AO CARRINHO E ATUALIZAR
 function adicionarPorcaoAoCarrinho() {
     if (!opcaoSelecionada) {
-        alert("Por favor, selecione o peso antes de adicionar!");
+        alert("Por favor, selecione o peso!");
         return;
     }
 
     const valor = itemAtual.prices[opcaoSelecionada];
     const textoPeso = (opcaoSelecionada === "P") ? "600g" : "1kg";
     
-    // Cria o objeto para o carrinho (Verifique se a variável 'carrinho' já existe globalmente)
-    if (typeof carrinho === 'undefined') window.carrinho = [];
-
     carrinho.push({
         title: `${itemAtual.title} (${textoPeso})`,
         price: valor,
@@ -612,24 +580,29 @@ function adicionarPorcaoAoCarrinho() {
         categoria: "porcao"
     });
 
-    // Funções auxiliares (Certifique-se que elas existam no seu script.js principal)
     if(typeof salvarCarrinho === "function") salvarCarrinho();
     if(typeof atualizarCarrinho === "function") atualizarCarrinho();
     
     fecharModalCustom();
-    
     if(typeof mostrarToast === "function") mostrarToast();
 }
 
-// 5. FUNÇÃO PARA FECHAR O MODAL
+// 4. FUNÇÃO PARA ABRIR CARRINHO (IMPORTANTE)
+function abrirCarrinho() {
+    const cartModal = document.getElementById("cart-modal");
+    if (cartModal) {
+        cartModal.style.display = "block";
+        if(typeof atualizarCarrinho === "function") atualizarCarrinho();
+    } else {
+        alert("Erro: O contêiner do carrinho não foi encontrado nesta página!");
+    }
+}
+
 function fecharModalCustom() { 
     const m = document.getElementById("modal-opcoes-custom");
     if(m) m.style.display = "none"; 
 }
 
-// 6. INICIALIZAÇÃO AUTOMÁTICA
-document.addEventListener("DOMContentLoaded", () => {
-    carregarPorcoes();
-});
-
-
+// INICIALIZAÇÃO
+document.addEventListener("DOMContentLoaded", carregarPorcoes);
+ 
