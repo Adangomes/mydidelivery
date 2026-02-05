@@ -292,7 +292,8 @@ document.addEventListener("DOMContentLoaded", () => {
     initSplash(); 
     initMenu(); 
     carregarStatusLoja();
-    carregarProdutos(); 
+    carregarProdutos();
+    carregarDogs();
     carregarBebidas(); 
     carregarPizzas(); // <--- FALTAVA ESSA LINHA PARA AS PIZZAS APARECEREM
     carregarCarrinhoStorage();
@@ -476,6 +477,7 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
     fecharModalPizza();
     if(typeof mostrarToast === "function") mostrarToast();
 };
+
 
 
 
