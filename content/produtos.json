@@ -17,7 +17,7 @@
       },
       "categoria": "pizza",
       "ingredientes": "Mussarela, calabresa, cebola e orégano",
-      "image": "/imagens/pizza.jpg"
+      "image": "/imagens/teste.jpg""
     },
     {
       "title": "Batata frita",
@@ -27,7 +27,7 @@
       },
       "categoria": "porcao",
       "ingredientes": "batata frita",
-      "image": "/imagens/pizza.jpg"
+      "image": "/imagens/teste.jpg"
     },
     {
       "title": "Kings Duplo Bacon",
