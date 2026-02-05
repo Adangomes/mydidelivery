@@ -13,55 +13,29 @@ collections:
         label: "Categorias de Produtos"
         name: "produtos_config"
         fields:
-          - label: "Produtos"
+          - label: "Lista Geral de Produtos"
             name: "produtos"
-            widget: "object"
+            widget: "list"
+            summary: '{{title}} ({{categoria}})'
             fields:
-              - label: "Hambúrgueres"
-                name: "burgers"
-                widget: "list" # Trocado de map para list
-                summary: '{{title}}'
-                fields:
-                  - { label: "Nome", name: "title", widget: "string" }
-                  - { label: "Preço", name: "price", widget: "number", value_type: "float" }
-                  - { label: "Categoria", name: "categoria", widget: "hidden", default: "burger" }
-                  - { label: "Ingredientes", name: "ingredientes", widget: "text" }
-                  - { label: "Imagem", name: "image", widget: "image" }
+              - { label: "Nome", name: "title", widget: "string" }
+              - { label: "Categoria", name: "categoria", widget: "select", options: ["burger", "bebida", "pizza", "porcao", "dog"] }
+              - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text" }
+              - { label: "Imagem", name: "image", widget: "image" }
               
-              - label: "Bebidas"
-                name: "bebidas"
-                widget: "list" # Trocado de map para list
-                summary: '{{title}}'
+              # PREÇO SIMPLES (Para Burger, Dog e Bebida)
+              - { label: "Preço Único (Burger/Dog/Bebida)", name: "price", widget: "number", value_type: "float", required: false }
+              
+              # PREÇOS MÚLTIPLOS (Para Pizza e Porção)
+              - label: "Preços por Tamanho (Pizza/Porção)"
+                name: "prices"
+                widget: "object"
+                required: false
                 fields:
-                  - { label: "Nome", name: "title", widget: "string" }
-                  - { label: "Preço", name: "price", widget: "number", value_type: "float" }
-                  - { label: "Categoria", name: "categoria", widget: "hidden", default: "bebida" }
-                  - { label: "Descrição", name: "ingredientes", widget: "string" }
-                  - { label: "Imagem", name: "image", widget: "image" }
-
-              - label: "Pizzas"
-                name: "pizzas"
-                widget: "list" # Trocado de map para list
-                summary: '{{nome}}'
-                fields:
-                  - { label: "Nome da Pizza", name: "nome", widget: "string" }
-                  - { label: "Categoria", name: "categoria", widget: "hidden", default: "pizza" }
-                  - { label: "Ingredientes", name: "ingredientes", widget: "text" }
-                  - { label: "Imagem", name: "imagem", widget: "image" }
-                  - label: "Preços"
-                    name: "prices"
-                    widget: "object"
-                    fields:
-                      - { label: "Pequena", name: "P", widget: "number", value_type: "float" }
-                      - { label: "Média", name: "M", widget: "number", value_type: "float" }
-                      - { label: "Grande", name: "G", widget: "number", value_type: "float" }
+                  - { label: "Pequena / 600g", name: "P", widget: "number", value_type: "float", required: false }
+                  - { label: "Média (Só Pizza)", name: "M", widget: "number", value_type: "float", required: false }
+                  - { label: "Grande / 1kg", name: "G", widget: "number", value_type: "float", required: false }
 
   - name: "configuracoes"
     label: "Configurações da Loja"
-    files:
-      - file: "content/config.json"
-        label: "Status e Horários"
-        name: "loja_config"
-        fields:
-          - { label: "Loja Aberta?", name: "loja_aberta", widget: "boolean", default: true }
-          - { label: "Mensagem de Loja Fechada", name: "msg_fechado", widget: "string", default: "Desculpe, estamos fechados no momento!" }
+    # ... resto do seu código de config ...
