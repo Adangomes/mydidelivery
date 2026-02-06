@@ -373,6 +373,7 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarPorcoes();
     carregarBebidas(); 
     carregarPizzas(); // <--- FALTAVA ESSA LINHA PARA AS PIZZAS APARECEREM
+    carregarParmedianas();
     carregarCarrinhoStorage();
 });
 
@@ -680,6 +681,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
