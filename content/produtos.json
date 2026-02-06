@@ -5,7 +5,7 @@
       "price": 45.5,
       "oldPrice": 48,
       "categoria": "burger",
-      "ingredientes": "Pão, humbúrguer, queijo, presunto, bife, tomate, alface",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, bife, tomate, alface",
       "image": "/imagens/xsalada.jpeg"
     },
     {
@@ -41,14 +41,14 @@
       "price": 40,
       "oldPrice": 45,
       "categoria": "burger",
-      "ingredientes": "Pão, humbúrguer, queijo, presunto, bacon, milho, ervilha, tomate, alface",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, bacon, milho, ervilha, tomate, alface",
       "image": "/imagens/xsalada.jpeg"
     },
     {
       "title": "X CALABRESA",
       "price": 40,
       "categoria": "burger",
-      "ingredientes": "Pão, humbúrguer, queijo, presunto, calabresa, milho, ervilha, tomate, alface",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, calabresa, milho, ervilha, tomate, alface",
       "image": "/imagens/xsalada.jpeg"
     },
     {
@@ -90,7 +90,7 @@
       "title": "X COREÇÃO",
       "price": 40,
       "categoria": "burger",
-      "ingredientes": "Pão, humbúrguer, queijo, presunto, coração, milho, ervilha, tomate, alface",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, coração, milho, ervilha, tomate, alface",
       "image": "/imagens/xsalada.jpeg"
     },
     {
@@ -101,6 +101,23 @@
       "price": 55,
       "prices": {
         "M": -2
+      }
+    },
+    {
+      "title": "X BURGUER",
+      "categoria": "burger",
+      "ingredientes": "Pão, hambúrguer, queijo, presunto",
+      "price": 15,
+      "image": "/imagens/xsalada.jpeg"
+    },
+    {
+      "title": "X SALADA",
+      "categoria": "burger",
+      "ingredientes": "Pão, hambúrguer, queijo, presunto, tomate, alface, milho, ervilha",
+      "image": "/imagens/xsalada.jpeg",
+      "price": 20,
+      "prices": {
+        "P": -1
       }
     }
   ]
