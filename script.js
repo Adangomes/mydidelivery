@@ -65,18 +65,23 @@ async function carregarProdutos() {
     } catch (error) { console.error("Erro produtos:", error); }
 }
 async function carregarParmedianas() {
-    const container = document.getElementById("parmedianas"); // O ID que você vai usar no HTML
+    const container = document.getElementById("parmedianas");
     if (!container) return;
     try {
         const res = await fetch("/content/produtos.json");
         const data = await res.json();
-        const lista = data.produtos;
+        
+        // Filtra apenas os produtos da categoria parmediana
+        const parmegianas = data.produtos.filter(p => p.categoria === "parmediana");
+        
         container.innerHTML = "";
-        lista.forEach((p) => {
-            if (p.categoria !== "parmediana") return; // Filtra a nova categoria
+        parmegianas.forEach((p) => {
+            // Reutiliza sua função de criar card simples que já funciona nos burgers
             container.appendChild(criarCardProduto(p));
         });
-    } catch (error) { console.error("Erro parmedianas:", error); }
+    } catch (error) { 
+        console.error("Erro ao carregar parmedianas:", error); 
+    }
 }
 
 async function carregarDogs() {
@@ -675,6 +680,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
