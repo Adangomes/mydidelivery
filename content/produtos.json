@@ -3,14 +3,14 @@
     {
       "title": "X BIFE",
       "price": 45.5,
-      "oldPrice": 48.0,
+      "oldPrice": 48,
       "categoria": "burger",
-      "ingredientes": "Pão, hambúrguer,queijo, presunto, bife, tomate, alface",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, bife, tomate, alface",
       "image": "/imagens/xsalada.jpeg"
     },
     {
       "title": "BIFE À PARMEGIANA",
-      "price": 160.0,
+      "price": 160,
       "categoria": "parmediana",
       "ingredientes": "Suculento bife à parmegiana acompanhado de arroz soltinho e salada fresca",
       "image": "/imagens/parmediana.jpeg"
@@ -18,9 +18,9 @@
     {
       "title": "Pizza Calabresa c/ Cebola",
       "prices": {
-        "P": 40.0,
-        "M": 60.0,
-        "G": 90.0
+        "P": 40,
+        "M": 60,
+        "G": 90
       },
       "categoria": "pizza",
       "ingredientes": "Mussarela, calabresa, cebola e orégano",
@@ -29,31 +29,31 @@
     {
       "title": "Batata frita",
       "prices": {
-        "P": 30.0,
-        "G": 40.0
+        "P": 30,
+        "G": 40
       },
       "categoria": "porcao",
-      "ingredientes": "",
+      "ingredientes": ".",
       "image": "/imagens/fritas.jpeg"
     },
     {
       "title": "X BACON",
-      "price": 40.00,
-      "oldPrice": 45.00,
+      "price": 40,
+      "oldPrice": 45,
       "categoria": "burger",
-      "ingredientes": "Pão, hambúrguer,queijo, presunto, bacon, milho, ervilha, tomate, alface",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, bacon, milho, ervilha, tomate, alface",
       "image": "/imagens/xsalada.jpeg"
     },
     {
       "title": "X CALABRESA",
-      "price": 40.00,
+      "price": 40,
       "categoria": "burger",
-      "ingredientes": "Pão, hambúrguer,queijo, presunto, calabresa, milho, ervilha, tomate, alface",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, calabresa, milho, ervilha, tomate, alface",
       "image": "/imagens/xsalada.jpeg"
     },
     {
       "title": "Dog Bacon",
-      "price": 25.0,
+      "price": 25,
       "categoria": "dog",
       "ingredientes": "Pão, salsicha, bacon, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
       "image": "/imagens/dog.jpeg"
@@ -74,24 +74,34 @@
     },
     {
       "title": "Coca-Cola 600ml",
-      "price": 8.0,
+      "price": 8,
       "categoria": "bebida",
       "ingredientes": "600ml",
       "image": "/imagens/teste.jpg"
     },
     {
       "title": "Guaraná 600ml",
-      "price": 8.0,
+      "price": 8,
       "categoria": "bebida",
       "ingredientes": "600ml",
       "image": "/imagens/teste.jpg"
     },
     {
       "title": "X COREÇÃO",
-      "price": 40.00,
+      "price": 40,
       "categoria": "burger",
-      "ingredientes": "Pão, hambúrguer,queijo, presunto, coração, milho, ervilha, tomate, alface",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, coração, milho, ervilha, tomate, alface",
       "image": "/imagens/xsalada.jpeg"
+    },
+    {
+      "title": "X SNOOP",
+      "categoria": "burger",
+      "ingredientes": "Pão, hambúrguer, queijo, presunto, calabresa, frango, coração, bacon, ovo, requeijão, tomate, alface",
+      "image": "/imagens/xsalada.jpeg",
+      "price": 55,
+      "prices": {
+        "M": -2
+      }
     }
   ]
 }
