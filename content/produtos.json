@@ -241,6 +241,13 @@
         "P": 54,
         "G": 71
       }
+    },
+    {
+      "title": "FRANGO À PARMEGIANA",
+      "categoria": "parmediana",
+      "ingredientes": "Frango à parmegiana, coberto de molho de tomate e queijo derretido, acompanhado de arroz branco soltinho e salada fresca",
+      "image": "/imagens/parmediana.jpeg",
+      "price": 140
     }
   ]
 }
