@@ -1,12 +1,12 @@
 {
   "produtos": [
     {
-      "title": "Kings Burger Tradicional",
-      "price": 19.9,
-      "oldPrice": 24.9,
+      "title": "X BIFE",
+      "price": 45.5,
+      "oldPrice": 48.0,
       "categoria": "burger",
-      "ingredientes": "Hambúrguer artesanal 140g, duas fatias de queijo e pão brioche",
-      "image": "/imagens/teste.jpg"
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, bife, tomate, alface",
+      "image": "/imagens/xsalada.jpeg"
     },
     {
       "title": "Bife à Parmegiana",
@@ -24,7 +24,7 @@
       },
       "categoria": "pizza",
       "ingredientes": "Mussarela, calabresa, cebola e orégano",
-      "image": "/imagens/teste.jpg"
+      "image": "/imagens/margerita.jpeg"
     },
     {
       "title": "Batata frita",
@@ -34,29 +34,29 @@
       },
       "categoria": "porcao",
       "ingredientes": "batata frita",
-      "image": "/imagens/teste.jpg"
+      "image": "/imagens/fritas.jpeg"
     },
     {
-      "title": "Kings Duplo Bacon",
-      "price": 29.9,
-      "oldPrice": 34.9,
+      "title": "X BACON",
+      "price": 40.00,
+      "oldPrice": 45.00,
       "categoria": "burger",
-      "ingredientes": "Dois hambúrgueres artesanais de 100g cada, queijo derretido, bacon crocante e pão brioche",
-      "image": "/imagens/teste.jpg"
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, bacon, milho, ervilha, tomate, alface",
+      "image": "/imagens/xsalada.jpeg"
     },
     {
-      "title": "Kings Calabresa",
-      "price": 31,
+      "title": "X CALABRESA",
+      "price": 40.00,
       "categoria": "burger",
-      "ingredientes": "Hambúrguer artesanal 140g, calabresa grelhada, queijo e pão brioche",
-      "image": "/imagens/teste.jpg"
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, calabresa, milho, ervilha, tomate, alface",
+      "image": "/imagens/xsalada.jpeg"
     },
     {
       "title": "Dog Bacon",
       "price": 25.0,
       "categoria": "dog",
       "ingredientes": "Pão, salsicha, bacon, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
-      "image": "/imagens/teste.jpg"
+      "image": "/imagens/dog.jpeg"
     },
     {
       "title": "Coca-Cola Lata",
@@ -74,17 +74,24 @@
     },
     {
       "title": "Coca-Cola 600ml",
-      "price": 8.5,
+      "price": 8.0,
       "categoria": "bebida",
       "ingredientes": "600ml",
       "image": "/imagens/teste.jpg"
     },
     {
-      "title": "kings burger classic",
-      "price": 28,
-      "categoria": "burger",
-      "ingredientes": "hamburguer artesanal 150g, queijo prato, pão brioche",
+      "title": "Guaraná 600ml",
+      "price": 8.0,
+      "categoria": "bebida",
+      "ingredientes": "600ml",
       "image": "/imagens/teste.jpg"
+    },
+    {
+      "title": "X COREÇÃO",
+      "price": 40.00,
+      "categoria": "burger",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, coração, milho, ervilha, tomate, alface",
+      "image": "/imagens/xsalada.jpeg"
     }
   ]
 }
