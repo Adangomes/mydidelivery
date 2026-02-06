@@ -137,6 +137,7 @@
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
         gap: 14px;
+        align-items: stretch;
     }
     
     .card-produto {
@@ -607,6 +608,7 @@
     .card-produto button:active {
         transform: scale(0.98);
     }
+
 
 
 
