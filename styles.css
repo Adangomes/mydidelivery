@@ -165,7 +165,9 @@
     font-size: .75rem;
     padding: 4px 12px;
     color: #666;
-    flex-grow: 1; 
+    min-height: 55px; 
+    display: flex;
+    align-items: flex-start;
 }
     
     .card-produto strong {
@@ -599,6 +601,7 @@
     .card-produto button:active {
         transform: scale(0.98);
     }
+
 
 
 
