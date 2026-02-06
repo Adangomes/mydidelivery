@@ -3,28 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel Admin - SNOOP LANCHE</title>
-    <link rel="stylesheet" href="admin.css">
-</head>
+    <title>SNOOP LANCHE - Admin</title>
+    <link rel="stylesheet" href="admin.css"> </head>
 <body>
 
-    <div id="container-ativacao" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:10000; display:flex; align-items:center; justify-content:center;">
-        <button onclick="ativarSomEDestravar()" style="padding:30px 60px; font-size:24px; background:#ffcc00; color:#000; border:none; border-radius:15px; font-weight:bold; cursor:pointer; box-shadow:0 0 30px rgba(255,204,0,0.4);">
-            🔊 CLIQUE PARA LIGAR O SOM
+    <div id="container-ativacao" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center;">
+        <button onclick="ativarSomEDestravar()" style="padding:30px 60px; font-size:24px; background:#ffcc00; color:#000; border:none; border-radius:15px; font-weight:bold; cursor:pointer;">
+            🔊 ATIVAR SOM DO SISTEMA
         </button>
     </div>
 
     <header class="admin-header">
-        <h1>Painel <span>SNOOP LANCHE</span></h1>
-        <button class="btn-relatorio" onclick="abrirRelatorio()">📊 Ver Relatório</button>
+        <h1>SNOOP <span>LANCHE</span></h1>
+        <button class="btn-relatorio" onclick="abrirRelatorio()">📊 HISTÓRICO</button>
     </header>
 
     <ul id="pedidos-container"></ul>
 
     <div id="modal-relatorio" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="fecharRelatorio()">&times;</span>
-            <h2 class="modal-title">HISTÓRICO DE VENDAS</h2>
+            <span style="float:right; cursor:pointer; font-size:28px; color:white;" onclick="fecharRelatorio()">&times;</span>
+            <h2 style="text-align:center; color:var(--primary);">HISTÓRICO DE VENDAS</h2>
             <div class="stats-container">
                 <div class="stat-box">PEDIDOS<br><b id="rel-qtd">0</b></div>
                 <div class="stat-box">TOTAL VENDIDO<br><b id="rel-total">R$ 0,00</b></div>
@@ -63,18 +62,13 @@
         function ativarSomEDestravar() {
             const context = new (window.AudioContext || window.webkitAudioContext)();
             if (context.state === 'suspended') context.resume();
-
-            const somTeste = new Audio('alert.mpeg');
-            somTeste.play().then(() => {
+            new Audio('alert.mpeg').play().then(() => {
                 audioLiberado = true;
                 prontoParaTocar = true;
                 document.getElementById('container-ativacao').style.display = 'none';
-            }).catch(e => {
-                alert("ERRO: Arquivo 'alert.mpeg' não encontrado.");
-            });
+            }).catch(() => alert("Arquivo alert.mpeg não encontrado!"));
         }
 
-        // ESCUTA NOVOS PEDIDOS
         db.ref('pedidos').on('child_added', (snap) => {
             const p = snap.val();
             const id = snap.key;
@@ -82,100 +76,58 @@
             li.className = 'pedido-card';
             li.id = `card-${id}`;
             
-            // Itens com preço unitário
             let itensHtml = Array.isArray(p.itens) ? p.itens.map(i => 
-                `• ${i.qtd}x ${i.produto} <small style="color:#777;">(R$ ${parseFloat(i.precoUn || 0).toFixed(2).replace('.',',')})</small>`
-            ).join('<br>') : "Erro nos itens";
+                `• ${i.qtd}x ${i.produto} <small style="color:#888;">(R$ ${parseFloat(i.precoUn || 0).toFixed(2)})</small>`
+            ).join('<br>') : "Erro";
 
             li.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <h3 style="margin:0;">${p.cliente}</h3>
-                    <span style="background:#000; color:#ffcc00; padding:5px 12px; border-radius:8px; font-weight:bold; font-size:1.2rem; border: 1px solid #ffcc00;">
-                        🕒 ${p.horario || '--:--'}
-                    </span>
-                </div>
-                <div style="margin:8px 0;"><span class="badge-pagamento">${p.pagamento || 'NÃO INFORMADO'}</span></div>
-                
+                <h3>${p.cliente} <span class="badge-pagamento">${p.pagamento}</span></h3>
+                <div class="info"><b>🕒 Horário:</b> ${p.horario}</div>
                 <div class="info"><b>📍 Endereço:</b> ${p.endereco}</div>
                 <div class="info"><b>📍 Ref:</b> ${p.referencia || 'Não informada'}</div>
                 
-                <div class="itens-box" style="background:#fff9e6; padding:12px; border-radius:8px; margin:12px 0; border-left: 5px solid #ffcc00;">
-                    <b style="color:#d32f2f; font-size:0.9rem;">🛒 ITENS DO PEDIDO:</b><br>
-                    <div style="margin-top:5px; font-weight:500;">${itensHtml}</div>
+                <div class="itens-box">
+                    <b style="color:var(--primary);">🛒 ITENS DO PEDIDO:</b><br>
+                    <div style="margin-top:5px;">${itensHtml}</div>
                 </div>
                 
-                <div class="info-obs"><b>💬 Obs Cozinha:</b> ${p.obs_cozinha || 'Nenhuma'}</div>
+                <div class="info-obs">💬 OBS: ${p.obs_cozinha || 'Nenhuma'}</div>
                 
-                <div style="background:#f2f2f2; padding:12px; border-radius:8px; margin-top:10px; border: 1px solid #ddd;">
-                    <div style="display:flex; justify-content:space-between; font-size:0.9rem; margin-bottom:4px;">
-                        <span>Produtos:</span> <span>R$ ${parseFloat(p.subtotal || 0).toFixed(2).replace('.',',')}</span>
+                <div class="financeiro-box">
+                    <div style="display:flex; justify-content:space-between; font-size:13px;">
+                        <span>Produtos: R$ ${parseFloat(p.subtotal).toFixed(2)}</span>
+                        <span>Taxa: R$ ${parseFloat(p.taxaEntrega).toFixed(2)}</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; font-size:0.9rem; color:#d32f2f; font-weight:bold;">
-                        <span>Taxa de Entrega:</span> <span>R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2).replace('.',',')}</span>
-                    </div>
-                    <div class="total" style="font-size:1.5rem; margin-top:8px; border-top:2px dashed #ccc; padding-top:8px; color:#000; font-weight:900;">
-                        TOTAL: R$ ${parseFloat(p.total || 0).toFixed(2).replace('.',',')}
-                    </div>
+                    <div class="total">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</div>
                 </div>
 
                 <div class="btn-group">
-                    <button class="btn-cozinha" onclick="imprimir('cozinha', '${id}')">Cozinha</button>
-                    <button class="btn-motoboy" onclick="imprimir('motoboy', '${id}')">Motoboy</button>
+                    <button class="btn-cozinha" onclick="imprimir('cozinha', '${id}')">COZINHA</button>
+                    <button class="btn-motoboy" onclick="imprimir('motoboy', '${id}')">MOTOBOY</button>
                 </div>
-                <button class="btn-concluir" onclick="concluirPedido('${id}')">✅ Concluir Pedido</button>
+                <button class="btn-concluir" onclick="concluirPedido('${id}')">✅ CONCLUIR PEDIDO</button>
             `;
             document.getElementById('pedidos-container').prepend(li);
-
-            if (prontoParaTocar && audioLiberado) {
-                new Audio('alert.mpeg').play().catch(e => {});
-            }
+            if (prontoParaTocar) new Audio('alert.mpeg').play().catch(()=>{});
         });
 
-        db.ref('pedidos').once('value', () => { 
-            setTimeout(() => { if(audioLiberado) prontoParaTocar = true; }, 2000); 
-        });
-
-        // IMPRESSÃO ATUALIZADA
         function imprimir(tipo, id) {
             db.ref('pedidos/'+id).once('value', s => {
                 const p = s.val();
-                let itens = Array.isArray(p.itens) ? p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>') : "Sem itens";
-                
+                let lista = Array.isArray(p.itens) ? p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>') : "";
                 let html = tipo === 'cozinha' ? 
-                    `<div style="width:72mm;font-family:Arial;text-align:center;">
-                        <h2>SNOOP LANCHE</h2>
-                        <h3>COZINHA (${p.horario})</h3><hr>
-                        <div style="text-align:left; font-size:14px;">
-                            <b>CLIENTE:</b> ${p.cliente}<br><hr>
-                            <b>ITENS:</b><br><div style="font-size:18px; font-weight:bold;">${itens}</div><br><hr>
-                            <b>OBS:</b> ${p.obs_cozinha}
-                        </div>
-                    </div>` :
-                    `<div style="width:72mm;font-family:Arial; font-size:14px;">
-                        <center><h2>SNOOP LANCHE</h2>
-                        <b>PEDIDO ÀS: ${p.horario}</b></center><hr>
-                        <b>CLIENTE:</b> ${p.cliente}<br>
-                        <b>ENDEREÇO:</b> ${p.endereco}<br>
-                        <b>REF:</b> ${p.referencia}<br><hr>
-                        <b>PAGAMENTO:</b> ${p.pagamento}<br>
-                        Produtos: R$ ${parseFloat(p.subtotal).toFixed(2)}<br>
-                        Taxa: R$ ${parseFloat(p.taxaEntrega).toFixed(2)}<br>
-                        <b style="font-size:18px;">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</b><br><hr>
-                        <b>OBS:</b> ${p.obs_cozinha}
-                    </div>`;
-
-                const doc = document.getElementById('iframe-impressao').contentWindow.document;
-                doc.open(); doc.write(`<html><body style="margin:0;" onload="window.print()">${html}</body></html>`); doc.close();
+                    `<div style="width:72mm;font-family:Arial;text-align:center;"><h2>SNOOP LANCHE</h2><h3>COZINHA</h3><hr><div style="text-align:left;"><b>CLIENTE:</b> ${p.cliente}<br><b>ITENS:</b><br><div style="font-size:18px;font-weight:bold;">${lista}</div><hr><b>OBS:</b> ${p.obs_cozinha}</div></div>` :
+                    `<div style="width:72mm;font-family:Arial;font-size:14px;"><center><h2>SNOOP LANCHE</h2></center><hr><b>CLIENTE:</b> ${p.cliente}<br><b>ENDEREÇO:</b> ${p.endereco}<br><b>REF:</b> ${p.referencia}<br><hr><div style="border:1px solid #000;padding:5px;"><b>CONFERIR PRODUTOS:</b><br><b>${lista}</b></div><hr><b>PAGAMENTO:</b> ${p.pagamento}<br><b>TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</b></div>`;
+                const win = document.getElementById('iframe-impressao').contentWindow;
+                win.document.open(); win.document.write(html); win.document.close(); win.print();
             });
         }
 
         function concluirPedido(id) {
-            if(confirm("Deseja concluir e arquivar este pedido?")){
+            if(confirm("Deseja concluir este pedido?")){
                 const ref = db.ref('pedidos/'+id);
                 ref.once('value', s => {
-                    const data = s.val();
-                    data.horaFinalizado = new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'});
-                    db.ref('relatorios').child(id).set(data).then(() => {
+                    db.ref('relatorios').child(id).set(s.val()).then(() => {
                         ref.remove();
                         document.getElementById('card-'+id).remove();
                     });
@@ -184,22 +136,20 @@
         }
 
         function abrirRelatorio() {
-            const lista = document.getElementById('tabela-relatorio');
-            lista.innerHTML = ''; let total = 0; let qtd = 0;
+            const t = document.getElementById('tabela-relatorio'); t.innerHTML = '';
+            let soma = 0; let q = 0;
             db.ref('relatorios').once('value', s => {
                 s.forEach(c => {
-                    const r = c.val(); total += parseFloat(r.total || 0); qtd++;
-                    lista.innerHTML += `<tr><td>${r.horario || '--:--'}</td><td>${r.cliente}</td><td>R$ ${parseFloat(r.total).toFixed(2)}</td></tr>`;
+                    const r = c.val(); soma += parseFloat(r.total); q++;
+                    t.innerHTML += `<tr><td>${r.horario}</td><td>${r.cliente}</td><td>R$ ${parseFloat(r.total).toFixed(2)}</td></tr>`;
                 });
-                document.getElementById('rel-total').innerText = `R$ ${total.toFixed(2).replace('.',',')}`;
-                document.getElementById('rel-qtd').innerText = qtd;
+                document.getElementById('rel-total').innerText = 'R$ ' + soma.toFixed(2);
+                document.getElementById('rel-qtd').innerText = q;
                 document.getElementById('modal-relatorio').style.display = 'block';
             });
         }
         function fecharRelatorio() { document.getElementById('modal-relatorio').style.display = 'none'; }
-        function limparRelatorio() { if(confirm("CUIDADO: Limpar todo o histórico de vendas?")) db.ref('relatorios').remove().then(() => abrirRelatorio()); }
+        function limparRelatorio() { if(confirm("Limpar todo o histórico?")) db.ref('relatorios').remove().then(() => abrirRelatorio()); }
     </script>
 </body>
 </html>
-
-
