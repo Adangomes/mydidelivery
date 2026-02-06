@@ -9,13 +9,6 @@
       "image": "/imagens/xsalada.jpeg"
     },
     {
-      "title": "BIFE À PARMEGIANA",
-      "price": 160,
-      "categoria": "parmediana",
-      "ingredientes": "Suculento bife à parmegiana acompanhado de arroz soltinho e salada fresca",
-      "image": "/imagens/parmediana.jpeg"
-    },
-    {
       "title": "PIZZA CALABRESA C/CEBOLA",
       "prices": {
         "P": 40,
@@ -248,6 +241,13 @@
       "ingredientes": "Frango à parmegiana, coberto de molho de tomate e queijo derretido, acompanhado de arroz branco soltinho e salada fresca",
       "image": "/imagens/parmediana.jpeg",
       "price": 140
+    },
+    {
+      "title": "BIFE À PARMEGIANA",
+      "ingredientes": "Suculento bife à parmegiana acompanhado de arroz soltinho e salada fresca",
+      "categoria": "parmediana",
+      "image": "/imagens/parmediana.jpeg",
+      "price": 159
     }
   ]
 }
