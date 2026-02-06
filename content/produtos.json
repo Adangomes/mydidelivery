@@ -304,6 +304,13 @@
       "ingredientes": ".",
       "image": "/imagens/teste.jpg",
       "price": 7
+    },
+    {
+      "title": "X GALINHA",
+      "categoria": "burger",
+      "ingredientes": ".HGSCUGwkjgcukdSCASDcSDVASVAGE",
+      "image": "/imagens/xsalada.jpeg",
+      "price": 100
     }
   ]
 }
