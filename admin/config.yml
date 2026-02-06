@@ -16,13 +16,18 @@ collections:
           - label: "Lista Geral de Produtos"
             name: "produtos"
             widget: "list"
-            summary: '{{fields.title}} ({{fields.categoria}})'
+            summary: '{{title}} ({{categoria}})'
             fields:
               - { label: "Nome", name: "title", widget: "string" }
-              - { label: "Categoria", name: "categoria", widget: "select", options: ["burger", "bebida", "pizza", "porcao", "dog"] }
+              - { 
+                  label: "Categoria", 
+                  name: "categoria", 
+                  widget: "select", 
+                  options: ["burger", "bebida", "pizza", "porcao", "dog", "parmediana"] 
+                }
               - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text" }
               - { label: "Imagem", name: "image", widget: "image" }
-              - { label: "Preço Único (Burger/Dog/Bebida)", name: "price", widget: "number", value_type: "float", required: false }
+              - { label: "Preço Único (Burger/Dog/Bebida/Parmediana)", name: "price", widget: "number", value_type: "float", required: false }
               - label: "Preços por Tamanho (Pizza/Porção)"
                 name: "prices"
                 widget: "object"
@@ -32,7 +37,6 @@ collections:
                   - { label: "Média (Só Pizza)", name: "M", widget: "number", value_type: "float", required: false }
                   - { label: "Grande / 1kg", name: "G", widget: "number", value_type: "float", required: false }
 
-  # AQUI ESTAVA O ERRO - AGORA CORRIGIDO
   - name: "configuracoes"
     label: "Configurações da Loja"
     files:
