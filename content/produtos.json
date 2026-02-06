@@ -311,6 +311,23 @@
       "ingredientes": ".HGSCUGwkjgcukdSCASDcSDVASVAGE",
       "image": "/imagens/xsalada.jpeg",
       "price": 100
+    },
+    {
+      "title": "COCA COLA 2L",
+      "categoria": "bebida",
+      "ingredientes": ".",
+      "image": "/imagens/teste.jpg",
+      "price": 18,
+      "prices": {
+        "P": ""
+      }
+    },
+    {
+      "title": "GUARANÁ ANTÁRTICA 2L",
+      "categoria": "bebida",
+      "ingredientes": ".",
+      "image": "/imagens/teste.jpg",
+      "price": 15
     }
   ]
 }
