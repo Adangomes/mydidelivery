@@ -64,6 +64,20 @@ async function carregarProdutos() {
         });
     } catch (error) { console.error("Erro produtos:", error); }
 }
+async function carregarParmedianas() {
+    const container = document.getElementById("parmedianas"); // O ID que você vai usar no HTML
+    if (!container) return;
+    try {
+        const res = await fetch("/content/produtos.json");
+        const data = await res.json();
+        const lista = data.produtos;
+        container.innerHTML = "";
+        lista.forEach((p) => {
+            if (p.categoria !== "parmediana") return; // Filtra a nova categoria
+            container.appendChild(criarCardProduto(p));
+        });
+    } catch (error) { console.error("Erro parmedianas:", error); }
+}
 
 async function carregarDogs() {
     const container = document.getElementById("dogs"); // Precisa ter esse ID no HTML
@@ -661,6 +675,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
