@@ -88,10 +88,10 @@ async function carregarParmedianas() {
         const res = await fetch("/content/produtos.json");
         const data = await res.json();
         const lista = data.produtos;
+        console.log("Produtos encontrados:", lista.filter(p => p.categoria === "parmediana"));
         container.innerHTML = "";
         lista.forEach((p) => {
-            // O toLowerCase() garante que 'Parmediana' ou 'parmediana' funcionem
-            if (p.categoria.toLowerCase().trim() === "parmediana") {
+            if (p.categoria === "parmediana") {
                 const card = document.createElement("div");
                 card.className = "card-produto";
                 card.innerHTML = `
@@ -693,6 +693,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
