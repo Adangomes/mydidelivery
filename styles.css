@@ -159,9 +159,11 @@
 }
 .card-produto h3 {
     font-size: .95rem;
-    padding: 10px 12px 0;
     font-weight: 600;
-    min-height: 40px;
+    padding: 10px 12px 0;
+
+    height: 44px;
+    overflow: hidden;
 
     display: flex;
     align-items: center;
@@ -169,23 +171,17 @@
 
 .card-produto p {
     font-size: .75rem;
-    padding: 4px 12px;
     color: #666;
+    padding: 4px 12px;
 
-    min-height: 60px;
-    flex-grow: 1; /* empurra tudo pra baixo */
-    display: flex;
-    align-items: flex-start;
-
+    height: 66px;
     overflow: hidden;
 }
 
 .card-produto strong {
     padding: 8px 12px;
     font-size: 1rem;
-
-    margin-top: auto; /* fixa no fundo */
-    display: block;
+    margin-top: auto;
 }
 
 .card-produto button {
@@ -613,6 +609,7 @@
     .card-produto button:active {
         transform: scale(0.98);
     }
+
 
 
 
