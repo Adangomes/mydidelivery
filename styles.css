@@ -159,15 +159,19 @@
         font-size: .95rem;
         padding: 10px 12px 0;
         font-weight: 600;
+        min-height: 40px; 
+    display: flex;
+    align-items: center;
     }
     
     .card-produto p {
     font-size: .75rem;
     padding: 4px 12px;
     color: #666;
-    min-height: 55px; 
+    min-height: 60px;  
     display: flex;
     align-items: flex-start;
+    overflow: hidden; 
 }
     
     .card-produto strong {
@@ -601,6 +605,7 @@
     .card-produto button:active {
         transform: scale(0.98);
     }
+
 
 
 
