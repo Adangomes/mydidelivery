@@ -176,6 +176,39 @@
         "M": 60,
         "G": 90
       }
+    },
+    {
+      "title": "BACON",
+      "categoria": "pizza",
+      "ingredientes": "Muçarela, bacon, tomate, orégano",
+      "image": "/imagens/margerita.jpeg",
+      "prices": {
+        "P": 40,
+        "M": 60,
+        "G": 90
+      }
+    },
+    {
+      "title": "MUSSARELA",
+      "categoria": "pizza",
+      "ingredientes": "Muçarela, requeijão, cheddar, orégano",
+      "image": "/imagens/margerita.jpeg",
+      "prices": {
+        "P": 40,
+        "M": 60,
+        "G": 90
+      }
+    },
+    {
+      "title": "FRANGO",
+      "categoria": "pizza",
+      "ingredientes": "Muçarela, frango, requeijão, orégano",
+      "image": "/imagens/margerita.jpeg",
+      "prices": {
+        "P": 40,
+        "M": 59,
+        "G": 90
+      }
     }
   ]
 }
