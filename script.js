@@ -88,20 +88,21 @@ async function carregarParmedianas() {
         const res = await fetch("/content/produtos.json");
         const data = await res.json();
         const lista = data.produtos;
-        console.log("Produtos encontrados:", lista.filter(p => p.categoria === "parmediana"));
         container.innerHTML = "";
         lista.forEach((p) => {
             if (p.categoria === "parmediana") {
                 const card = document.createElement("div");
                 card.className = "card-produto";
                 card.innerHTML = `
-                    <img src="${p.imagem}" alt="${p.nome}">
-                    <h3>${p.nome}</h3>
-                    <p>${p.descricao}</p> 
-                    <strong>R$ ${p.preco.toFixed(2).replace('.', ',')}</strong>
-                    <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})">
-                        Adicionar
-                    </button>`;
+                    <img src="${p.imagem}" alt="${p.nome}" style="width:100%; border-radius:10px;">
+                    <div style="text-align:center; padding:10px;">
+                        <h3 style="margin:10px 0;">${p.nome}</h3>
+                        <p style="font-size:0.9rem; color:#666;">${p.descricao}</p> 
+                        <strong style="display:block; margin:10px 0; font-size:1.2rem;">R$ ${p.preco.toFixed(2).replace('.', ',')}</strong>
+                        <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})" style="cursor:pointer;">
+                            Adicionar
+                        </button>
+                    </div>`;
                 container.appendChild(card);
             }
         });
@@ -693,6 +694,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
