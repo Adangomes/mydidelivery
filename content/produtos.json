@@ -209,6 +209,17 @@
         "M": 59,
         "G": 90
       }
+    },
+    {
+      "title": "CALABRESA",
+      "categoria": "pizza",
+      "ingredientes": "Muçarela, calabresa, orégano",
+      "image": "/imagens/margerita.jpeg",
+      "prices": {
+        "P": 40,
+        "M": 60,
+        "G": 90
+      }
     }
   ]
 }
