@@ -679,6 +679,10 @@ if (btnFinal) {
 carregarPorcoes();
 
 
+function voltarParaFormulario() {
+    document.getElementById("resumo-pedido").style.display = "none";
+    document.getElementById("form-entrega").style.display = "block";
+}
 
 
 
