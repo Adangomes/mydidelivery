@@ -161,10 +161,12 @@
     }
     
     .card-produto p {
-        font-size: .75rem;
-        padding: 4px 12px;
-        color: #666;
-    }
+    font-size: .75rem;
+    padding: 4px 12px;
+    color: #666;
+    /* Adicione a linha abaixo aqui dentro */
+    flex-grow: 1; 
+}
     
     .card-produto strong {
         padding: 0 12px;
@@ -597,3 +599,4 @@
     .card-produto button:active {
         transform: scale(0.98);
     }
+
