@@ -349,6 +349,51 @@
       "ingredientes": "Pão, salsicha, bacon, requeijão, queijo, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
       "image": "/imagens/dog.jpeg",
       "price": 32
+    },
+    {
+      "title": "HAVAINA",
+      "categoria": "pizza",
+      "ingredientes": "Chocolate branco, abacaxi, morango",
+      "image": "/imagens/pizza1.jpeg",
+      "price": "",
+      "prices": {
+        "P": 40,
+        "M": 60,
+        "G": 90
+      }
+    },
+    {
+      "title": "BRASILEIRA",
+      "categoria": "pizza",
+      "ingredientes": "Chocolate preto, abacaxi, morango",
+      "image": "/imagens/pizza1.jpeg",
+      "prices": {
+        "P": 40,
+        "M": 60,
+        "G": 90
+      }
+    },
+    {
+      "title": "SENSAÇÃO",
+      "categoria": "pizza",
+      "ingredientes": "Chocolate preto, morango",
+      "image": "/imagens/pizza1.jpeg",
+      "prices": {
+        "P": 40,
+        "M": 60,
+        "G": 90
+      }
+    },
+    {
+      "title": "BANANA NEVADA",
+      "categoria": "pizza",
+      "ingredientes": "Chocolate branco, banana, canela",
+      "image": "/imagens/pizza1.jpeg",
+      "prices": {
+        "P": 40,
+        "M": 60,
+        "G": 90
+      }
     }
   ]
 }
