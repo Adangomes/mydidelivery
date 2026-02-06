@@ -157,13 +157,12 @@
     height: 140px; /* Sua altura de imagem */
     object-fit: cover;
 }
-
 .card-produto h3 {
     font-size: .95rem;
     padding: 10px 12px 0;
     font-weight: 600;
-    /* Alinhamento do título */
-    min-height: 40px; 
+    min-height: 40px;
+
     display: flex;
     align-items: center;
 }
@@ -172,19 +171,21 @@
     font-size: .75rem;
     padding: 4px 12px;
     color: #666;
-    /* Alinhamento da descrição */
+
     min-height: 60px;
-    flex: 1; /* Preenche o espaço para empurrar o preço */
+    flex-grow: 1; /* empurra tudo pra baixo */
     display: flex;
     align-items: flex-start;
-    overflow: hidden; 
+
+    overflow: hidden;
 }
 
 .card-produto strong {
-    padding: 0 12px;
-    margin-top: auto; /* O segredo do alinhamento do preço */
+    padding: 8px 12px;
     font-size: 1rem;
-    display: block; 
+
+    margin-top: auto; /* fixa no fundo */
+    display: block;
 }
 
 .card-produto button {
@@ -612,6 +613,7 @@
     .card-produto button:active {
         transform: scale(0.98);
     }
+
 
 
 
