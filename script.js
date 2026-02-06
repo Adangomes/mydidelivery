@@ -270,8 +270,7 @@ async function finalizarEntrega() {
         alert("Erro: Banco de dados não inicializado."); return;
     }
 
-    // --- PARTE QUE PRECISA MEXER (CAPTURA BLINDADA) ---
-    // Usamos o ?.value e o || "" para NUNCA retornar undefined
+    // --- CAPTURA DE DADOS ---
     const nomeCli    = document.getElementById("nomeCliente")?.value || "Não informado";
     const cidadeCli  = document.getElementById("cidade")?.value || "";
     const bairroCli  = document.getElementById("bairro")?.value || "";
@@ -282,43 +281,47 @@ async function finalizarEntrega() {
     const pagtoCli   = document.getElementById("pagamento")?.value || "Não informado";
     const valorTroco = document.getElementById("trocoPara")?.value || "";
 
-    // Validação de segurança
     if(!document.getElementById("pagamento")?.value) { 
         alert("Escolha a forma de pagamento!"); return; 
     }
 
+    // --- CÁLCULOS E HORÁRIO ---
     let subtotal = 0;
-    // Início da Mensagem
-    let msgWhatsApp = " *NOVO PEDIDO* %0A";
+    const agora = new Date();
+    const horarioPedido = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    
+    // --- CONSTRUÇÃO DA MENSAGEM (FOCO: CONFERÊNCIA MOTOBOY/CLIENTE) ---
+    let msgWhatsApp = `*🔔 NOVO PEDIDO - ${horarioPedido}* %0A`;
     msgWhatsApp += "---------------------------%0A";
     
     const itensPedido = carrinho.map(i => {
         subtotal += i.price * i.qtd;
-        // Se for pizza, destaca os sabores em negrito
         let tituloFinal = i.categoria === "pizza" ? `*${i.title}*` : i.title;
-        msgWhatsApp += `• ${i.qtd}x ${tituloFinal}%0A   _R$ ${(i.price * i.qtd).toFixed(2).replace(".", ",")}_%0A`;
+        // Itens com valor individual para conferência
+        msgWhatsApp += `• ${i.qtd}x ${tituloFinal} (R$ ${i.price.toFixed(2).replace(".", ",")})%0A`;
         return { produto: i.title, qtd: i.qtd, precoUn: i.price };
     });
 
     const totalGeral = subtotal + taxaEntregaCalculada;
 
     msgWhatsApp += "---------------------------%0A";
-    msgWhatsApp += ` *TOTAL: R$ ${totalGeral.toFixed(2).replace(".", ",")}*%0A`;
+    msgWhatsApp += ` *VALOR PRODUTOS:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += ` *TAXA ENTREGA:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += ` *TOTAL GERAL: R$ ${totalGeral.toFixed(2).replace(".", ",")}*%0A`;
     msgWhatsApp += "---------------------------%0A%0A";
 
     msgWhatsApp += ` *CLIENTE:* ${nomeCli}%0A`;
-    msgWhatsApp += ` *ENTREGA:* ${ruaCli}, ${numCli}%0A`;
-    msgWhatsApp += ` *BAIRRO:* ${bairroCli}%0A`;
+    msgWhatsApp += ` *ENTREGA:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
     msgWhatsApp += ` *REF:* _${pontoRef}_%0A%0A`;
     
     msgWhatsApp += ` *PAGAMENTO:* ${pagtoCli}%0A`;
     if(valorTroco) msgWhatsApp += ` *TROCO PARA:* R$ ${valorTroco}%0A`;
     
-    msgWhatsApp += ` *OBS:* ${obsCozinha}%0A`;
-    msgWhatsApp += "---------------------------";;
+    msgWhatsApp += ` *OBS COZINHA:* ${obsCozinha}%0A`;
+    msgWhatsApp += "---------------------------";
 
     try {
-        // Envia para o Firebase
+        // Envia para o Firebase (Incluindo Horário e Detalhamento)
         await db.ref('pedidos').push({
             cliente: nomeCli,
             cidade: cidadeCli,
@@ -331,25 +334,21 @@ async function finalizarEntrega() {
             subtotal: subtotal,
             taxaEntrega: taxaEntregaCalculada,
             total: totalGeral,
-            data: new Date().toISOString(),
+            horario: horarioPedido, // Para a cozinha controlar o tempo
+            data: agora.toISOString(),
             status: "novo"
         });
         
-        // Limpa o carrinho antes de sair
         carrinho = []; 
         salvarCarrinho(); 
         atualizarCarrinho(); 
         fecharDelivery();
 
-       // 2. PREPARA O ENVIO (A parte que você vai substituir)
         const numeroLimpo = WHATSAPP_NUMERO.replace(/\D/g, ''); 
-
-        // 3. DISPARA O WHATSAPP (O comando definitivo)
         window.location.href = `https://api.whatsapp.com/send?phone=${numeroLimpo}&text=${msgWhatsApp}`;
 
     } catch (error) {
         console.error("Erro Firebase:", error);
-        // Mesmo se o banco falhar, o cliente consegue enviar o pedido
         const numeroLimpo = WHATSAPP_NUMERO.replace(/\D/g, '');
         window.location.href = `https://api.whatsapp.com/send?phone=${numeroLimpo}&text=${msgWhatsApp}`;
     }
@@ -678,6 +677,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
