@@ -64,24 +64,19 @@ async function carregarProdutos() {
         });
     } catch (error) { console.error("Erro produtos:", error); }
 }
+
 async function carregarParmedianas() {
     const container = document.getElementById("parmedianas");
     if (!container) return;
-
     try {
         const res = await fetch("/content/produtos.json");
         const data = await res.json();
         const lista = data.produtos;
-        
-        container.innerHTML = ""; // Limpa o container antes de carregar
-
+        container.innerHTML = "";
         lista.forEach((p) => {
-            // Filtra apenas pela categoria 'parmediana'
             if (p.categoria === "parmediana") {
                 const card = document.createElement("div");
                 card.className = "card-produto";
-
-                // ESTA ESTRUTURA É A QUE O CSS USA PARA ALINHAR
                 card.innerHTML = `
                     <img src="${p.imagem}" alt="${p.nome}">
                     <h3>${p.nome}</h3>
@@ -89,8 +84,7 @@ async function carregarParmedianas() {
                     <strong>R$ ${p.preco.toFixed(2).replace('.', ',')}</strong>
                     <button onclick="adicionarAoCarrinho('${p.nome}', ${p.preco})">
                         Adicionar
-                    </button>
-                `;
+                    </button>`;
                 container.appendChild(card);
             }
         });
@@ -98,8 +92,6 @@ async function carregarParmedianas() {
         console.error("Erro ao carregar parmedianas:", error); 
     }
 }
-
-// Chamar a função quando a página carregar
 document.addEventListener("DOMContentLoaded", carregarParmedianas);
 async function carregarDogs() {
     const container = document.getElementById("dogs"); // Precisa ter esse ID no HTML
@@ -698,6 +690,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
