@@ -266,28 +266,28 @@
     {
       "title": "DOG CORAÇÃO",
       "categoria": "dog",
-      "ingredientes": "\"Pão, salsicha, coração, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "ingredientes": "Pão, salsicha, coração, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
       "image": "/imagens/dog.jpeg",
       "price": 30
     },
     {
       "title": "DOG CALABRESA",
       "categoria": "dog",
-      "ingredientes": "\"Pão, salsicha, calabresa, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "ingredientes": "Pão, salsicha, calabresa, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
       "image": "/imagens/dog.jpeg",
       "price": 23
     },
     {
       "title": "DOG CATUPIRY",
       "categoria": "dog",
-      "ingredientes": "\"Pão, salsicha, catupiry, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "ingredientes": "Pão, salsicha, catupiry, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
       "image": "/imagens/dog.jpeg",
       "price": 24
     },
     {
       "title": "DOG BIFE",
       "categoria": "dog",
-      "ingredientes": "\"Pão, salsicha, bife(coxão mole), tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "ingredientes": "Pão, salsicha, bife(coxão mole), tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
       "image": "/imagens/dog.jpeg",
       "price": 25
     },
@@ -304,13 +304,6 @@
       "ingredientes": ".",
       "image": "/imagens/teste.jpg",
       "price": 7
-    },
-    {
-      "title": "X GALINHA",
-      "categoria": "burger",
-      "ingredientes": ".HGSCUGwkjgcukdSCASDcSDVASVAGE",
-      "image": "/imagens/xsalada.jpeg",
-      "price": 100
     },
     {
       "title": "COCA COLA 2L",
@@ -342,6 +335,20 @@
       "ingredientes": ".",
       "image": "/imagens/teste.jpg",
       "price": 10
+    },
+    {
+      "title": "DOG PIZZA",
+      "categoria": "dog",
+      "ingredientes": "Pão, salsicha, presunto, requeijão, queijo, orégano, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "image": "/imagens/dog.jpeg",
+      "price": 23
+    },
+    {
+      "title": "DOG SICILANO",
+      "categoria": "dog",
+      "ingredientes": "Pão, salsicha, bacon, requeijão, queijo, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "image": "/imagens/dog.jpeg",
+      "price": 32
     }
   ]
 }
