@@ -290,6 +290,20 @@
       "ingredientes": "\"Pão, salsicha, bife(coxão mole), tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
       "image": "/imagens/dog.jpeg",
       "price": 25
+    },
+    {
+      "title": "kaiser lata",
+      "categoria": "bebida",
+      "ingredientes": ".",
+      "image": "/imagens/teste.jpg",
+      "price": 7
+    },
+    {
+      "title": "Amstel lata",
+      "categoria": "bebida",
+      "ingredientes": ".",
+      "image": "/imagens/teste.jpg",
+      "price": 7
     }
   ]
 }
