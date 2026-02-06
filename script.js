@@ -70,20 +70,17 @@ async function carregarParmedianas() {
     try {
         const res = await fetch("/content/produtos.json");
         const data = await res.json();
-        
-        // Filtra apenas os produtos da categoria parmediana
-        const parmegianas = data.produtos.filter(p => p.categoria === "parmediana");
-        
+        const lista = data.produtos;
         container.innerHTML = "";
-        parmegianas.forEach((p) => {
-            // Reutiliza sua função de criar card simples que já funciona nos burgers
-            container.appendChild(criarCardProduto(p));
+        
+        lista.forEach((p) => {
+            if (p.categoria === "parmediana") {
+                // Aqui ele usa a função criarCardProduto que já dá o estilo padrão
+                container.appendChild(criarCardProduto(p));
+            }
         });
-    } catch (error) { 
-        console.error("Erro ao carregar parmedianas:", error); 
-    }
+    } catch (error) { console.error("Erro ao carregar parmedianas:", error); }
 }
-
 async function carregarDogs() {
     const container = document.getElementById("dogs"); // Precisa ter esse ID no HTML
     if (!container) return;
@@ -681,6 +678,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
