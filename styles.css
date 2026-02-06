@@ -175,10 +175,11 @@
 }
     
     .card-produto strong {
-        padding: 0 12px;
-        margin-top: auto;
-        font-size: 1rem;
-    }
+    padding: 0 12px;
+    margin-top: auto; /* <--- ISSO AQUI É O SEGREDO FINAL */
+    font-size: 1rem;
+    display: block; /* Adicione isso para garantir que a margem funcione */
+}
     
     .card-produto button {
         margin: 12px;
@@ -605,6 +606,7 @@
     .card-produto button:active {
         transform: scale(0.98);
     }
+
 
 
 
