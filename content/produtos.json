@@ -238,7 +238,7 @@
     {
       "title": "FRANGO À PARMEGIANA",
       "categoria": "parmediana",
-      "ingredientes": "Frango à parmegiana, molho de tomate e queijo, acompanhado de arroz branco soltinho e salada fresca",
+      "ingredientes": "Frango à parmegiana, coberto de molho de tomate e queijo derretido, acompanhado de arroz branco soltinho e salada fresca",
       "image": "/imagens/parmediana.jpeg",
       "price": 140
     },
@@ -248,6 +248,27 @@
       "categoria": "parmediana",
       "image": "/imagens/parmediana.jpeg",
       "price": 160
+    },
+    {
+      "title": "DOG DUPLO",
+      "categoria": "dog",
+      "ingredientes": "\"Pão, 2 salsicha, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "image": "/imagens/dog.jpeg",
+      "price": 14
+    },
+    {
+      "title": "DOG FRANGO",
+      "categoria": "dog",
+      "ingredientes": "\"Pão, salsicha, frango, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "image": "/imagens/dog.jpeg",
+      "price": 22
+    },
+    {
+      "title": "DOG CORAÇÃO",
+      "categoria": "dog",
+      "ingredientes": "\"Pão, salsicha, coração, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "image": "/imagens/dog.jpeg",
+      "price": 30
     }
   ]
 }
