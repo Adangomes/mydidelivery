@@ -269,6 +269,27 @@
       "ingredientes": "\"Pão, salsicha, coração, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
       "image": "/imagens/dog.jpeg",
       "price": 30
+    },
+    {
+      "title": "DOG CALABRESA",
+      "categoria": "dog",
+      "ingredientes": "\"Pão, salsicha, calabresa, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "image": "/imagens/dog.jpeg",
+      "price": 23
+    },
+    {
+      "title": "DOG CATUPIRY",
+      "categoria": "dog",
+      "ingredientes": "\"Pão, salsicha, catupiry, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "image": "/imagens/dog.jpeg",
+      "price": 24
+    },
+    {
+      "title": "DOG BIFE",
+      "categoria": "dog",
+      "ingredientes": "\"Pão, salsicha, bife(coxão mole), tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "image": "/imagens/dog.jpeg",
+      "price": 25
     }
   ]
 }
