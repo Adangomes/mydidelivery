@@ -220,6 +220,27 @@
         "M": 60,
         "G": 90
       }
+    },
+    {
+      "title": "BATATA FRITA C/BACON",
+      "categoria": "porcao",
+      "ingredientes": ".",
+      "image": "/imagens/fritas.jpeg",
+      "price": 0,
+      "prices": {
+        "P": 40,
+        "G": 50
+      }
+    },
+    {
+      "title": "BATATA FRITA COMPLETA",
+      "categoria": "porcao",
+      "ingredientes": "Frango, bacon, calabresa, cheddar, requeijão",
+      "image": "/imagens/fritas.jpeg",
+      "prices": {
+        "P": 54,
+        "G": 71
+      }
     }
   ]
 }
