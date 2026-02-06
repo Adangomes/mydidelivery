@@ -157,6 +157,13 @@
       "ingredientes": "Pão, hambúrguer, queijo, presunto, strogonoff frango, batata palha, alface",
       "price": 19,
       "image": "/imagens/xsalada.jpeg"
+    },
+    {
+      "title": "X SICILIANO ",
+      "categoria": "burger",
+      "ingredientes": "Pão, hambúrguer, queijo, bacon, requeijão, alface",
+      "image": "/imagens/xsalada.jpeg",
+      "price": 21
     }
   ]
 }
