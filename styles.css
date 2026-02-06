@@ -129,71 +129,75 @@
     /* ============================= */
     
     .secao {
-        padding: 16px;
-    }
-    
-    .cards,
-    .products-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
-        gap: 14px;
-        align-items: stretch;
-    }
-    
-    .card-produto {
-        background: #fff;
-        border-radius: 18px;
-        overflow: hidden;
-        box-shadow: 0 12px 28px rgba(0, 0, 0, .08);
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-    
-    .card-produto img {
-        width: 100%;
-        height: 140px;
-        object-fit: cover;
-    }
-    
-    .card-produto h3 {
-        font-size: .95rem;
-        padding: 10px 12px 0;
-        font-weight: 600;
-        min-height: 40px; 
+    padding: 16px;
+}
+
+.cards,
+.products-grid {
+    display: grid;
+    /* Mantive sua medida de 165px */
+    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
+    gap: 14px;
+    /* Isso garante que todos os cards da mesma linha fiquem do mesmo tamanho */
+    align-items: stretch; 
+}
+
+.card-produto {
+    background: #fff;
+    border-radius: 18px; /* Suas bordas arredondadas */
+    overflow: hidden;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .08); /* Sua sombra */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.card-produto img {
+    width: 100%;
+    height: 140px; /* Sua altura de imagem */
+    object-fit: cover;
+}
+
+.card-produto h3 {
+    font-size: .95rem;
+    padding: 10px 12px 0;
+    font-weight: 600;
+    /* Alinhamento do título */
+    min-height: 40px; 
     display: flex;
     align-items: center;
-    }
-    
-    .card-produto p {
+}
+
+.card-produto p {
     font-size: .75rem;
     padding: 4px 12px;
     color: #666;
+    /* Alinhamento da descrição */
     min-height: 60px;
-    flex: 1;
+    flex: 1; /* Preenche o espaço para empurrar o preço */
     display: flex;
     align-items: flex-start;
     overflow: hidden; 
 }
-    
-    .card-produto strong {
+
+.card-produto strong {
     padding: 0 12px;
-    margin-top: auto; /* <--- ISSO AQUI É O SEGREDO FINAL */
+    margin-top: auto; /* O segredo do alinhamento do preço */
     font-size: 1rem;
-    display: block; /* Adicione isso para garantir que a margem funcione */
+    display: block; 
 }
-    
-    .card-produto button {
-        margin: 12px;
-        padding: 12px;
-        border-radius: 14px;
-        background: #111;
-        color: #fff;
-        border: none;
-        font-size: .85rem;
-        font-weight: 600;
-        cursor: pointer;
-    }
+
+.card-produto button {
+    margin: 12px;
+    padding: 12px;
+    border-radius: 14px;
+    background: #111; /* Sua cor preta */
+    color: #fff;
+    border: none;
+    font-size: .85rem;
+    font-weight: 600;
+    cursor: pointer;
+}
     /* ============================= */
     /* MODAIS */
     /* ============================= */
@@ -608,6 +612,7 @@
     .card-produto button:active {
         transform: scale(0.98);
     }
+
 
 
 
