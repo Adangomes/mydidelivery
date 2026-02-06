@@ -88,7 +88,7 @@
                 <div class="info"><b> Ref:</b> ${p.referencia || 'Não informada'}</div>
                 
                 <div class="itens-box">
-                    <b style="color:var(--primary);">🛒 ITENS DO PEDIDO:</b><br>
+                    <b style="color:var(--primary);"> ITENS DO PEDIDO:</b><br>
                     <div style="margin-top:5px;">${itensHtml}</div>
                 </div>
                 
@@ -121,7 +121,7 @@
                 
                 if (tipo === 'cozinha') {
                     html = `<div style="width:72mm;font-family:Arial;text-align:center;">
-                                <h2>SNOOP LANCHE</h2><h3>COZINHA</h3><hr>
+                                <h2>SNOOP LANCHE</h2><h3>COZINHA (${p.horario})</h3><hr>
                                 <div style="text-align:left;">
                                     <b>CLIENTE:</b> ${p.cliente}<br>
                                     <b>ITENS:</b><br>
@@ -130,9 +130,9 @@
                                 </div>
                             </div>`;
                 } else {
-                    // MOTOBOY FORMATADO COMO VOCÊ PEDIU
                     html = `<div style="width:72mm;font-family:Arial;font-size:14px;">
-                                <center><h2>SNOOP LANCHE</h2></center><hr>
+                                <center><h2>SNOOP LANCHE</h2>
+                                <b>HORÁRIO: ${p.horario}</b></center><hr>
                                 <b>CLIENTE:</b> ${p.cliente}<br>
                                 <b>ENDEREÇO:</b> ${p.endereco}<br>
                                 <b>REF:</b> ${p.referencia || 'Não informado'}<br>
@@ -150,7 +150,7 @@
                 
                 const win = document.getElementById('iframe-impressao').contentWindow;
                 win.document.open(); 
-                win.document.write(`<html><body onload="window.print()">${html}</body></html>`); 
+                win.document.write(`<html><body style="margin:0;" onload="window.print()">${html}</body></html>`); 
                 win.document.close();
             });
         }
