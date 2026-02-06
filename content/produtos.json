@@ -119,6 +119,23 @@
       "prices": {
         "P": -1
       }
+    },
+    {
+      "title": "X GALINHA ",
+      "categoria": "burger",
+      "ingredientes": "Pão, hambúrguer, queijo, presunto, frango, milho, ervilha, tomate, alface",
+      "image": "/imagens/xsalada.jpeg",
+      "prices": {
+        "P": -1
+      },
+      "price": 22
+    },
+    {
+      "title": "X TICK",
+      "categoria": "burger",
+      "ingredientes": "Pão, frango, queijo, requeijão",
+      "image": "/imagens/xsalada.jpeg",
+      "price": 22
     }
   ]
 }
