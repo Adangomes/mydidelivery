@@ -168,7 +168,8 @@
     font-size: .75rem;
     padding: 4px 12px;
     color: #666;
-    min-height: 60px;  
+    min-height: 60px;
+    flex: 1;
     display: flex;
     align-items: flex-start;
     overflow: hidden; 
@@ -606,6 +607,7 @@
     .card-produto button:active {
         transform: scale(0.98);
     }
+
 
 
 
