@@ -136,6 +136,27 @@
       "ingredientes": "Pão, frango, queijo, requeijão",
       "image": "/imagens/xsalada.jpeg",
       "price": 22
+    },
+    {
+      "title": "X EGG",
+      "categoria": "burger",
+      "ingredientes": "Pão, hambúrguer, queijo, presunto, ovo, milho, ervilha, tomate, alface",
+      "image": "/imagens/xsalada.jpeg",
+      "price": 21
+    },
+    {
+      "title": "X DOG",
+      "categoria": "burger",
+      "ingredientes": "Pão, hambúrguer, presunto, queijo, salsicha, milho, ervilha, tomate, alface",
+      "price": 21,
+      "image": "/imagens/xsalada.jpeg"
+    },
+    {
+      "title": "X STROGONOFF",
+      "categoria": "burger",
+      "ingredientes": "Pão, hambúrguer, queijo, presunto, strogonoff frango, batata palha, alface",
+      "price": 19,
+      "image": "/imagens/xsalada.jpeg"
     }
   ]
 }
