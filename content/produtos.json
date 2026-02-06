@@ -328,6 +328,20 @@
       "ingredientes": ".",
       "image": "/imagens/teste.jpg",
       "price": 15
+    },
+    {
+      "price": 10,
+      "image": "/imagens/teste.jpg",
+      "title": "LARANJINHA",
+      "categoria": "bebida",
+      "ingredientes": "."
+    },
+    {
+      "title": "FRAMBOESA 2L",
+      "categoria": "bebida",
+      "ingredientes": ".",
+      "image": "/imagens/teste.jpg",
+      "price": 10
     }
   ]
 }
