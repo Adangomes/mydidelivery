@@ -65,6 +65,22 @@ async function carregarProdutos() {
     } catch (error) { console.error("Erro produtos:", error); }
 }
 
+
+async function carregarDogs() {
+    const container = document.getElementById("dogs"); // Precisa ter esse ID no HTML
+    if (!container) return;
+    try {
+        const res = await fetch("/content/produtos.json");
+        const data = await res.json();
+        const lista = data.produtos;
+        container.innerHTML = "";
+        lista.forEach((p) => {
+            if (p.categoria !== "dog") return; // Filtra apenas categoria dog
+            container.appendChild(criarCardProduto(p));
+        });
+    } catch (error) { console.error("Erro dogs:", error); }
+}
+// DAQUI PRA BAIXO É DE PARMEGIANA
 async function carregarParmedianas() {
     const container = document.getElementById("parmedianas");
     if (!container) return;
@@ -74,7 +90,8 @@ async function carregarParmedianas() {
         const lista = data.produtos;
         container.innerHTML = "";
         lista.forEach((p) => {
-            if (p.categoria === "parmediana") {
+            // O toLowerCase() garante que 'Parmediana' ou 'parmediana' funcionem
+            if (p.categoria.toLowerCase().trim() === "parmediana") {
                 const card = document.createElement("div");
                 card.className = "card-produto";
                 card.innerHTML = `
@@ -93,21 +110,7 @@ async function carregarParmedianas() {
     }
 }
 document.addEventListener("DOMContentLoaded", carregarParmedianas);
-async function carregarDogs() {
-    const container = document.getElementById("dogs"); // Precisa ter esse ID no HTML
-    if (!container) return;
-    try {
-        const res = await fetch("/content/produtos.json");
-        const data = await res.json();
-        const lista = data.produtos;
-        container.innerHTML = "";
-        lista.forEach((p) => {
-            if (p.categoria !== "dog") return; // Filtra apenas categoria dog
-            container.appendChild(criarCardProduto(p));
-        });
-    } catch (error) { console.error("Erro dogs:", error); }
-}
-
+// DAQUI PRA CIMA É DE PARMEGIANA
 async function carregarBebidas() {
     const container = document.getElementById("bebidas");
     if (!container) return;
@@ -690,6 +693,7 @@ if (btnFinal) {
 
 // Inicialização
 carregarPorcoes();
+
 
 
 
