@@ -8,15 +8,15 @@
       "ingredientes": "Hambúrguer artesanal 140g, duas fatias de queijo e pão brioche",
       "image": "/imagens/teste.jpg"
     },
-     {
-  "title": "Bife à Parmegiana",
-  "price": 160.0,
-  "categoria": "parmediana",
-  "ingredientes": "Suculento bife à parmegiana acompanhado de arroz soltinho e salada fresca",
-  "image": "/imagens/parmegiana.jpg"
-}
     {
-      "title": "Pizza Calabresa c/ Cebola", 
+      "title": "Bife à Parmegiana",
+      "price": 160.0,
+      "categoria": "parmediana",
+      "ingredientes": "Suculento bife à parmegiana acompanhado de arroz soltinho e salada fresca",
+      "image": "/imagens/parmegiana.jpg"
+    },
+    {
+      "title": "Pizza Calabresa c/ Cebola",
       "prices": {
         "P": 40.0,
         "M": 60.0,
