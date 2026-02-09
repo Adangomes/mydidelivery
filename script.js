@@ -221,7 +221,12 @@ window.removerItem = function(index) {
 // ==================================================
 function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
 function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
-function abrirDelivery() { 
+function abrirDelivery() {
+    // --- TRAVA DE SEGURANÇA: CARRINHO VAZIO ---
+    if (carrinho.length === 0) {
+        alert("Seu carrinho está vazio! Adicione algum produto antes de finalizar.");
+        return; 
+    }
     fecharCarrinho(); 
     document.getElementById("delivery-modal").style.display = "flex";
     document.getElementById("form-entrega").style.display = "block";
@@ -686,6 +691,7 @@ function voltarParaDados() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
 
 
 
