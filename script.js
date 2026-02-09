@@ -290,14 +290,13 @@ async function finalizarEntrega() {
     const agora = new Date();
     const horarioPedido = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     
-    // --- CONSTRUÇÃO DA MENSAGEM (FOCO: CONFERÊNCIA MOTOBOY/CLIENTE) ---
-    let msgWhatsApp = `*🔔 NOVO PEDIDO - ${horarioPedido}* %0A`;
+    // --- CONSTRUÇÃO DA MENSAGEM ---
+    let msgWhatsApp = `*🔔 NOVO PEDIDO - ${horarioPedido}*%0A`;
     msgWhatsApp += "---------------------------%0A";
     
     const itensPedido = carrinho.map(i => {
         subtotal += i.price * i.qtd;
         let tituloFinal = i.categoria === "pizza" ? `*${i.title}*` : i.title;
-        // Itens com valor individual para conferência
         msgWhatsApp += `• ${i.qtd}x ${tituloFinal} (R$ ${i.price.toFixed(2).replace(".", ",")})%0A`;
         return { produto: i.title, qtd: i.qtd, precoUn: i.price };
     });
@@ -305,23 +304,29 @@ async function finalizarEntrega() {
     const totalGeral = subtotal + taxaEntregaCalculada;
 
     msgWhatsApp += "---------------------------%0A";
-    msgWhatsApp += ` *VALOR PRODUTOS:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += ` *TAXA ENTREGA:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
-    msgWhatsApp += ` *TOTAL GERAL: R$ ${totalGeral.toFixed(2).replace(".", ",")}*%0A`;
+    msgWhatsApp += `*VALOR PRODUTOS:* R$ ${subtotal.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += `*TAXA ENTREGA:* R$ ${taxaEntregaCalculada.toFixed(2).replace(".", ",")}%0A`;
+    msgWhatsApp += `*TOTAL GERAL: R$ ${totalGeral.toFixed(2).replace(".", ",")}*%0A`;
     msgWhatsApp += "---------------------------%0A%0A";
 
-    msgWhatsApp += ` *CLIENTE:* ${nomeCli}%0A`;
-    msgWhatsApp += ` *ENTREGA:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
-    msgWhatsApp += ` *REF:* _${pontoRef}_%0A%0A`;
+    msgWhatsApp += `*CLIENTE:* ${nomeCli}%0A`;
+    msgWhatsApp += `*ENTREGA:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
+    msgWhatsApp += `*REF:* _${pontoRef}_%0A%0A`;
     
-    msgWhatsApp += ` *PAGAMENTO:* ${pagtoCli}%0A`;
-    if(valorTroco) msgWhatsApp += ` *TROCO PARA:* R$ ${valorTroco}%0A`;
+    msgWhatsApp += `*PAGAMENTO:* ${pagtoCli}%0A`;
+    if(valorTroco) msgWhatsApp += `*TROCO PARA:* R$ ${valorTroco}%0A`;
     
-    msgWhatsApp += ` *OBS COZINHA:* ${obsCozinha}%0A`;
+    msgWhatsApp += `*OBS COZINHA:* ${obsCozinha}%0A`;
     msgWhatsApp += "---------------------------";
 
+    // --- FUNÇÃO PARA ABRIR O WHATSAPP DIRETO ---
+    const enviarWhats = () => {
+        const numeroLimpo = WHATSAPP_NUMERO.replace(/\D/g, '');
+        // wa.me abre o app direto sem tela de confirmação em muitos navegadores
+        window.open(`https://wa.me/${numeroLimpo}?text=${msgWhatsApp}`, "_blank");
+    };
+
     try {
-        // Envia para o Firebase (Incluindo Horário e Detalhamento)
         await db.ref('pedidos').push({
             cliente: nomeCli,
             cidade: cidadeCli,
@@ -334,7 +339,7 @@ async function finalizarEntrega() {
             subtotal: subtotal,
             taxaEntrega: taxaEntregaCalculada,
             total: totalGeral,
-            horario: horarioPedido, // Para a cozinha controlar o tempo
+            horario: horarioPedido,
             data: agora.toISOString(),
             status: "novo"
         });
@@ -343,14 +348,11 @@ async function finalizarEntrega() {
         salvarCarrinho(); 
         atualizarCarrinho(); 
         fecharDelivery();
-
-        const numeroLimpo = WHATSAPP_NUMERO.replace(/\D/g, ''); 
-        window.location.href = `https://api.whatsapp.com/send?phone=${numeroLimpo}&text=${msgWhatsApp}`;
+        enviarWhats(); // Chama o WhatsApp aqui
 
     } catch (error) {
         console.error("Erro Firebase:", error);
-        const numeroLimpo = WHATSAPP_NUMERO.replace(/\D/g, '');
-        window.location.href = `https://api.whatsapp.com/send?phone=${numeroLimpo}&text=${msgWhatsApp}`;
+        enviarWhats(); // Se o Firebase falhar, ainda envia o Whats
     }
 }
 
@@ -684,6 +686,7 @@ function voltarParaDados() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
 
 
 
