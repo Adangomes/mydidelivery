@@ -1,4 +1,4 @@
 {
-  "aberto": true,
-  "mensagem": "ABERTO"
+  "aberto": false,
+  "mensagem": "Fechado"
 }
