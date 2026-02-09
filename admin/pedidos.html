@@ -7,6 +7,39 @@
     <link rel="stylesheet" href="admin.css"> 
 </head>
 <body>
+    <!-- 🔐 LOGIN ADMIN -->
+<div id="login-admin" style="
+    position:fixed;
+    inset:0;
+    background:#000;
+    z-index:30000;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+">
+    <div style="background:#111; padding:40px; border-radius:20px; text-align:center; width:320px;">
+        <h2 style="color:#ffcc00;">🔒 ÁREA ADMIN</h2>
+        <input 
+            type="password" 
+            id="senhaAdmin" 
+            placeholder="Digite a senha"
+            style="width:100%; padding:15px; font-size:18px; border-radius:10px; border:none; margin:20px 0;"
+        >
+        <button onclick="verificarSenha()" style="
+            width:100%;
+            padding:15px;
+            font-size:18px;
+            background:#ffcc00;
+            border:none;
+            border-radius:10px;
+            font-weight:bold;
+            cursor:pointer;
+        ">
+            ENTRAR
+        </button>
+        <p id="erro-senha" style="color:red; display:none;">Senha incorreta</p>
+    </div>
+</div>
 
     <div id="container-ativacao" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:10000; display:flex; align-items:center; justify-content:center;">
         <button onclick="ativarSomEDestravar()" style="padding:30px 60px; font-size:24px; background:#ffcc00; color:#000; border:none; border-radius:15px; font-weight:bold; cursor:pointer;">
@@ -45,6 +78,26 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
+            // ===============================
+    // 🔐 CONFIG SENHA ADMIN
+    // ===============================
+    const SENHA_ADMIN = "snoop123";
+
+    function verificarSenha() {
+        const senha = document.getElementById("senhaAdmin").value;
+
+        if (senha === SENHA_ADMIN) {
+            document.getElementById("login-admin").style.display = "none";
+            localStorage.setItem("admin_logado", "true");
+        } else {
+            document.getElementById("erro-senha").style.display = "block";
+        }
+    }
+
+    if (localStorage.getItem("admin_logado") === "true") {
+        document.getElementById("login-admin").style.display = "none";
+    }
+
         const firebaseConfig = {
             apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
             authDomain: "myproject26-10f0e.firebaseapp.com",
@@ -185,3 +238,4 @@
     </script>
 </body>
 </html>
+
