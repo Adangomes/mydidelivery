@@ -271,11 +271,15 @@ async function mostrarResumo() {
 // FINALIZAR PEDIDO (FIREBASE + WHATSAPP)
 // ==================================================
 async function finalizarEntrega() {
+
     if (typeof db === 'undefined') {
-        alert("Erro: Banco de dados não inicializado."); return;
+        alert("Erro: Banco de dados não inicializado.");
+        return;
     }
 
-    // --- CAPTURA DE DADOS ---
+    // ===============================
+    // CAPTURA DE DADOS DO CLIENTE
+    // ===============================
     const nomeCli    = document.getElementById("nomeCliente")?.value || "Não informado";
     const cidadeCli  = document.getElementById("cidade")?.value || "";
     const bairroCli  = document.getElementById("bairro")?.value || "";
@@ -283,27 +287,44 @@ async function finalizarEntrega() {
     const numCli     = document.getElementById("numero")?.value || "";
     const pontoRef   = document.getElementById("pontoReferencia")?.value || "Não informado";
     const obsCozinha = document.getElementById("obsCozinha")?.value || "Nenhuma";
-    const pagtoCli   = document.getElementById("pagamento")?.value || "Não informado";
+    const pagtoCli   = document.getElementById("pagamento")?.value || "";
     const valorTroco = document.getElementById("trocoPara")?.value || "";
 
-    if(!document.getElementById("pagamento")?.value) { 
-        alert("Escolha a forma de pagamento!"); return; 
+    if (!pagtoCli) {
+        alert("Escolha a forma de pagamento!");
+        return;
     }
 
-    // --- CÁLCULOS E HORÁRIO ---
+    // ===============================
+    // CÁLCULOS
+    // ===============================
     let subtotal = 0;
     const agora = new Date();
-    const horarioPedido = agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    
-    // --- CONSTRUÇÃO DA MENSAGEM ---
-    let msgWhatsApp = `*🔔 NOVO PEDIDO - ${horarioPedido}*%0A`;
+    const horarioPedido = agora.toLocaleTimeString('pt-BR', {
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    // ===============================
+    // MONTAGEM DA MENSAGEM WHATSAPP
+    // ===============================
+    let msgWhatsApp = `* NOVO PEDIDO - ${horarioPedido}*%0A`;
     msgWhatsApp += "---------------------------%0A";
-    
-    const itensPedido = carrinho.map(i => {
-        subtotal += i.price * i.qtd;
-        let tituloFinal = i.categoria === "pizza" ? `*${i.title}*` : i.title;
-        msgWhatsApp += `• ${i.qtd}x ${tituloFinal} (R$ ${i.price.toFixed(2).replace(".", ",")})%0A`;
-        return { produto: i.title, qtd: i.qtd, precoUn: i.price };
+
+    const itensPedido = carrinho.map(item => {
+        subtotal += item.price * item.qtd;
+
+        let tituloFinal = item.categoria === "pizza"
+            ? `*${item.title}*`
+            : item.title;
+
+        msgWhatsApp += `• ${item.qtd}x ${tituloFinal} (R$ ${item.price.toFixed(2).replace(".", ",")})%0A`;
+
+        return {
+            produto: item.title,
+            qtd: item.qtd,
+            precoUn: item.price
+        };
     });
 
     const totalGeral = subtotal + taxaEntregaCalculada;
@@ -317,21 +338,29 @@ async function finalizarEntrega() {
     msgWhatsApp += `*CLIENTE:* ${nomeCli}%0A`;
     msgWhatsApp += `*ENTREGA:* ${ruaCli}, ${numCli} - ${bairroCli}%0A`;
     msgWhatsApp += `*REF:* _${pontoRef}_%0A%0A`;
-    
+
     msgWhatsApp += `*PAGAMENTO:* ${pagtoCli}%0A`;
-    if(valorTroco) msgWhatsApp += `*TROCO PARA:* R$ ${valorTroco}%0A`;
-    
+    if (valorTroco) {
+        msgWhatsApp += `*TROCO PARA:* R$ ${valorTroco}%0A`;
+    }
+
     msgWhatsApp += `*OBS COZINHA:* ${obsCozinha}%0A`;
     msgWhatsApp += "---------------------------";
 
-    // --- FUNÇÃO PARA ABRIR O WHATSAPP DIRETO ---
-    const enviarWhats = () => {
-        const numeroLimpo = WHATSAPP_NUMERO.replace(/\D/g, '');
-        // wa.me abre o app direto sem tela de confirmação em muitos navegadores
-        window.open(`https://wa.me/${numeroLimpo}?text=${msgWhatsApp}`, "_blank");
-    };
+    // ===============================
+    // ABRE O WHATSAPP (ANTES DO AWAIT)
+    // ===============================
+    const numeroLimpo = WHATSAPP_NUMERO.replace(/\D/g, '');
+    const linkWhats = `https://wa.me/${numeroLimpo}?text=${msgWhatsApp}`;
 
+    // 🔥 ESSENCIAL: abre no clique do usuário
+    window.open(linkWhats, "_blank");
+
+    // ===============================
+    // SALVA NO FIREBASE
+    // ===============================
     try {
+
         await db.ref('pedidos').push({
             cliente: nomeCli,
             cidade: cidadeCli,
@@ -348,16 +377,14 @@ async function finalizarEntrega() {
             data: agora.toISOString(),
             status: "novo"
         });
-        
-        carrinho = []; 
-        salvarCarrinho(); 
-        atualizarCarrinho(); 
+
+        carrinho = [];
+        salvarCarrinho();
+        atualizarCarrinho();
         fecharDelivery();
-        enviarWhats(); // Chama o WhatsApp aqui
 
     } catch (error) {
-        console.error("Erro Firebase:", error);
-        enviarWhats(); // Se o Firebase falhar, ainda envia o Whats
+        console.error("Erro ao salvar no Firebase:", error);
     }
 }
 
@@ -691,6 +718,7 @@ function voltarParaDados() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
 
 
 
