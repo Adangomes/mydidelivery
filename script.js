@@ -235,11 +235,25 @@ function abrirDelivery() {
 function fecharDelivery() { document.getElementById("delivery-modal").style.display = "none"; }
 
 async function calcularTaxa(endereco) {
-    const geo = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(endereco)}&limit=1&apiKey=${GEOAPIFY_KEY}`).then(r => r.json());
+
+    const geo = await fetch(
+        `https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(endereco)}&limit=1&apiKey=${GEOAPIFY_KEY}`
+    ).then(r => r.json());
+
     const destino = geo.features[0].geometry.coordinates;
-    const rota = await fetch(`https://api.geoapify.com/v1/routing?waypoints=${RESTAURANTE_COORD[1]},${RESTAURANTE_COORD[0]}|${destino[1]},${destino[0]}&mode=drive&apiKey=${GEOAPIFY_KEY}`).then(r => r.json());
+
+    const rota = await fetch(
+        `https://api.geoapify.com/v1/routing?waypoints=${RESTAURANTE_COORD[1]},${RESTAURANTE_COORD[0]}|${destino[1]},${destino[0]}&mode=drive&apiKey=${GEOAPIFY_KEY}`
+    ).then(r => r.json());
+
     const km = rota.features[0].properties.distance / 1000;
-    return TAXA_BASE + km * VALOR_POR_KM;
+
+    // 🔥 REGRA: MENOS DE 1 KM = ENTREGA GRÁTIS
+    if (km < 1) {
+        return 0;
+    }
+
+    return TAXA_BASE + (km * VALOR_POR_KM);
 }
 
 async function mostrarResumo() {
@@ -308,7 +322,7 @@ async function finalizarEntrega() {
     // ===============================
     // MONTAGEM DA MENSAGEM WHATSAPP
     // ===============================
-    let msgWhatsApp = `* NOVO PEDIDO - ${horarioPedido}*%0A`;
+    let msgWhatsApp = `*NOVO PEDIDO - ${horarioPedido}*%0A`;
     msgWhatsApp += "---------------------------%0A";
 
     const itensPedido = carrinho.map(item => {
@@ -718,6 +732,7 @@ function voltarParaDados() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
 
 
 
