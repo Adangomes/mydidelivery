@@ -394,6 +394,13 @@
         "M": 60,
         "G": 90
       }
+    },
+    {
+      "title": "ENERGÉTICO",
+      "categoria": "bebida",
+      "image": "/imagens/guarana.jpeg",
+      "price": 100,
+      "ingredientes": "."
     }
   ]
 }
