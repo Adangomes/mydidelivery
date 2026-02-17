@@ -770,29 +770,29 @@ function voltarParaDados() {
 
 
 // ATIVA PROMOÇAO 
-// Função para sincronizar automaticamente com o Portal MYDI
 async function sincronizarPromoComPortal() {
     try {
-        // O "?t=" impede que o navegador use uma versão "velha" (cache) do arquivo
+        // Busca o status atualizado
         const res = await fetch("/content/status.json?t=" + new Date().getTime());
         const data = await res.json();
         
-        // Verifica se o Firebase (db) está carregado na página
-        if (data.promocaoAtiva !== undefined && window.db) {
+        // Verifica se o Firebase está disponível e se o campo existe
+        if (window.db && data.promocaoAtiva !== undefined) {
             window.db.ref('lojas/snoop_lanche').update({
-                promo: data.promocaoAtiva,
+                promo: data.promocaoAtiva, // Puxa o valor do seu Switch do CMS
                 nome: "SNOOP LANCHE",
                 ultimaAtualizacao: new Date().toISOString()
             });
-            console.log("Portal Mydi atualizado via Firebase! Status Promo:", data.promocaoAtiva);
+            console.log("Portal Mydi Sincronizado! Promoção está:", data.promocaoAtiva);
         }
     } catch (e) {
-        console.error("Erro ao sincronizar com Firebase:", e);
+        console.error("Erro na sincronização:", e);
     }
 }
 
-// Executa a sincronização assim que o script é lido
+// Chama a função
 sincronizarPromoComPortal();
+
 
 
 
