@@ -301,7 +301,7 @@
     {
       "title": "Amstel lata",
       "categoria": "bebida",
-      "ingredientes": ".",
+      "ingredientes": "350 ml",
       "image": "/imagens/teste.jpg",
       "price": 7
     },
@@ -394,6 +394,13 @@
         "M": 60,
         "G": 90
       }
+    },
+    {
+      "categoria": "promocao",
+      "title": "X BACON + COCA LATA",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, bacon, milho, ervilha, tomate, alface + COCA LATA 350ml",
+      "price": 34.99,
+      "image": "/imagens/xsalada.jpeg"
     }
   ]
 }
