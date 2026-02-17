@@ -33,6 +33,40 @@ async function carregarStatusLoja() {
         console.error("Erro ao carregar status");
     }
 }
+// ==================================================
+// CARREGA PROMOÇAO
+async function carregarPromocoes() {
+    const container = document.getElementById("promocoes"); // Certifique-se de ter esse ID no HTML
+    if (!container) return;
+
+    try {
+        const res = await fetch("/content/produtos.json");
+        const data = await res.json();
+        const lista = data.produtos;
+
+        container.innerHTML = "";
+
+        lista.forEach((p) => {
+            // Se você definiu no CMS a categoria "promocao"
+            if (p.categoria !== "promocao") return; 
+
+            // Se você seguiu minha dica do campo "Ativar Promoção?" (boolean), use:
+            // if (!p.promo) return;
+
+            container.appendChild(criarCardProduto(p));
+        });
+
+        // Se o container estiver vazio após o loop, você pode exibir uma mensagem
+        if (container.innerHTML === "") {
+            container.innerHTML = "<p class='text-gray-400 text-xs'>Nenhuma promoção ativa hoje.</p>";
+        }
+
+    } catch (error) { 
+        console.error("Erro promocoes:", error); 
+    }
+}
+
+// ==================================================
 
 // ==================================================
 // MOTOR DE RENDERIZAÇÃO
@@ -412,6 +446,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initSplash(); 
     initMenu(); 
     carregarStatusLoja();
+    carregarPromocoes();
     carregarProdutos();
     carregarDogs();
     carregarPorcoes();
@@ -732,6 +767,7 @@ function voltarParaDados() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
 
 
 
