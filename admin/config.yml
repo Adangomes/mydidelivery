@@ -23,7 +23,7 @@ collections:
                   label: "Categoria", 
                   name: "categoria", 
                   widget: "select", 
-                  options: ["burger", "bebida", "pizza", "porcao", "dog", "parmediana"] 
+                  options: ["burger", "bebida", "pizza", "porcao", "dog", "parmediana", "promocao"] 
                 }
               - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text" }
               - { label: "Imagem", name: "image", widget: "image" }
@@ -46,3 +46,4 @@ collections:
         fields:
           - { label: "Loja Aberta?", name: "aberto", widget: "boolean", default: true }
           - { label: "Mensagem Fechado", name: "mensagem", widget: "string" }
+
