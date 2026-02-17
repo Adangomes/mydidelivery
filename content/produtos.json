@@ -400,7 +400,8 @@
       "categoria": "promocao",
       "ingredientes": "Pão, humbúrguer,queijo, presunto, bacon, milho, ervilha, tomate, alface + coca lata 350ml",
       "image": "/imagens/xsalada.jpeg",
-      "price": 34.99
+      "price": 34.99,
+      "oldPrice": 40
     }
   ]
 }
