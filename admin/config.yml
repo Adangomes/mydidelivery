@@ -37,7 +37,7 @@ collections:
                   - { label: "Média (Só Pizza)", name: "M", widget: "number", value_type: "float", required: false }
                   - { label: "Grande / 1kg", name: "G", widget: "number", value_type: "float", required: false }
 
-  - name: "configuracoes"
+   - name: "configuracoes"
     label: "Configurações da Loja"
     files:
       - file: "content/status.json"
@@ -45,5 +45,6 @@ collections:
         name: "status_loja"
         fields:
           - { label: "Loja Aberta?", name: "aberto", widget: "boolean", default: true }
+          - { label: "Ativar Promoção no App Mydi?", name: "promocaoAtiva", widget: "boolean", default: false }
           - { label: "Mensagem Fechado", name: "mensagem", widget: "string" }
 
