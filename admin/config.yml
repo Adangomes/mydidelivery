@@ -28,6 +28,10 @@ collections:
               - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text" }
               - { label: "Imagem", name: "image", widget: "image" }
               - { label: "Preço Único (Burger/Dog/Bebida/Parmediana)", name: "price", widget: "number", value_type: "float", required: false }
+              
+              # --- CAMPO ADICIONADO ABAIXO ---
+              - { label: "Preço Antigo (Para aparecer riscado)", name: "oldPrice", widget: "number", value_type: "float", required: false }
+              
               - label: "Preços por Tamanho (Pizza/Porção)"
                 name: "prices"
                 widget: "object"
