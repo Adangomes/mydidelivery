@@ -394,6 +394,13 @@
         "M": 60,
         "G": 90
       }
+    },
+    {
+      "title": "X BACON + COCA COLA LATA",
+      "categoria": "promocao",
+      "ingredientes": "Pão, humbúrguer,queijo, presunto, bacon, milho, ervilha, tomate, alface + Coca lata 350ml",
+      "image": "/imagens/xsalada.jpeg",
+      "price": 34.99
     }
   ]
 }
