@@ -44,3 +44,4 @@ collections:
           - { label: "Loja Aberta?", name: "aberto", widget: "boolean", default: true }
           - { label: "Ativar Promoção no App Mydi?", name: "promocaoAtiva", widget: "boolean", default: false }
           - { label: "Mensagem Fechado", name: "mensagem", widget: "string" }
+
