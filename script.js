@@ -380,47 +380,54 @@ function abrirModalPizza(nome) {
     pizzaPrincipal = produtosGeral.find(p => p.title === nome);
     if (!pizzaPrincipal) return;
 
-    saboresSelecionados = []; 
-    tamanhoSelecionado = null;
+    saboresSelecionados = [];
+    
+    // Identifica o limite máximo de sabores permitido para este item
+    let maxSaboresPermitidos = 1;
+    if (nome.includes("PIZZA M")) maxSaboresPermitidos = 2;
+    if (nome.includes("PIZZA G")) maxSaboresPermitidos = 3;
 
-    // Título e Descrição
+    // Preenche Título e Descrição
     document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
     document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes || "";
-    
-    // Esconde seções iniciais
-    document.getElementById("secao-sabores").style.display = "none";
-    if(document.getElementById("secao-adicionais")) document.getElementById("secao-adicionais").style.display = "none";
-    
-    // Configura o botão principal para o estado inicial
-    const btnConfirmar = document.getElementById("btn-confirmar-pizza");
-    btnConfirmar.disabled = true;
-    btnConfirmar.innerText = "Escolha o tamanho"; 
 
-    const container = document.getElementById("pizza-sizes-container");
-    container.innerHTML = "";
+    // Limpa a área de "Escolha o Tamanho" e coloca a "Quantidade de Sabores"
+    const containerTamanhos = document.getElementById("pizza-sizes-container");
+    const labelPasso = document.querySelector(".label-step"); // Onde diz "1. ESCOLHA O TAMANHO"
+    
+    if(labelPasso) labelPasso.innerText = "QUANTOS SABORES?";
+    
+    containerTamanhos.innerHTML = ""; // Limpa o botão "M R$ 60,00"
 
-    // Renderiza tamanhos
-    Object.keys(pizzaPrincipal.prices).forEach(tam => {
-        const btn = document.createElement("button");
-        btn.className = "btn-tamanho-opcional";
-        btn.innerHTML = `<strong>${tam}</strong><br>R$ ${pizzaPrincipal.prices[tam].toFixed(2)}`;
-        btn.onclick = () => {
-            tamanhoSelecionado = tam;
-            limiteSabores = tam === "P" ? 1 : (tam === "M" ? 2 : 3);
-            
-            document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
-            btn.classList.add("ativo");
-            
-            document.getElementById("secao-sabores").style.display = "block";
-            renderizarSabores();
-            
-            // Atualiza o texto do botão após escolher tamanho
-            btnConfirmar.innerText = `Selecione ${limiteSabores} sabor(es)`;
-        };
-        container.appendChild(btn);
-    });
+    // Se for Pizza P, apenas exibe a mensagem
+    if (maxSaboresPermitidos === 1) {
+        containerTamanhos.innerHTML = `<p style="color: #e67e22; font-weight: bold;">Somente 1 sabor disponível para este tamanho.</p>`;
+        limiteSabores = 1;
+        document.getElementById("secao-sabores").style.display = "block";
+        renderizarSabores();
+    } else {
+        // Se for M ou G, cria os botões 1, 2 ou 3
+        for (let i = 1; i <= maxSaboresPermitidos; i++) {
+            const btn = document.createElement("button");
+            btn.className = "btn-quantidade-sabor";
+            btn.innerText = `${i} Sabor${i > 1 ? 'es' : ''}`;
+            btn.onclick = () => {
+                limiteSabores = i;
+                document.querySelectorAll(".btn-quantidade-sabor").forEach(b => b.classList.remove("ativo"));
+                btn.classList.add("ativo");
+                document.getElementById("secao-sabores").style.display = "block";
+                renderizarSabores();
+                atualizarBotaoConfirmar();
+            };
+            containerTamanhos.appendChild(btn);
+        }
+    }
 
     document.getElementById("pizza-options-modal").style.display = "flex";
+}
+
+function fecharModalPizza() {
+    document.getElementById("pizza-options-modal").style.display = "none";
 }
 
 function renderizarSabores() {
@@ -503,6 +510,7 @@ async function carregarStatusLoja() {
         s.className = "status fechado";
     }
 }
+
 
 
 
