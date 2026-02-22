@@ -467,6 +467,12 @@ function toggleSabor(nome) {
     }
 }
 
+function mostrarToast(msg = "Produto adicionado!") {
+    const toast = document.getElementById("toast-geral");
+    toast.innerText = msg;
+    toast.classList.add("show");
+    setTimeout(() => toast.classList.remove("show"), 3000);
+}
 
 
 
