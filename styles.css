@@ -249,81 +249,82 @@ body { background: #fff; color: #333; overflow-x: hidden; }
    ============================================================ */
 
 /* Remove qualquer altura estranha de containers genéricos */
-.form-grid div {
-    height: auto !important;
+/* ============================================================
+   AJUSTE FINAL: FORMULÁRIO E RESUMO UNIFICADOS
+   ============================================================ */
+
+/* 1. Reset de containers para matar buracos brancos */
+.modal-overlay div {
+    height: auto !important; 
     margin: 0;
-    padding: 0;
 }
 
-/* CONTAINER DO FORMULÁRIO */
-.form-grid {
-    padding: 10px 20px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px; /* Espaço controlado entre as linhas */
+/* 2. Estilo do Resumo do Pedido (Ajustado) */
+.summary-box {
+    padding: 15px 20px;
     background: #fff;
+    border-top: 1px dashed #ddd; /* Linha discreta para separar do form */
+    margin-top: 0 !important; /* Cola no formulário */
 }
 
-/* INPUTS: Aqui definimos a altura, apenas nos campos! */
-.form-grid input,
-.form-grid select {
-    width: 100%;
-    height: 48px; /* Altura ideal do print profissional */
-    padding: 0 16px;
-    border-radius: 15px; /* Arredondamento suave */
-    border: 1px solid #ddd;
-    background: #fff;
-    font-size: 0.95rem;
-    color: #333;
-    outline: none;
-    box-sizing: border-box; /* Garante que o padding não aumente o campo */
-}
-
-/* TEXTAREA: Não pode ter altura fixa de 48px */
-.form-grid textarea {
-    width: 100%;
-    min-height: 80px;
-    padding: 12px 16px;
-    border-radius: 15px;
-    border: 1px solid #ddd;
-    font-size: 0.95rem;
-    resize: none;
-    outline: none;
-}
-
-/* LINHA RUA E NÚMERO (GRID PERFEITO) */
-.row-inputs {
-    display: grid !important;
-    grid-template-columns: 1fr 85px !important; /* Rua larga, Número curto */
-    gap: 10px !important;
-    height: auto !important; /* Crucial para não criar buraco */
-}
-
-/* Ajuste do botão de fechar para não empurrar tudo */
-.btn-fechar-modal {
-    margin-top: 5px;
-    background: #f1f1f1;
-    border: none;
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    cursor: pointer;
+.summary-line {
     display: flex;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    color: #444;
 }
 
-/* BOTÃO CALCULAR TAXA (BARRA CHAPADA) */
+.summary-line.total {
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+    font-weight: 800;
+    color: #000;
+    font-size: 1.1rem;
+}
+
+/* 3. Botão Calcular Taxa (Agora colado e integrado) */
 .btn-principal.w-100.mt-2 {
     width: 100%;
-    background: #f8f8f8;
+    background: #f8f8f8; /* Cinza claro do print */
     color: #333;
     border: none;
     border-top: 1px solid #eee;
-    padding: 15px;
+    padding: 16px;
     font-weight: 700;
-    margin-top: 10px !important;
-    border-radius: 0; /* Geralmente é reto no final do modal */
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 0 !important; /* Remove o espaço entre o form e o botão */
+    border-radius: 0 0 20px 20px; /* Arredonda só a base do modal */
 }
 
+/* 4. Ajuste dos Inputs para não esticarem o modal */
+.form-grid {
+    padding: 15px 20px 10px; /* Menos padding embaixo para o botão colar */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
 
+.form-grid input, 
+.form-grid select {
+    height: 45px !important; /* Altura fixa apenas nos campos */
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    padding: 0 15px;
+    box-sizing: border-box;
+}
+
+/* 5. Linha de Endereço (Grid Compacto) */
+.row-inputs {
+    display: grid !important;
+    grid-template-columns: 1fr 80px !important;
+    gap: 10px !important;
+}
+
+/* 6. Cabeçalho do Modal */
+.modal-header-clean {
+    padding: 20px 20px 5px;
+    text-align: center;
+}
