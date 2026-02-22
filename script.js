@@ -414,6 +414,39 @@ async function carregarStatusLoja() {
     }
 }
 
+function toggleSabor(nome) {
+    const index = saboresSelecionados.indexOf(nome);
+    if (index > -1) {
+        // Se já está selecionado, remove
+        saboresSelecionados.splice(index, 1);
+    } else {
+        // Se não está e não atingiu o limite, adiciona
+        if (saboresSelecionados.length < limiteSabores) {
+            saboresSelecionados.push(nome);
+        } else {
+            alert(`Você só pode escolher ${limiteSabores} sabor(es) para este tamanho!`);
+        }
+    }
+    renderizarSabores();
+    
+    // Mostra ou esconde os adicionais (Passo 3) se o limite for atingido
+    const secaoAdicionais = document.getElementById("secao-adicionais");
+    const btnConfirmar = document.getElementById("btn-confirmar-pizza");
+    
+    if (saboresSelecionados.length === limiteSabores) {
+        if(secaoAdicionais) secaoAdicionais.style.display = "block";
+        if(btnConfirmar) {
+            btnConfirmar.disabled = false;
+            btnConfirmar.innerText = "Adicionar ao Carrinho";
+        }
+    } else {
+        if(secaoAdicionais) secaoAdicionais.style.display = "none";
+        if(btnConfirmar) {
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerText = `Selecione mais ${limiteSabores - saboresSelecionados.length} sabor(es)`;
+        }
+    }
+}
 
 
 
