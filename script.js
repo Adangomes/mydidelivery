@@ -295,6 +295,7 @@ function removerItem(idx) {
 }
 
 // Versão com trava de segurança (Loja Fechada)
+// Mantenha suas funções de interface normalmente
 function abrirCarrinho() {
     const statusLoja = document.getElementById("status-loja");
     const estaFechado = statusLoja.classList.contains("fechado");
@@ -303,7 +304,6 @@ function abrirCarrinho() {
         alert("Desculpe, a loja está fechada no momento! Não é possível realizar pedidos agora.");
         return;
     }
-
     document.getElementById("cart-modal").style.display = "flex";
 }
 
@@ -311,57 +311,51 @@ function fecharCarrinho() {
     document.getElementById("cart-modal").style.display = "none";
 }
 
-function abrirDelivery() {
-    if(!carrinho.length) return alert("Seu carrinho está vazio!");
-    
-    // Fecha o carrinho e abre o modal de entrega
-    fecharCarrinho();
-    document.getElementById("delivery-modal").style.display = "flex";
-}
+// ... (Mantenha abrirDelivery, fecharModalPizza, mostrarToast e carregarCarrinhoStorage como estão)
 
-function fecharModalPizza() {
-    document.getElementById("pizza-options-modal").style.display = "none";
-}
-
-function mostrarToast() { 
-    const t = document.getElementById("toast-geral"); 
-    t.classList.add("show"); 
-    setTimeout(()=>t.classList.remove("show"), 2000); 
-}
-
-function carregarCarrinhoStorage() { 
-    carrinho = JSON.parse(localStorage.getItem("carrinho")) || []; 
-    atualizarCarrinho(); 
-}
-
-async function carregarStatusLoja() {
+// NOVA FUNÇÃO DE STATUS INTEGRADA AO FIREBASE
+function carregarStatusLoja() {
     const s = document.getElementById("status-loja");
     
-    try {
-        const response = await fetch('./content/status.json?v=' + Date.now());
-        const data = await response.json();
+    // Ouve a "pasta" configuracoes no seu Firebase
+    db.ref('configuracoes').on('value', (snap) => {
+        const config = snap.val();
+        if (!config) return;
 
-        // 1. Verifica se o botão "Loja Aberta?" está ligado (true)
-        if (data.aberto === true) {
+        const agora = new Date();
+        // Formata hora atual para "HH:MM" (ex: "19:30")
+        const horaAtual = agora.getHours().toString().padStart(2, '0') + ":" + 
+                          agora.getMinutes().toString().padStart(2, '0');
+        const diaSemana = agora.getDay(); // 0 = Domingo, 2 = Terça, etc.
+
+        let lojaAberta = false;
+
+        // LÓGICA DE DECISÃO:
+        // 1. Prioridade: Se o modo manual estiver ativo no Admin
+        if (config.modoManual) {
+            lojaAberta = config.statusManual;
+        } 
+        // 2. Senão, verifica horário automático (Terça a Domingo)
+        else {
+            const diasPermitidos = [2, 3, 4, 5, 6, 0]; // Terça a Domingo
+            const dentroDoHorario = (horaAtual >= config.horaAbre && horaAtual < config.horaFecha);
+            const diaValido = diasPermitidos.includes(diaSemana);
+            
+            if (dentroDoHorario && diaValido) {
+                lojaAberta = true;
+            }
+        }
+
+        // APLICAÇÃO VISUAL NO SITE
+        if (lojaAberta) {
             s.innerText = "ABERTO AGORA";
             s.className = "status aberto";
-        } 
-        // 2. Se o botão estiver desligado (false)
-        else {
-            // Se você escreveu algo na caixa do admin, ele usa. 
-            // Se a caixa estiver vazia ou com "ABERTO", ele força o texto "FECHADO NO MOMENTO"
-            if (data.mensagem && data.mensagem !== "ABERTO") {
-                s.innerText = data.mensagem;
-            } else {
-                s.innerText = "FECHADO NO MOMENTO";
-            }
-            
+        } else {
+            // Se houver uma mensagem personalizada no Admin, usa ela, senão usa o padrão
+            s.innerText = config.mensagem || "FECHADO NO MOMENTO";
             s.className = "status fechado";
         }
-    } catch (error) {
-        s.innerText = "FECHADO";
-        s.className = "status fechado";
-    }
+    });
 }
 
 
