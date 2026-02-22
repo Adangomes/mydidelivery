@@ -127,12 +127,22 @@ async function mostrarResumo() {
 
     const enderecoCompleto = `${rua}, ${num}, ${bairro}, ${cidade}, SC, Brasil`;
 
+    // 1. Liga o carregamento
     document.getElementById("loading-taxa").style.display = "flex";
-    const taxa = await calcularTaxaEntrega(enderecoCompleto);
+
+    // 2. Faz o cálculo E cria uma espera de 1.5 segundos ao mesmo tempo
+    // O 'await' vai esperar os dois terminarem
+    const [taxa] = await Promise.all([
+        calcularTaxaEntrega(enderecoCompleto),
+        new Promise(resolve => setTimeout(resolve, 1500)) // <--- AQUI ESTÁ O TEMPO (1.5 seg)
+    ]);
+
+    // 3. Desliga o carregamento
     document.getElementById("loading-taxa").style.display = "none";
 
     if (taxa === null) return alert("Não conseguimos localizar este endereço. Verifique o nome da rua e número.");
 
+    // ... restante do seu código (subtotal, trocar telas, etc)
     taxaEntregaCalculada = taxa;
     let sub = 0; 
     carrinho.forEach(i => sub += (i.price * i.qtd));
@@ -297,3 +307,4 @@ function carregarStatusLoja() {
     s.innerText = "ABERTO AGORA"; 
     s.className = "status aberto"; 
 }
+
