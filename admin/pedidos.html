@@ -49,6 +49,9 @@
 
     <header class="admin-header">
         <h1>SNOOP <span>LANCHE</span></h1>
+        <button id="btn-status-loja" onclick="alternarStatusLoja()" style="padding: 10px 20px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s;">
+            CARREGANDO...
+        </button>
         <button class="btn-relatorio" onclick="abrirRelatorio()"> HISTÓRICO</button>
     </header>
 
@@ -233,11 +236,43 @@
                 document.getElementById('modal-relatorio').style.display = 'block';
             });
         }
+
+        // ==========================================
+// 🏪 CONTROLE DE STATUS DA LOJA (ABERTO/FECHADO)
+// ==========================================
+
+const statusRef = db.ref('configuracoes/status');
+
+// Fica ouvindo o banco para mudar a cor do botão no admin automaticamente
+statusRef.on('value', (snap) => {
+    const estaAberta = snap.val();
+    const btn = document.getElementById('btn-status-loja');
+    
+    if (estaAberta) {
+        btn.innerText = "🟢 LOJA ABERTA";
+        btn.style.background = "#2ecc71";
+        btn.style.color = "#fff";
+    } else {
+        btn.innerText = "🔴 LOJA FECHADA";
+        btn.style.background = "#e74c3c";
+        btn.style.color = "#fff";
+    }
+});
+
+function alternarStatusLoja() {
+    statusRef.once('value', (snap) => {
+        const statusAtual = snap.val();
+        // Se estiver true, vira false. Se for false, vira true.
+        statusRef.set(!statusAtual);
+    });
+}
+        
         function fecharRelatorio() { document.getElementById('modal-relatorio').style.display = 'none'; }
         function limparRelatorio() { if(confirm("Limpar todo o histórico?")) db.ref('relatorios').remove().then(() => abrirRelatorio()); }
     </script>
 </body>
 </html>
+
 
 
 
