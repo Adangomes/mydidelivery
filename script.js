@@ -364,6 +364,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initMenu(); 
 
     carregarStatusLoja();      // ✅ mantém
+    criarCardProduto(p)
     
 
     carregarCardapioCompleto(); // 🔥 NOVO (substitui todos os outros)
@@ -785,6 +786,7 @@ async function carregarCardapioCompleto() {
 
     });
 }
+
 
 
 
