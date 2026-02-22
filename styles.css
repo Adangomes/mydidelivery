@@ -383,3 +383,10 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 #secao-sabores {
     margin-top: 15px;
 }
+
+.item-sabor-wizard.desabilitado {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none; /* Garante que não clique mesmo */
+    filter: grayscale(1);
+}
