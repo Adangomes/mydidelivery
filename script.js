@@ -302,9 +302,32 @@ function carregarCarrinhoStorage() {
     atualizarCarrinho(); 
 }
 
-function carregarStatusLoja() { 
-    const s = document.getElementById("status-loja"); 
-    s.innerText = "ABERTO AGORA"; 
-    s.className = "status aberto"; 
+async function carregarStatusLoja() {
+    const s = document.getElementById("status-loja");
+    
+    try {
+        // Busca o arquivo de status (adicionamos o timestamp para evitar cache)
+        const response = await fetch('./content/status.json?v=' + Date.now());
+        const data = await response.json();
+
+        // data.aberto vem do seu config.yml (widget: boolean)
+        if (data.aberto) {
+            s.innerText = "ABERTO AGORA";
+            s.className = "status aberto";
+        } else {
+            // Se estiver falso, usa a mensagem do painel ou um padrão
+            s.innerText = data.mensagem || "FECHADO NO MOMENTO";
+            s.className = "status fechado";
+        }
+    } catch (error) {
+        console.error("Erro ao carregar status:", error);
+        // Fallback caso o arquivo falhe
+        s.innerText = "FECHADO";
+        s.className = "status fechado";
+    }
 }
+
+// Chama a função ao carregar a página
+carregarStatusLoja();
+
 
