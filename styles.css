@@ -294,40 +294,34 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 /* RODAPÉ COM BOTÕES LADO A LADO */
 .modal-footer-pizzas {
     display: flex;
-    gap: 10px; /* Espaço entre os botões */
-    padding: 15px 20px;
+    gap: 10px;
+    padding: 15px;
     background: white;
     border-top: 1px solid #eee;
-    position: sticky;
-    bottom: 0;
 }
 
-/* Botão Voltar (Estilo Secundário) */
 .btn-voltar-modal {
-    flex: 1; /* Ocupa menos espaço que o confirmar */
-    padding: 12px;
-    border: 1px solid #ddd;
-    background: #f8f8f8;
-    color: #444;
+    flex: 1;
+    height: 45px;
+    border: 1px solid #ccc;
+    background: #fff;
     border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
+    color: #333;
 }
 
-/* Botão Confirmar (Estilo Principal) */
 #btn-confirmar-pizza {
-    flex: 2; /* Ocupa o dobro do espaço do voltar */
-    padding: 12px;
+    flex: 2;
+    height: 45px;
     border: none;
-    background: #27ae60; /* Verde para ação positiva */
-    color: white;
     border-radius: 8px;
     font-weight: bold;
-    cursor: pointer;
+    background-color: #28a745; /* Verde Sucesso */
+    color: white;
 }
 
 #btn-confirmar-pizza:disabled {
-    background: #ccc;
-    cursor: not-allowed;
+    background-color: #ccc;
 }
 
