@@ -402,6 +402,14 @@
       "image": "/imagens/xsalada.jpeg",
       "price": 34.99,
       "oldPrice": 40
+    },
+    {
+      "title": "frango",
+      "categoria": "dog",
+      "ingredientes": "fffffffffffffffffffffffff",
+      "image": "/imagens/dog.jpeg",
+      "price": 30,
+      "oldPrice": 45
     }
   ]
 }
