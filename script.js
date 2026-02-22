@@ -381,32 +381,29 @@ function abrirModalPizza(nome) {
     if (!pizzaPrincipal) return;
 
     saboresSelecionados = [];
-    
-    // Identifica o limite máximo de sabores permitido para este item
     let maxSaboresPermitidos = 1;
     if (nome.includes("PIZZA M")) maxSaboresPermitidos = 2;
     if (nome.includes("PIZZA G")) maxSaboresPermitidos = 3;
 
-    // Preenche Título e Descrição
-    document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
-    document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes || "";
-
-    // Limpa a área de "Escolha o Tamanho" e coloca a "Quantidade de Sabores"
     const containerTamanhos = document.getElementById("pizza-sizes-container");
-    const labelPasso = document.querySelector(".label-step"); // Onde diz "1. ESCOLHA O TAMANHO"
+    const labelPasso = document.querySelector(".label-step"); 
     
-    if(labelPasso) labelPasso.innerText = "QUANTOS SABORES?";
-    
-    containerTamanhos.innerHTML = ""; // Limpa o botão "M R$ 60,00"
-
-    // Se for Pizza P, apenas exibe a mensagem
+    // PULO DO GATO: Se for Pizza P (apenas 1 sabor), esconde a pergunta
     if (maxSaboresPermitidos === 1) {
-        containerTamanhos.innerHTML = `<p style="color: #e67e22; font-weight: bold;">Somente 1 sabor disponível para este tamanho.</p>`;
-        limiteSabores = 1;
+        labelPasso.style.display = "none";
+        containerTamanhos.style.display = "none";
+        limiteSabores = 1; // Define o limite automaticamente
+        
+        // Já pula direto para a lista de sabores
         document.getElementById("secao-sabores").style.display = "block";
         renderizarSabores();
     } else {
-        // Se for M ou G, cria os botões 1, 2 ou 3
+        // Se for M ou G, mostra a pergunta e os botões
+        labelPasso.style.display = "block";
+        labelPasso.innerText = "Quantos sabores?";
+        containerTamanhos.style.display = "flex";
+        containerTamanhos.innerHTML = ""; 
+
         for (let i = 1; i <= maxSaboresPermitidos; i++) {
             const btn = document.createElement("button");
             btn.className = "btn-quantidade-sabor";
@@ -417,7 +414,6 @@ function abrirModalPizza(nome) {
                 btn.classList.add("ativo");
                 document.getElementById("secao-sabores").style.display = "block";
                 renderizarSabores();
-                atualizarBotaoConfirmar();
             };
             containerTamanhos.appendChild(btn);
         }
@@ -510,6 +506,7 @@ async function carregarStatusLoja() {
         s.className = "status fechado";
     }
 }
+
 
 
 
