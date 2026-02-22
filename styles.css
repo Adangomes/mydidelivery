@@ -11,14 +11,14 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 .status.aberto { color: #2ecc71; }
 .cart { font-size: 1.5rem; cursor: pointer; }
 
-/* NAV CATEGORIAS (ESTILO IGUAL À FOTO) */
+/* NAV CATEGORIAS (MENU FIXO SUPERIOR) */
 .categorias-nav { 
     position: sticky; 
     top: 65px; 
     background: #fff; 
     z-index: 999; 
     border-bottom: 1px solid #eee; 
-    padding: 0; /* Removido padding para alinhar a linha inferior */
+    padding: 0; 
 }
 .categorias-scroll { 
     display: flex; 
@@ -35,26 +35,31 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     padding: 15px 20px; 
     display: inline-block;
     transition: 0.3s;
-    border-bottom: 3px solid transparent; /* Linha invisível por padrão */
+    border-bottom: 3px solid transparent;
 }
 .cat-link.active { 
     color: #e67e22; 
     font-weight: 700;
-    border-bottom: 3px solid #e67e22; /* Linha laranja igual à foto */
+    border-bottom: 3px solid #e67e22; 
 }
 
-/* PRODUTOS (ESTILO LIMPO) */
+/* PRODUTOS & TÍTULOS DE CATEGORIA NA LISTA (AJUSTADO) */
 .container-main { padding: 10px 20px; }
 .secao-categoria { scroll-margin-top: 130px; margin-top: 20px; }
+
+/* Título da categoria no corpo da página (Igual ao menu superior) */
 .titulo-categoria-lista { 
-    font-size: 1rem; 
+    font-size: 0.9rem; 
     font-weight: 800; 
     margin-bottom: 20px; 
-    color: #444; 
+    color: #e67e22; /* Cor laranja igual ao menu ativo */
     text-transform: uppercase; 
-    border-bottom: 1px solid #f1f1f1;
+    border-bottom: 3px solid #e67e22; /* Linha laranja igual ao menu ativo */
     padding-bottom: 8px;
+    display: inline-block; /* Faz a linha ocupar apenas o tamanho do texto */
+    width: auto;
 }
+
 .item-produto-lista { 
     display: flex; 
     justify-content: space-between; 
@@ -66,7 +71,7 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 .info-produto { flex: 1; }
 .nome-produto-lista { 
     font-size: 0.95rem; 
-    color: #000; /* Ajustado para Preto */
+    color: #000; 
     font-weight: 700; 
     text-transform: uppercase;
 }
@@ -77,7 +82,7 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     line-height: 1.4; 
 }
 .preco-unico { 
-    color: #27ae60; /* Verde igual à foto */
+    color: #27ae60; 
     font-weight: 700; 
     font-size: 1rem; 
     display: block;
@@ -111,10 +116,11 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* MODAIS E RESTANTE DO CÓDIGO PERMANECEM IGUAIS */
+/* MODAIS */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
-.modal-box, .cart-box { background: #fff; width: 92%; max-width: 400px; border-radius: 24px; overflow: hidden; position: relative; max-height: 85vh; display: flex; flex-direction: column; }
-.modal-header-clean { padding: 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; }
-.btn-principal { background: #e67e22; color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; width: 100%; }
+.modal-box { background: #fff; width: 92%; max-width: 400px; border-radius: 24px; overflow: hidden; position: relative; max-height: 85vh; display: flex; flex-direction: column; }
+.btn-principal { background: #e67e22; color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; width: 100%; cursor: pointer; }
+
+/* TOAST */
 .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 0.8rem; opacity: 0; transition: 0.3s; z-index: 5000; }
 .toast.show { opacity: 1; }
