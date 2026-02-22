@@ -241,15 +241,44 @@ function fecharModalPizza() {
 }
 function renderizarSabores() {
     const grid = document.getElementById("lista-sabores-meia");
-    const contador = document.getElementById("contador-fatias"); 
-    
     if (!grid) return;
     grid.innerHTML = "";
     
+    // Filtra apenas os sabores de pizza (ajuste conforme sua lógica de categorias)
     const saboresDisponiveis = produtosGeral.filter(p => 
-        p.categoria.toLowerCase() === "pizza" && 
-        !p.title.toUpperCase().includes("PIZZA")
+        p.categoria.toLowerCase() === "pizza" && !p.title.includes("PIZZA ")
     );
+
+    // Verifica se já selecionamos o máximo permitido (ex: 2/2)
+    const atingiuLimite = saboresSelecionados.length >= limiteSabores;
+
+    saboresDisponiveis.forEach(p => {
+        const estaSelecionado = saboresSelecionados.includes(p.title);
+        
+        // Se atingiu o limite e o item NÃO está selecionado, ele fica desabilitado
+        const classeStatus = estaSelecionado ? 'selecionado' : (atingiuLimite ? 'desabilitado' : '');
+        
+        // Só permite clicar se não estiver selecionado OU se ainda não atingiu o limite
+        const acaoClique = (!atingiuLimite || estaSelecionado) ? `onclick="toggleSabor('${p.title}')"` : "";
+
+        grid.innerHTML += `
+            <div class="item-sabor-wizard ${classeStatus}" ${acaoClique}>
+                <div style="display:flex; flex-direction:column">
+                    <span style="font-weight:700">${p.title}</span>
+                    <small style="font-size:0.75rem; color:#777">${p.ingredientes || ""}</small>
+                </div>
+                <span class="status-check">${estaSelecionado ? '✅' : '+'}</span>
+            </div>`;
+    });
+
+    // Atualiza o contador de sabores no topo da lista
+    const contador = document.getElementById("contador-fatias");
+    if (contador) {
+        contador.innerText = `Escolha os Sabores (${saboresSelecionados.length}/${limiteSabores})`;
+    }
+    
+    atualizarBotaoConfirmar();
+}
 
     saboresDisponiveis.forEach(p => {
         const selecionado = saboresSelecionados.includes(p.title);
@@ -506,6 +535,7 @@ async function carregarStatusLoja() {
         s.className = "status fechado";
     }
 }
+
 
 
 
