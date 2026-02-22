@@ -3,12 +3,13 @@
   "mensagem": "ABERTO",
   "promocaoAtiva": true,
   "diasFuncionamento": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6
+    "0",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "1"
   ],
   "horaAbre": "18:00",
   "horaFecha": "22:30"
