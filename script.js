@@ -376,8 +376,45 @@ function fecharCarrinho() {
     document.getElementById("cart-modal").style.display = "none";
 }
 
-function fecharModalPizza() {
-    document.getElementById("pizza-options-modal").style.display = "none";
+function abrirModalPizza(nome) {
+    pizzaPrincipal = produtosGeral.find(p => p.title === nome);
+    if (!pizzaPrincipal) return;
+
+    saboresSelecionados = []; 
+    tamanhoSelecionado = null;
+
+    // A linha da imagem foi removida daqui para o modal abrir limpo
+    document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
+    document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes || "";
+    
+    // Esconde as próximas etapas até o tamanho ser escolhido
+    document.getElementById("secao-sabores").style.display = "none";
+    const secAdic = document.getElementById("secao-adicionais");
+    if(secAdic) secAdic.style.display = "none";
+    
+    const btnConfirmar = document.getElementById("btn-confirmar-pizza");
+    btnConfirmar.disabled = true;
+    btnConfirmar.innerText = "Selecione o tamanho";
+
+    const container = document.getElementById("pizza-sizes-container");
+    container.innerHTML = "";
+
+    Object.keys(pizzaPrincipal.prices).forEach(tam => {
+        const btn = document.createElement("button");
+        btn.className = "btn-tamanho-opcional";
+        btn.innerHTML = `<strong>${tam}</strong><br>R$ ${pizzaPrincipal.prices[tam].toFixed(2)}`;
+        btn.onclick = () => {
+            tamanhoSelecionado = tam;
+            limiteSabores = tam === "P" ? 1 : (tam === "M" ? 2 : 3);
+            document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
+            btn.classList.add("ativo");
+            document.getElementById("secao-sabores").style.display = "block";
+            renderizarSabores();
+        };
+        container.appendChild(btn);
+    });
+
+    document.getElementById("pizza-options-modal").style.display = "flex";
 }
 
 function abrirDelivery() {
@@ -428,3 +465,4 @@ async function carregarStatusLoja() {
         s.className = "status fechado";
     }
 }
+
