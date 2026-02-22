@@ -355,3 +355,28 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 .close-modal, .btn-fechar-pizza {
     display: none !important;
 }
+.grid-tamanhos {
+    display: flex;          /* Mudamos de grid para flex para melhor controle */
+    gap: 10px;              /* Espaço entre os botões */
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.btn-quantidade-sabor {
+    flex: 1;                /* Faz todos os botões terem o mesmo tamanho */
+    padding: 15px 5px;
+    border: 2px solid #eee;
+    background: white;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.btn-quantidade-sabor.ativo {
+    border-color: #e67e22;  /* Laranja da sua marca */
+    background: #fff5ed;
+    color: #e67e22;
+}
