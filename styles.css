@@ -235,86 +235,127 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 .toast.show { opacity: 1; }
 
 /* ============================================================
-   ESTILO DO FORMULÁRIO DE ENTREGA (AJUSTADO)
+/* ============================================================
+   FORMULÁRIO ENTREGA - SNOOP LANCHE (VERSÃO PROFISSIONAL)
    ============================================================ */
 
-/* Container interno do formulário */
-.form-grid {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px; /* Espaçamento entre os campos */
+/* RESET BÁSICO */
+* {
+    box-sizing: border-box;
 }
 
-/* Estilização geral de Inputs, Selects e Textareas */
-.form-grid input, 
-.form-grid select, 
+/* HEADER DO MODAL */
+.modal-header-clean {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px 20px 10px;
+    background: #fff;
+}
+
+.modal-header-clean h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #222;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+}
+
+/* BOTÃO FECHAR */
+.btn-fechar-modal {
+    background: #f1f1f1;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+    font-size: 1rem;
+    color: #666;
+}
+
+.btn-fechar-modal:hover {
+    background: #e0e0e0;
+    transform: rotate(90deg);
+}
+
+/* FORMULÁRIO */
+.form-grid {
+    padding: 10px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* MAIS EQUILÍBRIO */
+}
+
+/* INPUTS PADRÃO */
+.form-grid input,
+.form-grid select,
 .form-grid textarea {
     width: 100%;
-    padding: 12px 15px;
-    border-radius: 10px; /* Bordas arredondadas modernas */
-    border: 1px solid #ddd;
-    background-color: #fcfcfc;
-    font-size: 0.9rem;
+    height: 48px;
+    padding: 0 16px;
+    border-radius: 12px;
+    border: 1.5px solid #ddd;
+    background: #fff;
+    font-size: 0.95rem;
     color: #333;
     outline: none;
     transition: all 0.2s ease;
 }
 
-/* Efeito ao clicar/digitar nos campos */
-.form-grid input:focus, 
-.form-grid select:focus, 
-.form-grid textarea:focus {
-    border-color: #e67e22; /* Cor laranja do Snoop Lanche */
-    background-color: #fff;
-    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1); /* Brilho suave ao redor */
+/* TEXTAREA AJUSTE */
+.form-grid textarea {
+    height: auto;
+    padding: 12px 16px;
+    resize: none;
 }
 
-/* Organização de Rua e Número na mesma linha */
+/* FOCO */
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus {
+    border-color: #ff7a00;
+    box-shadow: 0 0 0 3px rgba(255, 122, 0, 0.15);
+}
+
+/* LINHA RUA + NÚMERO (AGORA PERFEITA) */
 .row-inputs {
-    display: grid;
-    grid-template-columns: 2.5fr 1fr; /* Rua maior, Número menor */
+    display: flex;
     gap: 10px;
 }
 
-/* Ajuste específico para as áreas de observação */
-.form-grid textarea {
-    resize: none;
-    min-height: 45px;
+.row-inputs input:first-child {
+    flex: 1; /* Rua ocupa tudo */
 }
 
-/* Estilo do campo de troco (quando aparece) */
-#div-troco {
-    margin-top: 5px;
-    animation: fadeIn 0.3s ease;
+.row-inputs input:last-child {
+    width: 90px; /* Número fixo */
+    text-align: center;
 }
 
-/* Animação simples para transição de telas no modal */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-5px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Placeholder (texto de fundo) mais sutil */
-::placeholder {
-    color: #bbb;
-    font-size: 0.85rem;
-}
-
-/* Ajuste do botão de fechar dentro do formulário */
-.btn-fechar-modal {
-    background: #f0f0f0;
+/* BOTÃO CALCULAR TAXA */
+.btn-principal.w-100.mt-2 {
+    width: 100%;
+    background: #f5f5f5;
+    color: #333;
     border: none;
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    color: #666;
-    font-weight: bold;
+    border-top: 1px solid #ddd;
+    padding: 14px;
+    font-weight: 600;
+    margin-top: 10px !important;
     cursor: pointer;
-    transition: 0.3s;
+    transition: 0.2s;
 }
 
-.btn-fechar-modal:hover {
-    background: #e74c3c;
-    color: #fff;
+.btn-principal.w-100.mt-2:hover {
+    background: #eee;
 }
+
+/* PLACEHOLDER */
+::placeholder {
+    color: #999;
+}
+
