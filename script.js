@@ -673,8 +673,11 @@ async function carregarCardapioCompleto() {
         const data = await res.json();
         const produtos = data.produtos;
 
+        // "cardapio-corpo" deve ser a ID da sua <main> ou <div> principal no HTML
         const corpoCardapio = document.getElementById("cardapio-corpo");
-        corpoCardapio.innerHTML = ""; // Limpa o menu
+        if (!corpoCardapio) return;
+        
+        corpoCardapio.innerHTML = ""; 
 
         // 1. Agrupar produtos por categoria
         const categorias = {};
@@ -683,35 +686,43 @@ async function carregarCardapioCompleto() {
             categorias[p.categoria].push(p);
         });
 
-        // 2. Renderizar cada categoria e seus produtos no novo estilo
+        // 2. Renderizar cada categoria
         Object.keys(categorias).forEach(catNome => {
             const section = document.createElement("section");
             section.className = "secao-categoria";
             
-            // Título da Categoria (Ex: BURGER, PIZZA)
+            // Cria o título da categoria (Ex: BURGER, PIZZA)
             section.innerHTML = `<h2 class="titulo-categoria-lista">${catNome.toUpperCase()}</h2>`;
 
             categorias[catNome].forEach(p => {
+                // Se for pizza ou porção, e você quiser que use o modal de tamanhos, 
+                // pulamos a renderização automática aqui para não duplicar.
+                if ((p.categoria === 'pizza' || p.categoria === 'porcao') && typeof abrirModalPizza === "function") {
+                    // Opcional: Você pode chamar uma função aqui ou deixar as seções fixas no HTML
+                    return; 
+                }
+
                 const itemDiv = document.createElement("div");
                 itemDiv.className = "item-produto-lista";
                 
-                // Trata o preço (se for pizza/porção com múltiplos preços ou preço único)
+                // Trata o preço
                 let precoDisplay = "";
-                if (p.prices) {
-                    precoDisplay = Object.entries(p.prices)
-                        .map(([tam, val]) => `<span class="tag-preco">${tam}: R$ ${val.toFixed(2)}</span>`)
-                        .join(" ");
+                if (p.prices && !p.price) {
+                    // Pega o menor preço para mostrar "A partir de"
+                    const valores = Object.values(p.prices).filter(v => v > 0);
+                    const menorPreco = Math.min(...valores);
+                    precoDisplay = `<span class="preco-unico">A partir de R$ ${menorPreco.toFixed(2).replace(".", ",")}</span>`;
                 } else {
                     precoDisplay = `<span class="preco-unico">R$ ${p.price.toFixed(2).replace(".", ",")}</span>`;
                 }
 
-                // Layout igual à foto: Info à esquerda, Imagem à direita
+                // Layout: Info esquerda, Imagem direita
                 itemDiv.innerHTML = `
-                    <div class="info-produto" onclick='abrirDetalhes(${JSON.stringify(p)})'>
+                    <div class="info-produto" onclick='adicionarCarrinhoPorProduto(${JSON.stringify(p)})'>
                         <h3 class="nome-produto-lista">${p.title}</h3>
                         <p class="desc-produto-lista">${p.ingredientes || ""}</p>
                         <div class="container-preco-lista">
-                            ${p.oldPrice ? `<span class="preco-antigo">R$ ${p.oldPrice.toFixed(2)}</span>` : ""}
+                            ${p.oldPrice ? `<span class="preco-antigo">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
                             ${precoDisplay}
                         </div>
                     </div>
@@ -726,11 +737,14 @@ async function carregarCardapioCompleto() {
             corpoCardapio.appendChild(section);
         });
 
+        // 3. Inicializa as partes especiais (Pizzas/Porções)
+        if (typeof carregarPizzas === "function") carregarPizzas();
+        if (typeof carregarPorcoes === "function") carregarPorcoes();
+
     } catch (e) {
         console.error("Erro ao carregar cardápio:", e);
     }
 }
-
 
 
 
