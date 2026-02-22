@@ -314,49 +314,43 @@ function fecharCarrinho() {
 // ... (Mantenha abrirDelivery, fecharModalPizza, mostrarToast e carregarCarrinhoStorage como estão)
 
 // NOVA FUNÇÃO DE STATUS INTEGRADA AO FIREBASE
-function carregarStatusLoja() {
+async function carregarStatusLoja() {
     const s = document.getElementById("status-loja");
     
-    // Ouve a "pasta" configuracoes no seu Firebase
-    db.ref('configuracoes').on('value', (snap) => {
-        const config = snap.val();
-        if (!config) return;
+    try {
+        // Busca o arquivo JSON que o Netlify CMS salvou
+        const response = await fetch('./content/status.json?v=' + Date.now());
+        const data = await response.json();
 
         const agora = new Date();
-        // Formata hora atual para "HH:MM" (ex: "19:30")
+        // Formata a hora atual do celular do cliente (Ex: "19:45")
         const horaAtual = agora.getHours().toString().padStart(2, '0') + ":" + 
                           agora.getMinutes().toString().padStart(2, '0');
-        const diaSemana = agora.getDay(); // 0 = Domingo, 2 = Terça, etc.
+        
+        const diaHoje = agora.getDay(); // 0 a 6
 
-        let lojaAberta = false;
+        // Verifica se hoje está na lista de dias que você clicou lá no Admin
+        const diaValido = data.diasFuncionamento.includes(diaHoje) || 
+                          data.diasFuncionamento.includes(String(diaHoje));
 
-        // LÓGICA DE DECISÃO:
-        // 1. Prioridade: Se o modo manual estiver ativo no Admin
-        if (config.modoManual) {
-            lojaAberta = config.statusManual;
-        } 
-        // 2. Senão, verifica horário automático (Terça a Domingo)
-        else {
-            const diasPermitidos = [2, 3, 4, 5, 6, 0]; // Terça a Domingo
-            const dentroDoHorario = (horaAtual >= config.horaAbre && horaAtual < config.horaFecha);
-            const diaValido = diasPermitidos.includes(diaSemana);
-            
-            if (dentroDoHorario && diaValido) {
-                lojaAberta = true;
-            }
-        }
+        // Verifica se a hora atual está entre a abertura e fechamento
+        const dentroDoHorario = (horaAtual >= data.horaAbre && horaAtual < data.horaFecha);
 
-        // APLICAÇÃO VISUAL NO SITE
-        if (lojaAberta) {
+        if (diaValido && dentroDoHorario) {
             s.innerText = "ABERTO AGORA";
             s.className = "status aberto";
         } else {
-            // Se houver uma mensagem personalizada no Admin, usa ela, senão usa o padrão
-            s.innerText = config.mensagem || "FECHADO NO MOMENTO";
+            s.innerText = "FECHADO NO MOMENTO";
             s.className = "status fechado";
         }
-    });
+
+    } catch (error) {
+        console.error("Erro ao ler status:", error);
+        s.innerText = "FECHADO";
+        s.className = "status fechado";
+    }
 }
+
 
 
 
