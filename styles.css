@@ -218,6 +218,7 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 
 /* ESTILOS DO MODAL DE PIZZA */
 /* ESTILOS DO MODAL DE PIZZA - VERSÃO LIMPA */
+/* ESTILOS DO MODAL DE PIZZA - VERSÃO MINIMALISTA */
 .modal-pizza-ajustado {
     max-height: 90vh;
     overflow-y: auto;
@@ -225,81 +226,71 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     border-radius: 15px 15px 0 0;
 }
 
-/* Header sem imagem, apenas com o botão de fechar */
 .modal-header-limpo {
-    padding: 20px 20px 10px 20px;
+    padding: 20px 20px 5px 20px;
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
 }
 
 .btn-fechar-pizza {
-    background: #eee;
+    background: #f1f1f1;
     color: #333;
     border: none;
     border-radius: 50%;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    font-size: 1.1rem;
 }
 
 .modal-content-pizzas { padding: 0 20px 20px 20px; }
 
+.label-step {
+    font-weight: 700;
+    font-size: 1rem;
+    margin: 15px 0 10px 0;
+    display: block;
+    color: #e67e22; /* Cor de destaque para os títulos das seções */
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
 .grid-tamanhos {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 12px;
 }
 
 .btn-tamanho-opcional {
-    padding: 10px;
+    padding: 12px 5px;
     border: 2px solid #eee;
-    background: white;
-    border-radius: 10px;
+    background: #fff;
+    border-radius: 12px;
     cursor: pointer;
-    text-align: center;
-    font-size: 0.8rem;
-    transition: 0.2s;
+    transition: 0.3s;
 }
 
 .btn-tamanho-opcional.ativo {
     border-color: #e67e22;
     background: #fff5ed;
     color: #e67e22;
+    transform: scale(1.02);
 }
 
 .item-sabor-wizard {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px;
+    padding: 14px;
     border: 1px solid #eee;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 8px;
-    cursor: pointer;
 }
 
 .item-sabor-wizard.selecionado {
-    border-color: #28a745;
-    background: #f0fff4;
-}
-
-.item-sabor-wizard.desabilitado {
-    opacity: 0.5;
-    background: #f9f9f9;
-}
-
-.label-step {
-    font-weight: 800;
-    font-size: 0.9rem;
-    margin-bottom: 10px;
-    display: block;
-    color: #333;
+    border-color: #27ae60;
+    background: #f1fcf5;
 }
 
 .modal-footer-pizzas {
@@ -309,3 +300,4 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     position: sticky;
     bottom: 0;
 }
+
