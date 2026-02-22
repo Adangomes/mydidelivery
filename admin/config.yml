@@ -19,16 +19,10 @@ collections:
             summary: '{{title}} ({{categoria}})'
             fields:
               - { label: "Nome", name: "title", widget: "string" }
-              - { 
-  label: "Categoria", 
-  name: "categoria", 
-  widget: "string"
-}
+              - { label: "Categoria", name: "categoria", widget: "string" }
               - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text" }
               - { label: "Imagem", name: "image", widget: "image" }
               - { label: "Preço Único (Burger/Dog/Bebida/Parmediana)", name: "price", widget: "number", value_type: "float", required: false }
-              
-              # --- CAMPO ADICIONADO ABAIXO ---
               - { label: "Preço Antigo (Para aparecer riscado)", name: "oldPrice", widget: "number", value_type: "float", required: false }
               
               - label: "Preços por Tamanho (Pizza/Porção)"
@@ -50,4 +44,3 @@ collections:
           - { label: "Loja Aberta?", name: "aberto", widget: "boolean", default: true }
           - { label: "Ativar Promoção no App Mydi?", name: "promocaoAtiva", widget: "boolean", default: false }
           - { label: "Mensagem Fechado", name: "mensagem", widget: "string" }
-
