@@ -686,8 +686,7 @@ if (btnFinal) {
     };
 }
 
-// Inicialização
-carregarPorcoes();
+
 
 
 // ULTIMO BOTAO DE VOLTAR..
@@ -773,6 +772,7 @@ async function carregarCardapioCompleto() {
         console.error("Erro ao carregar cardápio:", e);
     }
 }
+
 
 
 
