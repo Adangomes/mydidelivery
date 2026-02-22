@@ -255,8 +255,9 @@ function abrirModalPizza(nome) {
 
 function renderizarSabores() {
     const grid = document.getElementById("lista-sabores-meia");
-    const contador = document.getElementById("contador-fatias"); // ID CORRIGIDO
+    const contador = document.getElementById("contador-fatias"); 
     
+    if (!grid) return;
     grid.innerHTML = "";
     
     const saboresDisponiveis = produtosGeral.filter(p => 
@@ -283,8 +284,175 @@ function renderizarSabores() {
         contador.innerText = `2. Escolha os Sabores (${saboresSelecionados.length}/${limiteSabores})`;
     }
 }
-    // Atualiza o texto do passo 2
-    document.getElementById("contador-sabores").innerText = `2. Escolha os Sabores (${saboresSelecionados.length}/${limiteSabores})`;
+
+function addSabor(nome, n) {
+    if(n === 1 && saboresSelecionados.length < limiteSabores) saboresSelecionados.push(nome);
+    else if(n === -1) { 
+        const i = saboresSelecionados.indexOf(nome); 
+        if(i > -1) saboresSelecionados.splice(i, 1); 
+    }
+    renderizarSabores();
+}
+
+function fecharModalPizza() {
+    document.getElementById("pizza-options-modal").style.display = "none";
+}
+
+function carregarCarrinhoStorage() {
+    const salvo = localStorage.getItem("carrinho");
+    if(salvo) {
+        carrinho = JSON.parse(salvo);
+        atualizarCarrinho();
+    }
+}
+
+function abrirDelivery() {
+    if(carrinho.length === 0) return alert("Seu carrinho está vazio!");
+    fecharCarrinho();
+    document.getElementById("delivery-modal").style.display = "flex";
+    document.getElementById("form-entrega").style.display = "block";
+    document.getElementById("resumo-pedido").style.display = "none";
+}
+
+function confirmarPizza() {
+    const selectBorda = document.getElementById("select-borda");
+    const valorBorda = parseFloat(selectBorda.value) || 0;
+    const nomeBorda = selectBorda.options[selectBorda.selectedIndex].text;
+    const azeitona = document.querySelector('input[name="azeitona"]:checked').value;
+
+    const precoBase = pizzaPrincipal.prices[tamanhoSelecionado];
+    const precoFinal = precoBase + valorBorda;
+
+    const descricaoSabores = saboresSelecionados.join(" / ");
+    
+    const itemCarrinho = {
+        title: `${pizzaPrincipal.title} (${tamanhoSelecionado})`,
+        ingredientes: `${descricaoSabores} | ${nomeBorda} | ${azeitona}`,
+        price: precoFinal,
+        qtd: 1,
+        image: pizzaPrincipal.image
+    };
+
+    carrinho.push(itemCarrinho);
+    fecharModalPizza();
+    atualizarCarrinho();
+    mostrarToast("Pizza adicionada!");
+}
+
+function adicionarCarrinhoPorProduto(p) {
+    let item = carrinho.find(i => i.title === p.title);
+    if(item) item.qtd++; else carrinho.push({...p, qtd: 1});
+    atualizarCarrinho();
+    mostrarToast();
+}
+
+function atualizarCarrinho() {
+    const box = document.getElementById("cart-items");
+    let total = 0; 
+    if(!box) return;
+    box.innerHTML = "";
+    
+    carrinho.forEach((i, idx) => {
+        total += (i.price * i.qtd);
+        box.innerHTML += `
+            <div class="item-sabor-fatia" style="display:flex; justify-content:space-between; align-items:center; padding: 10px; border-bottom:1px solid #eee;">
+                <div style="display:flex; flex-direction:column">
+                    <span style="font-weight:700; font-size:0.9rem;">${i.qtd}x ${i.title}</span>
+                    <small style="font-size:0.7rem; color:#666;">${i.ingredientes || ""}</small>
+                    <span style="color:#27ae60; font-weight:bold;">R$ ${(i.price * i.qtd).toFixed(2)}</span>
+                </div>
+                <button onclick="removerItem(${idx})" style="background:none; color:#e74c3c; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+            </div>`;
+    });
+    
+    document.getElementById("subtotal").innerText = `R$ ${total.toFixed(2)}`;
+    document.getElementById("total").innerText = `R$ ${total.toFixed(2)}`;
+    localStorage.setItem("carrinho", JSON.stringify(carrinho));
+}
+
+function removerItem(idx) {
+    carrinho.splice(idx, 1);
+    atualizarCarrinho();
+}
+
+function abrirCarrinho() {
+    const statusLoja = document.getElementById("status-loja");
+    if (statusLoja && statusLoja.classList.contains("fechado")) {
+        alert("Desculpe, a loja está fechada!");
+        return;
+    }
+    document.getElementById("cart-modal").style.display = "flex";
+}
+
+function fecharCarrinho() {
+    document.getElementById("cart-modal").style.display = "none";
+}
+
+async function carregarStatusLoja() {
+    const s = document.getElementById("status-loja");
+    try {
+        const response = await fetch('./content/status.json?v=' + Date.now());
+        const data = await response.json();
+        const agora = new Date();
+        const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
+        const [hAbre, mAbre] = data.horaAbre.split(':').map(Number);
+        const [hFecha, mFecha] = data.horaFecha.split(':').map(Number);
+        const minutosAbre = hAbre * 60 + mAbre;
+        const minutosFecha = hFecha * 60 + mFecha;
+        const diaHoje = agora.getDay();
+        const atendeHoje = data.diasFuncionamento.map(String).includes(String(diaHoje));
+        const dentroDoHorario = (horaAtualMinutos >= minutosAbre && horaAtualMinutos < minutosFecha);
+
+        if (atendeHoje && dentroDoHorario) {
+            s.innerHTML = "<span>ABERTO AGORA</span>";
+            s.className = "status aberto";
+        } else {
+            s.innerHTML = "<span>FECHADO</span>";
+            s.className = "status fechado";
+        }
+    } catch (error) {
+        s.innerText = "FECHADO";
+        s.className = "status fechado";
+    }
+}
+
+function toggleSabor(nome) {
+    const index = saboresSelecionados.indexOf(nome);
+    if (index > -1) {
+        saboresSelecionados.splice(index, 1);
+    } else {
+        if (saboresSelecionados.length < limiteSabores) {
+            saboresSelecionados.push(nome);
+        } else {
+            alert(`Limite de ${limiteSabores} sabores atingido!`);
+        }
+    }
+    renderizarSabores();
+    
+    const secaoAdicionais = document.getElementById("secao-adicionais");
+    const btnConfirmar = document.getElementById("btn-confirmar-pizza");
+    
+    if (saboresSelecionados.length === limiteSabores) {
+        if(secaoAdicionais) secaoAdicionais.style.display = "block";
+        if(btnConfirmar) {
+            btnConfirmar.disabled = false;
+            btnConfirmar.innerText = "Adicionar ao Carrinho";
+        }
+    } else {
+        if(secaoAdicionais) secaoAdicionais.style.display = "none";
+        if(btnConfirmar) {
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerText = `Selecione mais ${limiteSabores - saboresSelecionados.length} sabor(es)`;
+        }
+    }
+}
+
+function mostrarToast(msg = "Produto adicionado!") {
+    const toast = document.getElementById("toast-geral");
+    if(!toast) return;
+    toast.innerText = msg;
+    toast.style.display = "block";
+    setTimeout(() => { toast.style.display = "none"; }, 3000);
 }
 
 function addSabor(nome, n) {
@@ -473,6 +641,7 @@ function mostrarToast(msg = "Produto adicionado!") {
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 3000);
 }
+
 
 
 
