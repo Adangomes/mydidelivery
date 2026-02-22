@@ -21,7 +21,7 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarCarrinhoStorage();
 });
 
-// CARREGAR CARDÁPIO
+// --- CARREGAMENTO DO CARDÁPIO ---
 async function carregarCardapioCompleto() {
     try {
         const res = await fetch("content/produtos.json?v=" + Date.now());
@@ -41,7 +41,6 @@ async function carregarCardapioCompleto() {
         Object.keys(categorias).forEach((cat, index) => {
             const idCat = `cat-${cat.replace(/\s+/g, '-')}`;
             
-            // Nav Link
             const link = document.createElement("a");
             link.href = `#${idCat}`;
             link.className = `cat-link ${index === 0 ? 'active' : ''}`;
@@ -52,7 +51,6 @@ async function carregarCardapioCompleto() {
             };
             nav.appendChild(link);
 
-            // Section
             const section = document.createElement("section");
             section.className = "secao-categoria";
             section.id = idCat;
@@ -82,7 +80,7 @@ async function carregarCardapioCompleto() {
     } catch (e) { console.error(e); }
 }
 
-// SCROLL SPY
+// --- CONTROLE DE NAVEGAÇÃO ---
 function ativarScrollSpy() {
     const secoes = document.querySelectorAll(".secao-categoria");
     const links = document.querySelectorAll(".cat-link");
@@ -103,50 +101,96 @@ function ativarScrollSpy() {
     });
 }
 
-// GEOAPIFY
+// --- LÓGICA DE ENTREGA E GEOAPIFY ---
 async function calcularTaxaEntrega(end) {
     try {
-        const geo = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(end)}&apiKey=${GEOAPIFY_KEY}`).then(r => r.json());
-        if (!geo.features.length) return null;
+        // Busca o endereço focando na região de Jaraguá do Sul/Guaramirim
+        const geo = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(end)}&filter=rect:-49.2568,-26.5824,-48.8164,-26.3486&apiKey=${GEOAPIFY_KEY}`).then(r => r.json());
+        if (!geo.features || geo.features.length === 0) return null;
+        
         const dest = geo.features[0].geometry.coordinates;
-
         const rota = await fetch(`https://api.geoapify.com/v1/routing?waypoints=${RESTAURANTE_COORD[1]},${RESTAURANTE_COORD[0]}|${dest[1]},${dest[0]}&mode=drive&apiKey=${GEOAPIFY_KEY}`).then(r => r.json());
+        
+        if (!rota.features) return null;
         const km = rota.features[0].properties.distance / 1000;
-        return km < 1 ? 0 : TAXA_BASE + (km * VALOR_POR_KM);
+        return km < 1 ? 2.00 : TAXA_BASE + (km * VALOR_POR_KM); // Exemplo: taxa mínima de 2 reais se for muito perto
     } catch (e) { return null; }
 }
 
 async function mostrarResumo() {
-    const end = `${document.getElementById("rua").value}, ${document.getElementById("numero").value}, ${document.getElementById("bairro").value}, ${document.getElementById("cidade").value}`;
-    if(!document.getElementById("rua").value) return alert("Preencha a rua!");
+    const rua = document.getElementById("rua").value;
+    const num = document.getElementById("numero").value;
+    const bairro = document.getElementById("bairro").value;
+    const cidade = document.getElementById("cidade").value;
+
+    if(!rua || !num || !bairro) return alert("Por favor, preencha Rua, Número e Bairro!");
+
+    const enderecoCompleto = `${rua}, ${num}, ${bairro}, ${cidade}, SC, Brasil`;
 
     document.getElementById("loading-taxa").style.display = "flex";
-    const taxa = await calcularTaxaEntrega(end);
+    const taxa = await calcularTaxaEntrega(enderecoCompleto);
     document.getElementById("loading-taxa").style.display = "none";
 
-    if (taxa === null) return alert("Endereço não encontrado!");
+    if (taxa === null) return alert("Não conseguimos localizar este endereço. Verifique o nome da rua e número.");
 
     taxaEntregaCalculada = taxa;
-    let sub = 0; carrinho.forEach(i => sub += (i.price * i.qtd));
+    let sub = 0; 
+    carrinho.forEach(i => sub += (i.price * i.qtd));
 
     document.getElementById("form-entrega").style.display = "none";
     document.getElementById("resumo-pedido").style.display = "block";
-    document.getElementById("resumo-itens").innerHTML = carrinho.map(i => `<p>• ${i.qtd}x ${i.title}</p>`).join("");
-    document.getElementById("resumo-taxa").innerText = `Taxa: R$ ${taxa.toFixed(2)}`;
+    
+    document.getElementById("resumo-itens").innerHTML = carrinho.map(i => `
+        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+            <span>${i.qtd}x ${i.title}</span>
+            <span>R$ ${(i.price * i.qtd).toFixed(2)}</span>
+        </div>
+    `).join("");
+
+    document.getElementById("resumo-taxa").innerText = `Taxa de Entrega: R$ ${taxa.toFixed(2)}`;
     document.getElementById("resumo-total").innerText = `Total: R$ ${(sub + taxa).toFixed(2)}`;
 }
 
-// WHATSAPP
+// --- FINALIZAÇÃO E WHATSAPP ---
+function toggleTroco(metodo) {
+    const divTroco = document.getElementById('div-troco');
+    divTroco.style.display = (metodo === 'Dinheiro') ? 'block' : 'none';
+}
+
+function voltarParaDados() {
+    document.getElementById("resumo-pedido").style.display = "none";
+    document.getElementById("form-entrega").style.display = "block";
+}
+
 function enviarWhatsApp() {
+    const nome = document.getElementById("nomeCliente").value;
+    const cidade = document.getElementById("cidade").value;
+    const rua = document.getElementById("rua").value;
+    const num = document.getElementById("numero").value;
+    const bairro = document.getElementById("bairro").value;
+    const ponto = document.getElementById("pontoReferencia").value;
+    const obs = document.getElementById("obsCozinha").value;
+    const pag = document.getElementById("pagamento").value;
+    const troco = document.getElementById("trocoPara").value;
+
+    if(!nome) return alert("Por favor, informe seu nome.");
+
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*%0A%0A`;
+    msg += `*Cliente:* ${nome}%0A`;
+    msg += `--------------------------%0A`;
     carrinho.forEach(i => msg += `• ${i.qtd}x ${i.title}%0A`);
-    msg += `%0A*Endereço:* ${document.getElementById("rua").value}, ${document.getElementById("numero").value}%0A`;
-    msg += `*Pagamento:* ${document.getElementById("pagamento").value}%0A`;
+    msg += `--------------------------%0A`;
+    msg += `*Endereço:* ${rua}, ${num}%0A`;
+    msg += `*Bairro:* ${bairro} - ${cidade}%0A`;
+    if(ponto) msg += `*Ref:* ${ponto}%0A`;
+    if(obs) msg += `*Obs:* ${obs}%0A`;
+    msg += `*Pagamento:* ${pag}${pag === 'Dinheiro' ? ' (Troco para: '+troco+')' : ''}%0A`;
     msg += `*Total:* ${document.getElementById("resumo-total").innerText}`;
+
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`);
 }
 
-// MODAL PIZZA
+// --- MODAL PIZZA (SABORES E TAMANHOS) ---
 function abrirModalPizza(nome) {
     pizzaPrincipal = produtosGeral.find(p => p.title === nome);
     saboresSelecionados = []; tamanhoSelecionado = null;
@@ -198,7 +242,7 @@ function addSabor(nome, n) {
 }
 
 function confirmarPizza() {
-    if(!tamanhoSelecionado || saboresSelecionados.length < limiteSabores) return alert("Selecione o tamanho e sabores!");
+    if(!tamanhoSelecionado || saboresSelecionados.length < limiteSabores) return alert("Selecione o tamanho e todos os sabores!");
     adicionarCarrinhoPorProduto({
         title: `Pizza ${tamanhoSelecionado} (${saboresSelecionados.join("/")})`,
         price: pizzaPrincipal.prices[tamanhoSelecionado],
@@ -207,7 +251,7 @@ function confirmarPizza() {
     fecharModalPizza();
 }
 
-// CARRINHO AUX
+// --- FUNÇÕES DO CARRINHO ---
 function adicionarCarrinhoPorProduto(p) {
     let item = carrinho.find(i => i.title === p.title);
     if(item) item.qtd++; else carrinho.push({...p, qtd: 1});
@@ -234,8 +278,22 @@ function atualizarCarrinho() {
 function removerItem(idx) { carrinho.splice(idx, 1); atualizarCarrinho(); }
 function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
 function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
-function abrirDelivery() { if(!carrinho.length) return alert("Carrinho vazio!"); document.getElementById("delivery-modal").style.display = "flex"; fecharCarrinho(); }
+function abrirDelivery() { if(!carrinho.length) return alert("Seu carrinho está vazio!"); document.getElementById("delivery-modal").style.display = "flex"; fecharCarrinho(); }
 function fecharModalPizza() { document.getElementById("pizza-options-modal").style.display = "none"; }
-function mostrarToast() { const t = document.getElementById("toast-geral"); t.classList.add("show"); setTimeout(()=>t.classList.remove("show"), 2000); }
-function carregarCarrinhoStorage() { carrinho = JSON.parse(localStorage.getItem("carrinho")) || []; atualizarCarrinho(); }
-function carregarStatusLoja() { const s = document.getElementById("status-loja"); s.innerText = "ABERTO AGORA"; s.className = "status aberto"; }
+
+function mostrarToast() { 
+    const t = document.getElementById("toast-geral"); 
+    t.classList.add("show"); 
+    setTimeout(()=>t.classList.remove("show"), 2000); 
+}
+
+function carregarCarrinhoStorage() { 
+    carrinho = JSON.parse(localStorage.getItem("carrinho")) || []; 
+    atualizarCarrinho(); 
+}
+
+function carregarStatusLoja() { 
+    const s = document.getElementById("status-loja"); 
+    s.innerText = "ABERTO AGORA"; 
+    s.className = "status aberto"; 
+}
