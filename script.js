@@ -55,51 +55,7 @@ function initMenu() {
     btn.onclick = () => menu.classList.toggle("open");
 }
 
-async function carregarCardapioCompleto() {
-    const container = document.getElementById("cardapio");
-    const menuCategorias = document.getElementById("menu-categorias");
 
-    if (!container || !menuCategorias) return;
-
-    try {
-        const res = await fetch("/content/produtos.json");
-        const data = await res.json();
-        produtos = data.produtos;
-
-        container.innerHTML = "";
-        menuCategorias.innerHTML = "";
-
-        // 🔥 CRIA CATEGORIAS AUTOMATICAMENTE
-        const categorias = [...new Set(produtos.map(p => p.categoria))];
-
-        categorias.forEach(cat => {
-
-            // MENU (topo)
-            const btn = document.createElement("button");
-            btn.innerText = cat.toUpperCase();
-            btn.onclick = () => {
-                document.getElementById(cat).scrollIntoView({ behavior: "smooth" });
-            };
-            menuCategorias.appendChild(btn);
-
-            // SEÇÃO
-            const secao = document.createElement("div");
-            secao.id = cat;
-            secao.innerHTML = `<h2>${cat.toUpperCase()}</h2>`;
-
-            produtos
-                .filter(p => p.categoria === cat)
-                .forEach(p => {
-                    secao.appendChild(criarCardProduto(p));
-                });
-
-            container.appendChild(secao);
-        });
-
-    } catch (e) {
-        console.error("Erro ao carregar cardápio:", e);
-    }
-}
 
 
 
@@ -829,6 +785,7 @@ async function carregarCardapioCompleto() {
 
     });
 }
+
 
 
 
