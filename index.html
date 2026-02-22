@@ -1,111 +1,333 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
+
 <head>
+
     <meta charset="UTF-8" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <title>SNOOP LANCHE</title>
+
     <link rel="stylesheet" href="styles.css" />
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
+
 <body>
+
+
 
     <div id="toast-geral" class="toast">Produto adicionado ao carrinho!</div>
 
+
+
     <header class="header">
+
         <div class="header-top">
+
             <div class="logo">SNOOP LANCHE</div>
+
             <div id="status-loja" class="status">CARREGANDO...</div>
+
             <div class="cart" onclick="abrirCarrinho()">🛒</div>
+
         </div>
+
     </header>
 
+
+
     <nav id="categorias-nav" class="categorias-nav">
+
         <div id="categorias-scroll" class="categorias-scroll"></div>
+
     </nav>
+
+
 
     <main id="cardapio-corpo" class="container-main"></main>
 
-    <div id="pizza-options-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-box">
+
+
+    <footer class="footer">
+
+        <p>Sistema Desenvolvido por Adan Gomes</p>
+
+    </footer>
+
+
+
+    <div id="cart-modal" class="modal-overlay" style="display:none;">
+
+        <div class="cart-box">
+
             <div class="modal-header-clean">
-                <h3 id="pizza-modal-title">Montar Pizza</h3>
-                <button onclick="fecharModalPizza()" class="btn-fechar-modal">✕</button>
+
+                <h3>Meu Carrinho</h3>
+
+                <button onclick="fecharCarrinho()" class="btn-fechar-modal" style="position: absolute; right: 15px; top: 15px;">✕</button>
+
             </div>
 
-            <div style="padding: 20px;">
+            
+
+            <div id="cart-items" class="cart-items-list"></div>
+
+            
+
+            <div class="summary-box">
+
+                <div class="summary-line">
+
+                    <span>Subtotal</span>
+
+                    <span id="subtotal">R$ 0,00</span>
+
+                </div>
+
+                <div class="summary-line total">
+
+                    <span>Total</span>
+
+                    <span id="total">R$ 0,00</span>
+
+                </div>
+
+            </div>
+
+            
+
+            <div class="modal-actions">
+
+                <button class="btn-finalizar" onclick="abrirDelivery()">Finalizar Pedido</button>
+
+                <button class="btn-continuar" onclick="fecharCarrinho()">Continuar Comprando</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div id="delivery-modal" class="modal-overlay" style="display:none;">
+
+        <div class="modal-box">
+
+            <div id="form-entrega">
+
+                <div class="modal-header-clean">
+
+                    <h3>Entrega</h3>
+
+                    <button onclick="document.getElementById('delivery-modal').style.display='none'" class="btn-fechar-modal">✕</button>
+
+                </div>
+
+                <div class="form-grid">
+
+                    <input type="text" id="nomeCliente" placeholder="Seu Nome">
+
+                    
+
+                    <select id="cidade">
+
+                        <option value="Jaraguá do Sul">Jaraguá do Sul</option>
+
+                        <option value="Guaramirim">Guaramirim</option>
+
+                        <option value="Schroeder">Schroeder</option>
+
+                    </select>
+
+
+
+                    <div class="row-inputs">
+
+                        <input type="text" id="rua" placeholder="Rua" style="flex: 3;">
+
+                        <input type="text" id="numero" placeholder="Nº" style="flex: 1;">
+
+                    </div>
+
+                    
+
+                    <input type="text" id="bairro" placeholder="Bairro">
+
+                    
+
+                    <textarea id="pontoReferencia" placeholder="Ponto de Referência" rows="1"></textarea>
+
+                    <textarea id="obsCozinha" placeholder="Observações (Sem cebola, etc)" rows="1"></textarea>
+
+
+
+                    <select id="pagamento" onchange="toggleTroco(this.value)">
+
+                        <option value="Pix">Pix</option>
+
+                        <option value="Dinheiro">Dinheiro</option>
+
+                        <option value="Cartão">Cartão</option>
+
+                    </select>
+
+
+
+                    <div id="div-troco" style="display:none;">
+
+                        <input type="text" id="trocoPara" placeholder="Troco para quanto?" class="w-100">
+
+                    </div>
+
+                </div>
+
+                <button class="btn-principal w-100 mt-2" onclick="mostrarResumo()">Calcular Taxa</button>
+
+            </div>
+
+
+
+            <div id="resumo-pedido" style="display:none;">
+
+                <div class="modal-header-clean">
+
+                    <h3>Resumo do Pedido</h3>
+
+                </div>
+
+                <div id="resumo-itens" class="resumo-lista"></div>
+
+                <div class="resumo-valores">
+
+                    <p id="resumo-taxa"></p>
+
+                    <h4 id="resumo-total"></h4>
+
+                </div>
+
+                <div class="modal-actions">
+
+                    <button class="btn-secundario" onclick="voltarParaDados()">Voltar</button>
+
+                    <button class="btn-whatsapp" onclick="enviarWhatsApp()">Finalizar no WhatsApp</button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div id="pizza-options-modal" class="modal-overlay" style="display:none;">
+
+        <div class="modal-box modal-pizza-ajustado">
+
+            <div class="pizza-header-img">
+
+                <img id="modal-pizza-img" src="" alt="">
+
+                <button onclick="fecharModalPizza()" class="btn-fechar-pizza">✕</button>
+
+            </div>
+
+            <div class="modal-content-pizzas">
+
+                <h2 id="pizza-modal-title"></h2>
+
+                <p id="pizza-modal-desc" class="pizza-desc"></p>
+
                 <label class="label-step">1. Escolha o Tamanho</label>
+
                 <div id="pizza-sizes-container" class="grid-tamanhos"></div>
 
                 <div id="secao-sabores" style="display:none;">
-                    <label id="contador-sabores" class="label-step" style="color:#e67e22"></label>
+
+                    <label id="contador-fatias" class="label-step">2. Escolha os Sabores</label>
+
                     <div id="lista-sabores-meia" class="lista-fatias-scroll"></div>
+
                 </div>
 
-                <div id="secao-adicionais" style="display:none;" class="secao-extras">
-                    <label class="label-step">3. Borda Recheada?</label>
-                    <select id="select-borda" class="form-select mb-3" onchange="calcularTotalPizza()">
-                        <option value="0" data-nome="Sem Borda">Sem Borda (R$ 0,00)</option>
-                        <option value="5" data-nome="Borda de Catupiry">Borda de Catupiry (+ R$ 5,00)</option>
-                        <option value="7" data-nome="Borda de Cheddar">Borda de Cheddar (+ R$ 7,00)</option>
-                    </select>
-
-                    <label class="label-step">4. Opcionais Gratuitos</label>
-                    <div class="d-flex gap-4">
-                        <label style="font-size: 0.9rem;"><input type="radio" name="azeitona" value="Com Azeitona" checked> Com Azeitona</label>
-                        <label style="font-size: 0.9rem;"><input type="radio" name="azeitona" value="Sem Azeitona"> Sem Azeitona</label>
-                    </div>
-                </div>
             </div>
 
-            <div style="padding: 20px; border-top: 1px solid #eee;">
-                <div id="preco-total-pizza" style="font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; text-align: center;">Total: R$ 0,00</div>
-                <button id="btn-confirmar-pizza" onclick="confirmarPizza()" class="btn-principal" disabled>Selecione os sabores</button>
+            <div class="modal-footer-pizzas">
+
+                <button onclick="confirmarPizza()" class="btn-principal w-100">Adicionar ao Carrinho</button>
+
             </div>
+
         </div>
+
     </div>
 
-    <div id="cart-modal" class="modal-overlay" style="display:none;">
-        <div class="cart-box">
-            <div class="modal-header-clean"><h3>Meu Carrinho</h3><button onclick="fecharCarrinho()" class="btn-fechar-modal">✕</button></div>
-            <div id="cart-items" style="padding:20px; flex:1; overflow-y:auto;"></div>
-            <div style="padding:20px; border-top: 1px dashed #ddd;">
-                <div style="display:flex; justify-content:space-between; font-weight:800; font-size:1.2rem;">
-                    <span>Total</span><span id="total">R$ 0,00</span>
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button class="btn-finalizar" onclick="abrirDelivery()">Finalizar Pedido</button>
-                <button class="btn-continuar" onclick="fecharCarrinho()">Continuar Comprando</button>
-            </div>
-        </div>
+
+
+    <div id="loading-taxa" class="modal-overlay" style="display:none; background: rgba(255,255,255,0.8);">
+
+        <div class="spinner"></div>
+
     </div>
 
-    <div id="delivery-modal" class="modal-overlay" style="display:none;">
-        <div class="modal-box">
-            <div id="form-entrega">
-                <div class="modal-header-clean"><h3>Entrega</h3><button onclick="document.getElementById('delivery-modal').style.display='none'" class="btn-fechar-modal">✕</button></div>
-                <div class="form-grid">
-                    <input type="text" id="nomeCliente" placeholder="Seu Nome">
-                    <select id="cidade"><option value="Jaraguá do Sul">Jaraguá do Sul</option><option value="Guaramirim">Guaramirim</option></select>
-                    <div class="row-inputs"><input type="text" id="rua" placeholder="Rua" style="flex:3"><input type="text" id="numero" placeholder="Nº" style="flex:1"></div>
-                    <input type="text" id="bairro" placeholder="Bairro">
-                    <textarea id="obsCozinha" placeholder="Observações (Sem cebola, etc)"></textarea>
-                    <select id="pagamento" onchange="toggleTroco(this.value)"><option value="Pix">Pix</option><option value="Dinheiro">Dinheiro</option></select>
-                </div>
-                <button class="btn-principal w-100" onclick="mostrarResumo()">Calcular Taxa</button>
-            </div>
-            <div id="resumo-pedido" style="display:none; padding:20px;">
-                <div id="resumo-itens" style="margin-bottom:20px"></div>
-                <h4 id="resumo-total" style="font-weight:800; text-align:center; margin-bottom:20px;"></h4>
-                <button class="btn-whatsapp" onclick="enviarWhatsApp()">Finalizar no WhatsApp</button>
-            </div>
-        </div>
-    </div>
 
-    <div id="loading-taxa" style="display:none;"><div class="spinner"></div></div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+
+        const firebaseConfig = {
+
+            apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
+
+            authDomain: "myproject26-10f0e.firebaseapp.com",
+
+            databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
+
+            projectId: "myproject26-10f0e",
+
+            storageBucket: "myproject26-10f0e.firebasestorage.app",
+
+            messagingSenderId: "884850608032",
+
+            appId: "1:884850608032:web:79db6983346c3c20edc6c5"
+
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        window.db = firebase.database();
+
+
+
+        function sincronizarStatus() {
+
+            fetch('./content/status.json?v=' + Date.now())
+
+                .then(r => r.json())
+
+                .then(data => {
+
+                    window.db.ref('lojas/snoop_lanche').update({ promo: data.promocaoAtiva || false });
+
+                });
+
+        }
+
+        sincronizarStatus();
+
+    </script>
+
     <script src="script.js"></script>
+
 </body>
+
 </html>
