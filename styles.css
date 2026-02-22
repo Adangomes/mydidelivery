@@ -135,20 +135,17 @@
 .cards,
 .products-grid {
     display: grid;
-    /* Mantive sua medida de 165px */
-    grid-template-columns: repeat(auto-fill, minmax(165px, 1fr));
-    gap: 14px;
-    /* Isso garante que todos os cards da mesma linha fiquem do mesmo tamanho */
+    /* Isso força 2 colunas iguais (50% cada) idependente da largura do celular */
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 10px; /* Reduzi um pouco o espaço para ganhar área útil */
     align-items: stretch; 
 }
 
 .card-produto {
-    background: #fff;
-    border-radius: 18px; /* Suas bordas arredondadas */
-    overflow: hidden;
-    box-shadow: 0 12px 28px rgba(0, 0, 0, .08); /* Sua sombra */
     display: flex;
     flex-direction: column;
+    /* Garante que o conteúdo se espalhe e o botão fique na base */
+    justify-content: flex-start; 
     height: 100%;
 }
 
@@ -161,20 +158,17 @@
     font-size: .95rem;
     font-weight: 600;
     padding: 10px 12px 0;
-
-    height: 44px;
-    overflow: hidden;
-
-    display: flex;
-    align-items: center;
+    /* Removido height fixo */
+    display: block; 
 }
 
 .card-produto p {
     font-size: .75rem;
     color: #666;
     padding: 4px 12px;
-
-    height: 85px;
+    /* O segredo: ele cresce para ocupar o espaço vazio, empurrando o preço */
+    flex-grow: 1; 
+    /* Removido height fixo de 85px que causava o buraco */
     overflow: hidden;
 }
 
@@ -609,6 +603,7 @@
     .card-produto button:active {
         transform: scale(0.98);
     }
+
 
 
 
