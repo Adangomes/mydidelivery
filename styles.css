@@ -12,26 +12,22 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 .header-top { display: flex; justify-content: space-between; align-items: center; }
 .logo { font-weight: 800; font-size: 1.1rem; text-transform: uppercase; }
 
-/* Status Inteligente (Fundo colorido conforme o Admin) */
+/* Status Limpo (Apenas Texto Colorido) */
 .status { 
-    font-size: 10px; 
+    font-size: 11px; 
     position: absolute; 
     top: 38px; 
     left: 16px; 
-    font-weight: bold; 
-    padding: 2px 8px; 
-    border-radius: 4px; 
+    font-weight: 700; 
     text-transform: uppercase;
 }
 
 .status.aberto { 
-    background-color: #28a745 !important; 
-    color: #fff !important; 
+    color: #28a745 !important; 
 }
 
 .status.fechado { 
-    background-color: #dc3545 !important; 
-    color: #fff !important; 
+    color: #dc3545 !important; 
 }
 
 .cart { font-size: 1.5rem; cursor: pointer; }
@@ -111,3 +107,4 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 
 .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 0.8rem; opacity: 0; transition: 0.3s; z-index: 5000; }
 .toast.show { opacity: 1; }
+
