@@ -38,10 +38,26 @@ collections:
     label: "Configurações da Loja"
     files:
       - file: "content/status.json"
-        label: "Status da Loja"
+        label: "Status e Horários"
         name: "status_loja"
         fields:
-          - { label: "Loja Aberta?", name: "aberto", widget: "boolean", default: true }
           - { label: "Ativar Promoção no App Mydi?", name: "promocaoAtiva", widget: "boolean", default: false }
-          - { label: "Mensagem Fechado", name: "mensagem", widget: "string" }
+          
+          # Aqui você digita o horário (Ex: 18:00)
+          - { label: "Hora de Abertura", name: "horaAbre", widget: "string", default: "18:00" }
+          - { label: "Hora de Fechamento", name: "horaFecha", widget: "string", default: "23:30" }
+
+          # Aqui você clica nos dias que a loja funciona
+          - label: "Dias de Funcionamento"
+            name: "diasFuncionamento"
+            widget: "select"
+            multiple: true
+            options:
+              - { label: "Domingo", value: 0 }
+              - { label: "Segunda", value: 1 }
+              - { label: "Terça", value: 2 }
+              - { label: "Quarta", value: 3 }
+              - { label: "Quinta", value: 4 }
+              - { label: "Sexta", value: 5 }
+              - { label: "Sábado", value: 6 }
 
