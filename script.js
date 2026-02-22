@@ -204,41 +204,41 @@ function abrirModalPizza(nome) {
     if (!pizzaPrincipal) return;
 
     saboresSelecionados = []; 
-    tamanhoSelecionado = null;
+    
+    // Identifica o tamanho e o limite de sabores automaticamente pelo título
+    // Ex: "PIZZA M (9 fatias)" -> tamanhoSelecionado vira "M"
+    if (nome.includes("PIZZA P")) {
+        tamanhoSelecionado = "P";
+        limiteSabores = 1;
+    } else if (nome.includes("PIZZA M")) {
+        tamanhoSelecionado = "M";
+        limiteSabores = 2;
+    } else {
+        tamanhoSelecionado = "G"; // Caso tenha G
+        limiteSabores = 3;
+    }
 
-    document.getElementById("modal-pizza-img").src = pizzaPrincipal.image;
+    // Título e Descrição
     document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
     document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes || "";
     
-    document.getElementById("secao-sabores").style.display = "none";
-    const secAdic = document.getElementById("secao-adicionais");
-    if(secAdic) secAdic.style.display = "none";
+    // Esconde a seção de tamanho (que não precisamos mais) e mostra sabores
+    document.getElementById("secao-tamanhos").style.display = "none"; 
+    document.getElementById("secao-sabores").style.display = "block";
     
+    // Reset do botão confirmar
     const btnConfirmar = document.getElementById("btn-confirmar-pizza");
     btnConfirmar.disabled = true;
-    btnConfirmar.innerText = "Selecione o tamanho";
+    btnConfirmar.innerText = `Selecione ${limiteSabores} sabor(es)`;
 
-    const container = document.getElementById("pizza-sizes-container");
-    container.innerHTML = "";
-
-    Object.keys(pizzaPrincipal.prices).forEach(tam => {
-        const btn = document.createElement("button");
-        btn.className = "btn-tamanho-opcional";
-        btn.innerHTML = `<strong>${tam}</strong><br>R$ ${pizzaPrincipal.prices[tam].toFixed(2)}`;
-        btn.onclick = () => {
-            tamanhoSelecionado = tam;
-            limiteSabores = tam === "P" ? 1 : (tam === "M" ? 2 : 3);
-            document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
-            btn.classList.add("ativo");
-            document.getElementById("secao-sabores").style.display = "block";
-            renderizarSabores();
-        };
-        container.appendChild(btn);
-    });
-
+    renderizarSabores();
     document.getElementById("pizza-options-modal").style.display = "flex";
 }
 
+// FUNÇÃO VOLTAR (Para fechar o modal)
+function fecharModalPizza() {
+    document.getElementById("pizza-options-modal").style.display = "none";
+}
 function renderizarSabores() {
     const grid = document.getElementById("lista-sabores-meia");
     const contador = document.getElementById("contador-fatias"); 
@@ -503,6 +503,7 @@ async function carregarStatusLoja() {
         s.className = "status fechado";
     }
 }
+
 
 
 
