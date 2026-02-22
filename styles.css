@@ -1,108 +1,217 @@
 /* ============================================================
+
    RESET & FONTS
+
    ============================================================ */
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
+
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+
 body { background: #fff; color: #333; overflow-x: hidden; }
 
+
+
 /* ============================================================
+
    HEADER & STATUS DA LOJA
+
    ============================================================ */
+
 .header { position: sticky; top: 0; background: #000; color: #fff; padding: 12px 16px; z-index: 1000; height: 65px; }
+
 .header-top { display: flex; justify-content: space-between; align-items: center; }
+
 .logo { font-weight: 800; font-size: 1.1rem; text-transform: uppercase; }
 
+
+
+/* Status Limpo (Apenas Texto Colorido) */
+
 .status { 
+
     font-size: 11px; 
+
     position: absolute; 
+
     top: 38px; 
+
     left: 16px; 
+
     font-weight: 700; 
+
     text-transform: uppercase;
+
 }
-.status.aberto { color: #28a745 !important; }
-.status.fechado { color: #dc3545 !important; }
+
+
+
+.status.aberto { 
+
+    color: #28a745 !important; 
+
+}
+
+
+
+.status.fechado { 
+
+    color: #dc3545 !important; 
+
+}
+
+
+
 .cart { font-size: 1.5rem; cursor: pointer; }
 
+
+
 /* ============================================================
+
    NAV CATEGORIAS
+
    ============================================================ */
+
 .categorias-nav { position: sticky; top: 65px; background: #fff; z-index: 999; border-bottom: 1px solid #eee; padding: 0; }
+
 .categorias-scroll { display: flex; overflow-x: auto; white-space: nowrap; gap: 0; scrollbar-width: none; }
+
 .categorias-scroll::-webkit-scrollbar { display: none; }
+
 .cat-link { color: #666; text-decoration: none !important; font-size: 0.85rem; font-weight: 500; padding: 15px 20px; display: inline-block; transition: 0.3s; border-bottom: 3px solid transparent; }
+
 .cat-link.active { color: #e67e22; font-weight: 700; border-bottom: 3px solid #e67e22; }
 
+
+
 /* ============================================================
+
    LISTA DE PRODUTOS
+
    ============================================================ */
+
 .container-main { padding: 10px 20px; }
+
 .secao-categoria { scroll-margin-top: 130px; margin-top: 20px; }
+
 .titulo-categoria-lista { font-size: 0.9rem; font-weight: 800; margin-bottom: 15px; color: #e67e22; text-transform: uppercase; display: block; width: 100%; }
-.item-produto-lista { display: flex; justify-content: space-between; align-items: flex-start; padding: 15px 0; border-bottom: 1px solid #eee; gap: 15px; cursor: pointer; }
+
+.item-produto-lista { display: flex; justify-content: space-between; align-items: flex-start; padding: 15px 0; border-bottom: 1px solid #eee; gap: 15px; }
+
 .nome-produto-lista { font-size: 0.95rem; color: #000; font-weight: 700; text-transform: uppercase; }
+
 .desc-produto-lista { font-size: 0.8rem; color: #777; margin: 6px 0; line-height: 1.4; }
+
 .preco-unico { color: #27ae60; font-weight: 700; font-size: 1rem; display: block; margin-top: 8px; }
 
+
+
 .foto-produto-lista { position: relative; width: 95px; height: 95px; flex-shrink: 0; }
+
 .foto-produto-lista img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
 
+.btn-add-lista { position: absolute; bottom: -5px; right: -5px; background: #e67e22; color: #fff; border: none; border-radius: 50%; width: 28px; height: 28px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
+
+
+
 /* ============================================================
-   MODAIS & PIZZA WIZARD
+
+   MODAIS (CARRINHO E ENTREGA)
+
    ============================================================ */
-.modal-overlay { 
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6); 
-    display: flex; align-items: flex-end; justify-content: center; 
-    z-index: 2000; backdrop-filter: blur(3px); 
-}
-@media (min-width: 768px) { .modal-overlay { align-items: center; } }
+
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
+
+
+
+/* Ajuste para matar espaços vazios em qualquer div dentro do modal */
+
+.modal-overlay div { height: auto; margin: 0; }
+
+
 
 .modal-box, .cart-box { 
-    background: #fff; width: 100%; max-width: 500px; 
-    max-height: 92vh; overflow-y: auto; border-radius: 25px 25px 0 0; 
-    box-shadow: 0 -10px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column;
-}
-@media (min-width: 768px) { .modal-box { border-radius: 20px; } }
 
-/* Grid de Tamanhos */
-.grid-tamanhos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 15px 0; }
-.btn-tamanho-opcional { 
-    padding: 12px 5px; border: 2px solid #eee; border-radius: 14px; 
-    background: #fff; font-weight: bold; font-size: 0.85rem; transition: 0.3s;
-}
-.btn-tamanho-opcional.ativo { border-color: #e67e22; background: #fff5ed; color: #e67e22; }
+    background: #fff; 
 
-/* Lista de Sabores no Wizard */
-.lista-fatias-scroll { border: 1px solid #f0f0f0; border-radius: 15px; overflow: hidden; margin-top: 10px; }
-.item-sabor-wizard {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 15px; border-bottom: 1px solid #f9f9f9; cursor: pointer; transition: 0.2s;
-}
-.item-sabor-wizard:last-child { border-bottom: none; }
-.item-sabor-wizard.selecionado { background: #fff9c4; border-left: 6px solid #fbc02d; font-weight: 600; }
-.item-sabor-wizard.desabilitado { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
+    width: 95%; 
 
-.secao-extras { background: #f8f8f8; padding: 20px; border-radius: 18px; margin-top: 20px; border: 1px solid #eee; }
-.label-step { display: block; font-weight: 800; font-size: 0.9rem; margin-bottom: 8px; color: #333; text-transform: uppercase; }
+    max-width: 420px; 
 
-/* Formulários */
-.form-grid { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
-.form-grid input, .form-grid select, .form-grid textarea { 
-    width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #ddd; 
-    background: #fcfcfc; font-size: 16px !important; outline: none; 
+    border-radius: 22px; 
+
+    padding: 0; 
+
+    overflow: hidden; 
+
+    position: relative; 
+
+    display: flex; 
+
+    flex-direction: column;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+
 }
 
-/* Botões */
-.btn-principal, .btn-finalizar, .btn-whatsapp { 
-    width: 100%; background: #000; color: #fff; border: none; 
-    padding: 18px; font-weight: 700; font-size: 1rem; cursor: pointer; border-radius: 15px; 
-}
-.btn-principal:disabled { background: #ccc; cursor: not-allowed; }
 
-/* Loading & Toast */
-#loading-taxa { position: fixed; inset: 0; background: rgba(255,255,255,0.8); z-index: 9999; display: flex; align-items: center; justify-content: center; }
-.spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #000; border-radius: 50%; animation: spin 0.8s linear infinite; }
+
+.modal-header-clean { padding: 20px; background: #f8f8f8; border-bottom: 1px solid #eee; text-align: center; position: relative; }
+
+.modal-header-clean h3 { margin: 0; font-size: 1.1rem; color: #333; font-weight: 800; text-transform: uppercase; }
+
+
+
+.btn-fechar-modal { background: #f1f1f1; border: none; width: 32px; height: 32px; border-radius: 50%; color: #666; cursor: pointer; position: absolute; right: 15px; top: 15px; }
+
+
+
+/* Grid do Formulário */
+
+.form-grid { padding: 10px 20px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+.form-grid input, .form-grid select, .form-grid textarea { width: 100%; padding: 12px 15px; border-radius: 14px; border: 1px solid #ddd; background: #fcfcfc; font-size: 16px !important; outline: none; box-sizing: border-box; }
+
+.row-inputs { display: flex !important; gap: 10px; }
+
+
+
+/* Resumo de Valores */
+
+.summary-box, .resumo-valores { padding: 15px 20px; background: #fff; border-top: 1px dashed #ddd; }
+
+.summary-line, .resumo-lista div { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 5px; color: #444; }
+
+.summary-line.total, #resumo-total { font-weight: 800; color: #000; font-size: 1.1rem; margin-top: 8px; border-top: 1px solid #eee; padding-top: 8px; }
+
+
+
+/* Botões de Ação */
+
+.modal-actions { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 10px; }
+
+.btn-principal, .btn-finalizar, .btn-whatsapp { width: 100%; background: #111; color: #fff; border: none; padding: 16px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; border-radius: 12px; }
+
+.btn-principal:hover { background: #333; }
+
+.btn-secundario, .btn-continuar { background: #e5e5e5; color: #333; width: 100%; border: none; padding: 12px; font-weight: 600; cursor: pointer; border-radius: 12px; }
+
+
+
+/* ============================================================
+
+   LOADING & TOAST
+
+   ============================================================ */
+
+#loading-taxa { position: fixed !important; inset: 0 !important; width: 100vw !important; height: 100vh !important; background: rgba(255, 255, 255, 0.8) !important; backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 99999 !important; }
+
+.spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #111; border-radius: 50%; animation: spin 0.8s linear infinite; }
+
 @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 25px; border-radius: 50px; font-size: 0.85rem; opacity: 0; z-index: 5000; pointer-events: none; }
+
+
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 0.8rem; opacity: 0; transition: 0.3s; z-index: 5000; }
+
 .toast.show { opacity: 1; }
