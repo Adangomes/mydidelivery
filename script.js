@@ -285,11 +285,43 @@ function atualizarCarrinho() {
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
 }
 
-function removerItem(idx) { carrinho.splice(idx, 1); atualizarCarrinho(); }
-function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
-function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
-function abrirDelivery() { if(!carrinho.length) return alert("Seu carrinho está vazio!"); document.getElementById("delivery-modal").style.display = "flex"; fecharCarrinho(); }
-function fecharModalPizza() { document.getElementById("pizza-options-modal").style.display = "none"; }
+/* ============================================================ */
+/* FUNÇÕES DO CARRINHO E MODAIS                                 */
+/* ============================================================ */
+
+function removerItem(idx) {
+    carrinho.splice(idx, 1);
+    atualizarCarrinho();
+}
+
+// Versão com trava de segurança (Loja Fechada)
+function abrirCarrinho() {
+    const statusLoja = document.getElementById("status-loja");
+    const estaFechado = statusLoja.classList.contains("fechado");
+
+    if (estaFechado) {
+        alert("Desculpe, a loja está fechada no momento! Não é possível realizar pedidos agora.");
+        return;
+    }
+
+    document.getElementById("cart-modal").style.display = "flex";
+}
+
+function fecharCarrinho() {
+    document.getElementById("cart-modal").style.display = "none";
+}
+
+function abrirDelivery() {
+    if(!carrinho.length) return alert("Seu carrinho está vazio!");
+    
+    // Fecha o carrinho e abre o modal de entrega
+    fecharCarrinho();
+    document.getElementById("delivery-modal").style.display = "flex";
+}
+
+function fecharModalPizza() {
+    document.getElementById("pizza-options-modal").style.display = "none";
+}
 
 function mostrarToast() { 
     const t = document.getElementById("toast-geral"); 
@@ -329,5 +361,6 @@ async function carregarStatusLoja() {
 
 // Chama a função ao carregar a página
 carregarStatusLoja();
+
 
 
