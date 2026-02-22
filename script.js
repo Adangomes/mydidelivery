@@ -753,56 +753,83 @@ sincronizarPromoComPortal();
 
 
 async function carregarCardapioCompleto() {
-    const container = document.getElementById("cardapio");
-    const menu = document.getElementById("menu-categorias");
+    const res = await fetch("content/produtos.json?v=" + Date.now());
+    const data = await res.json();
 
-    if (!container || !menu) return;
+    const produtos = data.produtos;
 
-    try {
-        const res = await fetch("/content/produtos.json?v=" + Date.now());
-        const data = await res.json();
-        const lista = data.produtos;
+    const secoesContainer = document.querySelector(".secao");
+    const categoriasTopo = document.getElementById("categorias-container");
 
-        container.innerHTML = "";
-        menu.innerHTML = "";
+    secoesContainer.innerHTML = "";
+    categoriasTopo.innerHTML = "";
 
-        const categorias = [...new Set(lista.map(p => p.categoria))];
+    // 🧠 AGRUPAR POR CATEGORIA
+    const categorias = {};
 
-        categorias.forEach(cat => {
+    produtos.forEach(p => {
+        if (!categorias[p.categoria]) {
+            categorias[p.categoria] = [];
+        }
+        categorias[p.categoria].push(p);
+    });
 
-            // botão topo
-            const btn = document.createElement("button");
-            btn.innerText = cat.toUpperCase();
-            btn.onclick = () => {
-                document.getElementById("cat-" + cat)
-                    .scrollIntoView({ behavior: "smooth" });
-            };
-            menu.appendChild(btn);
+    // 🔥 CRIAR TUDO AUTOMATICAMENTE
+    Object.keys(categorias).forEach(nomeCategoria => {
 
-            // seção
-            const secao = document.createElement("div");
-            secao.id = "cat-" + cat;
+        const id = "categoria-" + nomeCategoria.toLowerCase();
 
-            secao.innerHTML = `
-                <h2>${cat.toUpperCase()}</h2>
-                <div class="grid-categoria"></div>
+        // ===== BOTÃO TOPO =====
+        const btn = document.createElement("button");
+        btn.innerText = nomeCategoria.toUpperCase();
+
+        btn.onclick = () => {
+            document.getElementById(id).scrollIntoView({
+                behavior: "smooth"
+            });
+
+            document.querySelectorAll(".categorias-topo button")
+                .forEach(b => b.classList.remove("ativo"));
+
+            btn.classList.add("ativo");
+        };
+
+        categoriasTopo.appendChild(btn);
+
+        // ===== SEÇÃO =====
+        const secao = document.createElement("div");
+        secao.className = "categoria";
+        secao.id = id;
+
+        secao.innerHTML = `
+            <h2>${nomeCategoria.toUpperCase()}</h2>
+            <div class="cards" id="${id}-container"></div>
+        `;
+
+        secoesContainer.appendChild(secao);
+
+        const grid = document.getElementById(`${id}-container`);
+
+        // ===== PRODUTOS =====
+        categorias[nomeCategoria].forEach(p => {
+            const card = document.createElement("div");
+            card.className = "card-produto";
+
+            card.innerHTML = `
+                <img src="${p.image}">
+                <div class="card-content">
+                    <h3>${p.title}</h3>
+                    <p>${p.ingredientes || ""}</p>
+                    <button class="btn-vermelho">VER</button>
+                </div>
             `;
 
-            const grid = secao.querySelector(".grid-categoria");
-
-            lista
-                .filter(p => p.categoria === cat)
-                .forEach(p => {
-                    grid.appendChild(criarCardProduto(p)); // usa seu card atual
-                });
-
-            container.appendChild(secao);
+            grid.appendChild(card);
         });
 
-    } catch (e) {
-        console.error("Erro ao carregar cardápio:", e);
-    }
+    });
 }
+
 
 
 
