@@ -55,19 +55,50 @@ function initMenu() {
     btn.onclick = () => menu.classList.toggle("open");
 }
 
-async function carregarProdutos() {
-    const container = document.getElementById("burgers");
-    if (!container) return;
+async function carregarCardapioCompleto() {
+    const container = document.getElementById("cardapio");
+    const menuCategorias = document.getElementById("menu-categorias");
+
+    if (!container || !menuCategorias) return;
+
     try {
         const res = await fetch("/content/produtos.json");
         const data = await res.json();
         produtos = data.produtos;
+
         container.innerHTML = "";
-        produtos.forEach((p) => {
-            if (p.categoria !== "burger") return;
-            container.appendChild(criarCardProduto(p));
+        menuCategorias.innerHTML = "";
+
+        // 🔥 CRIA CATEGORIAS AUTOMATICAMENTE
+        const categorias = [...new Set(produtos.map(p => p.categoria))];
+
+        categorias.forEach(cat => {
+
+            // MENU (topo)
+            const btn = document.createElement("button");
+            btn.innerText = cat.toUpperCase();
+            btn.onclick = () => {
+                document.getElementById(cat).scrollIntoView({ behavior: "smooth" });
+            };
+            menuCategorias.appendChild(btn);
+
+            // SEÇÃO
+            const secao = document.createElement("div");
+            secao.id = cat;
+            secao.innerHTML = `<h2>${cat.toUpperCase()}</h2>`;
+
+            produtos
+                .filter(p => p.categoria === cat)
+                .forEach(p => {
+                    secao.appendChild(criarCardProduto(p));
+                });
+
+            container.appendChild(secao);
         });
-    } catch (error) { console.error("Erro produtos:", error); }
+
+    } catch (e) {
+        console.error("Erro ao carregar cardápio:", e);
+    }
 }
 
 
@@ -379,7 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarStatusLoja();      // ✅ mantém
     
 
-    carregarProdutos(); // 🔥 NOVO (substitui todos os outros)
+    carregarCardapioCompleto(); // 🔥 NOVO (substitui todos os outros)
 
     carregarCarrinhoStorage(); // ✅ mantém
 });
@@ -772,6 +803,7 @@ async function carregarCardapioCompleto() {
         console.error("Erro ao carregar cardápio:", e);
     }
 }
+
 
 
 
