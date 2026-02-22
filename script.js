@@ -73,6 +73,38 @@ function adicionarCarrinhoPorProduto(p) {
 
 // ==================================================
 // CONTROLE DO CARRINHO (ATUALIZAR E REMOVER)
+function criarCardProduto(p) {
+    // 1. Tratamento para evitar erro se price for undefined (Pizzas/Porções)
+    const precoNumerico = p.price ? p.price : 0;
+    
+    // 2. Se for um item sem preço único (como pizza), exibimos um texto ou buscamos no objeto prices
+    let precoTexto = `R$ ${precoNumerico.toFixed(2).replace(".", ",")}`;
+    if (!p.price && p.prices) {
+        // Pega o valor da pizza Grande como exemplo ou mostra "Ver tamanhos"
+        const valorReferencia = p.prices.G || p.prices.M || p.prices.P;
+        precoTexto = `A partir de R$ ${valorReferencia.toFixed(2).replace(".", ",")}`;
+    }
+
+    const precoAntigo = p.oldPrice ? `<span style="text-decoration: line-through; color: #999; font-size: 0.8rem; margin-right: 5px;">R$ ${p.oldPrice.toFixed(2)}</span>` : "";
+    
+    // 3. Geramos o HTML com segurança
+    return `
+        <div class="card-produto-horizontal" onclick='adicionarCarrinhoPorProduto(${JSON.stringify(p)})'>
+            <div class="card-info">
+                <h3>${p.title}</h3>
+                <p>${p.ingredientes || ""}</p>
+                <div class="price-container">
+                    ${precoAntigo}
+                    <span class="price">${precoTexto}</span>
+                </div>
+            </div>
+            <div class="card-img">
+                <img src="${p.image}" alt="${p.title}" onerror="this.src='imagens/placeholder.png'">
+                <button class="btn-add">+</button>
+            </div>
+        </div>
+    `;
+}
 // ==================================================
 
 function atualizarCarrinho() {
@@ -745,6 +777,7 @@ async function carregarCardapioCompleto() {
         console.error("Erro ao carregar cardápio:", e);
     }
 }
+
 
 
 
