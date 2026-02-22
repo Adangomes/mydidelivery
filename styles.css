@@ -325,3 +325,33 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     background-color: #ccc;
 }
 
+/* Botões de 1, 2 sabores */
+.btn-quantidade-sabor {
+    flex: 1;
+    padding: 15px;
+    border: 2px solid #eee;
+    background: white;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px;
+    transition: 0.3s;
+}
+
+.btn-quantidade-sabor.ativo {
+    border-color: #e67e22;
+    background: #fff5ed;
+    color: #e67e22;
+}
+
+/* Garante que o container de botões use flexbox para ficarem lado a lado */
+#pizza-sizes-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+/* Esconde o X lá do topo da foto 2 */
+.close-modal, .btn-fechar-pizza {
+    display: none !important;
+}
