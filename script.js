@@ -275,13 +275,37 @@ function addSabor(nome, n) {
 }
 
 function confirmarPizza() {
-    if(!tamanhoSelecionado || saboresSelecionados.length < limiteSabores) return alert("Selecione o tamanho e todos os sabores!");
-    adicionarCarrinhoPorProduto({
-        title: `Pizza ${tamanhoSelecionado} (${saboresSelecionados.join("/")})`,
-        price: pizzaPrincipal.prices[tamanhoSelecionado],
-        qtd: 1
-    });
+    // 1. Pega o valor da borda selecionada
+    const selectBorda = document.getElementById("select-borda");
+    const valorBorda = parseFloat(selectBorda.value);
+    const nomeBorda = selectBorda.options[selectBorda.selectedIndex].text;
+
+    // 2. Pega a opção de azeitona
+    const azeitona = document.querySelector('input[name="azeitona"]:checked').value;
+
+    // 3. Calcula o preço total (Preço do Tamanho + Borda)
+    const precoBase = pizzaPrincipal.prices[tamanhoSelecionado];
+    const precoFinal = precoBase + valorBorda;
+
+    // 4. Monta a descrição do item para o carrinho
+    const descricaoSabores = saboresSelecionados.join(" / ");
+    const detalhesExtras = valorBorda > 0 ? ` + ${nomeBorda}` : "";
+    
+    const itemCarrinho = {
+        title: `${pizzaPrincipal.title} (${tamanhoSelecionado})`,
+        sabor: `${descricaoSabores}${detalhesExtras} | ${azeitona}`,
+        price: precoFinal,
+        quantidade: 1,
+        image: pizzaPrincipal.image
+    };
+
+    // 5. Adiciona ao carrinho (ajuste conforme o nome da sua função de carrinho)
+    carrinho.push(itemCarrinho);
+    
+    // 6. Fecha o modal e atualiza a tela
     fecharModalPizza();
+    atualizarCarrinho(); // Função que renderiza o carrinho
+    mostrarToast("Pizza adicionada!");
 }
 
 // --- FUNÇÕES DO CARRINHO ---
@@ -389,6 +413,7 @@ async function carregarStatusLoja() {
         s.className = "status fechado";
     }
 }
+
 
 
 
