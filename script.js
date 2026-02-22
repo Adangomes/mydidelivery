@@ -79,9 +79,9 @@ async function carregarCardapioCompleto() {
                 <span class="preco-unico">${p.price ? 'R$ '+p.price.toFixed(2) : 'Ver opções'}</span>
             </div>
             <div class="foto-produto-lista">
-                <img src="${p.image}" onerror="this.src='imagens/placeholder.png'">
-                <button class="btn-add-lista">+</button>
-            </div>
+    <img src="${p.image}" style="pointer-events: none;" onerror="this.src='imagens/placeholder.png'">
+    <button class="btn-add-lista">+</button>
+</div>
         </div>`;
 });
             corpo.appendChild(section);
@@ -463,6 +463,7 @@ function toggleSabor(nome) {
         }
     }
 }
+
 
 
 
