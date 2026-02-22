@@ -19,8 +19,7 @@
         </div>
     </header>
 
-    <main id="cardapio-corpo" class="container-main">
-        </main>
+    <main id="cardapio-corpo" class="container-main"></main>
 
     <footer class="footer">
         <p>Sistema Desenvolvido por Adan Gomes</p>
@@ -38,9 +37,49 @@
                 <p><strong id="total">Total: R$ 0,00</strong></p>
             </div>
             <div class="buttons">
-                <button class="btn-continuar" onclick="fecharCarrinho()">Continuar Comprando</button>
+                <button class="btn-continuar" onclick="fecharCarrinho()">Continuar</button>
                 <button class="btn-finalizar" onclick="abrirDelivery()">Finalizar Pedido</button>
             </div>
+        </div>
+    </div>
+
+    <div id="pizza-options-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <img id="modal-pizza-img" src="" alt="">
+                <button onclick="fecharModalPizza()" class="btn-fechar">✕</button>
+            </div>
+            <div class="modal-content">
+                <h2 id="pizza-modal-title"></h2>
+                <p id="pizza-modal-desc"></p>
+                <label>1. Escolha o Tamanho:</label>
+                <div id="pizza-sizes-container" class="grid-tamanhos"></div>
+                <div id="secao-sabores" style="display:none; margin-top:20px;">
+                    <label id="contador-fatias">2. Escolha os Sabores:</label>
+                    <div id="lista-sabores-meia" class="lista-fatias-scroll"></div>
+                </div>
+            </div>
+            <footer class="modal-footer">
+                <button onclick="confirmarPizza()" class="btn-confirmar">Adicionar Pizza</button>
+            </footer>
+        </div>
+    </div>
+
+    <div id="porcao-options-modal" class="modal-overlay" style="display:none;">
+        <div class="modal-box">
+            <div class="modal-header">
+                <img id="modal-porcao-img" src="" alt="">
+                <button onclick="fecharModalPorcao()" class="btn-fechar">✕</button>
+            </div>
+            <div class="modal-content">
+                <h2 id="porcao-modal-title"></h2>
+                <p id="porcao-modal-desc"></p>
+                <label>Escolha o Tamanho/Peso:</label>
+                <div id="porcao-sizes-container" class="grid-tamanhos"></div>
+            </div>
+            <footer class="modal-footer">
+                <button onclick="confirmarPorcao()" class="btn-confirmar">Adicionar Porção</button>
+            </footer>
         </div>
     </div>
 
