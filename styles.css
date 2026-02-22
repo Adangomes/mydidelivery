@@ -378,3 +378,28 @@ input, select, textarea {
     font-weight: bold;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
+
+.item-sabor-fatia {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+}
+.controles-fatias button {
+    background: #e67e22;
+    color: white;
+    border: none;
+    width: 25px;
+    height: 25px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.qtd-fatia {
+    margin: 0 10px;
+    font-weight: bold;
+}
+.btn-tamanho-opcional.ativo {
+    border: 2px solid #e67e22;
+    background: #fff5eb;
+}
