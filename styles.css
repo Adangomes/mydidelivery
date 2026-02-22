@@ -254,77 +254,116 @@ body { background: #fff; color: #333; overflow-x: hidden; }
    ============================================================ */
 
 /* 1. Reset de containers para matar buracos brancos */
-.modal-overlay div {
-    height: auto !important; 
-    margin: 0;
+/* ============================================================ */
+/* FORMULÁRIO DE ENTREGA (ESTILO APP - CONFORME REFERÊNCIA)     */
+/* ============================================================ */
+
+/* Remove qualquer altura fixa que esteja causando espaços horríveis */
+.delivery-box, .delivery-box div {
+    height: auto !important;
 }
 
-/* 2. Estilo do Resumo do Pedido (Ajustado) */
-.summary-box {
-    padding: 15px 20px;
-    background: #fff;
-    border-top: 1px dashed #ddd; /* Linha discreta para separar do form */
-    margin-top: 0 !important; /* Cola no formulário */
-}
-
-.summary-line {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 5px;
-    font-size: 0.9rem;
+/* Títulos dos campos (Labels) */
+.delivery-box label {
+    font-size: .75rem;
+    margin-top: 10px;
+    display: block;
     color: #444;
+    font-weight: 600;
 }
 
-.summary-line.total {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid #eee;
-    font-weight: 800;
-    color: #000;
-    font-size: 1.1rem;
-}
-
-/* 3. Botão Calcular Taxa (Agora colado e integrado) */
-.btn-principal.w-100.mt-2 {
+/* Inputs, Selects e Textarea (Igual ao seu código) */
+.delivery-box input,
+.delivery-box select,
+.delivery-box textarea {
     width: 100%;
-    background: #f8f8f8; /* Cinza claro do print */
-    color: #333;
-    border: none;
-    border-top: 1px solid #eee;
-    padding: 16px;
-    font-weight: 700;
-    font-size: 1rem;
-    cursor: pointer;
-    margin-top: 0 !important; /* Remove o espaço entre o form e o botão */
-    border-radius: 0 0 20px 20px; /* Arredonda só a base do modal */
-}
-
-/* 4. Ajuste dos Inputs para não esticarem o modal */
-.form-grid {
-    padding: 15px 20px 10px; /* Menos padding embaixo para o botão colar */
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.form-grid input, 
-.form-grid select {
-    height: 45px !important; /* Altura fixa apenas nos campos */
-    border-radius: 12px;
+    padding: 11px;
+    border-radius: 14px; /* Arredondamento padrão do seu código */
     border: 1px solid #ddd;
-    padding: 0 15px;
+    margin-top: 4px;
+    font-size: 16px !important; /* Evita zoom no iPhone */
+    background: #fff;
+    outline: none;
     box-sizing: border-box;
 }
 
-/* 5. Linha de Endereço (Grid Compacto) */
+/* Linha de Rua + Número na mesma linha */
 .row-inputs {
-    display: grid !important;
-    grid-template-columns: 1fr 80px !important;
-    gap: 10px !important;
+    display: flex !important;
+    gap: 10px;
+    margin-top: 4px;
 }
 
-/* 6. Cabeçalho do Modal */
-.modal-header-clean {
-    padding: 20px 20px 5px;
+.row-inputs input:first-child {
+    flex: 1; /* Rua ocupa o espaço maior */
+}
+
+.row-inputs input:last-child {
+    width: 85px; /* Número fica curtinho */
     text-align: center;
+}
+
+/* ============================================================ */
+/* RESUMO DO PEDIDO (IGUAL AO SEU CÓDIGO DE REFERÊNCIA)         */
+/* ============================================================ */
+
+#resumo-pedido {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 12px 0 0 0 !important;
+    width: 100% !important;
+    display: none; /* JS controla a visibilidade */
+}
+
+#resumo-itens p {
+    margin-bottom: 6px;
+    color: #444;
+    font-size: .85rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Linha de Total no Resumo */
+#resumo-itens strong {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    color: #000;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #ddd;
+}
+
+/* ============================================================ */
+/* BOTÕES DE AÇÃO (CALCULAR / FINALIZAR)                       */
+/* ============================================================ */
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.buttons button {
+    flex: 1;
+    padding: 13px;
+    border-radius: 16px; /* Arredondamento maior como nos modais */
+    border: none;
+    font-weight: 600;
+    font-size: .9rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Botão Voltar/Calcular (Cinza) */
+.buttons button:first-child {
+    background: #e5e5e5;
+    color: #333;
+}
+
+/* Botão Finalizar (Preto conforme o tema) */
+.buttons button:last-child {
+    background: #111;
+    color: #fff;
 }
