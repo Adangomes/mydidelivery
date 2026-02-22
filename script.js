@@ -57,33 +57,31 @@ async function carregarCardapioCompleto() {
             section.innerHTML = `<h2 class="titulo-categoria-lista">${cat}</h2>`;
 
             categorias[cat].forEach(p => {
-    // NOVA REGRA: Se for a categoria pizza, só mostra se o título contiver "Pizza" 
-    // (Ajuste essa lógica se os seus combos tiverem outro nome, como "Combo")
-    if (p.categoria.toLowerCase() === 'pizza' && !p.title.toUpperCase().includes("PIZZA")) {
-        return; // Pula e não mostra no cardápio principal
-    }
+                // Filtro para não mostrar sabores individuais de pizza fora do modal
+                if (p.categoria.toLowerCase() === 'pizza' && !p.title.toUpperCase().includes("PIZZA")) {
+                    return; 
+                }
 
-    const pJson = JSON.stringify(p).replace(/"/g, '&quot;');
-    let acao = `adicionarCarrinhoPorProduto(${pJson})`;
-    
-    // Se for um item de pizza (Combo), abre o modal configurador
-    if(p.categoria.toLowerCase() === 'pizza') {
-        acao = `abrirModalPizza('${p.title}')`;
-    }
+                const pJson = JSON.stringify(p).replace(/"/g, '&quot;');
+                let acao = `adicionarCarrinhoPorProduto(${pJson})`;
+                
+                if(p.categoria.toLowerCase() === 'pizza') {
+                    acao = `abrirModalPizza('${p.title}')`;
+                }
 
-    section.innerHTML += `
-        <div class="item-produto-lista" onclick="${acao}">
-            <div class="info-produto">
-                <h3 class="nome-produto-lista">${p.title}</h3>
-                <p class="desc-produto-lista">${p.ingredientes || ""}</p>
-                <span class="preco-unico">${p.price ? 'R$ '+p.price.toFixed(2) : 'Ver opções'}</span>
-            </div>
-            <div class="foto-produto-lista">
-    <img src="${p.image}" style="pointer-events: none;" onerror="this.src='imagens/placeholder.png'">
-    <button class="btn-add-lista">+</button>
-</div>
-        </div>`;
-});
+                section.innerHTML += `
+                    <div class="item-produto-lista" onclick="${acao}">
+                        <div class="info-produto">
+                            <h3 class="nome-produto-lista">${p.title}</h3>
+                            <p class="desc-produto-lista">${p.ingredientes || ""}</p>
+                            <span class="preco-unico">${p.price ? 'R$ '+p.price.toFixed(2) : 'Ver opções'}</span>
+                        </div>
+                        <div class="foto-produto-lista">
+                            <img src="${p.image}" style="pointer-events: none;" onerror="this.src='imagens/placeholder.png'">
+                            <button class="btn-add-lista">+</button>
+                        </div>
+                    </div>`;
+            });
             corpo.appendChild(section);
         });
         ativarScrollSpy();
@@ -99,7 +97,7 @@ function ativarScrollSpy() {
     window.addEventListener("scroll", () => {
         let atual = "";
         secoes.forEach(secao => {
-            if (pageYOffset >= secao.offsetTop - 150) atual = secao.getAttribute("id");
+            if (window.pageYOffset >= secao.offsetTop - 150) atual = secao.getAttribute("id");
         });
         links.forEach(link => {
             link.classList.remove("active");
@@ -114,7 +112,6 @@ function ativarScrollSpy() {
 // --- LÓGICA DE ENTREGA E GEOAPIFY ---
 async function calcularTaxaEntrega(end) {
     try {
-        // Busca o endereço focando na região de Jaraguá do Sul/Guaramirim
         const geo = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(end)}&filter=rect:-49.2568,-26.5824,-48.8164,-26.3486&apiKey=${GEOAPIFY_KEY}`).then(r => r.json());
         if (!geo.features || geo.features.length === 0) return null;
         
@@ -123,7 +120,7 @@ async function calcularTaxaEntrega(end) {
         
         if (!rota.features) return null;
         const km = rota.features[0].properties.distance / 1000;
-        return km < 1 ? 2.00 : TAXA_BASE + (km * VALOR_POR_KM); // Exemplo: taxa mínima de 2 reais se for muito perto
+        return km < 1 ? 2.00 : TAXA_BASE + (km * VALOR_POR_KM);
     } catch (e) { return null; }
 }
 
@@ -137,22 +134,17 @@ async function mostrarResumo() {
 
     const enderecoCompleto = `${rua}, ${num}, ${bairro}, ${cidade}, SC, Brasil`;
 
-    // 1. Liga o carregamento
     document.getElementById("loading-taxa").style.display = "flex";
 
-    // 2. Faz o cálculo E cria uma espera de 1.5 segundos ao mesmo tempo
-    // O 'await' vai esperar os dois terminarem
     const [taxa] = await Promise.all([
         calcularTaxaEntrega(enderecoCompleto),
-        new Promise(resolve => setTimeout(resolve, 2000)) // <--- AQUI ESTÁ O TEMPO (1.5 seg)
+        new Promise(resolve => setTimeout(resolve, 2000))
     ]);
 
-    // 3. Desliga o carregamento
     document.getElementById("loading-taxa").style.display = "none";
 
     if (taxa === null) return alert("Não conseguimos localizar este endereço. Verifique o nome da rua e número.");
 
-    // ... restante do seu código (subtotal, trocar telas, etc)
     taxaEntregaCalculada = taxa;
     let sub = 0; 
     carrinho.forEach(i => sub += (i.price * i.qtd));
@@ -174,35 +166,31 @@ async function mostrarResumo() {
 // --- FINALIZAÇÃO E WHATSAPP ---
 function toggleTroco(metodo) {
     const divTroco = document.getElementById('div-troco');
-    divTroco.style.display = (metodo === 'Dinheiro') ? 'block' : 'none';
-}
-
-function voltarParaDados() {
-    document.getElementById("resumo-pedido").style.display = "none";
-    document.getElementById("form-entrega").style.display = "block";
+    if(divTroco) divTroco.style.display = (metodo === 'Dinheiro') ? 'block' : 'none';
 }
 
 function enviarWhatsApp() {
     const nome = document.getElementById("nomeCliente").value;
-    const cidade = document.getElementById("cidade").value;
     const rua = document.getElementById("rua").value;
     const num = document.getElementById("numero").value;
     const bairro = document.getElementById("bairro").value;
-    const ponto = document.getElementById("pontoReferencia").value;
-    const obs = document.getElementById("obsCozinha").value;
+    const cidade = document.getElementById("cidade").value;
     const pag = document.getElementById("pagamento").value;
     const troco = document.getElementById("trocoPara").value;
+    const obs = document.getElementById("obsCozinha").value;
 
     if(!nome) return alert("Por favor, informe seu nome.");
 
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*%0A%0A`;
     msg += `*Cliente:* ${nome}%0A`;
     msg += `--------------------------%0A`;
-    carrinho.forEach(i => msg += `• ${i.qtd}x ${i.title}%0A`);
+    carrinho.forEach(i => {
+        msg += `• ${i.qtd}x ${i.title}%0A`;
+        if(i.sabor) msg += `  _${i.sabor}_%0A`;
+    });
     msg += `--------------------------%0A`;
     msg += `*Endereço:* ${rua}, ${num}%0A`;
     msg += `*Bairro:* ${bairro} - ${cidade}%0A`;
-    if(ponto) msg += `*Ref:* ${ponto}%0A`;
     if(obs) msg += `*Obs:* ${obs}%0A`;
     msg += `*Pagamento:* ${pag}${pag === 'Dinheiro' ? ' (Troco para: '+troco+')' : ''}%0A`;
     msg += `*Total:* ${document.getElementById("resumo-total").innerText}`;
@@ -210,7 +198,7 @@ function enviarWhatsApp() {
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`);
 }
 
-// --- MODAL PIZZA (SABORES E TAMANHOS) ---
+// --- MODAL PIZZA ---
 function abrirModalPizza(nome) {
     pizzaPrincipal = produtosGeral.find(p => p.title === nome);
     if (!pizzaPrincipal) return;
@@ -222,9 +210,9 @@ function abrirModalPizza(nome) {
     document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
     document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes || "";
     
-    // Reset dos passos seguintes
     document.getElementById("secao-sabores").style.display = "none";
-    if(document.getElementById("secao-adicionais")) document.getElementById("secao-adicionais").style.display = "none";
+    const secAdic = document.getElementById("secao-adicionais");
+    if(secAdic) secAdic.style.display = "none";
     
     const btnConfirmar = document.getElementById("btn-confirmar-pizza");
     btnConfirmar.disabled = true;
@@ -240,10 +228,8 @@ function abrirModalPizza(nome) {
         btn.onclick = () => {
             tamanhoSelecionado = tam;
             limiteSabores = tam === "P" ? 1 : (tam === "M" ? 2 : 3);
-            
             document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
             btn.classList.add("ativo");
-            
             document.getElementById("secao-sabores").style.display = "block";
             renderizarSabores();
         };
@@ -285,33 +271,35 @@ function renderizarSabores() {
     }
 }
 
-function addSabor(nome, n) {
-    if(n === 1 && saboresSelecionados.length < limiteSabores) saboresSelecionados.push(nome);
-    else if(n === -1) { 
-        const i = saboresSelecionados.indexOf(nome); 
-        if(i > -1) saboresSelecionados.splice(i, 1); 
+function toggleSabor(nome) {
+    const index = saboresSelecionados.indexOf(nome);
+    if (index > -1) {
+        saboresSelecionados.splice(index, 1);
+    } else {
+        if (saboresSelecionados.length < limiteSabores) {
+            saboresSelecionados.push(nome);
+        } else {
+            alert(`Você só pode escolher ${limiteSabores} sabor(es) para este tamanho!`);
+        }
     }
     renderizarSabores();
-}
-
-function fecharModalPizza() {
-    document.getElementById("pizza-options-modal").style.display = "none";
-}
-
-function carregarCarrinhoStorage() {
-    const salvo = localStorage.getItem("carrinho");
-    if(salvo) {
-        carrinho = JSON.parse(salvo);
-        atualizarCarrinho();
+    
+    const secaoAdicionais = document.getElementById("secao-adicionais");
+    const btnConfirmar = document.getElementById("btn-confirmar-pizza");
+    
+    if (saboresSelecionados.length === limiteSabores) {
+        if(secaoAdicionais) secaoAdicionais.style.display = "block";
+        if(btnConfirmar) {
+            btnConfirmar.disabled = false;
+            btnConfirmar.innerText = "Adicionar ao Carrinho";
+        }
+    } else {
+        if(secaoAdicionais) secaoAdicionais.style.display = "none";
+        if(btnConfirmar) {
+            btnConfirmar.disabled = true;
+            btnConfirmar.innerText = `Selecione mais ${limiteSabores - saboresSelecionados.length} sabor(es)`;
+        }
     }
-}
-
-function abrirDelivery() {
-    if(carrinho.length === 0) return alert("Seu carrinho está vazio!");
-    fecharCarrinho();
-    document.getElementById("delivery-modal").style.display = "flex";
-    document.getElementById("form-entrega").style.display = "block";
-    document.getElementById("resumo-pedido").style.display = "none";
 }
 
 function confirmarPizza() {
@@ -324,10 +312,11 @@ function confirmarPizza() {
     const precoFinal = precoBase + valorBorda;
 
     const descricaoSabores = saboresSelecionados.join(" / ");
+    const detalhesExtras = valorBorda > 0 ? ` + ${nomeBorda}` : "";
     
     const itemCarrinho = {
         title: `${pizzaPrincipal.title} (${tamanhoSelecionado})`,
-        ingredientes: `${descricaoSabores} | ${nomeBorda} | ${azeitona}`,
+        sabor: `${descricaoSabores}${detalhesExtras} | ${azeitona}`,
         price: precoFinal,
         qtd: 1,
         image: pizzaPrincipal.image
@@ -339,6 +328,7 @@ function confirmarPizza() {
     mostrarToast("Pizza adicionada!");
 }
 
+// --- FUNÇÕES GERAIS ---
 function adicionarCarrinhoPorProduto(p) {
     let item = carrinho.find(i => i.title === p.title);
     if(item) item.qtd++; else carrinho.push({...p, qtd: 1});
@@ -355,16 +345,14 @@ function atualizarCarrinho() {
     carrinho.forEach((i, idx) => {
         total += (i.price * i.qtd);
         box.innerHTML += `
-            <div class="item-sabor-fatia" style="display:flex; justify-content:space-between; align-items:center; padding: 10px; border-bottom:1px solid #eee;">
+            <div class="item-sabor-fatia" style="display:flex; justify-content:space-between; align-items:center; padding:5px 0;">
                 <div style="display:flex; flex-direction:column">
-                    <span style="font-weight:700; font-size:0.9rem;">${i.qtd}x ${i.title}</span>
-                    <small style="font-size:0.7rem; color:#666;">${i.ingredientes || ""}</small>
-                    <span style="color:#27ae60; font-weight:bold;">R$ ${(i.price * i.qtd).toFixed(2)}</span>
+                    <span style="font-size:0.85rem; font-weight:bold;">${i.qtd}x ${i.title}</span>
+                    ${i.sabor ? `<small style="font-size:0.7rem; color:#666">${i.sabor}</small>` : ''}
                 </div>
-                <button onclick="removerItem(${idx})" style="background:none; color:#e74c3c; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+                <button onclick="removerItem(${idx})" style="background:none; color:#e74c3c; border:none; font-size:1.1rem; cursor:pointer">✕</button>
             </div>`;
     });
-    
     document.getElementById("subtotal").innerText = `R$ ${total.toFixed(2)}`;
     document.getElementById("total").innerText = `R$ ${total.toFixed(2)}`;
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
@@ -376,8 +364,8 @@ function removerItem(idx) {
 }
 
 function abrirCarrinho() {
-    const statusLoja = document.getElementById("status-loja");
-    if (statusLoja && statusLoja.classList.contains("fechado")) {
+    const s = document.getElementById("status-loja");
+    if (s && s.classList.contains("fechado")) {
         alert("Desculpe, a loja está fechada!");
         return;
     }
@@ -388,267 +376,55 @@ function fecharCarrinho() {
     document.getElementById("cart-modal").style.display = "none";
 }
 
-async function carregarStatusLoja() {
-    const s = document.getElementById("status-loja");
-    try {
-        const response = await fetch('./content/status.json?v=' + Date.now());
-        const data = await response.json();
-        const agora = new Date();
-        const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
-        const [hAbre, mAbre] = data.horaAbre.split(':').map(Number);
-        const [hFecha, mFecha] = data.horaFecha.split(':').map(Number);
-        const minutosAbre = hAbre * 60 + mAbre;
-        const minutosFecha = hFecha * 60 + mFecha;
-        const diaHoje = agora.getDay();
-        const atendeHoje = data.diasFuncionamento.map(String).includes(String(diaHoje));
-        const dentroDoHorario = (horaAtualMinutos >= minutosAbre && horaAtualMinutos < minutosFecha);
-
-        if (atendeHoje && dentroDoHorario) {
-            s.innerHTML = "<span>ABERTO AGORA</span>";
-            s.className = "status aberto";
-        } else {
-            s.innerHTML = "<span>FECHADO</span>";
-            s.className = "status fechado";
-        }
-    } catch (error) {
-        s.innerText = "FECHADO";
-        s.className = "status fechado";
-    }
+function fecharModalPizza() {
+    document.getElementById("pizza-options-modal").style.display = "none";
 }
 
-function toggleSabor(nome) {
-    const index = saboresSelecionados.indexOf(nome);
-    if (index > -1) {
-        saboresSelecionados.splice(index, 1);
-    } else {
-        if (saboresSelecionados.length < limiteSabores) {
-            saboresSelecionados.push(nome);
-        } else {
-            alert(`Limite de ${limiteSabores} sabores atingido!`);
-        }
-    }
-    renderizarSabores();
-    
-    const secaoAdicionais = document.getElementById("secao-adicionais");
-    const btnConfirmar = document.getElementById("btn-confirmar-pizza");
-    
-    if (saboresSelecionados.length === limiteSabores) {
-        if(secaoAdicionais) secaoAdicionais.style.display = "block";
-        if(btnConfirmar) {
-            btnConfirmar.disabled = false;
-            btnConfirmar.innerText = "Adicionar ao Carrinho";
-        }
-    } else {
-        if(secaoAdicionais) secaoAdicionais.style.display = "none";
-        if(btnConfirmar) {
-            btnConfirmar.disabled = true;
-            btnConfirmar.innerText = `Selecione mais ${limiteSabores - saboresSelecionados.length} sabor(es)`;
-        }
-    }
+function abrirDelivery() {
+    if(carrinho.length === 0) return alert("Seu carrinho está vazio!");
+    fecharCarrinho();
+    document.getElementById("delivery-modal").style.display = "flex";
 }
 
 function mostrarToast(msg = "Produto adicionado!") {
     const toast = document.getElementById("toast-geral");
     if(!toast) return;
     toast.innerText = msg;
-    toast.style.display = "block";
-    setTimeout(() => { toast.style.display = "none"; }, 3000);
-}
-
-function addSabor(nome, n) {
-    if(n === 1 && saboresSelecionados.length < limiteSabores) saboresSelecionados.push(nome);
-    else if(n === -1) { const i = saboresSelecionados.indexOf(nome); if(i > -1) saboresSelecionados.splice(i, 1); }
-    renderizarSabores();
-}
-
-function confirmarPizza() {
-    // 1. Pega o valor da borda selecionada
-    const selectBorda = document.getElementById("select-borda");
-    const valorBorda = parseFloat(selectBorda.value);
-    const nomeBorda = selectBorda.options[selectBorda.selectedIndex].text;
-
-    // 2. Pega a opção de azeitona
-    const azeitona = document.querySelector('input[name="azeitona"]:checked').value;
-
-    // 3. Calcula o preço total (Preço do Tamanho + Borda)
-    const precoBase = pizzaPrincipal.prices[tamanhoSelecionado];
-    const precoFinal = precoBase + valorBorda;
-
-    // 4. Monta a descrição do item para o carrinho
-    const descricaoSabores = saboresSelecionados.join(" / ");
-    const detalhesExtras = valorBorda > 0 ? ` + ${nomeBorda}` : "";
-    
-    const itemCarrinho = {
-        title: `${pizzaPrincipal.title} (${tamanhoSelecionado})`,
-        sabor: `${descricaoSabores}${detalhesExtras} | ${azeitona}`,
-        price: precoFinal,
-        quantidade: 1,
-        image: pizzaPrincipal.image
-    };
-
-    // 5. Adiciona ao carrinho (ajuste conforme o nome da sua função de carrinho)
-    carrinho.push(itemCarrinho);
-    
-    // 6. Fecha o modal e atualiza a tela
-    fecharModalPizza();
-    atualizarCarrinho(); // Função que renderiza o carrinho
-    mostrarToast("Pizza adicionada!");
-}
-
-// --- FUNÇÕES DO CARRINHO ---
-function adicionarCarrinhoPorProduto(p) {
-    let item = carrinho.find(i => i.title === p.title);
-    if(item) item.qtd++; else carrinho.push({...p, qtd: 1});
-    atualizarCarrinho();
-    mostrarToast();
-}
-
-function atualizarCarrinho() {
-    const box = document.getElementById("cart-items");
-    let total = 0; box.innerHTML = "";
-    carrinho.forEach((i, idx) => {
-        total += (i.price * i.qtd);
-        box.innerHTML += `
-            <div class="item-sabor-fatia">
-                <span style="font-size:0.8rem">${i.qtd}x ${i.title}</span>
-                <button onclick="removerItem(${idx})" style="background:none; color:#e74c3c; border:none; font-size:1.2rem">✕</button>
-            </div>`;
-    });
-    document.getElementById("subtotal").innerText = `R$ ${total.toFixed(2)}`;
-    document.getElementById("total").innerText = `R$ ${total.toFixed(2)}`;
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-}
-
-/* ============================================================ */
-/* FUNÇÕES DO CARRINHO E MODAIS                                 */
-/* ============================================================ */
-
-function removerItem(idx) {
-    carrinho.splice(idx, 1);
-    atualizarCarrinho();
-}
-
-// Versão com trava de segurança (Loja Fechada)
-// Mantenha suas funções de interface normalmente
-function abrirCarrinho() {
-    const statusLoja = document.getElementById("status-loja");
-    const estaFechado = statusLoja.classList.contains("fechado");
-
-    if (estaFechado) {
-        alert("Desculpe, a loja está fechada no momento! Não é possível realizar pedidos agora.");
-        return;
-    }
-    document.getElementById("cart-modal").style.display = "flex";
-}
-
-function fecharCarrinho() {
-    document.getElementById("cart-modal").style.display = "none";
-}
-
-// ... (Mantenha abrirDelivery, fecharModalPizza, mostrarToast e carregarCarrinhoStorage como estão)
-
-// NOVA FUNÇÃO DE STATUS INTEGRADA AO FIREBASE
-async function carregarStatusLoja() {
-    const s = document.getElementById("status-loja");
-    
-    try {
-        const response = await fetch('./content/status.json?v=' + Date.now());
-        const data = await response.json();
-
-        const agora = new Date();
-        const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
-        
-        // Converte os horários do Admin (ex: "18:00") para minutos totais para facilitar o cálculo
-        const [hAbre, mAbre] = data.horaAbre.split(':').map(Number);
-        const [hFecha, mFecha] = data.horaFecha.split(':').map(Number);
-        
-        const minutosAbre = hAbre * 60 + mAbre;
-        const minutosFecha = hFecha * 60 + mFecha;
-        
-        const diaHoje = agora.getDay();
-        const atendeHoje = data.diasFuncionamento.map(String).includes(String(diaHoje));
-        const dentroDoHorario = (horaAtualMinutos >= minutosAbre && horaAtualMinutos < minutosFecha);
-
-        if (atendeHoje && dentroDoHorario) {
-            // VERIFICA SE FALTA POUCO PARA FECHAR (Ex: faltam menos de 30 minutos)
-            const faltamQuantosMinutos = minutosFecha - horaAtualMinutos;
-
-            if (faltamQuantosMinutos <= 30) {
-                s.innerHTML = "<span>ABERTO! FECHA EM BREVE</span>";
-                s.className = "status aberto alerta"; // Adicionamos uma classe extra para estilizar se quiser
-            } else {
-                s.innerHTML = "<span>ABERTO AGORA</span>";
-                s.className = "status aberto";
-            }
-        } else {
-            let msgFechado = "";
-            const horaAtualTexto = agora.getHours().toString().padStart(2, '0') + ":" + 
-                                  agora.getMinutes().toString().padStart(2, '0');
-
-            if (atendeHoje && horaAtualTexto < data.horaAbre) {
-                msgFechado = `FECHADO! ABRIREMOS ÀS ${data.horaAbre}`;
-            } else {
-                msgFechado = `FECHADO! RETORNAMOS AMANHÃ ÀS ${data.horaAbre}`;
-            }
-
-            s.innerHTML = `<span>${msgFechado}</span>`;
-            s.className = "status fechado";
-        }
-
-    } catch (error) {
-        s.innerText = "FECHADO";
-        s.className = "status fechado";
-    }
-}
-
-function toggleSabor(nome) {
-    const index = saboresSelecionados.indexOf(nome);
-    if (index > -1) {
-        // Se já está selecionado, remove
-        saboresSelecionados.splice(index, 1);
-    } else {
-        // Se não está e não atingiu o limite, adiciona
-        if (saboresSelecionados.length < limiteSabores) {
-            saboresSelecionados.push(nome);
-        } else {
-            alert(`Você só pode escolher ${limiteSabores} sabor(es) para este tamanho!`);
-        }
-    }
-    renderizarSabores();
-    
-    // Mostra ou esconde os adicionais (Passo 3) se o limite for atingido
-    const secaoAdicionais = document.getElementById("secao-adicionais");
-    const btnConfirmar = document.getElementById("btn-confirmar-pizza");
-    
-    if (saboresSelecionados.length === limiteSabores) {
-        if(secaoAdicionais) secaoAdicionais.style.display = "block";
-        if(btnConfirmar) {
-            btnConfirmar.disabled = false;
-            btnConfirmar.innerText = "Adicionar ao Carrinho";
-        }
-    } else {
-        if(secaoAdicionais) secaoAdicionais.style.display = "none";
-        if(btnConfirmar) {
-            btnConfirmar.disabled = true;
-            btnConfirmar.innerText = `Selecione mais ${limiteSabores - saboresSelecionados.length} sabor(es)`;
-        }
-    }
-}
-
-function mostrarToast(msg = "Produto adicionado!") {
-    const toast = document.getElementById("toast-geral");
-    toast.innerText = msg;
     toast.classList.add("show");
     setTimeout(() => toast.classList.remove("show"), 3000);
 }
 
+function carregarCarrinhoStorage() {
+    const salvo = localStorage.getItem("carrinho");
+    if(salvo) {
+        carrinho = JSON.parse(salvo);
+        atualizarCarrinho();
+    }
+}
 
+async function carregarStatusLoja() {
+    const s = document.getElementById("status-loja");
+    try {
+        const response = await fetch('./content/status.json?v=' + Date.now());
+        const data = await response.json();
+        const agora = new Date();
+        const horaMin = agora.getHours() * 60 + agora.getMinutes();
+        const [hA, mA] = data.horaAbre.split(':').map(Number);
+        const [hF, mF] = data.horaFecha.split(':').map(Number);
+        const minA = hA * 60 + mA;
+        const minF = hF * 60 + mF;
+        const diaH = agora.getDay();
+        const atende = data.diasFuncionamento.map(String).includes(String(diaH));
 
-
-
-
-
-
-
-
-
+        if (atende && (horaMin >= minA && horaMin < minF)) {
+            s.innerHTML = "<span>ABERTO AGORA</span>";
+            s.className = "status aberto";
+        } else {
+            s.innerHTML = "<span>FECHADO NO MOMENTO</span>";
+            s.className = "status fechado";
+        }
+    } catch (e) {
+        s.innerText = "FECHADO";
+        s.className = "status fechado";
+    }
+}
