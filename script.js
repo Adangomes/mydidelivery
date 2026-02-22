@@ -213,27 +213,43 @@ function enviarWhatsApp() {
 // --- MODAL PIZZA (SABORES E TAMANHOS) ---
 function abrirModalPizza(nome) {
     pizzaPrincipal = produtosGeral.find(p => p.title === nome);
-    saboresSelecionados = []; tamanhoSelecionado = null;
+    if (!pizzaPrincipal) return;
+
+    saboresSelecionados = []; 
+    tamanhoSelecionado = null;
+
     document.getElementById("modal-pizza-img").src = pizzaPrincipal.image;
     document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
-    document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes;
+    document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes || "";
     
+    // Reset dos passos seguintes
+    document.getElementById("secao-sabores").style.display = "none";
+    if(document.getElementById("secao-adicionais")) document.getElementById("secao-adicionais").style.display = "none";
+    
+    const btnConfirmar = document.getElementById("btn-confirmar-pizza");
+    btnConfirmar.disabled = true;
+    btnConfirmar.innerText = "Selecione o tamanho";
+
     const container = document.getElementById("pizza-sizes-container");
     container.innerHTML = "";
+
     Object.keys(pizzaPrincipal.prices).forEach(tam => {
         const btn = document.createElement("button");
         btn.className = "btn-tamanho-opcional";
-        btn.innerHTML = `${tam}<br>R$ ${pizzaPrincipal.prices[tam].toFixed(2)}`;
+        btn.innerHTML = `<strong>${tam}</strong><br>R$ ${pizzaPrincipal.prices[tam].toFixed(2)}`;
         btn.onclick = () => {
             tamanhoSelecionado = tam;
             limiteSabores = tam === "P" ? 1 : (tam === "M" ? 2 : 3);
+            
             document.querySelectorAll(".btn-tamanho-opcional").forEach(b => b.classList.remove("ativo"));
             btn.classList.add("ativo");
+            
             document.getElementById("secao-sabores").style.display = "block";
             renderizarSabores();
         };
         container.appendChild(btn);
     });
+
     document.getElementById("pizza-options-modal").style.display = "flex";
 }
 
@@ -447,6 +463,7 @@ function toggleSabor(nome) {
         }
     }
 }
+
 
 
 
