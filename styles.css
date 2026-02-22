@@ -11,7 +11,7 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 .status.aberto { color: #2ecc71; }
 .cart { font-size: 1.5rem; cursor: pointer; }
 
-/* NAV CATEGORIAS (MENU FIXO SUPERIOR) */
+/* NAV CATEGORIAS (MENU FIXO SUPERIOR) - MANTÉM A BARRA */
 .categorias-nav { 
     position: sticky; 
     top: 65px; 
@@ -40,24 +40,23 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 .cat-link.active { 
     color: #e67e22; 
     font-weight: 700;
-    border-bottom: 3px solid #e67e22; 
+    border-bottom: 3px solid #e67e22; /* Barra fixa apenas aqui */
 }
 
-/* PRODUTOS & TÍTULOS DE CATEGORIA NA LISTA (AJUSTADO) */
+/* PRODUTOS & TÍTULOS DE CATEGORIA NA LISTA - BARRA REMOVIDA */
 .container-main { padding: 10px 20px; }
 .secao-categoria { scroll-margin-top: 130px; margin-top: 20px; }
 
-/* Título da categoria no corpo da página (Igual ao menu superior) */
 .titulo-categoria-lista { 
     font-size: 0.9rem; 
     font-weight: 800; 
-    margin-bottom: 20px; 
-    color: #e67e22; /* Cor laranja igual ao menu ativo */
+    margin-bottom: 15px; 
+    color: #e67e22; 
     text-transform: uppercase; 
-    border-bottom: 3px solid #e67e22; /* Linha laranja igual ao menu ativo */
-    padding-bottom: 8px;
-    display: inline-block; /* Faz a linha ocupar apenas o tamanho do texto */
-    width: auto;
+    border-bottom: none; /* BARRA REMOVIDA DAS CATEGORIAS QUE ROLAM */
+    padding-bottom: 0;
+    display: block; 
+    width: 100%;
 }
 
 .item-produto-lista { 
@@ -116,11 +115,10 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* MODAIS */
+/* MODAIS & OUTROS */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
 .modal-box { background: #fff; width: 92%; max-width: 400px; border-radius: 24px; overflow: hidden; position: relative; max-height: 85vh; display: flex; flex-direction: column; }
 .btn-principal { background: #e67e22; color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; width: 100%; cursor: pointer; }
 
-/* TOAST */
 .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 0.8rem; opacity: 0; transition: 0.3s; z-index: 5000; }
 .toast.show { opacity: 1; }
