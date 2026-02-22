@@ -134,7 +134,7 @@ async function mostrarResumo() {
     // O 'await' vai esperar os dois terminarem
     const [taxa] = await Promise.all([
         calcularTaxaEntrega(enderecoCompleto),
-        new Promise(resolve => setTimeout(resolve, 1500)) // <--- AQUI ESTÁ O TEMPO (1.5 seg)
+        new Promise(resolve => setTimeout(resolve, 2000)) // <--- AQUI ESTÁ O TEMPO (1.5 seg)
     ]);
 
     // 3. Desliga o carregamento
