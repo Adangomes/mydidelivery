@@ -318,38 +318,55 @@ async function carregarStatusLoja() {
     const s = document.getElementById("status-loja");
     
     try {
-        // Busca o arquivo JSON que o Netlify CMS salvou
         const response = await fetch('./content/status.json?v=' + Date.now());
         const data = await response.json();
 
         const agora = new Date();
-        // Formata a hora atual do celular do cliente (Ex: "19:45")
-        const horaAtual = agora.getHours().toString().padStart(2, '0') + ":" + 
-                          agora.getMinutes().toString().padStart(2, '0');
+        const horaAtualMinutos = agora.getHours() * 60 + agora.getMinutes();
         
-        const diaHoje = agora.getDay(); // 0 a 6
+        // Converte os horários do Admin (ex: "18:00") para minutos totais para facilitar o cálculo
+        const [hAbre, mAbre] = data.horaAbre.split(':').map(Number);
+        const [hFecha, mFecha] = data.horaFecha.split(':').map(Number);
+        
+        const minutosAbre = hAbre * 60 + mAbre;
+        const minutosFecha = hFecha * 60 + mFecha;
+        
+        const diaHoje = agora.getDay();
+        const atendeHoje = data.diasFuncionamento.map(String).includes(String(diaHoje));
+        const dentroDoHorario = (horaAtualMinutos >= minutosAbre && horaAtualMinutos < minutosFecha);
 
-        // Verifica se hoje está na lista de dias que você clicou lá no Admin
-        const diaValido = data.diasFuncionamento.includes(diaHoje) || 
-                          data.diasFuncionamento.includes(String(diaHoje));
+        if (atendeHoje && dentroDoHorario) {
+            // VERIFICA SE FALTA POUCO PARA FECHAR (Ex: faltam menos de 30 minutos)
+            const faltamQuantosMinutos = minutosFecha - horaAtualMinutos;
 
-        // Verifica se a hora atual está entre a abertura e fechamento
-        const dentroDoHorario = (horaAtual >= data.horaAbre && horaAtual < data.horaFecha);
-
-        if (diaValido && dentroDoHorario) {
-            s.innerText = "ABERTO AGORA";
-            s.className = "status aberto";
+            if (faltamQuantosMinutos <= 30) {
+                s.innerHTML = "<span>ABERTO! FECHA EM BREVE</span>";
+                s.className = "status aberto alerta"; // Adicionamos uma classe extra para estilizar se quiser
+            } else {
+                s.innerHTML = "<span>ABERTO AGORA</span>";
+                s.className = "status aberto";
+            }
         } else {
-            s.innerText = "FECHADO NO MOMENTO";
+            let msgFechado = "";
+            const horaAtualTexto = agora.getHours().toString().padStart(2, '0') + ":" + 
+                                  agora.getMinutes().toString().padStart(2, '0');
+
+            if (atendeHoje && horaAtualTexto < data.horaAbre) {
+                msgFechado = `FECHADO! ABRIREMOS ÀS ${data.horaAbre}`;
+            } else {
+                msgFechado = `FECHADO! RETORNAMOS AMANHÃ ÀS ${data.horaAbre}`;
+            }
+
+            s.innerHTML = `<span>${msgFechado}</span>`;
             s.className = "status fechado";
         }
 
     } catch (error) {
-        console.error("Erro ao ler status:", error);
         s.innerText = "FECHADO";
         s.className = "status fechado";
     }
 }
+
 
 
 
