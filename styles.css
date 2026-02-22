@@ -233,3 +233,88 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
 .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 0.8rem; opacity: 0; transition: 0.3s; z-index: 5000; }
 .toast.show { opacity: 1; }
+
+/* ============================================================
+   ESTILO DO FORMULÁRIO DE ENTREGA (AJUSTADO)
+   ============================================================ */
+
+/* Container interno do formulário */
+.form-grid {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* Espaçamento entre os campos */
+}
+
+/* Estilização geral de Inputs, Selects e Textareas */
+.form-grid input, 
+.form-grid select, 
+.form-grid textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 10px; /* Bordas arredondadas modernas */
+    border: 1px solid #ddd;
+    background-color: #fcfcfc;
+    font-size: 0.9rem;
+    color: #333;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+/* Efeito ao clicar/digitar nos campos */
+.form-grid input:focus, 
+.form-grid select:focus, 
+.form-grid textarea:focus {
+    border-color: #e67e22; /* Cor laranja do Snoop Lanche */
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1); /* Brilho suave ao redor */
+}
+
+/* Organização de Rua e Número na mesma linha */
+.row-inputs {
+    display: grid;
+    grid-template-columns: 2.5fr 1fr; /* Rua maior, Número menor */
+    gap: 10px;
+}
+
+/* Ajuste específico para as áreas de observação */
+.form-grid textarea {
+    resize: none;
+    min-height: 45px;
+}
+
+/* Estilo do campo de troco (quando aparece) */
+#div-troco {
+    margin-top: 5px;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Animação simples para transição de telas no modal */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Placeholder (texto de fundo) mais sutil */
+::placeholder {
+    color: #bbb;
+    font-size: 0.85rem;
+}
+
+/* Ajuste do botão de fechar dentro do formulário */
+.btn-fechar-modal {
+    background: #f0f0f0;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    color: #666;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-fechar-modal:hover {
+    background: #e74c3c;
+    color: #fff;
+}
