@@ -35,36 +35,7 @@ async function carregarStatusLoja() {
 }
 // ==================================================
 // CARREGA PROMOÇAO
-async function carregarPromocoes() {
-    const container = document.getElementById("promocoes"); // Certifique-se de ter esse ID no HTML
-    if (!container) return;
 
-    try {
-        const res = await fetch("/content/produtos.json");
-        const data = await res.json();
-        const lista = data.produtos;
-
-        container.innerHTML = "";
-
-        lista.forEach((p) => {
-            // Se você definiu no CMS a categoria "promocao"
-            if (p.categoria !== "promocao") return; 
-
-            // Se você seguiu minha dica do campo "Ativar Promoção?" (boolean), use:
-            // if (!p.promo) return;
-
-            container.appendChild(criarCardProduto(p));
-        });
-
-        // Se o container estiver vazio após o loop, você pode exibir uma mensagem
-        if (container.innerHTML === "") {
-            container.innerHTML = "<p class='text-gray-400 text-xs'>Nenhuma promoção ativa hoje.</p>";
-        }
-
-    } catch (error) { 
-        console.error("Erro promocoes:", error); 
-    }
-}
 
 // ==================================================
 
@@ -100,47 +71,6 @@ async function carregarProdutos() {
 }
 
 
-async function carregarDogs() {
-    const container = document.getElementById("dogs"); // Precisa ter esse ID no HTML
-    if (!container) return;
-    try {
-        const res = await fetch("/content/produtos.json");
-        const data = await res.json();
-        const lista = data.produtos;
-        container.innerHTML = "";
-        lista.forEach((p) => {
-            if (p.categoria !== "dog") return; // Filtra apenas categoria dog
-            container.appendChild(criarCardProduto(p));
-        });
-    } catch (error) { console.error("Erro dogs:", error); }
-}
-// DAQUI PRA BAIXO É DE PARMEGIANA
-async function carregarParmedianas() {
-    const container = document.getElementById("parmedianas");
-    if (!container) return;
-    try {
-        const res = await fetch("/content/produtos.json");
-        const data = await res.json();
-        produtos = data.produtos;
-        container.innerHTML = "";
-        produtos.forEach((p) => {
-            if (p.categoria !== "parmediana") return;
-            container.appendChild(criarCardProduto(p));
-        });
-    } catch (error) { console.error("Erro parmedianas:", error); }
-}
-// DAQUI PRA CIMA É DE PARMEGIANA
-async function carregarBebidas() {
-    const container = document.getElementById("bebidas");
-    if (!container) return;
-    try {
-        const res = await fetch("/content/produtos.json");
-        const data = await res.json();
-        const bebidas = data.produtos.filter(p => p.categoria === "bebida");
-        container.innerHTML = "";
-        bebidas.forEach((p) => { container.appendChild(criarCardProduto(p)); });
-    } catch (error) { console.error("Erro bebidas:", error); }
-}
 
 function criarCardProduto(p) {
     const temDesconto = p.oldPrice && p.oldPrice > p.price;
@@ -445,15 +375,13 @@ async function finalizarEntrega() {
 document.addEventListener("DOMContentLoaded", () => {
     initSplash(); 
     initMenu(); 
-    carregarStatusLoja();
-    carregarPromocoes();
-    carregarProdutos();
-    carregarDogs();
-    carregarPorcoes();
-    carregarBebidas(); 
-    carregarPizzas(); // <--- FALTAVA ESSA LINHA PARA AS PIZZAS APARECEREM
-    carregarParmedianas();
-    carregarCarrinhoStorage();
+
+    carregarStatusLoja();      // ✅ mantém
+    
+
+    carregarCardapioCompleto(); // 🔥 NOVO (substitui todos os outros)
+
+    carregarCarrinhoStorage(); // ✅ mantém
 });
 
 function mostrarToast() {
@@ -794,6 +722,57 @@ async function sincronizarPromoComPortal() {
 sincronizarPromoComPortal();
 
 
+async function carregarCardapioCompleto() {
+    const container = document.getElementById("cardapio");
+    const menu = document.getElementById("menu-categorias");
+
+    if (!container || !menu) return;
+
+    try {
+        const res = await fetch("/content/produtos.json?v=" + Date.now());
+        const data = await res.json();
+        const lista = data.produtos;
+
+        container.innerHTML = "";
+        menu.innerHTML = "";
+
+        const categorias = [...new Set(lista.map(p => p.categoria))];
+
+        categorias.forEach(cat => {
+
+            // botão topo
+            const btn = document.createElement("button");
+            btn.innerText = cat.toUpperCase();
+            btn.onclick = () => {
+                document.getElementById("cat-" + cat)
+                    .scrollIntoView({ behavior: "smooth" });
+            };
+            menu.appendChild(btn);
+
+            // seção
+            const secao = document.createElement("div");
+            secao.id = "cat-" + cat;
+
+            secao.innerHTML = `
+                <h2>${cat.toUpperCase()}</h2>
+                <div class="grid-categoria"></div>
+            `;
+
+            const grid = secao.querySelector(".grid-categoria");
+
+            lista
+                .filter(p => p.categoria === cat)
+                .forEach(p => {
+                    grid.appendChild(criarCardProduto(p)); // usa seu card atual
+                });
+
+            container.appendChild(secao);
+        });
+
+    } catch (e) {
+        console.error("Erro ao carregar cardápio:", e);
+    }
+}
 
 
 
