@@ -227,45 +227,53 @@
 
 
     <div id="pizza-options-modal" class="modal-overlay" style="display:none;">
-
         <div class="modal-box modal-pizza-ajustado">
-
             <div class="pizza-header-img">
-
                 <img id="modal-pizza-img" src="" alt="">
-
                 <button onclick="fecharModalPizza()" class="btn-fechar-pizza">✕</button>
-
             </div>
-
+            
             <div class="modal-content-pizzas">
-
                 <h2 id="pizza-modal-title"></h2>
-
                 <p id="pizza-modal-desc" class="pizza-desc"></p>
 
                 <label class="label-step">1. Escolha o Tamanho</label>
-
                 <div id="pizza-sizes-container" class="grid-tamanhos"></div>
 
-                <div id="secao-sabores" style="display:none;">
-
+                <div id="secao-sabores" style="display:none; margin-top: 20px;">
                     <label id="contador-fatias" class="label-step">2. Escolha os Sabores</label>
-
                     <div id="lista-sabores-meia" class="lista-fatias-scroll"></div>
-
                 </div>
 
+                <div id="secao-adicionais" style="display:none; margin-top: 20px;">
+                    <label class="label-step">3. Bordas e Opcionais</label>
+                    
+                    <div class="form-group mb-3">
+                        <select id="select-borda" class="form-select">
+                            <option value="0">Sem Borda Recheada</option>
+                            <option value="10">Borda de Catupiry (+ R$ 10,00)</option>
+                            <option value="10">Borda de Cheddar (+ R$ 10,00)</option>
+                            <option value="12">Borda de Chocolate (+ R$ 12,00)</option>
+                        </select>
+                    </div>
+
+                    <div class="d-flex gap-3 p-2 bg-light rounded">
+                        <label style="cursor:pointer">
+                            <input type="radio" name="azeitona" value="Com Azeitona" checked> Com Azeitona
+                        </label>
+                        <label style="cursor:pointer">
+                            <input type="radio" name="azeitona" value="Sem Azeitona"> Sem Azeitona
+                        </label>
+                    </div>
+                </div>
             </div>
 
             <div class="modal-footer-pizzas">
-
-                <button onclick="confirmarPizza()" class="btn-principal w-100">Adicionar ao Carrinho</button>
-
+                <button id="btn-confirmar-pizza" onclick="confirmarPizza()" class="btn-principal w-100" disabled>
+                    Selecione o tamanho
+                </button>
             </div>
-
         </div>
-
     </div>
 
 
@@ -331,3 +339,4 @@
 </body>
 
 </html>
+
