@@ -11,7 +11,7 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 .status.aberto { color: #2ecc71; }
 .cart { font-size: 1.5rem; cursor: pointer; }
 
-/* NAV CATEGORIAS (MENU FIXO SUPERIOR) - MANTÉM A BARRA */
+/* NAV CATEGORIAS (MENU FIXO SUPERIOR) */
 .categorias-nav { 
     position: sticky; 
     top: 65px; 
@@ -40,10 +40,10 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 .cat-link.active { 
     color: #e67e22; 
     font-weight: 700;
-    border-bottom: 3px solid #e67e22; /* Barra fixa apenas aqui */
+    border-bottom: 3px solid #e67e22; 
 }
 
-/* PRODUTOS & TÍTULOS DE CATEGORIA NA LISTA - BARRA REMOVIDA */
+/* PRODUTOS & TÍTULOS NA LISTA */
 .container-main { padding: 10px 20px; }
 .secao-categoria { scroll-margin-top: 130px; margin-top: 20px; }
 
@@ -53,7 +53,7 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     margin-bottom: 15px; 
     color: #e67e22; 
     text-transform: uppercase; 
-    border-bottom: none; /* BARRA REMOVIDA DAS CATEGORIAS QUE ROLAM */
+    border-bottom: none; 
     padding-bottom: 0;
     display: block; 
     width: 100%;
@@ -115,10 +115,121 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* MODAIS & OUTROS */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
-.modal-box { background: #fff; width: 92%; max-width: 400px; border-radius: 24px; overflow: hidden; position: relative; max-height: 85vh; display: flex; flex-direction: column; }
-.btn-principal { background: #e67e22; color: #fff; border: none; padding: 14px; border-radius: 15px; font-weight: 700; width: 100%; cursor: pointer; }
+/* --- AJUSTE DO CARRINHO (PROFISSIONAL) --- */
+.cart-box {
+    background: #fff;
+    width: 92%;
+    max-width: 400px;
+    border-radius: 20px;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+}
 
+.modal-header-clean {
+    padding: 20px;
+    background: #f8f8f8;
+    border-bottom: 1px solid #eee;
+    text-align: center;
+}
+
+.modal-header-clean h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.cart-items-list {
+    padding: 15px;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.item-sabor-fatia {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f2f2f2;
+}
+
+.item-sabor-fatia span {
+    font-size: 0.9rem;
+    color: #444;
+    font-weight: 600;
+}
+
+.btn-remover-item {
+    background: #fff1f0;
+    color: #e74c3c;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.summary-box {
+    padding: 20px;
+    background: #fff;
+    border-top: 1px solid #eee;
+}
+
+.summary-line {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.summary-line.total {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 2px dashed #eee;
+    color: #000;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+
+.modal-actions {
+    padding: 0 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-finalizar {
+    background: #e67e22;
+    color: #fff;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+}
+
+.btn-continuar {
+    background: #f0f0f0;
+    color: #555;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* MODAL GERAL & TOAST */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
 .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 0.8rem; opacity: 0; transition: 0.3s; z-index: 5000; }
 .toast.show { opacity: 1; }
