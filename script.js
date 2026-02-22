@@ -240,19 +240,32 @@ function abrirModalPizza(nome) {
 function renderizarSabores() {
     const grid = document.getElementById("lista-sabores-meia");
     grid.innerHTML = "";
-    produtosGeral.filter(p => p.categoria === "pizza").forEach(p => {
-        const qtd = saboresSelecionados.filter(s => s === p.title).length;
+    
+    // Aqui pegamos todos os sabores que foram "escondidos" do cardápio principal
+    const saboresDisponiveis = produtosGeral.filter(p => 
+        p.categoria.toLowerCase() === "pizza" && 
+        !p.title.toUpperCase().includes("PIZZA")
+    );
+
+    saboresDisponiveis.forEach(p => {
+        const selecionado = saboresSelecionados.includes(p.title);
+        const atingiuLimite = saboresSelecionados.length >= limiteSabores;
+        
+        // Classe 'desabilitado' para o efeito visual de bloqueio
+        const classeStatus = selecionado ? 'selecionado' : (atingiuLimite ? 'desabilitado' : '');
+        
         grid.innerHTML += `
-            <div class="item-sabor-fatia">
-                <span>${p.title}</span>
-                <div class="controles-fatias">
-                    <button onclick="addSabor('${p.title}', -1)">-</button>
-                    <span>${qtd}</span>
-                    <button onclick="addSabor('${p.title}', 1)">+</button>
+            <div class="item-sabor-wizard ${classeStatus}" onclick="toggleSabor('${p.title}')">
+                <div style="display:flex; flex-direction:column">
+                    <span style="font-weight:700">${p.title}</span>
+                    <small style="font-size:0.7rem; color:#777">${p.ingredientes || ""}</small>
                 </div>
+                <span class="status-check">${selecionado ? '✅' : '+'}</span>
             </div>`;
     });
-    document.getElementById("contador-fatias").innerText = `2. Sabores (${saboresSelecionados.length}/${limiteSabores})`;
+
+    // Atualiza o texto do passo 2
+    document.getElementById("contador-sabores").innerText = `2. Escolha os Sabores (${saboresSelecionados.length}/${limiteSabores})`;
 }
 
 function addSabor(nome, n) {
@@ -376,6 +389,7 @@ async function carregarStatusLoja() {
         s.className = "status fechado";
     }
 }
+
 
 
 
