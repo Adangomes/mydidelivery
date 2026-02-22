@@ -1,6 +1,27 @@
 {
   "produtos": [
     {
+      "title": "PIZZA P (6 fatias)",
+      "prices": { "P": 40 },
+      "categoria": "pizza",
+      "ingredientes": "Escolha 1 sabor",
+      "image": "/imagens/margerita.jpeg"
+    },
+    {
+      "title": "PIZZA M (9 fatias)",
+      "prices": { "M": 60 },
+      "categoria": "pizza",
+      "ingredientes": "Escolha até 2 sabores",
+      "image": "/imagens/margerita.jpeg"
+    },
+    {
+      "title": "PIZZA G (12 fatias)",
+      "prices": { "G": 90 },
+      "categoria": "pizza",
+      "ingredientes": "Escolha até 3 sabores",
+      "image": "/imagens/margerita.jpeg"
+    },
+    {
       "title": "X BIFE",
       "price": 45.5,
       "oldPrice": 48,
@@ -9,22 +30,8 @@
       "image": "/imagens/xsalada.jpeg"
     },
     {
-      "title": "PIZZA CALABRESA C/CEBOLA",
-      "prices": {
-        "P": 40,
-        "M": 60,
-        "G": 90
-      },
-      "categoria": "pizza",
-      "ingredientes": "Mussarela, calabresa, cebola e orégano",
-      "image": "/imagens/margerita.jpeg"
-    },
-    {
       "title": "BATATA FRITA",
-      "prices": {
-        "P": 30,
-        "G": 40
-      },
+      "prices": { "P": 30, "G": 40 },
       "categoria": "porcao",
       "ingredientes": ".",
       "image": "/imagens/fritas.jpeg"
@@ -92,9 +99,7 @@
       "ingredientes": "Pão, hambúrguer, queijo, presunto, calabresa, frango, coração, bacon, ovo, requeijão, tomate, alface",
       "image": "/imagens/xsalada.jpeg",
       "price": 55,
-      "prices": {
-        "M": -2
-      }
+      "prices": { "M": -2 }
     },
     {
       "title": "X BURGUER",
@@ -109,18 +114,14 @@
       "ingredientes": "Pão, hambúrguer, queijo, presunto, tomate, alface, milho, ervilha",
       "image": "/imagens/xsalada.jpeg",
       "price": 20,
-      "prices": {
-        "P": -1
-      }
+      "prices": { "P": -1 }
     },
     {
-      "title": "X GALINHA ",
+      "title": "X GALINHA",
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, queijo, presunto, frango, milho, ervilha, tomate, alface",
       "image": "/imagens/xsalada.jpeg",
-      "prices": {
-        "P": -1
-      },
+      "prices": { "P": -1 },
       "price": 22
     },
     {
@@ -152,7 +153,7 @@
       "image": "/imagens/xsalada.jpeg"
     },
     {
-      "title": "X SICILIANO ",
+      "title": "X SICILIANO",
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, queijo, bacon, requeijão, alface",
       "image": "/imagens/xsalada.jpeg",
@@ -163,56 +164,35 @@
       "categoria": "pizza",
       "ingredientes": "Muçarela, presunto, ovo, cebola, orégano",
       "image": "/imagens/margerita.jpeg",
-      "price": "",
-      "prices": {
-        "P": 40,
-        "M": 60,
-        "G": 90
-      }
+      "price": 0
     },
     {
       "title": "BACON",
       "categoria": "pizza",
       "ingredientes": "Muçarela, bacon, tomate, orégano",
       "image": "/imagens/margerita.jpeg",
-      "prices": {
-        "P": 40,
-        "M": 60,
-        "G": 90
-      }
+      "price": 0
     },
     {
       "title": "MUSSARELA",
       "categoria": "pizza",
       "ingredientes": "Muçarela, requeijão, cheddar, orégano",
       "image": "/imagens/margerita.jpeg",
-      "prices": {
-        "P": 40,
-        "M": 60,
-        "G": 90
-      }
+      "price": 0
     },
     {
       "title": "FRANGO",
       "categoria": "pizza",
       "ingredientes": "Muçarela, frango, requeijão, orégano",
       "image": "/imagens/margerita.jpeg",
-      "prices": {
-        "P": 40,
-        "M": 59,
-        "G": 90
-      }
+      "price": 0
     },
     {
       "title": "CALABRESA",
       "categoria": "pizza",
       "ingredientes": "Muçarela, calabresa, orégano",
       "image": "/imagens/margerita.jpeg",
-      "prices": {
-        "P": 40,
-        "M": 60,
-        "G": 90
-      }
+      "price": 0
     },
     {
       "title": "BATATA FRITA C/BACON",
@@ -220,20 +200,14 @@
       "ingredientes": ".",
       "image": "/imagens/fritas.jpeg",
       "price": 0,
-      "prices": {
-        "P": 40,
-        "G": 50
-      }
+      "prices": { "P": 40, "G": 50 }
     },
     {
       "title": "BATATA FRITA COMPLETA",
       "categoria": "porcao",
       "ingredientes": "Frango, bacon, calabresa, cheddar, requeijão",
       "image": "/imagens/fritas.jpeg",
-      "prices": {
-        "P": 54,
-        "G": 71
-      }
+      "prices": { "P": 54, "G": 71 }
     },
     {
       "title": "FRANGO À PARMEGIANA",
@@ -252,14 +226,14 @@
     {
       "title": "DOG DUPLO",
       "categoria": "dog",
-      "ingredientes": "\"Pão, 2 salsicha, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "ingredientes": "Pão, 2 salsicha, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
       "image": "/imagens/dog.jpeg",
       "price": 14
     },
     {
       "title": "DOG FRANGO",
       "categoria": "dog",
-      "ingredientes": "\"Pão, salsicha, frango, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
+      "ingredientes": "Pão, salsicha, frango, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
       "image": "/imagens/dog.jpeg",
       "price": 22
     },
@@ -310,10 +284,7 @@
       "categoria": "bebida",
       "ingredientes": ".",
       "image": "/imagens/teste.jpg",
-      "price": 18,
-      "prices": {
-        "P": ""
-      }
+      "price": 18
     },
     {
       "title": "GUARANÁ ANTÁRTICA 2L",
@@ -323,9 +294,9 @@
       "price": 15
     },
     {
+      "title": "LARANJINHA",
       "price": 10,
       "image": "/imagens/teste.jpg",
-      "title": "LARANJINHA",
       "categoria": "bebida",
       "ingredientes": "."
     },
@@ -355,45 +326,28 @@
       "categoria": "pizza",
       "ingredientes": "Chocolate branco, abacaxi, morango",
       "image": "/imagens/pizza1.jpeg",
-      "price": "",
-      "prices": {
-        "P": 40,
-        "M": 60,
-        "G": 90
-      }
+      "price": 0
     },
     {
       "title": "BRASILEIRA",
       "categoria": "pizza",
       "ingredientes": "Chocolate preto, abacaxi, morango",
       "image": "/imagens/pizza1.jpeg",
-      "prices": {
-        "P": 40,
-        "M": 60,
-        "G": 90
-      }
+      "price": 0
     },
     {
       "title": "SENSAÇÃO",
       "categoria": "pizza",
       "ingredientes": "Chocolate preto, morango",
       "image": "/imagens/pizza1.jpeg",
-      "prices": {
-        "P": 40,
-        "M": 60,
-        "G": 90
-      }
+      "price": 0
     },
     {
       "title": "BANANA NEVADA",
       "categoria": "pizza",
       "ingredientes": "Chocolate branco, banana, canela",
       "image": "/imagens/pizza1.jpeg",
-      "prices": {
-        "P": 40,
-        "M": 60,
-        "G": 90
-      }
+      "price": 0
     },
     {
       "title": "X BACON + COCA LATA 350ml",
