@@ -53,6 +53,8 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     margin-bottom: 15px; 
     color: #e67e22; 
     text-transform: uppercase; 
+    border-bottom: none; 
+    padding-bottom: 0;
     display: block; 
     width: 100%;
 }
@@ -113,15 +115,8 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* --- MODAIS (GERAL) --- */
-.modal-overlay { 
-    position: fixed; inset: 0; 
-    background: rgba(0,0,0,0.6); 
-    display: flex; align-items: center; justify-content: center; 
-    z-index: 2000; backdrop-filter: blur(3px); 
-}
-
-.cart-box, .modal-box {
+/* --- AJUSTE DO CARRINHO (PROFISSIONAL) --- */
+.cart-box {
     background: #fff;
     width: 92%;
     max-width: 400px;
@@ -137,7 +132,6 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     padding: 20px;
     background: #f8f8f8;
     border-bottom: 1px solid #eee;
-    position: relative;
     text-align: center;
 }
 
@@ -149,60 +143,6 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     text-transform: uppercase;
 }
 
-.btn-fechar-modal {
-    position: absolute;
-    right: 15px;
-    top: 18px;
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    color: #999;
-    cursor: pointer;
-}
-
-/* --- FORMULÁRIO DE ENTREGA (AJUSTADO PARA PROFISSIONAL) --- */
-.form-grid {
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.form-grid input, 
-.form-grid select, 
-.form-grid textarea {
-    width: 100%;
-    padding: 12px 15px;
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    background-color: #fcfcfc;
-    font-size: 0.9rem;
-    color: #333;
-    outline: none;
-    transition: 0.2s;
-}
-
-.form-grid input:focus, 
-.form-grid select:focus, 
-.form-grid textarea:focus {
-    border-color: #e67e22;
-    background-color: #fff;
-    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
-}
-
-/* Linha com Rua e Número lado a lado */
-.row-inputs {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 10px;
-}
-
-/* Estilo para labels implícitos ou placeholders */
-::placeholder {
-    color: #aaa;
-}
-
-/* --- CARRINHO & RESUMO --- */
 .cart-items-list {
     padding: 15px;
     max-height: 350px;
@@ -260,7 +200,6 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     font-size: 1.1rem;
 }
 
-/* BOTÕES DE AÇÃO */
 .modal-actions {
     padding: 0 20px 20px;
     display: flex;
@@ -268,5 +207,29 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     gap: 10px;
 }
 
-.btn-principal, .btn-whatsapp {
-    background
+.btn-finalizar {
+    background: #e67e22;
+    color: #fff;
+    border: none;
+    padding: 16px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(230, 126, 34, 0.3);
+}
+
+.btn-continuar {
+    background: #f0f0f0;
+    color: #555;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* MODAL GERAL & TOAST */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
+.toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 0.8rem; opacity: 0; transition: 0.3s; z-index: 5000; }
+.toast.show { opacity: 1; }
