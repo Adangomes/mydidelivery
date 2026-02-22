@@ -255,9 +255,10 @@ function abrirModalPizza(nome) {
 
 function renderizarSabores() {
     const grid = document.getElementById("lista-sabores-meia");
+    const contador = document.getElementById("contador-fatias"); // ID CORRIGIDO
+    
     grid.innerHTML = "";
     
-    // Aqui pegamos todos os sabores que foram "escondidos" do cardápio principal
     const saboresDisponiveis = produtosGeral.filter(p => 
         p.categoria.toLowerCase() === "pizza" && 
         !p.title.toUpperCase().includes("PIZZA")
@@ -266,8 +267,6 @@ function renderizarSabores() {
     saboresDisponiveis.forEach(p => {
         const selecionado = saboresSelecionados.includes(p.title);
         const atingiuLimite = saboresSelecionados.length >= limiteSabores;
-        
-        // Classe 'desabilitado' para o efeito visual de bloqueio
         const classeStatus = selecionado ? 'selecionado' : (atingiuLimite ? 'desabilitado' : '');
         
         grid.innerHTML += `
@@ -280,6 +279,10 @@ function renderizarSabores() {
             </div>`;
     });
 
+    if (contador) {
+        contador.innerText = `2. Escolha os Sabores (${saboresSelecionados.length}/${limiteSabores})`;
+    }
+}
     // Atualiza o texto do passo 2
     document.getElementById("contador-sabores").innerText = `2. Escolha os Sabores (${saboresSelecionados.length}/${limiteSabores})`;
 }
@@ -463,6 +466,7 @@ function toggleSabor(nome) {
         }
     }
 }
+
 
 
 
