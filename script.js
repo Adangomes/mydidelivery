@@ -57,23 +57,33 @@ async function carregarCardapioCompleto() {
             section.innerHTML = `<h2 class="titulo-categoria-lista">${cat}</h2>`;
 
             categorias[cat].forEach(p => {
-                const pJson = JSON.stringify(p).replace(/"/g, '&quot;');
-                let acao = `adicionarCarrinhoPorProduto(${pJson})`;
-                if(p.categoria === 'pizza') acao = `abrirModalPizza('${p.title}')`;
+    // NOVA REGRA: Se for a categoria pizza, só mostra se o título contiver "Pizza" 
+    // (Ajuste essa lógica se os seus combos tiverem outro nome, como "Combo")
+    if (p.categoria.toLowerCase() === 'pizza' && !p.title.toUpperCase().includes("PIZZA")) {
+        return; // Pula e não mostra no cardápio principal
+    }
 
-                section.innerHTML += `
-                    <div class="item-produto-lista" onclick="${acao}">
-                        <div class="info-produto">
-                            <h3 class="nome-produto-lista">${p.title}</h3>
-                            <p class="desc-produto-lista">${p.ingredientes || ""}</p>
-                            <span class="preco-unico">${p.price ? 'R$ '+p.price.toFixed(2) : 'Ver opções'}</span>
-                        </div>
-                        <div class="foto-produto-lista">
-                            <img src="${p.image}" onerror="this.src='imagens/placeholder.png'">
-                            <button class="btn-add-lista">+</button>
-                        </div>
-                    </div>`;
-            });
+    const pJson = JSON.stringify(p).replace(/"/g, '&quot;');
+    let acao = `adicionarCarrinhoPorProduto(${pJson})`;
+    
+    // Se for um item de pizza (Combo), abre o modal configurador
+    if(p.categoria.toLowerCase() === 'pizza') {
+        acao = `abrirModalPizza('${p.title}')`;
+    }
+
+    section.innerHTML += `
+        <div class="item-produto-lista" onclick="${acao}">
+            <div class="info-produto">
+                <h3 class="nome-produto-lista">${p.title}</h3>
+                <p class="desc-produto-lista">${p.ingredientes || ""}</p>
+                <span class="preco-unico">${p.price ? 'R$ '+p.price.toFixed(2) : 'Ver opções'}</span>
+            </div>
+            <div class="foto-produto-lista">
+                <img src="${p.image}" onerror="this.src='imagens/placeholder.png'">
+                <button class="btn-add-lista">+</button>
+            </div>
+        </div>`;
+});
             corpo.appendChild(section);
         });
         ativarScrollSpy();
@@ -366,6 +376,7 @@ async function carregarStatusLoja() {
         s.className = "status fechado";
     }
 }
+
 
 
 
