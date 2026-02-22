@@ -380,3 +380,6 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     background: #fff5ed;
     color: #e67e22;
 }
+#secao-sabores {
+    margin-top: 15px;
+}
