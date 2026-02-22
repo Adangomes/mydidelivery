@@ -27,24 +27,20 @@
 
     <!-- CONTEÚDO -->
     <div id="menu">
+    <header class="header">
+        <div class="logo">SNOOP LANCHE</div>
+        <div id="status-loja" class="status"></div>
+        <div class="cart" onclick="abrirCarrinho()">🛒</div>
+    </header>
 
-        <header class="header">
-    <div class="logo">SNOOP LANCHE</div>
-    <div id="status-loja" class="status"></div>
+    <div id="categorias-topo" class="menu-categorias-scroll"></div>
 
-    <div class="cart" onclick="abrirCarrinho()">🛒</div>
-</header>
+    <div id="cardapio-corpo" class="container-main"></div>
 
-<!-- MENU DE CATEGORIAS (IGUAL DA IMAGEM) -->
-<div id="cardapio" class="menu-categorias"></div>
-
-<!-- PRODUTOS -->
-<div id="categorias-container"></div>
-
-        <footer class="footer">
-            <p>Sistema Desenvolvido por Adan Gomes</p>
-        </footer>
-    </div>
+    <footer class="footer">
+        <p>Sistema Desenvolvido por Adan Gomes</p>
+    </footer>
+</div>
 
     <!-- CARRINHO -->
     <div id="cart-modal" style="display:none;">
@@ -164,6 +160,7 @@
     <script src="script.js"></script>
 </body>
 </html>
+
 
 
 
