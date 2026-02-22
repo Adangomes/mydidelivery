@@ -257,113 +257,118 @@ body { background: #fff; color: #333; overflow-x: hidden; }
 /* ============================================================ */
 /* FORMULÁRIO DE ENTREGA (ESTILO APP - CONFORME REFERÊNCIA)     */
 /* ============================================================ */
+/* ============================================================ */
+/* ESTILO AJUSTADO PARA O SEU HTML (styles.css)                 */
+/* ============================================================ */
 
-/* Remove qualquer altura fixa que esteja causando espaços horríveis */
-.delivery-box, .delivery-box div {
+/* 1. RESET DE CONTAINERS (Isso mata os espaços vazios) */
+.modal-overlay div {
     height: auto !important;
+    margin: 0;
 }
 
-/* Títulos dos campos (Labels) */
-.delivery-box label {
-    font-size: .75rem;
-    margin-top: 10px;
-    display: block;
-    color: #444;
-    font-weight: 600;
-}
-
-/* Inputs, Selects e Textarea (Igual ao seu código) */
-.delivery-box input,
-.delivery-box select,
-.delivery-box textarea {
-    width: 100%;
-    padding: 11px;
-    border-radius: 14px; /* Arredondamento padrão do seu código */
-    border: 1px solid #ddd;
-    margin-top: 4px;
-    font-size: 16px !important; /* Evita zoom no iPhone */
+/* 2. CAIXA DO MODAL (Bordas arredondadas de 22px como no seu código) */
+.modal-box, .cart-box {
     background: #fff;
+    width: 95%;
+    max-width: 420px;
+    border-radius: 22px;
+    padding: 0; /* Tiramos o padding daqui para o botão colar no final */
+    overflow: hidden;
+    position: relative;
+}
+
+/* 3. GRID DO FORMULÁRIO */
+.form-grid {
+    padding: 10px 20px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 4. INPUTS E SELECTS (Estilo do App de referência) */
+.form-grid input, 
+.form-grid select, 
+.form-grid textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 14px; /* Arredondamento de 14px pedido */
+    border: 1px solid #ddd;
+    background: #fcfcfc;
+    font-size: 16px !important; /* Importante para não dar zoom no iPhone */
     outline: none;
     box-sizing: border-box;
 }
 
-/* Linha de Rua + Número na mesma linha */
+/* 5. RUA E NÚMERO NA MESMA LINHA */
 .row-inputs {
     display: flex !important;
     gap: 10px;
-    margin-top: 4px;
 }
 
-.row-inputs input:first-child {
-    flex: 1; /* Rua ocupa o espaço maior */
-}
-
-.row-inputs input:last-child {
-    width: 85px; /* Número fica curtinho */
-    text-align: center;
-}
-
-/* ============================================================ */
-/* RESUMO DO PEDIDO (IGUAL AO SEU CÓDIGO DE REFERÊNCIA)         */
-/* ============================================================ */
-
-#resumo-pedido {
-    background: transparent !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    margin: 12px 0 0 0 !important;
-    width: 100% !important;
-    display: none; /* JS controla a visibilidade */
-}
-
-#resumo-itens p {
-    margin-bottom: 6px;
-    color: #444;
-    font-size: .85rem;
-    display: flex;
-    justify-content: space-between;
-}
-
-/* Linha de Total no Resumo */
-#resumo-itens strong {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1rem;
-    color: #000;
-    margin-top: 8px;
-    padding-top: 8px;
+/* 6. RESUMO DO PEDIDO (Limpo e sem bordas extras) */
+.summary-box, .resumo-valores {
+    padding: 15px 20px;
+    background: #fff;
     border-top: 1px dashed #ddd;
 }
 
-/* ============================================================ */
-/* BOTÕES DE AÇÃO (CALCULAR / FINALIZAR)                       */
-/* ============================================================ */
-
-.buttons {
+.summary-line, .resumo-lista p {
     display: flex;
-    gap: 10px;
-    margin-top: 15px;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+    color: #444;
 }
 
-.buttons button {
-    flex: 1;
-    padding: 13px;
-    border-radius: 16px; /* Arredondamento maior como nos modais */
+.summary-line.total, #resumo-total {
+    font-weight: 800;
+    color: #000;
+    font-size: 1.1rem;
+    margin-top: 8px;
+    border-top: 1px solid #eee;
+    padding-top: 8px;
+}
+
+/* 7. BOTÕES (Unificados com o seu HTML) */
+.btn-principal, .btn-finalizar, .btn-whatsapp {
+    width: 100%;
+    background: #111; /* Preto conforme o seu código */
+    color: #fff;
     border: none;
-    font-weight: 600;
-    font-size: .9rem;
+    padding: 16px;
+    font-weight: 700;
+    font-size: 1rem;
     cursor: pointer;
-    transition: 0.2s;
+    transition: 0.3s;
+    border-radius: 0; /* Quadrado para colar no fundo do modal */
 }
 
-/* Botão Voltar/Calcular (Cinza) */
-.buttons button:first-child {
+.btn-secundario, .btn-continuar {
     background: #e5e5e5;
     color: #333;
+    width: 100%;
+    border: none;
+    padding: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 8px;
 }
 
-/* Botão Finalizar (Preto conforme o tema) */
-.buttons button:last-child {
-    background: #111;
-    color: #fff;
+/* 8. HEADER DO MODAL */
+.modal-header-clean {
+    padding: 20px;
+    text-align: center;
+    position: relative;
 }
+
+.btn-fechar-modal {
+    background: #f1f1f1;
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    color: #666;
+    cursor: pointer;
+}
+
