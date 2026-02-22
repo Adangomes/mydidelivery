@@ -54,30 +54,6 @@ function initMenu() {
     if (!btn || !menu) return;
     btn.onclick = () => menu.classList.toggle("open");
 }
-
-
-
-
-
-function criarCardProduto(p) {
-    const temDesconto = p.oldPrice && p.oldPrice > p.price;
-    const card = document.createElement("div");
-    card.className = "card-produto";
-    card.innerHTML = `
-        <img src="${p.image}">
-        <div class="card-content">
-            <h3>${p.title}</h3>
-            <p>${p.ingredientes || ""}</p>
-            <div class="price-container">
-                <strong>R$ ${p.price.toFixed(2).replace(".", ",")}</strong>
-                ${temDesconto ? `<span class="old-price">R$ ${p.oldPrice.toFixed(2).replace(".", ",")}</span>` : ""}
-            </div>
-            <button onclick="adicionarCarrinhoPorProduto(${JSON.stringify(p).replace(/"/g, '&quot;')})">Adicionar</button>
-        </div>
-    `;
-    return card;
-}
-
 // ==================================================
 // LÓGICA DO CARRINHO
 // ==================================================
@@ -94,14 +70,6 @@ function adicionarCarrinhoPorProduto(p) {
     if (item) { item.qtd++; } else { carrinho.push({ ...p, qtd: 1 }); }
     salvarCarrinho(); atualizarCarrinho(); mostrarToast();
 }
-
-// ==================================================
-// LÓGICA DO CARRINHO (ATUALIZAR E REMOVER)
-// ==================================================
-
-// ==================================================
-// LÓGICA DO CARRINHO (ATUALIZAR E REMOVER) - REVISADA
-// ==================================================
 
 // ==================================================
 // CONTROLE DO CARRINHO (ATUALIZAR E REMOVER)
@@ -161,12 +129,6 @@ window.removerItem = function(index) {
     // 5. Manda atualizar a tela na hora
     atualizarCarrinho();
 };
-// AQUI É O CARRINHO
-
-
-
-
-//
 // ==================================================
 // ENTREGA & MODAIS
 // ==================================================
@@ -199,7 +161,7 @@ async function calcularTaxa(endereco) {
 
     const km = rota.features[0].properties.distance / 1000;
 
-    // 🔥 REGRA: MENOS DE 1 KM = ENTREGA GRÁTIS
+    
     if (km < 1) {
         return 0;
     }
@@ -318,7 +280,7 @@ async function finalizarEntrega() {
     const numeroLimpo = WHATSAPP_NUMERO.replace(/\D/g, '');
     const linkWhats = `https://wa.me/${numeroLimpo}?text=${msgWhatsApp}`;
 
-    // 🔥 ESSENCIAL: abre no clique do usuário
+    
     window.open(linkWhats, "_blank");
 
     // ===============================
@@ -550,10 +512,6 @@ document.getElementById("btn-adicionar-pizza").onclick = () => {
     fecharModalPizza();
     if(typeof mostrarToast === "function") mostrarToast();
 };
-
-
-
-
 // ==================================================
 // ===============================
 // MODAL DE PORÇÕES
@@ -710,81 +668,67 @@ sincronizarPromoComPortal();
 
 
 async function carregarCardapioCompleto() {
-    const res = await fetch("content/produtos.json?v=" + Date.now());
-    const data = await res.json();
+    try {
+        const res = await fetch("content/produtos.json?v=" + Date.now());
+        const data = await res.json();
+        const produtos = data.produtos;
 
-    const produtos = data.produtos;
+        const corpoCardapio = document.getElementById("cardapio-corpo");
+        corpoCardapio.innerHTML = ""; // Limpa o menu
 
-    const secoesContainer = document.querySelector(".secao");
-    const categoriasTopo = document.getElementById("categorias-container");
-
-    secoesContainer.innerHTML = "";
-    categoriasTopo.innerHTML = "";
-
-    // 🧠 AGRUPAR POR CATEGORIA
-    const categorias = {};
-
-    produtos.forEach(p => {
-        if (!categorias[p.categoria]) {
-            categorias[p.categoria] = [];
-        }
-        categorias[p.categoria].push(p);
-    });
-
-    // 🔥 CRIAR TUDO AUTOMATICAMENTE
-    Object.keys(categorias).forEach(nomeCategoria => {
-
-        const id = "categoria-" + nomeCategoria.toLowerCase();
-
-        // ===== BOTÃO TOPO =====
-        const btn = document.createElement("button");
-        btn.innerText = nomeCategoria.toUpperCase();
-
-        btn.onclick = () => {
-            document.getElementById(id).scrollIntoView({
-                behavior: "smooth"
-            });
-
-            document.querySelectorAll(".categorias-topo button")
-                .forEach(b => b.classList.remove("ativo"));
-
-            btn.classList.add("ativo");
-        };
-
-        categoriasTopo.appendChild(btn);
-
-        // ===== SEÇÃO =====
-        const secao = document.createElement("div");
-        secao.className = "categoria";
-        secao.id = id;
-
-        secao.innerHTML = `
-            <h2>${nomeCategoria.toUpperCase()}</h2>
-            <div class="cards" id="${id}-container"></div>
-        `;
-
-        secoesContainer.appendChild(secao);
-
-        const grid = document.getElementById(`${id}-container`);
-
-        // ===== PRODUTOS =====
-        categorias[nomeCategoria].forEach(p => {
-            const card = document.createElement("div");
-            card.className = "card-produto";
-
-            card.innerHTML = `
-                <img src="${p.image}">
-                <div class="card-content">
-                    <h3>${p.title}</h3>
-                    <p>${p.ingredientes || ""}</p>
-                    <button class="btn-vermelho">VER</button>
-                </div>
-            `;
-
-            grid.appendChild(card);
+        // 1. Agrupar produtos por categoria
+        const categorias = {};
+        produtos.forEach(p => {
+            if (!categorias[p.categoria]) categorias[p.categoria] = [];
+            categorias[p.categoria].push(p);
         });
 
-    });
+        // 2. Renderizar cada categoria e seus produtos no novo estilo
+        Object.keys(categorias).forEach(catNome => {
+            const section = document.createElement("section");
+            section.className = "secao-categoria";
+            
+            // Título da Categoria (Ex: BURGER, PIZZA)
+            section.innerHTML = `<h2 class="titulo-categoria-lista">${catNome.toUpperCase()}</h2>`;
+
+            categorias[catNome].forEach(p => {
+                const itemDiv = document.createElement("div");
+                itemDiv.className = "item-produto-lista";
+                
+                // Trata o preço (se for pizza/porção com múltiplos preços ou preço único)
+                let precoDisplay = "";
+                if (p.prices) {
+                    precoDisplay = Object.entries(p.prices)
+                        .map(([tam, val]) => `<span class="tag-preco">${tam}: R$ ${val.toFixed(2)}</span>`)
+                        .join(" ");
+                } else {
+                    precoDisplay = `<span class="preco-unico">R$ ${p.price.toFixed(2).replace(".", ",")}</span>`;
+                }
+
+                // Layout igual à foto: Info à esquerda, Imagem à direita
+                itemDiv.innerHTML = `
+                    <div class="info-produto" onclick='abrirDetalhes(${JSON.stringify(p)})'>
+                        <h3 class="nome-produto-lista">${p.title}</h3>
+                        <p class="desc-produto-lista">${p.ingredientes || ""}</p>
+                        <div class="container-preco-lista">
+                            ${p.oldPrice ? `<span class="preco-antigo">R$ ${p.oldPrice.toFixed(2)}</span>` : ""}
+                            ${precoDisplay}
+                        </div>
+                    </div>
+                    <div class="foto-produto-lista">
+                        <img src="${p.image}" alt="${p.title}" onerror="this.src='imagens/placeholder.png'">
+                        <button class="btn-add-lista" onclick='adicionarCarrinhoPorProduto(${JSON.stringify(p)})'>+</button>
+                    </div>
+                `;
+                section.appendChild(itemDiv);
+            });
+
+            corpoCardapio.appendChild(section);
+        });
+
+    } catch (e) {
+        console.error("Erro ao carregar cardápio:", e);
+    }
 }
 
 
