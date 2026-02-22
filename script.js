@@ -379,7 +379,7 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarStatusLoja();      // ✅ mantém
     
 
-    carregarCardapioCompleto(); // 🔥 NOVO (substitui todos os outros)
+    carregarProdutos(); // 🔥 NOVO (substitui todos os outros)
 
     carregarCarrinhoStorage(); // ✅ mantém
 });
@@ -772,6 +772,7 @@ async function carregarCardapioCompleto() {
         console.error("Erro ao carregar cardápio:", e);
     }
 }
+
 
 
 
