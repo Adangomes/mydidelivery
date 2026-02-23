@@ -386,8 +386,8 @@
     {
       "title": "kaiser lata",
       "categoria": "bebida",
-      "ingredientes": ".",
-      "image": "/imagens/teste.jpg",
+      "ingredientes": "350ml",
+      "image": "/imagens/kaiser.jpeg",
       "price": 7,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -422,9 +422,9 @@
     {
       "title": "LARANJINHA",
       "price": 10,
-      "image": "/imagens/teste.jpg",
+      "image": "/imagens/laranjinha.jpeg",
       "categoria": "bebida",
-      "ingredientes": ".",
+      "ingredientes": "2l",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
