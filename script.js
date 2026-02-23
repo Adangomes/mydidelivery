@@ -409,16 +409,13 @@ async function enviarWhatsApp() {
     const rua = document.getElementById("rua").value;
     const num = document.getElementById("numero").value;
     const bairro = document.getElementById("bairro").value;
-    const cidade = document.getElementById("cidade").value;
-
-    if(!nome || !rua || !num) return alert("Preencha os dados de entrega!");
-
+    if(!nome || !rua || !num) return alert("Por favor, preencha os dados de entrega!");
     let subtotal = 0;
-    carrinho.forEach(i => subtotal += (i.price * i.qtd));
-    let totalFinalCalculado = (subtotal + taxaEntregaCalculada) - descontoAplicado;
-
-    // --- 1. PREPARA OS DADOS PARA O FIREBASE (ADMIN) ---
-    const novoPedido = {
+    carrinho.forEach(i => subtotal += (i.price * i.qtd));  
+    // Cálculo final garantindo o desconto
+    const totalComDesconto = (subtotal + taxaEntregaCalculada) - descontoAplicado;
+    // --- ENVIAR PARA O FIREBASE (ADMIN) ---
+    const pedidoFirebase = {
         cliente: nome,
         endereco: `${rua}, ${num} - ${bairro}`,
         horario: new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}),
@@ -430,35 +427,35 @@ async function enviarWhatsApp() {
         pagamento: pag + (troco ? ` (Troco para ${troco})` : ""),
         subtotal: subtotal,
         taxaEntrega: taxaEntregaCalculada,
-        total: totalFinalCalculado,
-        obs_cozinha: "" // Você pode criar um campo de obs no form se quiser
+        desconto: descontoAplicado, // Enviando o campo que faltava
+        total: totalComDesconto,
+        obs_cozinha: "Nenhuma"
     };
-
-    // --- 2. SALVA NO FIREBASE ---
     try {
-        await firebase.database().ref('pedidos').push(novoPedido);
-        console.log("Pedido enviado ao Admin!");
-    } catch (erro) {
-        console.error("Erro ao avisar o painel admin:", erro);
+        await db.ref('pedidos').push(pedidoFirebase);
+    } catch (e) {
+        console.error("Erro ao salvar no banco:", e);
     }
-
-    // --- 3. MONTA A MENSAGEM DO WHATSAPP (COMO JÁ ESTAVA) ---
+    // --- MONTAR MENSAGEM DO WHATSAPP ---
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*%0A%0A`;
     msg += `*Cliente:* ${nome}%0A`;
     msg += `*Endereço:* ${rua}, ${num} - ${bairro}%0A`;
-    // ... restante do seu código da mensagem do whatsapp ...
-    msg += `*TOTAL FINAL:* R$ ${totalFinalCalculado.toFixed(2)}%0A`;
-
+    msg += `*Pagamento:* ${pag}${troco ? ' (Troco para ' + troco + ')' : ''}%0A`;
+    msg += `--------------------------%0A`;
+    // Listando os itens na mensagem
+    carrinho.forEach(i => {
+        msg += `• ${i.qtd}x ${i.title} (R$ ${(i.price * i.qtd).toFixed(2)})%0A`;
+    }); 
+    msg += `--------------------------%0A`;
+    msg += `*Subtotal:* R$ ${subtotal.toFixed(2)}%0A`;
+   
+    // Inclui a linha do desconto se ele existir
+    if(descontoAplicado > 0) {
+        msg += `*Cupom:* - R$ ${descontoAplicado.toFixed(2)}%0A`;
+    }    
+    msg += `*Taxa Entrega:* R$ ${taxaEntregaCalculada.toFixed(2)}%0A`;
+    msg += `*TOTAL FINAL:* R$ ${totalComDesconto.toFixed(2)}%0A`;
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`);
-}
-function mostrarToast(nomeItem) {
-    const toast = document.getElementById("toast-geral");
-    if (!toast) return;
-    toast.innerText = `${nomeItem} adicionado ao carrinho!✅`;
-    toast.classList.add("show");
-    setTimeout(() => {
-        toast.classList.remove("show");
-    }, 3000);
 }
 
 function carregarCarrinhoStorage() {
@@ -657,6 +654,7 @@ function voltarParaEntrega() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
 
 
 
