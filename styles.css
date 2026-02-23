@@ -504,3 +504,75 @@ footer {
     font-weight: 800;
     font-size: 1.1rem;
 }
+
+/* ============================================================
+   SEÇÃO DE CUPOM (ESTILO SNOOP LANCHE)
+   ============================================================ */
+
+.cupom-secao {
+    padding: 10px 20px;
+}
+
+.cupom-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+#input-cupom {
+    flex: 2;
+    padding: 12px 15px;
+    border-radius: 12px;
+    border: 1px solid #ddd;
+    background: #fcfcfc;
+    font-size: 0.9rem;
+    outline: none;
+    text-transform: uppercase; /* Deixa o cupom sempre em caixa alta */
+    transition: all 0.3s ease;
+}
+
+#input-cupom:focus {
+    border-color: #000;
+}
+
+/* Botão Aplicar seguindo o padrão dos botões do sistema */
+#btn-aplicar-cupom {
+    flex: 1;
+    background: #111;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+#btn-aplicar-cupom:active {
+    transform: scale(0.95);
+}
+
+/* Estilo para quando o cupom for INVÁLIDO */
+.cupom-invalido {
+    border-color: #dc3545 !important;
+    color: #dc3545 !important;
+    background-color: #fff5f5 !important;
+    font-weight: 700;
+}
+
+/* Estilo para quando o cupom for VÁLIDO */
+.cupom-valido {
+    border-color: #28a745 !important;
+    color: #28a745 !important;
+    background-color: #f1fcf5 !important;
+    font-weight: 700;
+}
+
+/* Mensagem de feedback abaixo do input */
+.cupom-msg-erro {
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 5px;
+    min-height: 15px; /* Evita que o layout "pule" quando a msg aparece */
+}
