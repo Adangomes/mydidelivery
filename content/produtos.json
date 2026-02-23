@@ -33,14 +33,14 @@
      "title": "BATATA FRITA 600g",
      "prices": { "P": 30 },
      "categoria": "porcao",
-     "ingredientes": "Selecione o tamanho!",
+     "ingredientes": "Opções de Batatas",
      "image": "/imagens/fritas.jpeg"
    },
    {
     "title": "BATATA FRITA 1kg",
     "prices": { "G": 40 },
     "categoria": "porcao",
-    "ingredientes": "Selecione o tamanho!",
+    "ingredientes": "Opções de Batata",
     "image": "/imagens/fritas.jpeg"
     },
     {
