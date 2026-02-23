@@ -287,9 +287,16 @@ function fecharModalPizza() { document.getElementById("pizza-options-modal").sty
 // --- FUNÇÕES GERAIS ---
 function adicionarCarrinhoPorProduto(p) {
     let item = carrinho.find(i => i.title === p.title);
-    if(item) item.qtd++; else carrinho.push({...p, qtd: 1});
+    if(item) {
+        item.qtd++; 
+    } else {
+        carrinho.push({...p, qtd: 1});
+    }
+    
     atualizarCarrinho();
-    mostrarToast();
+    
+    // CHAMA O TOAST COM O NOME DO PRODUTO (Ex: X-Bacon)
+    mostrarToast(p.title); 
 }
 
 function atualizarCarrinho() {
@@ -381,4 +388,5 @@ async function carregarStatusLoja() {
         }
     } catch (e) { s.className = "status fechado"; }
 }
+
 
