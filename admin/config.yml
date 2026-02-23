@@ -79,3 +79,22 @@ collections:
               - { label: "Quinta", value: "4" }
               - { label: "Sexta", value: "5" }
               - { label: "Sábado", value: "6" }
+
+# --- NOVA FUNÇÃO DE CUPOM ---
+      - file: "content/aplicardesconto.json"
+        label: "Cupons de Desconto"
+        name: "cupons_desconto"
+        fields:
+          - label: "Lista de Cupons"
+            name: "cupons"
+            widget: "list"
+            fields:
+              - { label: "Código do Cupom", name: "codigo", widget: "string", hint: "Ex: BEMVINDO10" }
+              - label: "Tipo de Desconto"
+                name: "tipo"
+                widget: "select"
+                options:
+                  - { label: "Porcentagem (%)", value: "porcentagem" }
+                  - { label: "Valor Fixo (R$)", value: "fixo" }
+              - { label: "Valor do Desconto", name: "valor", widget: "number", value_type: "float" }
+              - { label: "Ativo?", name: "ativo", widget: "boolean", default: true }
