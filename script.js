@@ -394,5 +394,20 @@ async function carregarStatusLoja() {
 }
 
 
+// Exemplo lógico simplificado
+function abrirModalBatatas(tamanhoSelecionado) { // 'G' por exemplo
+    
+    // O sistema filtra as batatas do seu JSON
+    const opcoesDisponiveis = produtos.filter(p => p.categoria === "porcao");
+    
+    // Limpa o modal e renderiza as opções com o preço da chave ['G']
+    opcoesDisponiveis.forEach(batata => {
+        let precoFinal = batata.prices[tamanhoSelecionado];
+        
+        // Aqui você injeta no HTML do Modal:
+        // Titulo: batata.title
+        // Preço: precoFinal
+    });
+}
 
 
