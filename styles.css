@@ -407,7 +407,7 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     filter: grayscale(1);
 }
 
-rodape {
+footer {
     width: 100%;
     padding: 20px 0;
     display: flex; /* Garante flexibilidade */
