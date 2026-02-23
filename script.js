@@ -214,9 +214,13 @@ function renderizarSabores() {
     if (!grid) return;
     grid.innerHTML = "";
     
-    const saboresDisponiveis = produtosGeral.filter(p => 
-        p.categoria.toLowerCase() === "pizza" && !p.title.toUpperCase().includes("PIZZA")
-    );
+    const saboresDisponiveis = produtosGeral.filter(p => {
+        const cat = p.categoria.toLowerCase();
+        const titulo = p.title.toUpperCase();
+        const eSaborPizza = (cat === "pizza" && !titulo.includes("PIZZA"));
+        const eOpcaoBatata = (cat === "porcao" && titulo.includes("BATATA") && !titulo.includes("("));
+        return eSaborPizza || eOpcaoBatata;
+    });
 
     const atingiuLimite = saboresSelecionados.length >= limiteSabores;
 
@@ -388,6 +392,7 @@ async function carregarStatusLoja() {
         }
     } catch (e) { s.className = "status fechado"; }
 }
+
 
 
 
