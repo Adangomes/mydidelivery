@@ -606,3 +606,8 @@ abrirCarrinho = function() {
     originalAbrirCarrinho();
     verificarDisponibilidadeCupons();
 };
+// ULTIMO BOTAO ANTES DE ENVIAR O PEDIDO
+function voltarParaEntrega() {
+    document.getElementById("resumo-pedido").style.display = "none";
+    document.getElementById("form-entrega").style.display = "block";
+}
