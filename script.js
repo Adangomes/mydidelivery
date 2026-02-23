@@ -130,69 +130,62 @@ async function calcularTaxaEntrega(end) {
         return km < 1 ? 2.00 : TAXA_BASE + (km * VALOR_POR_KM);
     } catch (e) { return null; }
 }
+
+
+// RESUMO DOS PEDIDOS
 async function mostrarResumo() {
     const rua = document.getElementById("rua").value;
     const num = document.getElementById("numero").value;
     const bairro = document.getElementById("bairro").value;
     const cidade = document.getElementById("cidade").value;
+
     if(!rua || !num || !bairro) return alert("Por favor, preencha Rua, Número e Bairro!");
+
     const enderecoCompleto = `${rua}, ${num}, ${bairro}, ${cidade}, SC, Brasil`;
     document.getElementById("loading-taxa").style.display = "flex";
+
     const taxa = await calcularTaxaEntrega(enderecoCompleto);
     document.getElementById("loading-taxa").style.display = "none";
+
     if (taxa === null) return alert("Não conseguimos localizar este endereço.");
+
     taxaEntregaCalculada = taxa;  
-    // 1. Calcula o subtotal dos produtos
+
     let sub = 0; 
     carrinho.forEach(i => sub += (i.price * i.qtd));
 
     document.getElementById("form-entrega").style.display = "none";
     document.getElementById("resumo-pedido").style.display = "block";
-    // 2. Lista os itens no resumo
+
+    // Preenche os itens
     document.getElementById("resumo-itens").innerHTML = carrinho.map(i => `
         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
             <span>${i.qtd}x ${i.title}</span>
             <span>R$ ${(i.price * i.qtd).toFixed(2)}</span>
         </div>
     `).join("");
-    // 3. Monta o financeiro (Taxa e Cupom)
+
+    // --- MONTA O RESUMO FINANCEIRO ---
     let htmlFinanceiro = "";
-    // Linha do Subtotal (Produtos)
-    htmlFinanceiro += `
-        <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
-            <span>Subtotal Produtos:</span>
-            <span>R$ ${sub.toFixed(2)}</span>
-        </div>`;
-    // Linha da Taxa de Entrega
-    htmlFinanceiro += `
-        <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
-            <span>Taxa de Entrega:</span>
-            <span>R$ ${taxa.toFixed(2)}</span>
-        </div>`;
-    // SE EXISTIR DESCONTO, ADICIONA A LINHA
+    htmlFinanceiro += `<div>Subtotal Produtos: R$ ${sub.toFixed(2)}</div>`;
+    htmlFinanceiro += `<div>Taxa de Entrega: R$ ${taxa.toFixed(2)}</div>`;
+    // Se tiver desconto, ele entra aqui com destaque
     if (descontoAplicado > 0) {
-        htmlFinanceiro += `
-            <div style="display:flex; justify-content:space-between; color: #e74c3c; font-weight: bold; margin-bottom: 5px;">
-                <span>Cupom Desconto:</span>
-                <span>- R$ ${descontoAplicado.toFixed(2)}</span>
-            </div>`;
+        htmlFinanceiro += `<div style="color: #e74c3c; font-weight: bold;">Cupom Desconto: - R$ ${descontoAplicado.toFixed(2)}</div>`;
     }
-    // 4. Atualiza o HTML do resumo financeiro
+    // Injeta no parágrafo do HTML
     document.getElementById("resumo-taxa").innerHTML = htmlFinanceiro;
-    // 5. CÁLCULO FINAL CORRETO: (Produtos + Taxa) - Desconto
-    const totalFinal = (sub + taxa) - descontoAplicado;   
-    // Atualiza o Total na tela
+    // Calcula e injeta o Total Final
+    const totalFinal = (sub + taxa) - descontoAplicado;
     document.getElementById("resumo-total").innerText = `Total: R$ ${Math.max(0, totalFinal).toFixed(2)}`;
 }
 // --- CONTROLE DE PIZZA (VERSÃO UNIFICADA) ---
 function abrirModalPizza(nome) {
     pizzaPrincipal = produtosGeral.find(p => p.title === nome);
     if (!pizzaPrincipal) return;
-
     saboresSelecionados = [];
     itemTemporarioPorcao = null; // Limpa estado de porção
     let maxSaboresPermitidos = 1;
-
     if (nome.toUpperCase().includes("PIZZA P")) {
         tamanhoSelecionado = "P"; maxSaboresPermitidos = 1;
     } else if (nome.toUpperCase().includes("PIZZA M")) {
@@ -200,13 +193,10 @@ function abrirModalPizza(nome) {
     } else if (nome.toUpperCase().includes("PIZZA G")) {
         tamanhoSelecionado = "G"; maxSaboresPermitidos = 3;
     }
-
     document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
     document.getElementById("pizza-modal-desc").innerText = pizzaPrincipal.ingredientes || "";
-
     const containerTamanhos = document.getElementById("pizza-sizes-container");
-    const labelPasso = document.querySelector(".label-step"); 
-    
+    const labelPasso = document.querySelector(".label-step");   
     if (maxSaboresPermitidos === 1) {
         if(labelPasso) labelPasso.style.display = "none";
         if(containerTamanhos) containerTamanhos.style.display = "none";
@@ -246,14 +236,11 @@ function renderizarSabores() {
         const titulo = p.title.toUpperCase();
         return (cat === "pizza" && !titulo.includes("PIZZA"));
     });
-
     const atingiuLimite = saboresSelecionados.length >= limiteSabores;
-
     saboresDisponiveis.forEach(p => {
         const selecionado = saboresSelecionados.includes(p.title);
         const classeStatus = selecionado ? 'selecionado' : (atingiuLimite ? 'desabilitado' : '');
         const acaoClique = (!atingiuLimite || selecionado) ? `onclick="toggleSabor('${p.title}')"` : "";
-
         grid.innerHTML += `
             <div class="item-sabor-wizard ${classeStatus}" ${acaoClique}>
                 <div style="display:flex; flex-direction:column">
@@ -263,23 +250,19 @@ function renderizarSabores() {
                 <span class="status-check">${selecionado ? '✅' : '+'}</span>
             </div>`;
     });
-
     const contador = document.getElementById("contador-fatias");
     if (contador) contador.innerText = `Sabores (${saboresSelecionados.length}/${limiteSabores})`;
     atualizarBotaoConfirmar();
 }
-
 function toggleSabor(nome) {
     const index = saboresSelecionados.indexOf(nome);
     if (index > -1) saboresSelecionados.splice(index, 1);
     else if (saboresSelecionados.length < limiteSabores) saboresSelecionados.push(nome);
     renderizarSabores();
 }
-
 function atualizarBotaoConfirmar() {
     const btn = document.getElementById("btn-confirmar-pizza");
-    const sec = document.getElementById("secao-adicionais");
-    
+    const sec = document.getElementById("secao-adicionais");   
     // Se for Porção
     if (itemTemporarioPorcao) {
         btn.disabled = false;
@@ -287,7 +270,6 @@ function atualizarBotaoConfirmar() {
         if(sec) sec.style.display = "none";
         return;
     }
-
     // Se for Pizza
     if (saboresSelecionados.length === limiteSabores) {
         if(sec) sec.style.display = "block";
@@ -298,8 +280,8 @@ function atualizarBotaoConfirmar() {
     }
 }
 
+    // FUNÇAÕ CONFIRMAR PIZZA 
 function confirmarPizza() {
-    // Caso seja uma porção selecionada
     if (itemTemporarioPorcao) {
         carrinho.push(itemTemporarioPorcao);
         atualizarCarrinho();
@@ -648,6 +630,7 @@ function voltarParaEntrega() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
 
 
 
