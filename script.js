@@ -406,23 +406,33 @@ function enviarWhatsApp() {
     const nome = document.getElementById("nomeCliente").value;
     const pag = document.getElementById("pagamento").value;
     const troco = document.getElementById("trocoPara").value;
+    const rua = document.getElementById("rua").value;
+    const num = document.getElementById("numero").value;
+    const bairro = document.getElementById("bairro").value;
+    const cidade = document.getElementById("cidade").value;
+    const complemento = document.getElementById("complemento") ? document.getElementById("complemento").value : "";
     if(!nome) return alert("Informe seu nome.");
+    if(!rua || !num || !bairro) return alert("O endereço parece estar incompleto no formulário.");
     let subtotal = 0;
     carrinho.forEach(i => subtotal += (i.price * i.qtd));
     let totalFinalCalculado = (subtotal + taxaEntregaCalculada) - descontoAplicado;
     if (totalFinalCalculado < 0) totalFinalCalculado = 0;
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*%0A%0A`;
     msg += `*Cliente:* ${nome}%0A`;
+    msg += `*Endereço:* ${rua}, ${num}%0A`;
+    msg += `*Bairro:* ${bairro}%0A`;
+    if(complemento) msg += `*Complemento:* ${complemento}%0A`;
+    msg += `*Cidade:* ${cidade}%0A`;   
     msg += `*Pagamento:* ${pag}${troco ? ' (Troco para ' + troco + ')' : ''}%0A`;
-    msg += `--------------------------%0A`;
+    msg += `--------------------------%0A`;    
     carrinho.forEach(i => {
         msg += `• ${i.qtd}x ${i.title}%0A${i.sabor ? '  _' + i.sabor + '_%0A' : ''}`;
-    });
+    }); 
     msg += `--------------------------%0A`;
-    msg += `*Subtotal:* R$ ${subtotal.toFixed(2)}%0A`;
+    msg += `*Subtotal:* R$ ${subtotal.toFixed(2)}%0A`;  
     if(descontoAplicado > 0) {
         msg += `*Cupom (${cupomAtivoNome}):* - R$ ${descontoAplicado.toFixed(2)}%0A`;
-    }
+    }  
     msg += `*Taxa Entrega:* R$ ${taxaEntregaCalculada.toFixed(2)}%0A`;
     msg += `*TOTAL FINAL:* R$ ${totalFinalCalculado.toFixed(2)}%0A`;
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`);
@@ -634,4 +644,5 @@ function voltarParaEntrega() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
 
