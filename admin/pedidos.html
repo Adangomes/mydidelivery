@@ -123,7 +123,7 @@
             }).catch(() => alert("Arquivo alert.mpeg não encontrado!"));
         }
 
-        db.ref('pedidos').on('child_added', (snap) => {
+       db.ref('pedidos').on('child_added', (snap) => {
             const p = snap.val();
             const id = snap.key;
             const li = document.createElement('li');
@@ -152,6 +152,13 @@
                         <span>Produtos: R$ ${parseFloat(p.subtotal).toFixed(2)}</span>
                         <span>Taxa: R$ ${parseFloat(p.taxaEntrega).toFixed(2)}</span>
                     </div>
+
+                    ${p.desconto > 0 ? `
+                    <div style="display:flex; justify-content:space-between; font-size:13px; color: #ffcc00; font-weight: bold;">
+                        <span>Cupom:</span>
+                        <span>- R$ ${parseFloat(p.desconto).toFixed(2)}</span>
+                    </div>` : ''}
+
                     <div class="total">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</div>
                 </div>
 
@@ -161,6 +168,7 @@
                 </div>
                 <button class="btn-concluir" onclick="concluirPedido('${id}')">✅ CONCLUIR PEDIDO</button>
             `;
+
             document.getElementById('pedidos-container').prepend(li);
             if (prontoParaTocar) new Audio('alert.mpeg').play().catch(()=>{});
         });
@@ -249,6 +257,7 @@ function alternarStatusLoja() {
     </script>
 </body>
 </html>
+
 
 
 
