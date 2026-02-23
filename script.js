@@ -57,31 +57,29 @@ async function carregarCardapioCompleto() {
             section.innerHTML = `<h2 class="titulo-categoria-lista">${cat}</h2>`;
 
             categorias[cat].forEach(p => {
-                // Filtro: não mostra sabores individuais na lista principal
+                // --- FILTRO DE SEGURANÇA (PIZZAS E PORÇÕES) ---
+                // Não mostra sabores de pizza soltos
                 if (p.categoria.toLowerCase() === 'pizza' && !p.title.toUpperCase().includes("PIZZA")) {
                     return; 
+                }
+                // Não mostra opções de batata soltas (as que tem preço 0 ou preços em objeto, mas não são o botão mestre)
+                if (p.categoria.toLowerCase() === 'porcao' && !p.title.toUpperCase().includes("600G") && !p.title.toUpperCase().includes("1KG")) {
+                    return;
                 }
 
                 const pJson = JSON.stringify(p).replace(/"/g, '&quot;');
                 
-                // --- INICIO DO AJUSTE SOLICITADO ---
                 let acao = "";
-                
-                // Se for pizza, abre modal de pizza
                 if(p.categoria.toLowerCase() === 'pizza') {
                     acao = `abrirModalPizza('${p.title}')`;
                 } 
-                // Se for porção OU tiver a marcação de abrir_modal, abre o modal dinâmico
-                else if (p.categoria.toLowerCase() === 'porcao' || p.tipo_escolha === 'abrir_modal') {
-                    // Usamos a categoria como tag_grupo caso tag_grupo não exista
-                    const tag = p.tag_grupo || p.categoria;
-                    acao = `abrirModalDinamico('${tag}', '${p.title}')`;
+                else if (p.categoria.toLowerCase() === 'porcao') {
+                    // Para porções, a tag alvo sempre será 'porcao' para buscar os sabores
+                    acao = `abrirModalDinamico('porcao', '${p.title}')`;
                 }
-                // Caso contrário (burgers, dogs, bebidas), adiciona direto
                 else {
                     acao = `adicionarCarrinhoPorProduto(${pJson})`;
                 }
-                // --- FIM DO AJUSTE SOLICITADO ---
 
                 section.innerHTML += `
                     <div class="item-produto-lista" onclick="${acao}">
@@ -231,9 +229,7 @@ function renderizarSabores() {
     const saboresDisponiveis = produtosGeral.filter(p => {
         const cat = p.categoria.toLowerCase();
         const titulo = p.title.toUpperCase();
-        const eSaborPizza = (cat === "pizza" && !titulo.includes("PIZZA"));
-        const eOpcaoBatata = (cat === "porcao" && titulo.includes("BATATA") && !titulo.includes("("));
-        return eSaborPizza || eOpcaoBatata;
+        return (cat === "pizza" && !titulo.includes("PIZZA"));
     });
 
     const atingiuLimite = saboresSelecionados.length >= limiteSabores;
@@ -411,7 +407,11 @@ function abrirModalDinamico(tagAlvo, tituloPrincipal) {
     const labelPasso = document.querySelector(".label-step");
     if(labelPasso) labelPasso.style.display = "none";
 
-    const itensEncontrados = produtosGeral.filter(p => p.categoria === tagAlvo);
+    // Busca as opções (os itens que estavam "escondidos" da lista)
+    const itensEncontrados = produtosGeral.filter(p => {
+        const titulo = p.title.toUpperCase();
+        return p.categoria === tagAlvo && !titulo.includes("600G") && !titulo.includes("1KG");
+    });
 
     if(itensEncontrados.length === 0) {
         containerSabores.innerHTML = "<p style='padding:20px'>Nenhuma opção cadastrada para esta categoria.</p>";
