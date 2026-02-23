@@ -148,19 +148,19 @@
                 <div class="info-obs">💬 OBS: ${p.obs_cozinha || 'Nenhuma'}</div>
                 
                 <div class="financeiro-box">
-                    <div style="display:flex; justify-content:space-between; font-size:13px;">
-                        <span>Produtos: R$ ${parseFloat(p.subtotal).toFixed(2)}</span>
-                        <span>Taxa: R$ ${parseFloat(p.taxaEntrega).toFixed(2)}</span>
-                    </div>
+    <div style="display:flex; justify-content:space-between; font-size:13px;">
+        <span>Produtos: R$ ${parseFloat(p.subtotal || 0).toFixed(2)}</span>
+        <span>Taxa: R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2)}</span>
+    </div>
 
-                    ${p.desconto > 0 ? `
-                    <div style="display:flex; justify-content:space-between; font-size:13px; color: #ffcc00; font-weight: bold;">
-                        <span>Cupom:</span>
-                        <span>- R$ ${parseFloat(p.desconto).toFixed(2)}</span>
-                    </div>` : ''}
+    ${p.desconto > 0 ? `
+    <div style="display:flex; justify-content:space-between; font-size:13px; color: #d35400; font-weight: bold;">
+        <span>Cupom Desconto:</span>
+        <span>- R$ ${parseFloat(p.desconto).toFixed(2)}</span>
+    </div>` : ''}
 
-                    <div class="total">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</div>
-                </div>
+    <div class="total">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</div>
+</div>
 
                 <div class="btn-group">
                     <button class="btn-cozinha" onclick="imprimir('cozinha', '${id}')">COZINHA</button>
@@ -174,47 +174,50 @@
         });
 
         function imprimir(tipo, id) {
-            db.ref('pedidos/'+id).once('value', s => {
-                const p = s.val();
-                let lista = Array.isArray(p.itens) ? p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>') : "";
-                
-                let html = "";
-                
-                if (tipo === 'cozinha') {
-                    html = `<div style="width:72mm;font-family:Arial;text-align:center;">
-                                <h2>SNOOP LANCHE</h2><h3>COZINHA (${p.horario})</h3><hr>
-                                <div style="text-align:left;">
-                                    <b>CLIENTE:</b> ${p.cliente}<br>
-                                    <b>ITENS:</b><br>
-                                    <div style="font-size:18px;font-weight:bold;">${lista}</div><hr>
-                                    <b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}
-                                </div>
-                            </div>`;
-                } else {
-                    html = `<div style="width:72mm;font-family:Arial;font-size:14px;">
-                                <center><h2>SNOOP LANCHE</h2>
-                                <b>HORÁRIO: ${p.horario}</b></center><hr>
-                                <b>CLIENTE:</b> ${p.cliente}<br>
-                                <b>ENDEREÇO:</b> ${p.endereco}<br>
-                                <b>REF:</b> ${p.referencia || 'Não informado'}<br>
-                                <b>PAGAMENTO:</b> ${p.pagamento}<br><hr>
-                                
-                                <b>PRODUTOS:</b><br>
-                                <div style="font-size:16px;font-weight:bold;">${lista}</div><br>
-                                
-                                Produtos: R$ ${parseFloat(p.subtotal || 0).toFixed(2)}<br>
-                                Taxa: R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2)}<br>
-                                <b style="font-size:18px;">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</b><hr>
-                                <b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}
-                            </div>`;
-                }
-                
-                const win = document.getElementById('iframe-impressao').contentWindow;
-                win.document.open(); 
-                win.document.write(`<html><body style="margin:0;" onload="window.print()">${html}</body></html>`); 
-                win.document.close();
-            });
+    db.ref('pedidos/'+id).once('value', s => {
+        const p = s.val();
+        let lista = Array.isArray(p.itens) ? p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>') : "";
+        
+        let html = "";
+        
+        if (tipo === 'cozinha') {
+            html = `<div style="width:72mm;font-family:Arial;text-align:center;">
+                        <h2>SNOOP LANCHE</h2><h3>COZINHA (${p.horario})</h3><hr>
+                        <div style="text-align:left;">
+                            <b>CLIENTE:</b> ${p.cliente}<br>
+                            <b>ITENS:</b><br>
+                            <div style="font-size:18px;font-weight:bold;">${lista}</div><hr>
+                            <b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}
+                        </div>
+                    </div>`;
+        } else {
+            html = `<div style="width:72mm;font-family:Arial;font-size:14px;">
+                        <center><h2>SNOOP LANCHE</h2>
+                        <b>HORÁRIO: ${p.horario}</b></center><hr>
+                        <b>CLIENTE:</b> ${p.cliente}<br>
+                        <b>ENDEREÇO:</b> ${p.endereco}<br>
+                        <b>REF:</b> ${p.referencia || 'Não informado'}<br>
+                        <b>PAGAMENTO:</b> ${p.pagamento}<br><hr>
+                        
+                        <b>PRODUTOS:</b><br>
+                        <div style="font-size:16px;font-weight:bold;">${lista}</div><br>
+                        
+                        Produtos: R$ ${parseFloat(p.subtotal || 0).toFixed(2)}<br>
+                        Taxa: R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2)}<br>
+                        
+                        ${p.desconto > 0 ? `Cupom Desconto: - R$ ${parseFloat(p.desconto).toFixed(2)}<br>` : ''}
+                        
+                        <b style="font-size:18px;">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</b><hr>
+                        <b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}
+                    </div>`;
         }
+        
+        const win = document.getElementById('iframe-impressao').contentWindow;
+        win.document.open(); 
+        win.document.write(`<html><body style="margin:0;" onload="window.print()">${html}</body></html>`); 
+        win.document.close();
+    });
+}
 
         function concluirPedido(id) {
             if(confirm("Deseja concluir este pedido?")){
@@ -257,6 +260,7 @@ function alternarStatusLoja() {
     </script>
 </body>
 </html>
+
 
 
 
