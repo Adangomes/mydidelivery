@@ -481,3 +481,26 @@ footer {
     transform: scale(0.9);
 }
 
+/* ============================================================
+   AJUSTE DE ALINHAMENTO NO RESUMO FINAL (TELA DE WHATSAPP)
+   ============================================================ */
+
+/* Alinha os itens do resumo (nome e preço) com o mesmo recuo do carrinho */
+.resumo-lista div {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 25px !important; /* Mesmos 25px que usamos no carrinho */
+    font-size: 0.9rem;
+}
+
+/* Alinha a linha da Taxa de Entrega */
+.summary-line {
+    padding: 5px 25px !important;
+}
+
+/* Alinha o Total Final */
+#resumo-total, .summary-line.total {
+    padding: 15px 25px !important;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
