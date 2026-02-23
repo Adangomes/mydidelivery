@@ -107,7 +107,7 @@
       "price": 6.5,
       "categoria": "bebida",
       "ingredientes": "350ml",
-      "image": "/imagens/teste.jpg",
+      "image": "/imagens/guarana-lata.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -116,7 +116,7 @@
       "price": 8,
       "categoria": "bebida",
       "ingredientes": "600ml",
-      "image": "/imagens/teste.jpg",
+      "image": "/imagens/coca-600.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -125,7 +125,7 @@
       "price": 8,
       "categoria": "bebida",
       "ingredientes": "600ml",
-      "image": "/imagens/teste.jpg",
+      "image": "/imagens/guarana600.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -396,7 +396,7 @@
       "title": "Amstel lata",
       "categoria": "bebida",
       "ingredientes": "350 ml",
-      "image": "/imagens/teste.jpg",
+      "image": "/imagens/kaiser-lata.jpeg",
       "price": 7,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -405,7 +405,7 @@
       "title": "COCA COLA 2L",
       "categoria": "bebida",
       "ingredientes": ".",
-      "image": "/imagens/teste.jpg",
+      "image": "/imagens/cocacola2l.jpeg",
       "price": 18,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -413,8 +413,8 @@
     {
       "title": "GUARANÁ ANTÁRTICA 2L",
       "categoria": "bebida",
-      "ingredientes": ".",
-      "image": "/imagens/teste.jpg",
+      "ingredientes": "2l",
+      "image": "/imagens/guarana2l.jpeg",
       "price": 15,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -431,8 +431,8 @@
     {
       "title": "FRAMBOESA 2L",
       "categoria": "bebida",
-      "ingredientes": ".",
-      "image": "/imagens/teste.jpg",
+      "ingredientes": "2l",
+      "image": "/imagens/framboesa.jpeg",
       "price": 10,
       "tipo_escolha": "direto",
       "tem_adicionais": false
