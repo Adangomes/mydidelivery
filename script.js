@@ -394,20 +394,39 @@ async function carregarStatusLoja() {
 }
 
 
-// Exemplo lógico simplificado
-function abrirModalBatatas(tamanhoSelecionado) { // 'G' por exemplo
+// Exemplo de como estruturar a abertura do modal de batatas
+function abrirModalBatata(tamanho) { // tamanho pode ser 'P' (600g) ou 'G' (1kg)
+    const modal = document.getElementById('pizza-options-modal'); // Reusando seu modal
+    const listaSabores = document.getElementById('lista-sabores-meia');
+    const tituloModal = document.getElementById('pizza-modal-title');
     
-    // O sistema filtra as batatas do seu JSON
-    const opcoesDisponiveis = produtos.filter(p => p.categoria === "porcao");
+    // Limpa o que tem dentro
+    listaSabores.innerHTML = "";
+    tituloModal.innerText = `BATATAS FRITAS - ${tamanho === 'P' ? '600g' : '1kg'}`;
     
-    // Limpa o modal e renderiza as opções com o preço da chave ['G']
-    opcoesDisponiveis.forEach(batata => {
-        let precoFinal = batata.prices[tamanhoSelecionado];
+    // Filtra no seu array de produtos apenas as batatas
+    // (Supondo que seu array se chame 'produtos')
+    const opcoesBatata = produtos.filter(item => item.categoria === "porcao");
+
+    opcoesBatata.forEach(batata => {
+        const precoTamanho = batata.prices[tamanho];
         
-        // Aqui você injeta no HTML do Modal:
-        // Titulo: batata.title
-        // Preço: precoFinal
+        const htmlSabor = `
+            <div class="card-sabor-batata" onclick="selecionarBatata('${batata.title}', ${precoTamanho})">
+                <div class="info-batata">
+                    <strong>${batata.title}</strong>
+                    <p>${batata.ingredientes}</p>
+                </div>
+                <span class="preco-batata">R$ ${precoTamanho.toFixed(2)}</span>
+            </div>
+        `;
+        listaSabores.innerHTML += htmlSabor;
     });
+
+    // Exibe o modal e esconde o que não for de batata
+    document.getElementById('secao-sabores').style.display = 'block';
+    document.getElementById('pizza-sizes-container').style.display = 'none'; // Esconde seleção de pizza
+    modal.style.display = 'flex';
 }
 
 
