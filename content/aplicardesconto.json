@@ -1,1 +1,16 @@
-
+{
+  "cupons": [
+    {
+      "codigo": "SNOOP10",
+      "tipo": "porcentagem",
+      "valor": 10,
+      "ativo": true
+    },
+    {
+      "codigo": "DESCONTO5",
+      "tipo": "fixo",
+      "valor": 5,
+      "ativo": true
+    }
+  ]
+}
