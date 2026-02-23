@@ -30,14 +30,14 @@
       "image": "/imagens/xsalada.jpeg"
     },
     {
-     "title": "BATATA FRITA (M)",
+     "title": "BATATA FRITA 600g",
      "prices": { "P": 30 },
      "categoria": "porcao",
      "ingredientes": "Selecione o tamanho!",
      "image": "/imagens/fritas.jpeg"
    },
    {
-    "title": "BATATA FRITA (G)",
+    "title": "BATATA FRITA 1kg",
     "prices": { "G": 40 },
     "categoria": "porcao",
     "ingredientes": "Selecione o tamanho!",
