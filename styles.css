@@ -440,7 +440,10 @@ footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px; /* Aumentei para 20px para os itens não colarem no canto */
+    
+    /* AQUI É O SEGREDO: O padding afasta o texto da esquerda e o X da direita */
+    padding: 12px 25px !important; 
+    
     border-bottom: 1px solid #f1f1f1;
     gap: 15px;
 }
@@ -459,23 +462,22 @@ footer {
 
 /* O BOTÃO DE EXCLUIR (CAIXA PRETA, X BRANCO) */
 .item-sabor-fatia button {
-    background: #000 !important;   /* Caixa preta */
-    color: #fff !important;       /* X branco */
+    background-color: #000 !important; /* Caixa Preta */
+    color: #fff !important;           /* X Branco */
     border: none !important;
-    border-radius: 8px;           /* Arredondamento moderno */
-    width: 38px;                  /* Tamanho ideal para toque */
-    height: 38px;
+    border-radius: 8px;
+    width: 35px;
+    height: 35px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem !important;
+    font-size: 1rem !important;
     cursor: pointer;
-    flex-shrink: 0;               /* Impede que o botão amasse */
-    transition: 0.2s;
+    flex-shrink: 0; /* Não deixa o botão esmagar */
 }
-
 /* Efeito de clique (fica cinza escuro ao apertar) */
 .item-sabor-fatia button:active {
     background: #333 !important;
     transform: scale(0.9);
 }
+
