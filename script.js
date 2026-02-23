@@ -122,72 +122,66 @@ function ativarScrollSpy() {
 async function calcularTaxaEntrega(end) {
     try {
         const geo = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${encodeURIComponent(end)}&filter=rect:-49.2568,-26.5824,-48.8164,-26.3486&apiKey=${GEOAPIFY_KEY}`).then(r => r.json());
-        if (!geo.features || geo.features.length === 0) return null;
-        
+        if (!geo.features || geo.features.length === 0) return null;  
         const dest = geo.features[0].geometry.coordinates;
         const rota = await fetch(`https://api.geoapify.com/v1/routing?waypoints=${RESTAURANTE_COORD[1]},${RESTAURANTE_COORD[0]}|${dest[1]},${dest[0]}&mode=drive&apiKey=${GEOAPIFY_KEY}`).then(r => r.json());
-        
         if (!rota.features) return null;
         const km = rota.features[0].properties.distance / 1000;
         return km < 1 ? 2.00 : TAXA_BASE + (km * VALOR_POR_KM);
     } catch (e) { return null; }
 }
-
 async function mostrarResumo() {
     const rua = document.getElementById("rua").value;
     const num = document.getElementById("numero").value;
     const bairro = document.getElementById("bairro").value;
     const cidade = document.getElementById("cidade").value;
-
     if(!rua || !num || !bairro) return alert("Por favor, preencha Rua, Número e Bairro!");
-
     const enderecoCompleto = `${rua}, ${num}, ${bairro}, ${cidade}, SC, Brasil`;
     document.getElementById("loading-taxa").style.display = "flex";
-
     const taxa = await calcularTaxaEntrega(enderecoCompleto);
     document.getElementById("loading-taxa").style.display = "none";
-
     if (taxa === null) return alert("Não conseguimos localizar este endereço.");
-
-    taxaEntregaCalculada = taxa;
+    taxaEntregaCalculada = taxa;  
+    // 1. Calcula o subtotal dos produtos
     let sub = 0; 
     carrinho.forEach(i => sub += (i.price * i.qtd));
 
     document.getElementById("form-entrega").style.display = "none";
     document.getElementById("resumo-pedido").style.display = "block";
-    
-    // Lista os itens no resumo
+    // 2. Lista os itens no resumo
     document.getElementById("resumo-itens").innerHTML = carrinho.map(i => `
         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
             <span>${i.qtd}x ${i.title}</span>
             <span>R$ ${(i.price * i.qtd).toFixed(2)}</span>
         </div>
     `).join("");
-
-    // --- NOVA LÓGICA DE EXIBIÇÃO DE VALORES ---
+    // 3. Monta o financeiro (Taxa e Cupom)
     let htmlFinanceiro = "";
-
-    // Se houver desconto aplicado, cria a linha do cupom
-    if (descontoAplicado > 0) {
-        htmlFinanceiro += `
-            <div style="display:flex; justify-content:space-between; color: #2ecc71; font-weight: bold; margin-bottom: 5px;">
-                <span>Cupom Desconto:</span>
-                <span>- R$ ${descontoAplicado.toFixed(2)}</span>
-            </div>`;
-    }
-
-    // Adiciona a linha da taxa de entrega
+    // Linha do Subtotal (Produtos)
+    htmlFinanceiro += `
+        <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+            <span>Subtotal Produtos:</span>
+            <span>R$ ${sub.toFixed(2)}</span>
+        </div>`;
+    // Linha da Taxa de Entrega
     htmlFinanceiro += `
         <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
             <span>Taxa de Entrega:</span>
             <span>R$ ${taxa.toFixed(2)}</span>
         </div>`;
-
-    // Atualiza o elemento da taxa (agora contendo taxa e cupom se houver)
+    // SE EXISTIR DESCONTO, ADICIONA A LINHA
+    if (descontoAplicado > 0) {
+        htmlFinanceiro += `
+            <div style="display:flex; justify-content:space-between; color: #e74c3c; font-weight: bold; margin-bottom: 5px;">
+                <span>Cupom Desconto:</span>
+                <span>- R$ ${descontoAplicado.toFixed(2)}</span>
+            </div>`;
+    }
+    // 4. Atualiza o HTML do resumo financeiro
     document.getElementById("resumo-taxa").innerHTML = htmlFinanceiro;
-
-    // Calcula o total subtraindo o desconto
-    const totalFinal = (sub + taxa) - descontoAplicado;
+    // 5. CÁLCULO FINAL CORRETO: (Produtos + Taxa) - Desconto
+    const totalFinal = (sub + taxa) - descontoAplicado;   
+    // Atualiza o Total na tela
     document.getElementById("resumo-total").innerText = `Total: R$ ${Math.max(0, totalFinal).toFixed(2)}`;
 }
 // --- CONTROLE DE PIZZA (VERSÃO UNIFICADA) ---
@@ -654,6 +648,7 @@ function voltarParaEntrega() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
 
 
 
