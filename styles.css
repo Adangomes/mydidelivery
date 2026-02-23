@@ -419,3 +419,54 @@ footer {
     color: #666;
     border-top: 1px solid #ddd;
 }
+
+/* ============================================================
+   AJUSTE DO BOTÃO EXCLUIR NO CARRINHO
+   ============================================================ */
+
+/* Container de cada linha do carrinho */
+.item-sabor-fatia {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px; /* Dá espaço para não ficar tudo apertado */
+    border-bottom: 1px solid #f1f1f1;
+    gap: 10px;
+}
+
+/* O texto do produto (ex: 1x X-BIFE) */
+.item-sabor-fatia div {
+    flex: 1; /* Empurra o botão de excluir para a ponta direita */
+    text-align: left;
+}
+
+.item-sabor-fatia span {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #000;
+}
+
+/* O BOTÃO DE EXCLUIR (X) */
+.item-sabor-fatia button {
+    background: #fff0f0 !important; /* Fundo suave para destacar a área de clique */
+    color: #e74c3c !important;      /* Cor vermelha para o X */
+    border: 1px solid #ffdada !important;
+    border-radius: 8px;             /* Deixa o botão quadradinho/arredondado */
+    width: 40px;                    /* Largura maior para o dedo acertar fácil */
+    height: 40px;                   /* Altura maior para o dedo acertar fácil */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem !important;   /* Deixa o X grande */
+    cursor: pointer;
+    flex-shrink: 0;                 /* Não deixa o botão "esmagar" se o nome do lanche for grande */
+    transition: 0.2s;
+    margin-right: 5px;
+}
+
+/* Efeito quando o cliente clica */
+.item-sabor-fatia button:active {
+    background: #e74c3c !important;
+    color: #fff !important;
+    transform: scale(0.9);
+}
