@@ -2,7 +2,9 @@
   "produtos": [
     {
       "title": "PIZZA P (6 fatias)",
-      "prices": { "P": 40 },
+      "prices": {
+        "P": 40
+      },
       "categoria": "pizza",
       "ingredientes": "Escolha 1 sabor",
       "image": "/imagens/margerita.jpeg",
@@ -11,7 +13,9 @@
     },
     {
       "title": "PIZZA M (9 fatias)",
-      "prices": { "M": 60 },
+      "prices": {
+        "M": 60
+      },
       "categoria": "pizza",
       "ingredientes": "Escolha até 2 sabores",
       "image": "/imagens/margerita.jpeg",
@@ -20,7 +24,9 @@
     },
     {
       "title": "PIZZA G (12 fatias)",
-      "prices": { "G": 90 },
+      "prices": {
+        "G": 90
+      },
       "categoria": "pizza",
       "ingredientes": "Escolha até 3 sabores",
       "image": "/imagens/margerita.jpeg",
@@ -39,7 +45,9 @@
     },
     {
       "title": "BATATA FRITA 600g",
-      "prices": { "P": 30 },
+      "prices": {
+        "P": 30
+      },
       "categoria": "porcao",
       "ingredientes": "Opções de Batatas",
       "image": "/imagens/fritas.jpeg",
@@ -48,7 +56,9 @@
     },
     {
       "title": "BATATA FRITA 1kg",
-      "prices": { "G": 40 },
+      "prices": {
+        "G": 40
+      },
       "categoria": "porcao",
       "ingredientes": "Opções de Batata",
       "image": "/imagens/fritas.jpeg",
@@ -88,7 +98,7 @@
       "price": 6.9,
       "categoria": "bebida",
       "ingredientes": "350ml",
-      "image": "/imagens/teste.jpg",
+      "image": "/imagens/coca-cola.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -134,7 +144,9 @@
       "ingredientes": "Pão, hambúrguer, queijo, presunto, calabresa, frango, coração, bacon, ovo, requeijão, tomate, alface",
       "image": "/imagens/xsalada.jpeg",
       "price": 55,
-      "prices": { "M": -2 },
+      "prices": {
+        "M": -2
+      },
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -153,7 +165,9 @@
       "ingredientes": "Pão, hambúrguer, queijo, presunto, tomate, alface, milho, ervilha",
       "image": "/imagens/xsalada.jpeg",
       "price": 20,
-      "prices": { "P": -1 },
+      "prices": {
+        "P": -1
+      },
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -162,7 +176,9 @@
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, queijo, presunto, frango, milho, ervilha, tomate, alface",
       "image": "/imagens/xsalada.jpeg",
-      "prices": { "P": -1 },
+      "prices": {
+        "P": -1
+      },
       "price": 22,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -263,7 +279,10 @@
       "ingredientes": "batata frita",
       "image": "/imagens/fritas.jpeg",
       "price": 0,
-      "prices": { "P": 30, "G": 40 },
+      "prices": {
+        "P": 30,
+        "G": 40
+      },
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": false
     },
@@ -273,7 +292,10 @@
       "ingredientes": "batata frita com bacon",
       "image": "/imagens/fritas.jpeg",
       "price": 0,
-      "prices": { "P": 40, "G": 50 },
+      "prices": {
+        "P": 40,
+        "G": 50
+      },
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": false
     },
@@ -282,7 +304,10 @@
       "categoria": "porcao",
       "ingredientes": "Frango, bacon, calabresa, cheddar, requeijão",
       "image": "/imagens/fritas.jpeg",
-      "prices": { "P": 54, "G": 71 },
+      "prices": {
+        "P": 54,
+        "G": 71
+      },
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": false
     },
