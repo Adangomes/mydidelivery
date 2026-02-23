@@ -407,3 +407,15 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     filter: grayscale(1);
 }
 
+rodape {
+    width: 100%;
+    padding: 20px 0;
+    display: flex; /* Garante flexibilidade */
+    justify-content: center; /* Centraliza horizontalmente se for flex */
+    align-items: center; /* Centraliza verticalmente */
+    text-align: center; /* Centraliza o texto internamente */
+    background-color: #f8f8f8; /* Ou a cor que você já estiver usando */
+    font-size: 0.9rem;
+    color: #666;
+    border-top: 1px solid #ddd;
+}
