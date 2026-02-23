@@ -425,48 +425,52 @@ footer {
    ============================================================ */
 
 /* Container de cada linha do carrinho */
+/* ============================================================
+   AJUSTE DO BOTÃO EXCLUIR E ESPAÇAMENTO NO CARRINHO
+   ============================================================ */
+
+/* 1. Container de cada linha: Adicionamos margens laterais para não encostar na borda */
 .item-sabor-fatia {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 15px; /* Dá espaço para não ficar tudo apertado */
+    padding: 15px 5px;      /* Espaço vertical interno */
+    margin: 0 20px;         /* MARGEM NAS LATERAIS: Resolve o problema de ficar colado */
     border-bottom: 1px solid #f1f1f1;
-    gap: 10px;
+    gap: 15px;
 }
 
-/* O texto do produto (ex: 1x X-BIFE) */
+/* 2. O texto do produto */
 .item-sabor-fatia div {
-    flex: 1; /* Empurra o botão de excluir para a ponta direita */
+    flex: 1;
     text-align: left;
 }
 
 .item-sabor-fatia span {
     font-size: 0.95rem;
-    font-weight: 600;
+    font-weight: 700;       /* Texto um pouco mais forte */
     color: #000;
 }
 
-/* O BOTÃO DE EXCLUIR (X) */
+/* 3. O BOTÃO DE EXCLUIR (Preto com X Branco) */
 .item-sabor-fatia button {
-    background: #fff0f0 !important; /* Fundo suave para destacar a área de clique */
-    color: #e74c3c !important;      /* Cor vermelha para o X */
-    border: 1px solid #ffdada !important;
-    border-radius: 8px;             /* Deixa o botão quadradinho/arredondado */
-    width: 40px;                    /* Largura maior para o dedo acertar fácil */
-    height: 40px;                   /* Altura maior para o dedo acertar fácil */
+    background: #000 !important;    /* CAIXA PRETA */
+    color: #fff !important;         /* X BRANCO */
+    border: none !important;
+    border-radius: 8px;             
+    width: 38px;                    
+    height: 38px;                   
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.3rem !important;   /* Deixa o X grande */
+    font-size: 1.1rem !important;   
     cursor: pointer;
-    flex-shrink: 0;                 /* Não deixa o botão "esmagar" se o nome do lanche for grande */
+    flex-shrink: 0;                 
     transition: 0.2s;
-    margin-right: 5px;
 }
 
-/* Efeito quando o cliente clica */
+/* Efeito ao clicar (fica cinza escuro) */
 .item-sabor-fatia button:active {
-    background: #e74c3c !important;
-    color: #fff !important;
+    background: #333 !important;
     transform: scale(0.9);
 }
