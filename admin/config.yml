@@ -18,20 +18,44 @@ collections:
             widget: "list"
             summary: '{{title}} ({{categoria}})'
             fields:
-              - { label: "Nome", name: "title", widget: "string" }
-              - { label: "Categoria", name: "categoria", widget: "string" }
-              - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text" }
-              - { label: "Imagem", name: "image", widget: "image" }
-              - { label: "Preço Único (Burger/Dog/Bebida/Parmediana)", name: "price", widget: "number", value_type: "float", required: false }
-              - { label: "Preço Antigo (Para aparecer riscado)", name: "oldPrice", widget: "number", value_type: "float", required: false }
+              # --- IDENTIFICAÇÃO ---
+              - { label: "Nome do Produto", name: "title", widget: "string" }
+              - { label: "Categoria Principal", name: "categoria", widget: "string", hint: "Ex: burger, batata, pizza" }
+              - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text", required: false }
+              - { label: "Imagem", name: "image", widget: "image", required: false }
+
+              # --- O PULO DO GATO: COMPORTAMENTO DINÂMICO ---
+              - label: "Ação ao Clicar"
+                name: "tipo_escolha"
+                widget: "select"
+                default: "direto"
+                options:
+                  - { label: "Adicionar Direto ao Carrinho", value: "direto" }
+                  - { label: "Abrir Modal de Sabores/Opções", value: "abrir_modal" }
               
-              - label: "Preços por Tamanho (Pizza/Porção)"
+              - label: "Chave/Tag de Grupo"
+                name: "tag_grupo"
+                widget: "string"
+                required: false
+                hint: "Use para agrupar. Ex: Se este for o botão 'Batata 600g', coloque a tag 'batata_600'. Nos sabores de 600g, coloque a mesma tag na 'Categoria'."
+
+              - label: "Habilitar Adicionais/Bordas?"
+                name: "tem_adicionais"
+                widget: "boolean"
+                default: false
+                hint: "Se marcado, o modal exibirá a seleção de bordas/extras."
+
+              # --- PREÇOS ---
+              - { label: "Preço Único (Lanches/Bebidas)", name: "price", widget: "number", value_type: "float", required: false }
+              - { label: "Preço Antigo (Promoção)", name: "oldPrice", widget: "number", value_type: "float", required: false }
+              
+              - label: "Preços por Tamanho (Se aplicável)"
                 name: "prices"
                 widget: "object"
                 required: false
                 fields:
                   - { label: "Pequena / 600g", name: "P", widget: "number", value_type: "float", required: false }
-                  - { label: "Média (Só Pizza)", name: "M", widget: "number", value_type: "float", required: false }
+                  - { label: "Média (Pizza)", name: "M", widget: "number", value_type: "float", required: false }
                   - { label: "Grande / 1kg", name: "G", widget: "number", value_type: "float", required: false }
 
   - name: "configuracoes"
@@ -41,8 +65,8 @@ collections:
         label: "Status e Horários"
         name: "status_loja"
         fields:
-          - { label: "Hora de Abertura (Ex: 18:00)", name: "horaAbre", widget: "string", default: "18:00" }
-          - { label: "Hora de Fechamento (Ex: 23:30)", name: "horaFecha", widget: "string", default: "23:30" }
+          - { label: "Hora de Abertura", name: "horaAbre", widget: "string", default: "18:00" }
+          - { label: "Hora de Fechamento", name: "horaFecha", widget: "string", default: "23:30" }
           - label: "Dias de Funcionamento"
             name: "diasFuncionamento"
             widget: "select"
@@ -55,4 +79,3 @@ collections:
               - { label: "Quinta", value: "4" }
               - { label: "Sexta", value: "5" }
               - { label: "Sábado", value: "6" }
-
