@@ -279,7 +279,7 @@ function confirmarPizza() {
     carrinho.push(itemCarrinho);
     fecharModalPizza();
     atualizarCarrinho();
-    mostrarToast("Pizza adicionada!");
+    mostrarToast(`${pizzaPrincipal.title}`);
 }
 
 function fecharModalPizza() { document.getElementById("pizza-options-modal").style.display = "none"; }
@@ -340,10 +340,20 @@ function enviarWhatsApp() {
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`);
 }
 
-function mostrarToast(msg = "Adicionado!") {
-    const t = document.getElementById("toast-geral");
-    if(!t) return; t.innerText = msg; t.classList.add("show");
-    setTimeout(() => t.classList.remove("show"), 3000);
+function mostrarToast(nomeItem) {
+    const toast = document.getElementById("toast-geral");
+    if (!toast) return;
+
+    // Define a mensagem personalizada
+    toast.innerText = `${nomeItem} adicionado ao carrinho!`;
+    
+    // Mostra o toast
+    toast.classList.add("show");
+
+    // Mantém por 3 segundos (3000ms) - você pode aumentar para 4000 se quiser um segundo a mais
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
 }
 
 function carregarCarrinhoStorage() {
@@ -371,3 +381,4 @@ async function carregarStatusLoja() {
         }
     } catch (e) { s.className = "status fechado"; }
 }
+
