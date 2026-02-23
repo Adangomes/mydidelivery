@@ -352,7 +352,7 @@ function mostrarToast(nomeItem) {
     if (!toast) return;
 
     // Define a mensagem personalizada
-    toast.innerText = `${nomeItem} adicionado ao carrinho!`;
+    toast.innerText = `${nomeItem} adicionado ao carrinho!✅`;
     
     // Mostra o toast
     toast.classList.add("show");
@@ -388,5 +388,6 @@ async function carregarStatusLoja() {
         }
     } catch (e) { s.className = "status fechado"; }
 }
+
 
 
