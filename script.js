@@ -133,51 +133,51 @@ async function calcularTaxaEntrega(end) {
 
 
 // RESUMO DOS PEDIDOS
-async function mostrarResumo() {
-    const rua = document.getElementById("rua").value;
-    const num = document.getElementById("numero").value;
-    const bairro = document.getElementById("bairro").value;
-    const cidade = document.getElementById("cidade").value;
+async function mostrarResumo() { // Inicia a função para gerar o resumo final do pedido
+    const rua = document.getElementById("rua").value; // Pega o nome da rua digitado no formulário
+    const num = document.getElementById("numero").value; // Pega o número da residência digitado
+    const bairro = document.getElementById("bairro").value; // Pega o bairro digitado
+    const cidade = document.getElementById("cidade").value; // Pega a cidade digitada
 
-    if(!rua || !num || !bairro) return alert("Por favor, preencha Rua, Número e Bairro!");
+    if(!rua || !num || !bairro) return alert("Por favor, preencha Rua, Número e Bairro!"); // Para a função se faltar dados básicos
 
-    const enderecoCompleto = `${rua}, ${num}, ${bairro}, ${cidade}, SC, Brasil`;
-    document.getElementById("loading-taxa").style.display = "flex";
+    const enderecoCompleto = `${rua}, ${num}, ${bairro}, ${cidade}, SC, Brasil`; // Cria o texto completo do endereço para o GPS
+    document.getElementById("loading-taxa").style.display = "flex"; // Mostra o ícone de carregando (loading) na tela
 
-    const taxa = await calcularTaxaEntrega(enderecoCompleto);
-    document.getElementById("loading-taxa").style.display = "none";
+    const taxa = await calcularTaxaEntrega(enderecoCompleto); // Chama a API e espera o cálculo da distância e do preço da entrega
+    document.getElementById("loading-taxa").style.display = "none"; // Esconde o ícone de carregando após receber a resposta
 
-    if (taxa === null) return alert("Não conseguimos localizar este endereço.");
+    if (taxa === null) return alert("Não conseguimos localizar este endereço."); // Exibe erro caso o GPS não encontre a rua
 
-    taxaEntregaCalculada = taxa;  
+    taxaEntregaCalculada = taxa; // Guarda o valor da entrega na variável global para usar no fechamento do pedido
 
-    let sub = 0; 
-    carrinho.forEach(i => sub += (i.price * i.qtd));
+    let sub = 0; // Cria a variável do subtotal começando em zero
+    carrinho.forEach(i => sub += (i.price * i.qtd)); // Soma o valor de cada item (preço x quantidade) ao subtotal
 
-    document.getElementById("form-entrega").style.display = "none";
-    document.getElementById("resumo-pedido").style.display = "block";
+    document.getElementById("form-entrega").style.display = "none"; // Esconde o formulário de preenchimento de endereço
+    document.getElementById("resumo-pedido").style.display = "block"; // Mostra a tela de resumo com os valores calculados
 
-    // Preenche os itens
-    document.getElementById("resumo-itens").innerHTML = carrinho.map(i => `
+    // Preenche a lista visual de itens no resumo do pedido
+    document.getElementById("resumo-itens").innerHTML = carrinho.map(i => ` // Transforma cada item do carrinho em uma linha HTML
         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-            <span>${i.qtd}x ${i.title}</span>
-            <span>R$ ${(i.price * i.qtd).toFixed(2)}</span>
+            <span>${i.qtd}x ${i.title}</span> // Mostra a quantidade e o nome do produto
+            <span>R$ ${(i.price * i.qtd).toFixed(2)}</span> // Mostra o valor total (preço unitário x quantidade)
         </div>
-    `).join("");
+    `).join(""); // Junta todas as linhas de produtos em um único texto para o HTML
 
-    // --- MONTA O RESUMO FINANCEIRO ---
-    let htmlFinanceiro = "";
-    htmlFinanceiro += `<div>Subtotal Produtos: R$ ${sub.toFixed(2)}</div>`;
-    htmlFinanceiro += `<div>Taxa de Entrega: R$ ${taxa.toFixed(2)}</div>`;
-    // Se tiver desconto, ele entra aqui com destaque
-    if (descontoAplicado > 0) {
-        htmlFinanceiro += `<div style="color: #e74c3c; font-weight: bold;">Cupom Desconto: - R$ ${descontoAplicado.toFixed(2)}</div>`;
+    // --- MONTA O RESUMO FINANCEIRO (Soma de valores e descontos) ---
+    let htmlFinanceiro = ""; // Inicia o texto do resumo financeiro vazio
+    htmlFinanceiro += `<div>Subtotal Produtos: R$ ${sub.toFixed(2)}</div>`; // Adiciona a linha do valor total dos produtos
+    htmlFinanceiro += `<div>Taxa de Entrega: R$ ${taxa.toFixed(2)}</div>`; // Adiciona a linha do custo da entrega calculada
+    
+    if (descontoAplicado > 0) { // Verifica se existe algum cupom de desconto aplicado no carrinho
+        htmlFinanceiro += `<div style="color: #e74c3c; font-weight: bold;">Cupom Desconto: - R$ ${descontoAplicado.toFixed(2)}</div>`; // Mostra o valor do desconto em vermelho
     }
-    // Injeta no parágrafo do HTML
-    document.getElementById("resumo-taxa").innerHTML = htmlFinanceiro;
-    // Calcula e injeta o Total Final
-    const totalFinal = (sub + taxa) - descontoAplicado;
-    document.getElementById("resumo-total").innerText = `Total: R$ ${Math.max(0, totalFinal).toFixed(2)}`;
+    
+    document.getElementById("resumo-taxa").innerHTML = htmlFinanceiro; // Insere todas as linhas financeiras na div correspondente
+    
+    const totalFinal = (sub + taxa) - descontoAplicado; // Faz o cálculo final: Produtos + Entrega - Desconto
+    document.getElementById("resumo-total").innerText = `Total: R$ ${Math.max(0, totalFinal).toFixed(2)}`; // Exibe o valor total final, garantindo que não seja menor que zero
 }
 // --- CONTROLE DE PIZZA (VERSÃO UNIFICADA) ---
 function abrirModalPizza(nome) {
@@ -630,6 +630,7 @@ function voltarParaEntrega() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
 
 
 
