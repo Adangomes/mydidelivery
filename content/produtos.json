@@ -33,14 +33,14 @@
      "title": "BATATA FRITA (M)",
      "prices": { "P": 30 },
      "categoria": "porcao",
-     "ingredientes": "Porção individual deliciosa",
+     "ingredientes": "Selecione o tamanho!",
      "image": "/imagens/fritas.jpeg"
    },
    {
     "title": "BATATA FRITA (G)",
     "prices": { "G": 40 },
     "categoria": "porcao",
-    "ingredientes": "Ideal para compartilhar",
+    "ingredientes": "Selecione o tamanho!",
     "image": "/imagens/fritas.jpeg"
     },
     {
