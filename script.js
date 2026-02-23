@@ -332,7 +332,10 @@ function adicionarCarrinhoPorProduto(p) {
 
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
-    let total = 0; if(!box) return; box.innerHTML = "";
+    let total = 0; 
+    if(!box) return; 
+    box.innerHTML = "";
+
     carrinho.forEach((i, idx) => {
         total += (i.price * i.qtd);
         box.innerHTML += `
@@ -344,8 +347,19 @@ function atualizarCarrinho() {
                 <button onclick="removerItem(${idx})" style="background:none; color:#e74c3c; border:none; cursor:pointer">✕</button>
             </div>`;
     });
+
+    // --- AJUSTE DO CUPOM ---
+    // Calcula o total subtraindo o desconto global
+    let totalComDesconto = total - descontoAplicado;
+    
+    // Garante que o total nunca seja negativo
+    if (totalComDesconto < 0) totalComDesconto = 0;
+
+    // Atualiza os textos na tela
     document.getElementById("subtotal").innerText = `R$ ${total.toFixed(2)}`;
-    document.getElementById("total").innerText = `R$ ${total.toFixed(2)}`;
+    document.getElementById("total").innerText = `R$ ${totalComDesconto.toFixed(2)}`;
+    
+    // Salva no navegador para não perder os itens
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
 }
 
@@ -368,13 +382,26 @@ function abrirDelivery() {
 function enviarWhatsApp() {
     const nome = document.getElementById("nomeCliente").value;
     const pag = document.getElementById("pagamento").value;
+    const troco = document.getElementById("trocoPara").value;
     if(!nome) return alert("Informe seu nome.");
-
-    let msg = `*NOVO PEDIDO - SNOOP LANCHE*%0A%0A*Cliente:* ${nome}%0A--------------------------%0A`;
+    let subtotal = 0;
+    carrinho.forEach(i => subtotal += (i.price * i.qtd));
+    let totalFinalCalculado = (subtotal + taxaEntregaCalculada) - descontoAplicado;
+    if (totalFinalCalculado < 0) totalFinalCalculado = 0;
+    let msg = `*NOVO PEDIDO - SNOOP LANCHE*%0A%0A`;
+    msg += `*Cliente:* ${nome}%0A`;
+    msg += `*Pagamento:* ${pag}${troco ? ' (Troco para ' + troco + ')' : ''}%0A`;
+    msg += `--------------------------%0A`;
     carrinho.forEach(i => {
-        msg += `• ${i.qtd}x ${i.title}%0A${i.sabor ? '  _'+i.sabor+'_%0A' : ''}`;
+        msg += `• ${i.qtd}x ${i.title}%0A${i.sabor ? '  _' + i.sabor + '_%0A' : ''}`;
     });
-    msg += `--------------------------%0A*Total:* ${document.getElementById("resumo-total").innerText}`;
+    msg += `--------------------------%0A`;
+    msg += `*Subtotal:* R$ ${subtotal.toFixed(2)}%0A`;
+    if(descontoAplicado > 0) {
+        msg += `*Cupom (${cupomAtivoNome}):* - R$ ${descontoAplicado.toFixed(2)}%0A`;
+    }
+    msg += `*Taxa Entrega:* R$ ${taxaEntregaCalculada.toFixed(2)}%0A`;
+    msg += `*TOTAL FINAL:* R$ ${totalFinalCalculado.toFixed(2)}%0A`;
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`);
 }
 
@@ -492,52 +519,90 @@ function selecionarOpcaoPorcao(titulo, preco, elementId, tituloMestre) {
 /* ============================================================
    LÓGICA DE CUPOM DE DESCONTO
    ============================================================ */
-
+/* ============================================================
+    LÓGICA DE CUPOM DE DESCONTO (SNOOP LANCHE)
+   ============================================================ */
 let descontoAplicado = 0;
+let cupomAtivoNome = "";
 
-async function aplicarCupom() {
+// 1. Verifica se existem cupons assim que o carrinho abre
+async function verificarDisponibilidadeCupons() {
     const input = document.getElementById('input-cupom');
-    const msg = document.getElementById('msg-cupom');
-    const codigoDigitado = input.value.trim().toUpperCase();
-
-    if (!codigoDigitado) return;
-
+    const btn = document.getElementById('btn-aplicar-cupom');
     try {
-        // Busca o arquivo JSON que o CMS alimenta
-        const response = await fetch('content/aplicardesconto.json');
+        const response = await fetch('content/aplicardesconto.json?v=' + Date.now());
         const data = await response.json();
-        
-        // Procura o cupom na lista
-        const cupom = data.cupons.find(c => c.codigo.toUpperCase() === codigoDigitado && c.ativo);
+        const temCupomAtivo = data.cupons && data.cupons.some(c => c.ativo);
 
-        if (cupom) {
-            let subtotal = calcularSubtotal(); // Certifique-se de que essa função existe no seu código
-            
-            if (cupom.tipo === "porcentagem") {
-                descontoAplicado = subtotal * (cupom.valor / 100);
-            } else if (cupom.tipo === "fixo") {
-                descontoAplicado = cupom.valor;
-            }
-
-            msg.innerHTML = `<span class="cupom-sucesso">Cupom "${cupom.codigo}" aplicado! - R$ ${descontoAplicado.toFixed(2)}</span>`;
-            msg.style.display = 'block';
-            
-            atualizarTotaisCarrinho(); // Função que atualiza o valor na tela
+        if (temCupomAtivo) {
+            input.placeholder = "Digite o cupom de desconto";
+            input.disabled = false;
+            btn.disabled = false;
         } else {
-            descontoAplicado = 0;
-            msg.innerHTML = `<span class="cupom-erro">Cupom inválido ou expirado.</span>`;
-            msg.style.display = 'block';
-            atualizarTotaisCarrinho();
+            input.placeholder = "Sem cupom de desconto no momento";
+            input.disabled = true;
+            btn.disabled = true;
         }
-    } catch (error) {
-        console.error("Erro ao carregar cupons:", error);
+    } catch (e) {
+        input.placeholder = "Digite o cupom de desconto";
     }
 }
 
-// Evento do botão
-document.getElementById('btn-aplicar-cupom').addEventListener('click', aplicarCupom);
+// 2. Aplica a lógica do cupom e o erro de 1.5s
+async function aplicarCupom() {
+    const input = document.getElementById('input-cupom');
+    const feedback = document.getElementById('msg-cupom-feedback');
+    const codigoDigitado = input.value.trim().toUpperCase();
 
-/* DICA: Dentro da sua função que calcula o TOTAL do carrinho, 
-   você deve subtrair a variável 'descontoAplicado'. 
-   Exemplo: totalFinal = (subtotal + taxaEntrega) - descontoAplicado;
-*/
+    if (!codigoDigitado || descontoAplicado > 0) return;
+
+    try {
+        const response = await fetch('content/aplicardesconto.json?v=' + Date.now());
+        const data = await response.json();
+        const cupom = data.cupons.find(c => c.codigo.toUpperCase() === codigoDigitado && c.ativo);
+
+        if (cupom) {
+            // SUCESSO
+            let subtotal = 0;
+            carrinho.forEach(i => subtotal += (i.price * i.qtd));
+
+            if (cupom.tipo === "porcentagem") {
+                descontoAplicado = subtotal * (cupom.valor / 100);
+            } else {
+                descontoAplicado = cupom.valor;
+            }
+
+            cupomAtivoNome = cupom.codigo;
+            input.classList.remove('cupom-invalido');
+            input.classList.add('cupom-valido');
+            input.disabled = true; // Trava após aplicar
+            feedback.innerHTML = `<span style="color:#28a745">Desconto de R$ ${descontoAplicado.toFixed(2)} aplicado!</span>`;
+            atualizarCarrinho(); // Atualiza a tela
+        } else {
+            // ERRO (1.5 segundos)
+            const placeholderOriginal = input.placeholder;
+            input.value = "";
+            input.placeholder = "CUPOM INVÁLIDO";
+            input.classList.add('cupom-invalido');
+
+            setTimeout(() => {
+                input.placeholder = placeholderOriginal;
+                input.classList.remove('cupom-invalido');
+            }, 1500);
+        }
+    } catch (error) {
+        console.error("Erro ao aplicar cupom", error);
+    }
+}
+
+// Adicionar evento ao botão (certifique-se que o ID no HTML seja btn-aplicar-cupom)
+document.addEventListener('click', (e) => {
+    if(e.target && e.target.id === 'btn-aplicar-cupom') aplicarCupom();
+});
+
+// Chamar verificação quando abrir o carrinho
+const originalAbrirCarrinho = abrirCarrinho;
+abrirCarrinho = function() {
+    originalAbrirCarrinho();
+    verificarDisponibilidadeCupons();
+};
