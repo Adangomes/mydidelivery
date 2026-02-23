@@ -488,3 +488,56 @@ function selecionarOpcaoPorcao(titulo, preco, elementId, tituloMestre) {
     }
     atualizarBotaoConfirmar();
 }
+
+/* ============================================================
+   LÓGICA DE CUPOM DE DESCONTO
+   ============================================================ */
+
+let descontoAplicado = 0;
+
+async function aplicarCupom() {
+    const input = document.getElementById('input-cupom');
+    const msg = document.getElementById('msg-cupom');
+    const codigoDigitado = input.value.trim().toUpperCase();
+
+    if (!codigoDigitado) return;
+
+    try {
+        // Busca o arquivo JSON que o CMS alimenta
+        const response = await fetch('content/aplicardesconto.json');
+        const data = await response.json();
+        
+        // Procura o cupom na lista
+        const cupom = data.cupons.find(c => c.codigo.toUpperCase() === codigoDigitado && c.ativo);
+
+        if (cupom) {
+            let subtotal = calcularSubtotal(); // Certifique-se de que essa função existe no seu código
+            
+            if (cupom.tipo === "porcentagem") {
+                descontoAplicado = subtotal * (cupom.valor / 100);
+            } else if (cupom.tipo === "fixo") {
+                descontoAplicado = cupom.valor;
+            }
+
+            msg.innerHTML = `<span class="cupom-sucesso">Cupom "${cupom.codigo}" aplicado! - R$ ${descontoAplicado.toFixed(2)}</span>`;
+            msg.style.display = 'block';
+            
+            atualizarTotaisCarrinho(); // Função que atualiza o valor na tela
+        } else {
+            descontoAplicado = 0;
+            msg.innerHTML = `<span class="cupom-erro">Cupom inválido ou expirado.</span>`;
+            msg.style.display = 'block';
+            atualizarTotaisCarrinho();
+        }
+    } catch (error) {
+        console.error("Erro ao carregar cupons:", error);
+    }
+}
+
+// Evento do botão
+document.getElementById('btn-aplicar-cupom').addEventListener('click', aplicarCupom);
+
+/* DICA: Dentro da sua função que calcula o TOTAL do carrinho, 
+   você deve subtrair a variável 'descontoAplicado'. 
+   Exemplo: totalFinal = (subtotal + taxaEntrega) - descontoAplicado;
+*/
