@@ -202,9 +202,17 @@
       "price": 0
     },
     {
+      "title": "BATATA FRITA",
+      "categoria": "porcao",
+      "ingredientes": "batata frita",
+      "image": "/imagens/fritas.jpeg",
+      "price": 0,
+      "prices": { "P": 30, "G": 40 }
+    },
+    {
       "title": "BATATA FRITA C/BACON",
       "categoria": "porcao",
-      "ingredientes": ".",
+      "ingredientes": "batata frita com bacon",
       "image": "/imagens/fritas.jpeg",
       "price": 0,
       "prices": { "P": 40, "G": 50 }
