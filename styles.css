@@ -430,17 +430,22 @@ footer {
    ============================================================ */
 
 /* 1. Container de cada linha: Adicionamos margens laterais para não encostar na borda */
+
+/* ============================================================
+   AJUSTE DE ESTILO DO BOTÃO EXCLUIR E ESPAÇAMENTO DO CARRINHO
+   ============================================================ */
+
+/* Container de cada linha do carrinho */
 .item-sabor-fatia {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 5px;      /* Espaço vertical interno */
-    margin: 0 20px;         /* MARGEM NAS LATERAIS: Resolve o problema de ficar colado */
+    padding: 12px 20px; /* Aumentei para 20px para os itens não colarem no canto */
     border-bottom: 1px solid #f1f1f1;
     gap: 15px;
 }
 
-/* 2. O texto do produto */
+/* O texto do produto (ex: 1x X-BIFE) */
 .item-sabor-fatia div {
     flex: 1;
     text-align: left;
@@ -448,28 +453,28 @@ footer {
 
 .item-sabor-fatia span {
     font-size: 0.95rem;
-    font-weight: 700;       /* Texto um pouco mais forte */
+    font-weight: 700; /* Deixei um pouco mais negrito para combinar com o layout */
     color: #000;
 }
 
-/* 3. O BOTÃO DE EXCLUIR (Preto com X Branco) */
+/* O BOTÃO DE EXCLUIR (CAIXA PRETA, X BRANCO) */
 .item-sabor-fatia button {
-    background: #000 !important;    /* CAIXA PRETA */
-    color: #fff !important;         /* X BRANCO */
+    background: #000 !important;   /* Caixa preta */
+    color: #fff !important;       /* X branco */
     border: none !important;
-    border-radius: 8px;             
-    width: 38px;                    
-    height: 38px;                   
+    border-radius: 8px;           /* Arredondamento moderno */
+    width: 38px;                  /* Tamanho ideal para toque */
+    height: 38px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.1rem !important;   
+    font-size: 1.1rem !important;
     cursor: pointer;
-    flex-shrink: 0;                 
+    flex-shrink: 0;               /* Impede que o botão amasse */
     transition: 0.2s;
 }
 
-/* Efeito ao clicar (fica cinza escuro) */
+/* Efeito de clique (fica cinza escuro ao apertar) */
 .item-sabor-fatia button:active {
     background: #333 !important;
     transform: scale(0.9);
