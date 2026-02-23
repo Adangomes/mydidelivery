@@ -156,6 +156,7 @@ async function mostrarResumo() {
     document.getElementById("form-entrega").style.display = "none";
     document.getElementById("resumo-pedido").style.display = "block";
     
+    // Lista os itens no resumo
     document.getElementById("resumo-itens").innerHTML = carrinho.map(i => `
         <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
             <span>${i.qtd}x ${i.title}</span>
@@ -163,10 +164,32 @@ async function mostrarResumo() {
         </div>
     `).join("");
 
-    document.getElementById("resumo-taxa").innerText = `Taxa de Entrega: R$ ${taxa.toFixed(2)}`;
-    document.getElementById("resumo-total").innerText = `Total: R$ ${(sub + taxa).toFixed(2)}`;
-}
+    // --- NOVA LÓGICA DE EXIBIÇÃO DE VALORES ---
+    let htmlFinanceiro = "";
 
+    // Se houver desconto aplicado, cria a linha do cupom
+    if (descontoAplicado > 0) {
+        htmlFinanceiro += `
+            <div style="display:flex; justify-content:space-between; color: #2ecc71; font-weight: bold; margin-bottom: 5px;">
+                <span>Cupom Desconto:</span>
+                <span>- R$ ${descontoAplicado.toFixed(2)}</span>
+            </div>`;
+    }
+
+    // Adiciona a linha da taxa de entrega
+    htmlFinanceiro += `
+        <div style="display:flex; justify-content:space-between; margin-bottom: 5px;">
+            <span>Taxa de Entrega:</span>
+            <span>R$ ${taxa.toFixed(2)}</span>
+        </div>`;
+
+    // Atualiza o elemento da taxa (agora contendo taxa e cupom se houver)
+    document.getElementById("resumo-taxa").innerHTML = htmlFinanceiro;
+
+    // Calcula o total subtraindo o desconto
+    const totalFinal = (sub + taxa) - descontoAplicado;
+    document.getElementById("resumo-total").innerText = `Total: R$ ${Math.max(0, totalFinal).toFixed(2)}`;
+}
 // --- CONTROLE DE PIZZA (VERSÃO UNIFICADA) ---
 function abrirModalPizza(nome) {
     pizzaPrincipal = produtosGeral.find(p => p.title === nome);
@@ -611,3 +634,4 @@ function voltarParaEntrega() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
