@@ -9,11 +9,12 @@ let carrinho = [];
 let produtosGeral = [];
 let taxaEntregaCalculada = 0;
 
-// Controle de Pizza
+// Controle de Pizza e Porção
 let pizzaPrincipal = null;
 let saboresSelecionados = []; 
 let tamanhoSelecionado = null;
 let limiteSabores = 1;
+let itemTemporarioPorcao = null; // Nova variável para controlar a porção antes de confirmar
 
 document.addEventListener("DOMContentLoaded", () => {
     carregarStatusLoja();
@@ -57,12 +58,9 @@ async function carregarCardapioCompleto() {
             section.innerHTML = `<h2 class="titulo-categoria-lista">${cat}</h2>`;
 
             categorias[cat].forEach(p => {
-                // --- FILTRO DE SEGURANÇA (PIZZAS E PORÇÕES) ---
-                // Não mostra sabores de pizza soltos
-                if (p.categoria.toLowerCase() === 'pizza' && !p.title.toUpperCase().includes("PIZZA")) {
-                    return; 
-                }
-                // Não mostra opções de batata soltas (as que tem preço 0 ou preços em objeto, mas não são o botão mestre)
+                if (p.categoria.toLowerCase() === 'pizza' && !p.title.toUpperCase().includes("PIZZA")) return; 
+                
+                // Esconde sabores de porção da lista principal
                 if (p.categoria.toLowerCase() === 'porcao' && !p.title.toUpperCase().includes("600G") && !p.title.toUpperCase().includes("1KG")) {
                     return;
                 }
@@ -74,7 +72,6 @@ async function carregarCardapioCompleto() {
                     acao = `abrirModalPizza('${p.title}')`;
                 } 
                 else if (p.categoria.toLowerCase() === 'porcao') {
-                    // Para porções, a tag alvo sempre será 'porcao' para buscar os sabores
                     acao = `abrirModalDinamico('porcao', '${p.title}')`;
                 }
                 else {
@@ -176,6 +173,7 @@ function abrirModalPizza(nome) {
     if (!pizzaPrincipal) return;
 
     saboresSelecionados = [];
+    itemTemporarioPorcao = null; // Limpa estado de porção
     let maxSaboresPermitidos = 1;
 
     if (nome.toUpperCase().includes("PIZZA P")) {
@@ -264,6 +262,16 @@ function toggleSabor(nome) {
 function atualizarBotaoConfirmar() {
     const btn = document.getElementById("btn-confirmar-pizza");
     const sec = document.getElementById("secao-adicionais");
+    
+    // Se for Porção
+    if (itemTemporarioPorcao) {
+        btn.disabled = false;
+        btn.innerText = "Adicionar ao Carrinho";
+        if(sec) sec.style.display = "none";
+        return;
+    }
+
+    // Se for Pizza
     if (saboresSelecionados.length === limiteSabores) {
         if(sec) sec.style.display = "block";
         btn.disabled = false; btn.innerText = "Adicionar ao Carrinho";
@@ -274,6 +282,17 @@ function atualizarBotaoConfirmar() {
 }
 
 function confirmarPizza() {
+    // Caso seja uma porção selecionada
+    if (itemTemporarioPorcao) {
+        carrinho.push(itemTemporarioPorcao);
+        atualizarCarrinho();
+        fecharModalPizza();
+        mostrarToast(itemTemporarioPorcao.title);
+        itemTemporarioPorcao = null;
+        return;
+    }
+
+    // Caso seja Pizza
     const selectBorda = document.getElementById("select-borda");
     const valorBorda = parseFloat(selectBorda.value) || 0;
     const nomeBorda = selectBorda.options[selectBorda.selectedIndex].text;
@@ -395,6 +414,7 @@ async function carregarStatusLoja() {
     } catch (e) { s.className = "status fechado"; }
 }
 
+// --- NOVO MODAL DINÂMICO DE PORÇÕES (COM SELEÇÃO VISUAL) ---
 function abrirModalDinamico(tagAlvo, tituloPrincipal) {
     const modal = document.getElementById('pizza-options-modal');
     const containerSabores = document.getElementById('lista-sabores-meia');
@@ -402,44 +422,69 @@ function abrirModalDinamico(tagAlvo, tituloPrincipal) {
 
     tituloModal.innerText = tituloPrincipal;
     containerSabores.innerHTML = "";
-    
+    itemTemporarioPorcao = null;
+    saboresSelecionados = []; // Reset para evitar conflitos
+
     document.getElementById('pizza-sizes-container').style.display = 'none';
     const labelPasso = document.querySelector(".label-step");
     if(labelPasso) labelPasso.style.display = "none";
 
-    // Busca as opções (os itens que estavam "escondidos" da lista)
     const itensEncontrados = produtosGeral.filter(p => {
         const titulo = p.title.toUpperCase();
         return p.categoria === tagAlvo && !titulo.includes("600G") && !titulo.includes("1KG");
     });
 
-    if(itensEncontrados.length === 0) {
-        containerSabores.innerHTML = "<p style='padding:20px'>Nenhuma opção cadastrada para esta categoria.</p>";
-    }
-
     itensEncontrados.forEach(item => {
         let tamanhoDesejado = tituloPrincipal.includes("600g") ? "P" : "G";
         let precoFinal = item.prices ? item.prices[tamanhoDesejado] : item.price;
 
-        containerSabores.innerHTML += `
-            <div class="item-sabor-wizard" onclick="adicionarOpcaoDireta('${item.title} (${tituloPrincipal})', ${precoFinal})">
-                <div style="display:flex; flex-direction:column">
-                    <span style="font-weight:700">${item.title}</span>
-                    <small style="font-size:0.75rem; color:#777">${item.ingredientes || ""}</small>
-                </div>
-                <span class="preco-tag">R$ ${precoFinal.toFixed(2)}</span>
-            </div>`;
+        const div = document.createElement("div");
+        div.className = "item-sabor-wizard";
+        div.id = `sabor-porcao-${item.title.replace(/\s+/g, '-')}`;
+        div.innerHTML = `
+            <div style="display:flex; flex-direction:column">
+                <span style="font-weight:700">${item.title}</span>
+                <small style="font-size:0.75rem; color:#777">${item.ingredientes || ""}</small>
+            </div>
+            <span class="preco-tag">R$ ${precoFinal.toFixed(2)}</span>`;
+        
+        div.onclick = () => selecionarOpcaoPorcao(item.title, precoFinal, div.id, tituloPrincipal);
+        containerSabores.appendChild(div);
     });
 
     document.getElementById("secao-sabores").style.display = "block";
     document.getElementById("secao-adicionais").style.display = "none";
+    
+    // Altera o botão de confirmação para o estado inicial
+    const btn = document.getElementById("btn-confirmar-pizza");
+    btn.disabled = true;
+    btn.innerText = "Selecione uma opção";
+    
     modal.style.display = "flex";
 }
 
-function adicionarOpcaoDireta(titulo, preco) {
-    const item = { title: titulo, price: preco, qtd: 1 };
-    carrinho.push(item);
-    atualizarCarrinho();
-    fecharModalPizza();
-    mostrarToast(titulo);
+function selecionarOpcaoPorcao(titulo, preco, elementId, tituloMestre) {
+    const elemento = document.getElementById(elementId);
+    
+    // Se já estiver selecionado, desmarca
+    if (elemento.classList.contains("selecionado")) {
+        elemento.classList.remove("selecionado");
+        document.querySelectorAll(".item-sabor-wizard").forEach(el => el.classList.remove("desabilitado"));
+        itemTemporarioPorcao = null;
+    } else {
+        // Marca o novo e desabilita os outros
+        document.querySelectorAll(".item-sabor-wizard").forEach(el => {
+            el.classList.remove("selecionado");
+            el.classList.add("desabilitado");
+        });
+        elemento.classList.remove("desabilitado");
+        elemento.classList.add("selecionado");
+        
+        itemTemporarioPorcao = { 
+            title: `${titulo} (${tituloMestre})`, 
+            price: preco, 
+            qtd: 1 
+        };
+    }
+    atualizarBotaoConfirmar();
 }
