@@ -232,6 +232,11 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     bottom: 40px; /* Sobe para 40px quando aparece */
 }
 
+.toast { 
+    /* ... seus outros estilos ... */
+    z-index: 10000 !important; 
+}
+
 /* ESTILOS DO MODAL DE PIZZA */
 /* ESTILOS DO MODAL DE PIZZA - VERSÃO LIMPA */
 /* ESTILOS DO MODAL DE PIZZA - VERSÃO MINIMALISTA */
@@ -576,3 +581,4 @@ footer {
     margin-top: 5px;
     min-height: 15px; /* Evita que o layout "pule" quando a msg aparece */
 }
+
