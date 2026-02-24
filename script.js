@@ -4,9 +4,10 @@
 const host = window.location.hostname;
 let LOJA_ID = "snoop_lanche"; 
 
+// Identifica a loja pela URL
 if (host.includes("casadacerveja")) {
     LOJA_ID = "casa_da_cerveja";
-} else if (host.includes("snooplanche")) {
+} else {
     LOJA_ID = "snoop_lanche";
 }
 
@@ -49,10 +50,17 @@ function estaAberto() {
 
 async function carregarStatusLoja() {
     const s = document.getElementById("status-loja");
+    const nomeLojaElemento = document.getElementById("nome-loja");
+    
     try {
         const res = await fetch(URL_STATUS + '?v=' + Date.now());
         const data = await res.json();
         
+        // Ajuste dinâmico do Nome da Loja
+        const nomeFantasia = data.nome_fantasia || (LOJA_ID === "casa_da_cerveja" ? "CASA DA CERVEJA" : "SNOOP LANCHE");
+        if (nomeLojaElemento) nomeLojaElemento.innerText = nomeFantasia;
+        document.title = nomeFantasia;
+
         WHATSAPP_NUMERO = data.whatsapp || WHATSAPP_NUMERO;
         TAXA_BASE = parseFloat(data.taxa_base) || 5;
         VALOR_POR_KM = parseFloat(data.valor_km) || 1.5;
@@ -65,14 +73,17 @@ async function carregarStatusLoja() {
         const minA = hA * 60 + mA; 
         const minF = hF * 60 + mF;
         const diaH = agora.getDay();
-        const atende = data.diasFuncionamento.map(String).includes(String(diaH));
+        
+        const atende = data.diasFuncionamento ? data.diasFuncionamento.map(String).includes(String(diaH)) : true;
 
         if (atende && (horaMin >= minA && horaMin < minF)) {
             s.innerHTML = "<span>ABERTO AGORA</span>"; s.className = "status aberto";
         } else {
             s.innerHTML = "<span>FECHADO</span>"; s.className = "status fechado";
         }
-    } catch (e) { s.className = "status fechado"; }
+    } catch (e) { 
+        if(s) s.className = "status fechado"; 
+    }
 }
 
 async function carregarCardapioCompleto() {
@@ -136,7 +147,7 @@ async function carregarCardapioCompleto() {
 }
 
 // ==========================================
-// 3. LÓGICA DO CARRINHO (USANDO SEU CSS)
+// 3. LÓGICA DO CARRINHO
 // ==========================================
 
 function atualizarCarrinho() {
@@ -146,7 +157,6 @@ function atualizarCarrinho() {
     
     carrinho.forEach((i, idx) => {
         total += (i.price * i.qtd);
-        // Aqui usamos a classe .item-sabor-fatia que você definiu no seu CSS
         box.innerHTML += `
             <div class="item-sabor-fatia">
                 <div>
@@ -158,6 +168,7 @@ function atualizarCarrinho() {
     });
     
     document.getElementById("total").innerText = `R$ ${Math.max(0, total - descontoAplicado).toFixed(2)}`;
+    document.getElementById("subtotal").innerText = `R$ ${total.toFixed(2)}`;
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
 }
 
@@ -194,7 +205,10 @@ async function verificarDisponibilidadeCupons() {
         const data = await res.json();
         const ativo = data.cupons && data.cupons.some(c => c.ativo);
         if(input) input.disabled = !ativo;
-        if(btn) btn.disabled = !ativo;
+        if(btn) {
+            btn.disabled = !ativo;
+            btn.onclick = aplicarCupom;
+        }
     } catch (e) {}
 }
 
@@ -277,6 +291,7 @@ function abrirModalDinamico(tag, titulo) {
 function atualizarBotaoConfirmar() {
     const btn = document.getElementById("btn-confirmar-pizza");
     btn.disabled = (!itemTemporarioPorcao && saboresSelecionados.length === 0);
+    btn.innerText = btn.disabled ? "Escolha as opções" : "Confirmar e Adicionar";
 }
 
 function confirmarPizza() {
@@ -319,6 +334,7 @@ async function mostrarResumo() {
     let sub = 0; carrinho.forEach(i => sub += (i.price * i.qtd));
     document.getElementById("resumo-itens").innerHTML = carrinho.map(i => `<div>${i.qtd}x ${i.title} - R$ ${(i.price*i.qtd).toFixed(2)}</div>`).join("");
     document.getElementById("resumo-total").innerText = `Total: R$ ${(sub + taxa - descontoAplicado).toFixed(2)}`;
+    document.getElementById("resumo-taxa").innerText = `Taxa de Entrega: R$ ${taxa.toFixed(2)}`;
 }
 
 async function calcularTaxaEntrega(end) {
@@ -340,6 +356,7 @@ async function enviarWhatsApp() {
     const num = document.getElementById("numero").value;
     const pag = document.getElementById("pagamento").value;
     const troco = document.getElementById("trocoPara").value;
+    const obs = document.getElementById("obsCozinha").value;
     
     let sub = 0; carrinho.forEach(i => sub += (i.price * i.qtd));
     const total = sub + taxaEntregaCalculada - descontoAplicado;
@@ -347,13 +364,15 @@ async function enviarWhatsApp() {
     let msg = `*PEDIDO: ${LOJA_ID.toUpperCase().replace('_', ' ')}*%0A`;
     msg += `*Cliente:* ${nome}%0A*Endereço:* ${rua}, ${num}%0A%0A`;
     carrinho.forEach(i => msg += `• ${i.qtd}x ${i.title} ${i.sabor ? '('+i.sabor+')' : ''}%0A`);
+    
+    if(obs) msg += `%0A*Obs:* ${obs}%0A`;
     msg += `%0A*Subtotal:* R$ ${sub.toFixed(2)}`;
     if(descontoAplicado > 0) msg += `%0A*Desconto:* - R$ ${descontoAplicado.toFixed(2)}`;
     msg += `%0A*Taxa:* R$ ${taxaEntregaCalculada.toFixed(2)}`;
     msg += `%0A*TOTAL: R$ ${total.toFixed(2)}*`;
     msg += `%0A*Pagamento:* ${pag} ${troco ? '(Troco para '+troco+')' : ''}`;
 
-    try { await db.ref(`pedidos/${LOJA_ID}`).push({ cliente: nome, total: total, itens: carrinho }); } catch(e){}
+    try { await window.db.ref(`pedidos/${LOJA_ID}`).push({ cliente: nome, total: total, itens: carrinho, data: new Date().toISOString() }); } catch(e){}
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`);
 }
 
