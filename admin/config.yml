@@ -12,7 +12,6 @@ collections:
   - name: "snoop_lanche"
     label: "Snoop Lanche"
     files:
-      # --- CARDÁPIO SNOOP ---
       - file: "content/snoop_lanche/produtos.json"
         label: "Cardápio - Snoop Lanche"
         name: "produtos_snoop"
@@ -36,11 +35,12 @@ collections:
                   - { label: "Média (Pizza)", name: "M", widget: "number", value_type: "float", required: false }
                   - { label: "Grande / 1kg", name: "G", widget: "number", value_type: "float", required: false }
 
-      # --- STATUS/CONFIG SNOOP ---
       - file: "content/snoop_lanche/status.json"
         label: "Configurações e Horários - Snoop"
         name: "status_snoop"
         fields:
+          # --- CAMPO ADICIONADO ABAIXO ---
+          - { label: "Nome do Estabelecimento", name: "nome_fantasia", widget: "string", default: "SNOOP LANCHE" }
           - { label: "WhatsApp do Restaurante", name: "whatsapp", widget: "string" }
           - { label: "Latitude", name: "lat", widget: "number", value_type: "float" }
           - { label: "Longitude", name: "long", widget: "number", value_type: "float" }
@@ -54,7 +54,6 @@ collections:
             multiple: true
             options: ["0", "1", "2", "3", "4", "5", "6"]
 
-      # --- CUPONS SNOOP ---
       - file: "content/snoop_lanche/aplicardesconto.json"
         label: "Cupons de Desconto - Snoop"
         name: "cupons_snoop"
@@ -74,7 +73,6 @@ collections:
   - name: "casa_da_cerveja"
     label: "Casa da Cerveja"
     files:
-      # --- CARDÁPIO CERVEJA ---
       - file: "content/casa_da_cerveja/produtos.json"
         label: "Cardápio - Casa da Cerveja"
         name: "produtos_cerveja"
@@ -90,18 +88,18 @@ collections:
               - { label: "Imagem", name: "image", widget: "image", required: false }
               - { label: "Preço", name: "price", widget: "number", value_type: "float" }
 
-      # --- STATUS/CONFIG CERVEJA ---
       - file: "content/casa_da_cerveja/status.json"
         label: "Configurações e Horários - Cervejaria"
         name: "status_cerveja"
         fields:
+          # --- CAMPO ADICIONADO ABAIXO ---
+          - { label: "Nome do Estabelecimento", name: "nome_fantasia", widget: "string", default: "CASA DA CERVEJA" }
           - { label: "WhatsApp", name: "whatsapp", widget: "string" }
           - { label: "Latitude", name: "lat", widget: "number", value_type: "float" }
           - { label: "Longitude", name: "long", widget: "number", value_type: "float" }
           - { label: "Hora de Abertura", name: "horaAbre", widget: "string" }
           - { label: "Hora de Fechamento", name: "horaFecha", widget: "string" }
 
-      # --- CUPONS CERVEJA ---
       - file: "content/casa_da_cerveja/aplicardesconto.json"
         label: "Cupons de Desconto - Cervejaria"
         name: "cupons_cerveja"
