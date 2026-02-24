@@ -10,7 +10,7 @@ collections:
   # GRUPO: CASA DA CERVEJA (LOJA 02)
   # ==========================================
   - name: "casa_da_cerveja"
-    label: "🍺 CASA DA CERVEJA"
+    label: "CASA DA CERVEJA"
     files:
       - file: "content/casa_da_cerveja/produtos.json"
         label: "Cardápio - Casa da Cerveja"
@@ -55,7 +55,7 @@ collections:
   # GRUPO: SNOOP LANCHE (LOJA 01)
   # ==========================================
   - name: "snoop_lanche"
-    label: "🍔 SNOOP LANCHE"
+    label: "SNOOP LANCHE"
     files:
       - file: "content/snoop_lanche/produtos.json"
         label: "Cardápio - Snoop Lanche"
@@ -97,3 +97,4 @@ collections:
             widget: "select"
             multiple: true
             options: ["0", "1", "2", "3", "4", "5", "6"]
+
