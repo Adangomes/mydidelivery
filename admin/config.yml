@@ -7,71 +7,10 @@ public_folder: "/imagens"
 
 collections:
   # ==========================================
-  # LOJA 01: SNOOP LANCHE
-  # ==========================================
-  - name: "snoop_lanche"
-    label: "Snoop Lanche"
-    files:
-      - file: "content/snoop_lanche/produtos.json"
-        label: "Cardápio - Snoop Lanche"
-        name: "produtos_snoop"
-        fields:
-          - label: "Lista Geral de Produtos"
-            name: "produtos"
-            widget: "list"
-            summary: '{{title}} ({{categoria}})'
-            fields:
-              - { label: "Nome do Produto", name: "title", widget: "string" }
-              - { label: "Categoria Principal", name: "categoria", widget: "string", hint: "Ex: burger, batata, pizza" }
-              - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text", required: false }
-              - { label: "Imagem", name: "image", widget: "image", required: false }
-              - { label: "Preço Único", name: "price", widget: "number", value_type: "float", required: false }
-              - label: "Preços por Tamanho"
-                name: "prices"
-                widget: "object"
-                required: false
-                fields:
-                  - { label: "Pequena / 600g", name: "P", widget: "number", value_type: "float", required: false }
-                  - { label: "Média (Pizza)", name: "M", widget: "number", value_type: "float", required: false }
-                  - { label: "Grande / 1kg", name: "G", widget: "number", value_type: "float", required: false }
-
-      - file: "content/snoop_lanche/status.json"
-        label: "Configurações e Horários - Snoop"
-        name: "status_snoop"
-        fields:
-          # --- CAMPO ADICIONADO ABAIXO ---
-          - { label: "Nome do Estabelecimento", name: "nome_fantasia", widget: "string", default: "SNOOP LANCHE" }
-          - { label: "WhatsApp do Restaurante", name: "whatsapp", widget: "string" }
-          - { label: "Latitude", name: "lat", widget: "number", value_type: "float" }
-          - { label: "Longitude", name: "long", widget: "number", value_type: "float" }
-          - { label: "Taxa Base (Até 1km)", name: "taxa_base", widget: "number", value_type: "float", default: 5 }
-          - { label: "Valor por KM adicional", name: "valor_km", widget: "number", value_type: "float", default: 1.5 }
-          - { label: "Hora de Abertura", name: "horaAbre", widget: "string", default: "18:00" }
-          - { label: "Hora de Fechamento", name: "horaFecha", widget: "string", default: "23:30" }
-          - label: "Dias de Funcionamento"
-            name: "diasFuncionamento"
-            widget: "select"
-            multiple: true
-            options: ["0", "1", "2", "3", "4", "5", "6"]
-
-      - file: "content/snoop_lanche/aplicardesconto.json"
-        label: "Cupons de Desconto - Snoop"
-        name: "cupons_snoop"
-        fields:
-          - label: "Lista de Cupons"
-            name: "cupons"
-            widget: "list"
-            fields:
-              - { label: "Código", name: "codigo", widget: "string" }
-              - { label: "Tipo", name: "tipo", widget: "select", options: ["porcentagem", "fixo"] }
-              - { label: "Valor", name: "valor", widget: "number", value_type: "float" }
-              - { label: "Ativo?", name: "ativo", widget: "boolean", default: true }
-
-  # ==========================================
-  # LOJA 02: CASA DA CERVEJA
+  # GRUPO: CASA DA CERVEJA (LOJA 02)
   # ==========================================
   - name: "casa_da_cerveja"
-    label: "Casa da Cerveja"
+    label: "🍺 CASA DA CERVEJA"
     files:
       - file: "content/casa_da_cerveja/produtos.json"
         label: "Cardápio - Casa da Cerveja"
@@ -92,7 +31,6 @@ collections:
         label: "Configurações e Horários - Cervejaria"
         name: "status_cerveja"
         fields:
-          # --- CAMPO ADICIONADO ABAIXO ---
           - { label: "Nome do Estabelecimento", name: "nome_fantasia", widget: "string", default: "CASA DA CERVEJA" }
           - { label: "WhatsApp", name: "whatsapp", widget: "string" }
           - { label: "Latitude", name: "lat", widget: "number", value_type: "float" }
@@ -112,3 +50,50 @@ collections:
               - { label: "Tipo", name: "tipo", widget: "select", options: ["porcentagem", "fixo"] }
               - { label: "Valor", name: "valor", widget: "number", value_type: "float" }
               - { label: "Ativo?", name: "ativo", widget: "boolean", default: true }
+
+  # ==========================================
+  # GRUPO: SNOOP LANCHE (LOJA 01)
+  # ==========================================
+  - name: "snoop_lanche"
+    label: "🍔 SNOOP LANCHE"
+    files:
+      - file: "content/snoop_lanche/produtos.json"
+        label: "Cardápio - Snoop Lanche"
+        name: "produtos_snoop"
+        fields:
+          - label: "Lista Geral de Produtos"
+            name: "produtos"
+            widget: "list"
+            summary: '{{title}} ({{categoria}})'
+            fields:
+              - { label: "Nome do Produto", name: "title", widget: "string" }
+              - { label: "Categoria Principal", name: "categoria", widget: "string" }
+              - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text", required: false }
+              - { label: "Imagem", name: "image", widget: "image", required: false }
+              - { label: "Preço Único", name: "price", widget: "number", value_type: "float", required: false }
+              - label: "Preços por Tamanho"
+                name: "prices"
+                widget: "object"
+                required: false
+                fields:
+                  - { label: "Pequena / 600g", name: "P", widget: "number", value_type: "float", required: false }
+                  - { label: "Média (Pizza)", name: "M", widget: "number", value_type: "float", required: false }
+                  - { label: "Grande / 1kg", name: "G", widget: "number", value_type: "float", required: false }
+
+      - file: "content/snoop_lanche/status.json"
+        label: "Configurações e Horários - Snoop"
+        name: "status_snoop"
+        fields:
+          - { label: "Nome do Estabelecimento", name: "nome_fantasia", widget: "string", default: "SNOOP LANCHE" }
+          - { label: "WhatsApp do Restaurante", name: "whatsapp", widget: "string" }
+          - { label: "Latitude", name: "lat", widget: "number", value_type: "float" }
+          - { label: "Longitude", name: "long", widget: "number", value_type: "float" }
+          - { label: "Taxa Base (Até 1km)", name: "taxa_base", widget: "number", value_type: "float", default: 5 }
+          - { label: "Valor por KM adicional", name: "valor_km", widget: "number", value_type: "float", default: 1.5 }
+          - { label: "Hora de Abertura", name: "horaAbre", widget: "string", default: "18:00" }
+          - { label: "Hora de Fechamento", name: "horaFecha", widget: "string", default: "23:30" }
+          - label: "Dias de Funcionamento"
+            name: "diasFuncionamento"
+            widget: "select"
+            multiple: true
+            options: ["0", "1", "2", "3", "4", "5", "6"]
