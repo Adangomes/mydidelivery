@@ -602,7 +602,7 @@ function voltarParaEntrega() {
 /* ============================================================
    FUNÇÃO DO TOAST (PARA O FINAL DO SEU SCRIPT.JS)
    ============================================================ */
-function mostrarToast(mensagem) {
+function mostrarToast(nomeProduto) {
     let toast = document.getElementById("toast");
     if (!toast) {
         toast = document.createElement("div");
@@ -610,10 +610,11 @@ function mostrarToast(mensagem) {
         toast.className = "toast";
         document.body.appendChild(toast);
     }
-    toast.innerText = mensagem;
+    toast.innerText = `${nomeProduto} adicionado ao carrinho!`;
     toast.classList.add("show");
     setTimeout(() => {
         toast.classList.remove("show");
-    }, 3000);
+    }, 1500);
 }
+
 
