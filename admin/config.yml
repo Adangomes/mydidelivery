@@ -18,13 +18,11 @@ collections:
             widget: "list"
             summary: '{{title}} ({{categoria}})'
             fields:
-              # --- IDENTIFICAÇÃO ---
               - { label: "Nome do Produto", name: "title", widget: "string" }
               - { label: "Categoria Principal", name: "categoria", widget: "string", hint: "Ex: burger, batata, pizza" }
               - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text", required: false }
               - { label: "Imagem", name: "image", widget: "image", required: false }
 
-              # --- O PULO DO GATO: COMPORTAMENTO DINÂMICO ---
               - label: "Ação ao Clicar"
                 name: "tipo_escolha"
                 widget: "select"
@@ -37,19 +35,17 @@ collections:
                 name: "tag_grupo"
                 widget: "string"
                 required: false
-                hint: "Use para agrupar. Ex: Se este for o botão 'Batata 600g', coloque a tag 'batata_600'. Nos sabores de 600g, coloque a mesma tag na 'Categoria'."
+                hint: "Use para agrupar tamanhos ou porções."
 
               - label: "Habilitar Adicionais/Bordas?"
                 name: "tem_adicionais"
                 widget: "boolean"
                 default: false
-                hint: "Se marcado, o modal exibirá a seleção de bordas/extras."
 
-              # --- PREÇOS ---
-              - { label: "Preço Único (Lanches/Bebidas)", name: "price", widget: "number", value_type: "float", required: false }
-              - { label: "Preço Antigo (Promoção)", name: "oldPrice", widget: "number", value_type: "float", required: false }
+              - { label: "Preço Único", name: "price", widget: "number", value_type: "float", required: false }
+              - { label: "Preço Antigo", name: "oldPrice", widget: "number", value_type: "float", required: false }
               
-              - label: "Preços por Tamanho (Se aplicável)"
+              - label: "Preços por Tamanho"
                 name: "prices"
                 widget: "object"
                 required: false
@@ -62,9 +58,39 @@ collections:
     label: "Configurações da Loja"
     files:
       - file: "content/status.json"
-        label: "Status e Horários"
+        label: "Dados, Localização e Horários"
         name: "status_loja"
         fields:
+          - label: "--- DADOS DE CONTATO ---"
+            name: "header_contato"
+            widget: "hidden"
+          - { label: "WhatsApp do Restaurante", name: "whatsapp", widget: "string", hint: "Ex: 5547992745867" }
+          
+          - label: "--- LOCALIZAÇÃO (P/ CÁLCULO DE TAXA) ---"
+            name: "header_loc"
+            widget: "hidden"
+          - { label: "CEP da Loja", name: "cep_loja", widget: "string", hint: "Ex: 89270-000" }
+          - { label: "Número do Estabelecimento", name: "numero_loja", widget: "string" }
+          - label: "Cidade"
+            name: "cidade_loja"
+            widget: "select"
+            options: 
+              - { label: "Guaramirim", value: "Guaramirim" }
+              - { label: "Jaraguá do Sul", value: "Jaraguá do Sul" }
+              - { label: "Schroeder", value: "Schroeder" }
+            default: "Guaramirim"
+          - { label: "Latitude", name: "lat", widget: "number", value_type: "float", hint: "Pegue no Google Maps" }
+          - { label: "Longitude", name: "long", widget: "number", value_type: "float", hint: "Pegue no Google Maps" }
+
+          - label: "--- REGRAS DE ENTREGA ---"
+            name: "header_entrega"
+            widget: "hidden"
+          - { label: "Taxa Base (Até 1km)", name: "taxa_base", widget: "number", value_type: "float", default: 5 }
+          - { label: "Valor por KM adicional", name: "valor_km", widget: "number", value_type: "float", default: 1.5 }
+
+          - label: "--- HORÁRIOS DE FUNCIONAMENTO ---"
+            name: "header_horarios"
+            widget: "hidden"
           - { label: "Hora de Abertura", name: "horaAbre", widget: "string", default: "18:00" }
           - { label: "Hora de Fechamento", name: "horaFecha", widget: "string", default: "23:30" }
           - label: "Dias de Funcionamento"
@@ -80,7 +106,6 @@ collections:
               - { label: "Sexta", value: "5" }
               - { label: "Sábado", value: "6" }
 
-# --- NOVA FUNÇÃO DE CUPOM ---
       - file: "content/aplicardesconto.json"
         label: "Cupons de Desconto"
         name: "cupons_desconto"
@@ -89,7 +114,7 @@ collections:
             name: "cupons"
             widget: "list"
             fields:
-              - { label: "Código do Cupom", name: "codigo", widget: "string", hint: "Ex: BEMVINDO10" }
+              - { label: "Código do Cupom", name: "codigo", widget: "string" }
               - label: "Tipo de Desconto"
                 name: "tipo"
                 widget: "select"
