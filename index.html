@@ -9,6 +9,7 @@
 </head>
 <body>
     <div id="toast-geral" class="toast">Produto adicionado ao carrinho!</div>
+    
     <header class="header">
         <div class="header-top">
             <div class="logo">SNOOP LANCHE</div>
@@ -16,13 +17,17 @@
             <div class="cart" onclick="abrirCarrinho()">🛒</div>
         </div>
     </header>
+
     <nav id="categorias-nav" class="categorias-nav">
         <div id="categorias-scroll" class="categorias-scroll"></div>
     </nav>
+
     <main id="cardapio-corpo" class="container-main"></main>
+
     <footer>
-    <p>Sistema Desenvolvido por Adan Gomes</p>
-</footer>
+        <p>Sistema Desenvolvido por Adan Gomes</p>
+    </footer>
+
     <div id="cart-modal" class="modal-overlay" style="display:none;">
         <div class="cart-box">
             <div class="modal-header-clean">
@@ -30,13 +35,15 @@
                 <button onclick="fecharCarrinho()" class="btn-fechar-modal" style="position: absolute; right: 15px; top: 15px;">✕</button>
             </div>
             <div id="cart-items" class="cart-items-list"></div>
+            
             <div class="cupom-secao">
-    <div class="cupom-container">
-        <input type="text" id="input-cupom" placeholder="Carregando cupons...">
-        <button id="btn-aplicar-cupom">Aplicar</button>
-    </div>
-    <div id="msg-cupom-feedback" class="cupom-msg-erro"></div>
-</div>
+                <div class="cupom-container">
+                    <input type="text" id="input-cupom" placeholder="Carregando cupons...">
+                    <button id="btn-aplicar-cupom">Aplicar</button>
+                </div>
+                <div id="msg-cupom-feedback" class="cupom-msg-erro"></div>
+            </div>
+
             <div class="summary-box">
                 <div class="summary-line">
                     <span>Subtotal</span>
@@ -47,19 +54,23 @@
                     <span id="total">R$ 0,00</span>
                 </div>
             </div>
+
             <div class="modal-actions">
                 <button class="btn-finalizar" onclick="abrirDelivery()">Finalizar Pedido</button>
                 <button class="btn-continuar" onclick="fecharCarrinho()">Continuar Comprando</button>
             </div>
         </div>
     </div>
+
     <div id="delivery-modal" class="modal-overlay" style="display:none;">
         <div class="modal-box">
+            
             <div id="form-entrega">
                 <div class="modal-header-clean">
                     <h3>Entrega</h3>
                     <button onclick="document.getElementById('delivery-modal').style.display='none'" class="btn-fechar-modal">✕</button>
                 </div>
+                
                 <div class="form-grid">
                     <input type="text" id="nomeCliente" placeholder="Seu Nome">
                     <select id="cidade">
@@ -83,12 +94,13 @@
                         <input type="text" id="trocoPara" placeholder="Troco para quanto?" class="w-100">
                     </div>
                 </div>
-                 </div> <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 15px;">
-            <button type="button" class="btn-secundario" style="flex: 1;" onclick="document.getElementById('delivery-modal').style.display='none'; document.getElementById('cart-modal').style.display='flex';">Voltar</button>
-            <button type="button" class="btn-whatsapp" style="flex: 1;" onclick="mostrarResumo()">Finalizar</button>
-        </div>
-    </div>
+
+                <div class="modal-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button type="button" class="btn-secundario" style="flex: 1;" onclick="document.getElementById('delivery-modal').style.display='none'; document.getElementById('cart-modal').style.display='flex';">Voltar</button>
+                    <button type="button" class="btn-whatsapp" style="flex: 1;" onclick="mostrarResumo()">Finalizar</button>
+                </div>
             </div>
+
             <div id="resumo-pedido" style="display:none;">
                 <div class="modal-header-clean">
                     <h3>Resumo do Pedido</h3>
@@ -103,8 +115,10 @@
                     <button class="btn-whatsapp" onclick="enviarWhatsApp()">Finalizar no WhatsApp</button>
                 </div>
             </div>
+
         </div>
     </div>
+
     <div id="pizza-options-modal" class="modal-overlay" style="display:none;">
         <div class="modal-box modal-pizza-ajustado">
             <div class="pizza-header-img">
@@ -116,10 +130,12 @@
                 <p id="pizza-modal-desc" class="pizza-desc"></p>
                 <label class="label-step">Quantos sabores?</label>
                 <div id="pizza-sizes-container" class="grid-tamanhos"></div>
+                
                 <div id="secao-sabores" style="display:none; margin-top: 20px;">
                     <label id="contador-fatias" class="label-step">Escolha os Sabores</label>
                     <div id="lista-sabores-meia" class="lista-fatias-scroll"></div>
                 </div>
+
                 <div id="secao-adicionais" style="display:none; margin-top: 20px;">
                     <label class="label-step">Bordas e Opcionais</label>    
                     <div class="form-group mb-3">
@@ -141,19 +157,16 @@
                 </div>
             </div>
             <div class="modal-footer-pizzas">
-                <button type="button" class="btn-voltar-modal" onclick="fecharModalPizza()">
-                    Voltar
-                </button>
-                
-                <button id="btn-confirmar-pizza" onclick="confirmarPizza()" disabled>
-                    Escolha o tamanho
-                </button>
+                <button type="button" class="btn-voltar-modal" onclick="fecharModalPizza()">Voltar</button>
+                <button id="btn-confirmar-pizza" onclick="confirmarPizza()" disabled>Escolha o tamanho</button>
             </div>
         </div>
     </div>
+
     <div id="loading-taxa" class="modal-overlay" style="display:none; background: rgba(255,255,255,0.8);">
         <div class="spinner"></div>
     </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
     <script>
@@ -168,6 +181,7 @@
         };
         firebase.initializeApp(firebaseConfig);
         window.db = firebase.database();
+        
         function sincronizarStatus() {
             fetch('./content/status.json?v=' + Date.now())
                 .then(r => r.json())
@@ -180,14 +194,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
