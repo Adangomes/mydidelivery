@@ -9,7 +9,6 @@ if (host.includes("casadacerveja") || urlParams.get("loja") === "casa_da_cerveja
     LOJA_ID = "casa_da_cerveja";
 }
 
-// Caminhos baseados na loja
 const URL_PRODUTOS = `content/${LOJA_ID}/produtos.json`;
 const URL_STATUS = `content/${LOJA_ID}/status.json`;
 const URL_DESCONTO = `content/${LOJA_ID}/aplicardesconto.json`;
@@ -93,19 +92,12 @@ async function carregarCardapioCompleto() {
 
         Object.keys(categorias).forEach((cat, index) => {
             const idCat = `cat-${cat.replace(/\s+/g, '-')}`;
-            const link = document.createElement("a");
-            link.href = `#${idCat}`;
-            link.className = `cat-link ${index === 0 ? 'active' : ''}`;
-            link.innerText = cat.toUpperCase();
-            nav.appendChild(link);
-
             const section = document.createElement("section");
             section.className = "secao-categoria";
             section.id = idCat;
             section.innerHTML = `<h2 class="titulo-categoria-lista">${cat}</h2>`;
 
             categorias[cat].forEach(p => {
-                // Filtros para Snoop (Pizzas/Porções com tamanhos)
                 if (LOJA_ID === "snoop_lanche") {
                     if (p.categoria.toLowerCase() === 'pizza' && !p.title.toUpperCase().includes("PIZZA")) return; 
                     if (p.categoria.toLowerCase() === 'porcao' && !p.title.toUpperCase().includes("600G") && !p.title.toUpperCase().includes("1KG")) return;
@@ -135,147 +127,31 @@ async function carregarCardapioCompleto() {
 }
 
 // ==========================================
-// 3. CONTROLE DE PIZZAS (A LÓGICA QUE FUNCIONA)
+// 3. FUNÇÕES DO CARRINHO (RESTAURADAS)
 // ==========================================
 
-function abrirModalPizza(nome) {
-    if (!estaAberto()) return alert("Loja fechada no momento!"); 
-
-    pizzaPrincipal = produtosGeral.find(p => p.title === nome);
-    if (!pizzaPrincipal) return;
-
-    saboresSelecionados = [];
-    itemTemporarioPorcao = null; 
-    let maxSaboresPermitidos = 1;
-
-    // Detecta o tamanho e limite de sabores
-    if (nome.toUpperCase().includes("PIZZA P")) {
-        tamanhoSelecionado = "P"; maxSaboresPermitidos = 1;
-    } else if (nome.toUpperCase().includes("PIZZA M")) {
-        tamanhoSelecionado = "M"; maxSaboresPermitidos = 2;
-    } else if (nome.toUpperCase().includes("PIZZA G")) {
-        tamanhoSelecionado = "G"; maxSaboresPermitidos = 3;
-    }
-
-    document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
-    const containerTamanhos = document.getElementById("pizza-sizes-container");
-    const labelPasso = document.querySelector(".label-step");   
-
-    if (maxSaboresPermitidos === 1) {
-        if(labelPasso) labelPasso.style.display = "none";
-        if(containerTamanhos) containerTamanhos.style.display = "none";
-        limiteSabores = 1; 
-        document.getElementById("secao-sabores").style.display = "block";
-        renderizarSabores();
-    } else {
-        if(labelPasso) { labelPasso.style.display = "block"; labelPasso.innerText = "Quantos sabores?"; }
-        if(containerTamanhos) {
-            containerTamanhos.style.display = "flex";
-            containerTamanhos.innerHTML = ""; 
-            for (let i = 1; i <= maxSaboresPermitidos; i++) {
-                const btn = document.createElement("button");
-                btn.className = "btn-quantidade-sabor";
-                btn.innerText = `${i} Sabor${i > 1 ? 'es' : ''}`;
-                btn.onclick = () => {
-                    limiteSabores = i;
-                    document.querySelectorAll(".btn-quantidade-sabor").forEach(b => b.classList.remove("ativo"));
-                    btn.classList.add("ativo");
-                    document.getElementById("secao-sabores").style.display = "block";
-                    renderizarSabores();
-                };
-                containerTamanhos.appendChild(btn);
-            }
-        }
-    }
-    document.getElementById("pizza-options-modal").style.display = "flex";
+function abrirCarrinho() {
+    if (!estaAberto()) return alert("Estamos fechados agora!");
+    const modal = document.getElementById("cart-modal");
+    if (modal) modal.style.display = "flex";
 }
 
-function renderizarSabores() {
-    const grid = document.getElementById("lista-sabores-meia");
-    if (!grid) return;
-    grid.innerHTML = "";
-    
-    const saboresDisponiveis = produtosGeral.filter(p => {
-        const cat = p.categoria.toLowerCase();
-        const titulo = p.title.toUpperCase();
-        return (cat === "pizza" && !titulo.includes("PIZZA"));
-    });
-
-    const atingiuLimite = saboresSelecionados.length >= limiteSabores;
-
-    saboresDisponiveis.forEach(p => {
-        const selecionado = saboresSelecionados.includes(p.title);
-        const classeStatus = selecionado ? 'selecionado' : (atingiuLimite ? 'desabilitado' : '');
-        
-        const div = document.createElement("div");
-        div.className = `item-sabor-wizard ${classeStatus}`;
-        div.innerHTML = `
-            <div style="display:flex; flex-direction:column">
-                <span style="font-weight:700">${p.title}</span>
-                <small style="font-size:0.75rem; color:#777">${p.ingredientes || ""}</small>
-            </div>
-            <span class="status-check">${selecionado ? '✅' : '+'}</span>`;
-        
-        if (!atingiuLimite || selecionado) {
-            div.onclick = () => toggleSabor(p.title);
-        }
-        grid.appendChild(div);
-    });
-
-    const contador = document.getElementById("contador-fatias");
-    if (contador) contador.innerText = `Sabores (${saboresSelecionados.length}/${limiteSabores})`;
-    atualizarBotaoConfirmar();
+function fecharCarrinho() {
+    const modal = document.getElementById("cart-modal");
+    if (modal) modal.style.display = "none";
 }
 
-function toggleSabor(nome) {
-    const index = saboresSelecionados.indexOf(nome);
-    if (index > -1) saboresSelecionados.splice(index, 1);
-    else if (saboresSelecionados.length < limiteSabores) saboresSelecionados.push(nome);
-    renderizarSabores();
+function abrirDelivery() {
+    if (carrinho.length === 0) return alert("Seu carrinho está vazio!");
+    fecharCarrinho();
+    const modal = document.getElementById("delivery-modal");
+    if (modal) modal.style.display = "flex";
 }
 
-function atualizarBotaoConfirmar() {
-    const btn = document.getElementById("btn-confirmar-pizza");
-    if (itemTemporarioPorcao) {
-        btn.disabled = false;
-        btn.innerText = "Adicionar ao Carrinho";
-        return;
-    }
-    if (saboresSelecionados.length === limiteSabores) {
-        btn.disabled = false; 
-        btn.innerText = "Adicionar ao Carrinho";
-    } else {
-        btn.disabled = true; 
-        btn.innerText = `Selecione ${limiteSabores - saboresSelecionados.length} sabor(es)`;
-    }
+function fecharDelivery() {
+    const modal = document.getElementById("delivery-modal");
+    if (modal) modal.style.display = "none";
 }
-
-function confirmarPizza() {
-    if (itemTemporarioPorcao) {
-        carrinho.push(itemTemporarioPorcao);
-    } else {
-        const precoBase = pizzaPrincipal.prices[tamanhoSelecionado];
-        carrinho.push({ 
-            title: `${pizzaPrincipal.title} (${tamanhoSelecionado})`, 
-            sabor: saboresSelecionados.join(" / "), 
-            price: precoBase, 
-            qtd: 1 
-        });
-    }
-    fecharModalPizza();
-    atualizarCarrinho();
-    mostrarToast("Item adicionado!");
-}
-
-function fecharModalPizza() { 
-    document.getElementById("pizza-options-modal").style.display = "none";
-    itemTemporarioPorcao = null;
-    saboresSelecionados = [];
-}
-
-// ==========================================
-// 4. CARRINHO E ENVIO
-// ==========================================
 
 function adicionarCarrinhoPorProduto(p) {
     if (!estaAberto()) return alert("Estamos fechados!"); 
@@ -289,15 +165,28 @@ function atualizarCarrinho() {
     let total = 0;
     if(!box) return;
     box.innerHTML = "";
+    
     carrinho.forEach((i, idx) => {
         total += (i.price * i.qtd);
         box.innerHTML += `
-            <div class="item-sabor-fatia">
-                <div><span>${i.qtd}x ${i.title}</span><br><small>${i.sabor || ''}</small></div>
-                <button onclick="removerItem(${idx})">✕</button>
+            <div class="item-sabor-fatia" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+                <div>
+                    <span style="font-weight:bold;">${i.qtd}x ${i.title}</span><br>
+                    <small style="color:#666">${i.sabor || ''}</small>
+                </div>
+                <button onclick="removerItem(${idx})" style="background:none; border:none; color:red; cursor:pointer; font-size:1.2rem;">✕</button>
             </div>`;
     });
-    document.getElementById("total").innerText = `R$ ${Math.max(0, total - descontoAplicado).toFixed(2)}`;
+
+    const totalElement = document.getElementById("total");
+    if (totalElement) {
+        totalElement.innerText = `R$ ${Math.max(0, total - descontoAplicado).toFixed(2)}`;
+    }
+    
+    // Atualiza o contador flutuante do carrinho se houver
+    const cartCounter = document.getElementById("cart-counter");
+    if (cartCounter) cartCounter.innerText = carrinho.length;
+
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
 }
 
@@ -306,10 +195,135 @@ function removerItem(idx) {
     atualizarCarrinho(); 
 }
 
+// ==========================================
+// 4. ENVIO PARA WHATSAPP
+// ==========================================
+
+function enviarWhatsApp() {
+    const nome = document.getElementById("nomeCliente").value;
+    const rua = document.getElementById("rua").value;
+    const num = document.getElementById("numero").value;
+    const bairro = document.getElementById("bairro").value;
+    const pag = document.getElementById("pagamento").value;
+    const troco = document.getElementById("trocoPara").value;
+
+    if (!nome || !rua || !num) return alert("Por favor, preencha nome e endereço!");
+
+    let sub = 0;
+    carrinho.forEach(i => sub += (i.price * i.qtd));
+    const totalFinal = sub + taxaEntregaCalculada - descontoAplicado;
+
+    const nomeLoja = document.getElementById("nome-loja").innerText;
+    let msg = `*NOVO PEDIDO - ${nomeLoja}*%0A%0A`;
+    msg += `*Cliente:* ${nome}%0A`;
+    msg += `*Endereço:* ${rua}, ${num} - ${bairro}%0A`;
+    msg += `--------------------------%0A`;
+    
+    carrinho.forEach(i => {
+        msg += `• ${i.qtd}x ${i.title}${i.sabor ? ' ('+i.sabor+')' : ''}%0A`;
+    });
+    
+    msg += `--------------------------%0A`;
+    msg += `*Subtotal:* R$ ${sub.toFixed(2)}%0A`;
+    if(taxaEntregaCalculada > 0) msg += `*Taxa:* R$ ${taxaEntregaCalculada.toFixed(2)}%0A`;
+    if(descontoAplicado > 0) msg += `*Desconto:* - R$ ${descontoAplicado.toFixed(2)}%0A`;
+    msg += `*TOTAL: R$ ${totalFinal.toFixed(2)}*%0A%0A`;
+    msg += `*Pagamento:* ${pag}${troco ? ' (Troco para ' + troco + ')' : ''}`;
+
+    window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`);
+}
+
+// ==========================================
+// 5. MODAL DE PIZZA (RESTANTE)
+// ==========================================
+
+function abrirModalPizza(nome) {
+    if (!estaAberto()) return alert("Loja fechada!"); 
+    pizzaPrincipal = produtosGeral.find(p => p.title === nome);
+    if (!pizzaPrincipal) return;
+
+    saboresSelecionados = [];
+    itemTemporarioPorcao = null; 
+    let maxSabores = 1;
+
+    if (nome.toUpperCase().includes("PIZZA P")) { tamanhoSelecionado = "P"; maxSabores = 1; }
+    else if (nome.toUpperCase().includes("PIZZA M")) { tamanhoSelecionado = "M"; maxSabores = 2; }
+    else if (nome.toUpperCase().includes("PIZZA G")) { tamanhoSelecionado = "G"; maxSabores = 3; }
+
+    document.getElementById("pizza-modal-title").innerText = pizzaPrincipal.title;
+    const container = document.getElementById("pizza-sizes-container");
+    if (container) {
+        container.style.display = maxSabores > 1 ? "flex" : "none";
+        container.innerHTML = "";
+        for (let i = 1; i <= maxSabores; i++) {
+            const btn = document.createElement("button");
+            btn.className = "btn-quantidade-sabor";
+            btn.innerText = `${i} Sabor${i > 1 ? 'es' : ''}`;
+            btn.onclick = () => {
+                limiteSabores = i;
+                document.querySelectorAll(".btn-quantidade-sabor").forEach(b => b.classList.remove("ativo"));
+                btn.classList.add("ativo");
+                document.getElementById("secao-sabores").style.display = "block";
+                renderizarSabores();
+            };
+            container.appendChild(btn);
+        }
+    }
+
+    if(maxSabores === 1) {
+        limiteSabores = 1;
+        document.getElementById("secao-sabores").style.display = "block";
+        renderizarSabores();
+    }
+    
+    document.getElementById("pizza-options-modal").style.display = "flex";
+}
+
+function renderizarSabores() {
+    const grid = document.getElementById("lista-sabores-meia");
+    if (!grid) return;
+    grid.innerHTML = "";
+    const sabores = produtosGeral.filter(p => p.categoria.toLowerCase() === "pizza" && !p.title.toUpperCase().includes("PIZZA"));
+    
+    sabores.forEach(s => {
+        const sel = saboresSelecionados.includes(s.title);
+        const div = document.createElement("div");
+        div.className = `item-sabor-wizard ${sel ? 'selecionado' : ''}`;
+        div.innerHTML = `<span>${s.title}</span><span class="status-check">${sel ? '✅' : '+'}</span>`;
+        div.onclick = () => {
+            if(sel) saboresSelecionados = saboresSelecionados.filter(x => x !== s.title);
+            else if(saboresSelecionados.length < limiteSabores) saboresSelecionados.push(s.title);
+            renderizarSabores();
+            atualizarBotaoConfirmar();
+        };
+        grid.appendChild(div);
+    });
+    atualizarBotaoConfirmar();
+}
+
+function atualizarBotaoConfirmar() {
+    const btn = document.getElementById("btn-confirmar-pizza");
+    if (btn) btn.disabled = (saboresSelecionados.length !== limiteSabores);
+}
+
+function confirmarPizza() {
+    const preco = pizzaPrincipal.prices[tamanhoSelecionado];
+    carrinho.push({ 
+        title: `${pizzaPrincipal.title} (${tamanhoSelecionado})`, 
+        sabor: saboresSelecionados.join(" / "), 
+        price: preco, 
+        qtd: 1 
+    });
+    fecharModalPizza();
+    atualizarCarrinho();
+}
+
+function fecharModalPizza() { document.getElementById("pizza-options-modal").style.display = "none"; }
+
 function mostrarToast(txt) {
     let t = document.getElementById("toast-geral");
     if(!t) return;
-    t.innerText = txt; t.classList.add("show");
+    t.innerText = txt + " adicionado!"; t.classList.add("show");
     setTimeout(() => t.classList.remove("show"), 2000);
 }
 
