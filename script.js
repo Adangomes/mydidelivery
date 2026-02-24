@@ -4,10 +4,11 @@
 const host = window.location.hostname;
 let LOJA_ID = "snoop_lanche"; 
 
-// Identifica a loja pela URL
+// Identifica a loja pela URL (Roteamento)
 if (host.includes("casadacerveja")) {
     LOJA_ID = "casa_da_cerveja";
 } else {
+    // Padrão ou snooplanche
     LOJA_ID = "snoop_lanche";
 }
 
@@ -45,7 +46,7 @@ function estaAberto() {
 }
 
 // ==========================================
-// 2. CARREGAMENTO DOS DADOS
+// 2. CARREGAMENTO DOS DADOS (DINÂMICO)
 // ==========================================
 
 async function carregarStatusLoja() {
@@ -56,16 +57,19 @@ async function carregarStatusLoja() {
         const res = await fetch(URL_STATUS + '?v=' + Date.now());
         const data = await res.json();
         
-        // Ajuste dinâmico do Nome da Loja
-        const nomeFantasia = data.nome_fantasia || (LOJA_ID === "casa_da_cerveja" ? "CASA DA CERVEJA" : "SNOOP LANCHE");
-        if (nomeLojaElemento) nomeLojaElemento.innerText = nomeFantasia;
-        document.title = nomeFantasia;
+        // --- ATUALIZAÇÃO DO NOME FANTASIA ---
+        // Se houver nome no JSON do painel, usa ele. Caso contrário, usa o ID formatado.
+        const nomeExibicao = data.nome_fantasia || LOJA_ID.toUpperCase().replace('_', ' ');
+        if (nomeLojaElemento) nomeLojaElemento.innerText = nomeExibicao;
+        document.title = nomeExibicao; // Altera o título da aba do navegador
 
+        // Atualiza variáveis globais com dados do painel
         WHATSAPP_NUMERO = data.whatsapp || WHATSAPP_NUMERO;
         TAXA_BASE = parseFloat(data.taxa_base) || 5;
         VALOR_POR_KM = parseFloat(data.valor_km) || 1.5;
         if(data.lat && data.long) RESTAURANTE_COORD = [data.long, data.lat];
 
+        // Lógica de Horário de Funcionamento
         const agora = new Date();
         const horaMin = agora.getHours() * 60 + agora.getMinutes();
         const [hA, mA] = data.horaAbre.split(':').map(Number);
@@ -74,15 +78,20 @@ async function carregarStatusLoja() {
         const minF = hF * 60 + mF;
         const diaH = agora.getDay();
         
-        const atende = data.diasFuncionamento ? data.diasFuncionamento.map(String).includes(String(diaH)) : true;
+        // Verifica se o restaurante abre no dia de hoje
+        const dias = data.diasFuncionamento || ["0","1","2","3","4","5","6"];
+        const atendeHoje = dias.map(String).includes(String(diaH));
 
-        if (atende && (horaMin >= minA && horaMin < minF)) {
-            s.innerHTML = "<span>ABERTO AGORA</span>"; s.className = "status aberto";
+        if (atendeHoje && (horaMin >= minA && horaMin < minF)) {
+            s.innerHTML = "<span>ABERTO AGORA</span>"; 
+            s.className = "status aberto";
         } else {
-            s.innerHTML = "<span>FECHADO</span>"; s.className = "status fechado";
+            s.innerHTML = "<span>FECHADO</span>"; 
+            s.className = "status fechado";
         }
     } catch (e) { 
         if(s) s.className = "status fechado"; 
+        console.error("Erro ao carregar status:", e);
     }
 }
 
@@ -119,6 +128,7 @@ async function carregarCardapioCompleto() {
             section.innerHTML = `<h2 class="titulo-categoria-lista">${cat}</h2>`;
 
             categorias[cat].forEach(p => {
+                // Filtros para Pizza e Porção conforme sua regra original
                 if (p.categoria.toLowerCase() === 'pizza' && !p.title.toUpperCase().includes("PIZZA")) return; 
                 if (p.categoria.toLowerCase() === 'porcao' && !p.title.toUpperCase().includes("600G") && !p.title.toUpperCase().includes("1KG")) return;
 
@@ -143,7 +153,7 @@ async function carregarCardapioCompleto() {
             corpo.appendChild(section);
         });
         ativarScrollSpy();
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error("Erro ao carregar cardápio:", e); }
 }
 
 // ==========================================
@@ -167,13 +177,13 @@ function atualizarCarrinho() {
             </div>`;
     });
     
-    document.getElementById("total").innerText = `R$ ${Math.max(0, total - descontoAplicado).toFixed(2)}`;
-    document.getElementById("subtotal").innerText = `R$ ${total.toFixed(2)}`;
+    const totalExibir = Math.max(0, total - descontoAplicado);
+    document.getElementById("total").innerText = `R$ ${totalExibir.toFixed(2)}`;
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
 }
 
 function adicionarCarrinhoPorProduto(p) {
-    if (!estaAberto()) return alert("Loja fechada!"); 
+    if (!estaAberto()) return alert("Loja fechada no momento!"); 
     carrinho.push({...p, qtd: 1});
     atualizarCarrinho();
     mostrarToast(p.title); 
@@ -181,7 +191,10 @@ function adicionarCarrinhoPorProduto(p) {
 
 function removerItem(idx) { 
     carrinho.splice(idx, 1); 
-    if(carrinho.length === 0) { descontoAplicado = 0; cupomAtivoNome = ""; }
+    if(carrinho.length === 0) { 
+        descontoAplicado = 0; 
+        cupomAtivoNome = ""; 
+    }
     atualizarCarrinho(); 
 }
 
@@ -191,7 +204,9 @@ function abrirCarrinho() {
     verificarDisponibilidadeCupons();
 }
 
-function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
+function fecharCarrinho() { 
+    document.getElementById("cart-modal").style.display = "none"; 
+}
 
 // ==========================================
 // 4. CUPONS E ENTREGA
@@ -205,10 +220,7 @@ async function verificarDisponibilidadeCupons() {
         const data = await res.json();
         const ativo = data.cupons && data.cupons.some(c => c.ativo);
         if(input) input.disabled = !ativo;
-        if(btn) {
-            btn.disabled = !ativo;
-            btn.onclick = aplicarCupom;
-        }
+        if(btn) btn.disabled = !ativo;
     } catch (e) {}
 }
 
@@ -291,7 +303,6 @@ function abrirModalDinamico(tag, titulo) {
 function atualizarBotaoConfirmar() {
     const btn = document.getElementById("btn-confirmar-pizza");
     btn.disabled = (!itemTemporarioPorcao && saboresSelecionados.length === 0);
-    btn.innerText = btn.disabled ? "Escolha as opções" : "Confirmar e Adicionar";
 }
 
 function confirmarPizza() {
@@ -334,7 +345,6 @@ async function mostrarResumo() {
     let sub = 0; carrinho.forEach(i => sub += (i.price * i.qtd));
     document.getElementById("resumo-itens").innerHTML = carrinho.map(i => `<div>${i.qtd}x ${i.title} - R$ ${(i.price*i.qtd).toFixed(2)}</div>`).join("");
     document.getElementById("resumo-total").innerText = `Total: R$ ${(sub + taxa - descontoAplicado).toFixed(2)}`;
-    document.getElementById("resumo-taxa").innerText = `Taxa de Entrega: R$ ${taxa.toFixed(2)}`;
 }
 
 async function calcularTaxaEntrega(end) {
@@ -356,23 +366,28 @@ async function enviarWhatsApp() {
     const num = document.getElementById("numero").value;
     const pag = document.getElementById("pagamento").value;
     const troco = document.getElementById("trocoPara").value;
-    const obs = document.getElementById("obsCozinha").value;
     
     let sub = 0; carrinho.forEach(i => sub += (i.price * i.qtd));
     const total = sub + taxaEntregaCalculada - descontoAplicado;
 
-    let msg = `*PEDIDO: ${LOJA_ID.toUpperCase().replace('_', ' ')}*%0A`;
+    // Cabeçalho dinâmico com o nome da loja
+    const nomeLoja = document.getElementById("nome-loja").innerText;
+    let msg = `*PEDIDO: ${nomeLoja}*%0A`;
     msg += `*Cliente:* ${nome}%0A*Endereço:* ${rua}, ${num}%0A%0A`;
     carrinho.forEach(i => msg += `• ${i.qtd}x ${i.title} ${i.sabor ? '('+i.sabor+')' : ''}%0A`);
-    
-    if(obs) msg += `%0A*Obs:* ${obs}%0A`;
     msg += `%0A*Subtotal:* R$ ${sub.toFixed(2)}`;
     if(descontoAplicado > 0) msg += `%0A*Desconto:* - R$ ${descontoAplicado.toFixed(2)}`;
     msg += `%0A*Taxa:* R$ ${taxaEntregaCalculada.toFixed(2)}`;
     msg += `%0A*TOTAL: R$ ${total.toFixed(2)}*`;
     msg += `%0A*Pagamento:* ${pag} ${troco ? '(Troco para '+troco+')' : ''}`;
 
-    try { await window.db.ref(`pedidos/${LOJA_ID}`).push({ cliente: nome, total: total, itens: carrinho, data: new Date().toISOString() }); } catch(e){}
+    // Tenta salvar no Firebase se a variável 'db' estiver disponível
+    try { 
+        if (typeof db !== 'undefined') {
+            await db.ref(`pedidos/${LOJA_ID}`).push({ cliente: nome, total: total, itens: carrinho, timestamp: Date.now() }); 
+        }
+    } catch(e){ console.error("Erro Firebase:", e); }
+
     window.open(`https://wa.me/${WHATSAPP_NUMERO}?text=${msg}`);
 }
 
@@ -394,7 +409,9 @@ function ativarScrollSpy() {
     const links = document.querySelectorAll(".cat-link");
     window.addEventListener("scroll", () => {
         let atual = "";
-        secoes.forEach(s => { if (window.pageYOffset >= s.offsetTop - 150) atual = s.id; });
+        secoes.forEach(s => { 
+            if (window.pageYOffset >= s.offsetTop - 150) atual = s.id; 
+        });
         links.forEach(l => {
             l.classList.remove("active");
             if (l.getAttribute("href") === `#${atual}`) l.classList.add("active");
@@ -403,7 +420,7 @@ function ativarScrollSpy() {
 }
 
 function abrirDelivery() {
-    if(carrinho.length === 0) return alert("Carrinho vazio!");
+    if(carrinho.length === 0) return alert("Seu carrinho está vazio!");
     fecharCarrinho();
     document.getElementById("delivery-modal").style.display = "flex";
 }
@@ -414,5 +431,6 @@ function voltarParaEntrega() {
 }
 
 function toggleTroco(val) {
-    document.getElementById("div-troco").style.display = (val === "Dinheiro") ? "block" : "none";
+    const divTroco = document.getElementById("div-troco");
+    if(divTroco) divTroco.style.display = (val === "Dinheiro") ? "block" : "none";
 }
