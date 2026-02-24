@@ -6,12 +6,16 @@ media_folder: "imagens"
 public_folder: "/imagens"
 
 collections:
-  - name: "cardapio"
-    label: "Cardápio Completo"
+  # ==========================================
+  # LOJA 01: SNOOP LANCHE
+  # ==========================================
+  - name: "snoop_lanche"
+    label: "Snoop Lanche"
     files:
-      - file: "content/produtos.json"
-        label: "Categorias de Produtos"
-        name: "produtos_config"
+      # --- CARDÁPIO SNOOP ---
+      - file: "content/snoop_lanche/produtos.json"
+        label: "Cardápio - Snoop Lanche"
+        name: "produtos_snoop"
         fields:
           - label: "Lista Geral de Produtos"
             name: "produtos"
@@ -22,29 +26,7 @@ collections:
               - { label: "Categoria Principal", name: "categoria", widget: "string", hint: "Ex: burger, batata, pizza" }
               - { label: "Ingredientes/Descrição", name: "ingredientes", widget: "text", required: false }
               - { label: "Imagem", name: "image", widget: "image", required: false }
-
-              - label: "Ação ao Clicar"
-                name: "tipo_escolha"
-                widget: "select"
-                default: "direto"
-                options:
-                  - { label: "Adicionar Direto ao Carrinho", value: "direto" }
-                  - { label: "Abrir Modal de Sabores/Opções", value: "abrir_modal" }
-              
-              - label: "Chave/Tag de Grupo"
-                name: "tag_grupo"
-                widget: "string"
-                required: false
-                hint: "Use para agrupar tamanhos ou porções."
-
-              - label: "Habilitar Adicionais/Bordas?"
-                name: "tem_adicionais"
-                widget: "boolean"
-                default: false
-
               - { label: "Preço Único", name: "price", widget: "number", value_type: "float", required: false }
-              - { label: "Preço Antigo", name: "oldPrice", widget: "number", value_type: "float", required: false }
-              
               - label: "Preços por Tamanho"
                 name: "prices"
                 widget: "object"
@@ -54,72 +36,81 @@ collections:
                   - { label: "Média (Pizza)", name: "M", widget: "number", value_type: "float", required: false }
                   - { label: "Grande / 1kg", name: "G", widget: "number", value_type: "float", required: false }
 
-  - name: "configuracoes"
-    label: "Configurações da Loja"
-    files:
-      - file: "content/status.json"
-        label: "Dados, Localização e Horários"
-        name: "status_loja"
+      # --- STATUS/CONFIG SNOOP ---
+      - file: "content/snoop_lanche/status.json"
+        label: "Configurações e Horários - Snoop"
+        name: "status_snoop"
         fields:
-          - label: "--- DADOS DE CONTATO ---"
-            name: "header_contato"
-            widget: "hidden"
-          - { label: "WhatsApp do Restaurante", name: "whatsapp", widget: "string", hint: "Ex: 5547992745867" }
-          
-          - label: "--- LOCALIZAÇÃO (P/ CÁLCULO DE TAXA) ---"
-            name: "header_loc"
-            widget: "hidden"
-          - { label: "CEP da Loja", name: "cep_loja", widget: "string", hint: "Ex: 89270-000" }
-          - { label: "Número do Estabelecimento", name: "numero_loja", widget: "string" }
-          - label: "Cidade"
-            name: "cidade_loja"
-            widget: "select"
-            options: 
-              - { label: "Guaramirim", value: "Guaramirim" }
-              - { label: "Jaraguá do Sul", value: "Jaraguá do Sul" }
-              - { label: "Schroeder", value: "Schroeder" }
-            default: "Guaramirim"
-          - { label: "Latitude", name: "lat", widget: "number", value_type: "float", hint: "Pegue no Google Maps" }
-          - { label: "Longitude", name: "long", widget: "number", value_type: "float", hint: "Pegue no Google Maps" }
-
-          - label: "--- REGRAS DE ENTREGA ---"
-            name: "header_entrega"
-            widget: "hidden"
+          - { label: "WhatsApp do Restaurante", name: "whatsapp", widget: "string" }
+          - { label: "Latitude", name: "lat", widget: "number", value_type: "float" }
+          - { label: "Longitude", name: "long", widget: "number", value_type: "float" }
           - { label: "Taxa Base (Até 1km)", name: "taxa_base", widget: "number", value_type: "float", default: 5 }
           - { label: "Valor por KM adicional", name: "valor_km", widget: "number", value_type: "float", default: 1.5 }
-
-          - label: "--- HORÁRIOS DE FUNCIONAMENTO ---"
-            name: "header_horarios"
-            widget: "hidden"
           - { label: "Hora de Abertura", name: "horaAbre", widget: "string", default: "18:00" }
           - { label: "Hora de Fechamento", name: "horaFecha", widget: "string", default: "23:30" }
           - label: "Dias de Funcionamento"
             name: "diasFuncionamento"
             widget: "select"
             multiple: true
-            options:
-              - { label: "Domingo", value: "0" }
-              - { label: "Segunda", value: "1" }
-              - { label: "Terça", value: "2" }
-              - { label: "Quarta", value: "3" }
-              - { label: "Quinta", value: "4" }
-              - { label: "Sexta", value: "5" }
-              - { label: "Sábado", value: "6" }
+            options: ["0", "1", "2", "3", "4", "5", "6"]
 
-      - file: "content/aplicardesconto.json"
-        label: "Cupons de Desconto"
-        name: "cupons_desconto"
+      # --- CUPONS SNOOP ---
+      - file: "content/snoop_lanche/aplicardesconto.json"
+        label: "Cupons de Desconto - Snoop"
+        name: "cupons_snoop"
         fields:
           - label: "Lista de Cupons"
             name: "cupons"
             widget: "list"
             fields:
-              - { label: "Código do Cupom", name: "codigo", widget: "string" }
-              - label: "Tipo de Desconto"
-                name: "tipo"
-                widget: "select"
-                options:
-                  - { label: "Porcentagem (%)", value: "porcentagem" }
-                  - { label: "Valor Fixo (R$)", value: "fixo" }
-              - { label: "Valor do Desconto", name: "valor", widget: "number", value_type: "float" }
+              - { label: "Código", name: "codigo", widget: "string" }
+              - { label: "Tipo", name: "tipo", widget: "select", options: ["porcentagem", "fixo"] }
+              - { label: "Valor", name: "valor", widget: "number", value_type: "float" }
+              - { label: "Ativo?", name: "ativo", widget: "boolean", default: true }
+
+  # ==========================================
+  # LOJA 02: CASA DA CERVEJA
+  # ==========================================
+  - name: "casa_da_cerveja"
+    label: "Casa da Cerveja"
+    files:
+      # --- CARDÁPIO CERVEJA ---
+      - file: "content/casa_da_cerveja/produtos.json"
+        label: "Cardápio - Casa da Cerveja"
+        name: "produtos_cerveja"
+        fields:
+          - label: "Lista Geral de Produtos"
+            name: "produtos"
+            widget: "list"
+            summary: '{{title}} ({{categoria}})'
+            fields:
+              - { label: "Nome do Produto", name: "title", widget: "string" }
+              - { label: "Categoria Principal", name: "categoria", widget: "string" }
+              - { label: "Ingredientes", name: "ingredientes", widget: "text", required: false }
+              - { label: "Imagem", name: "image", widget: "image", required: false }
+              - { label: "Preço", name: "price", widget: "number", value_type: "float" }
+
+      # --- STATUS/CONFIG CERVEJA ---
+      - file: "content/casa_da_cerveja/status.json"
+        label: "Configurações e Horários - Cervejaria"
+        name: "status_cerveja"
+        fields:
+          - { label: "WhatsApp", name: "whatsapp", widget: "string" }
+          - { label: "Latitude", name: "lat", widget: "number", value_type: "float" }
+          - { label: "Longitude", name: "long", widget: "number", value_type: "float" }
+          - { label: "Hora de Abertura", name: "horaAbre", widget: "string" }
+          - { label: "Hora de Fechamento", name: "horaFecha", widget: "string" }
+
+      # --- CUPONS CERVEJA ---
+      - file: "content/casa_da_cerveja/aplicardesconto.json"
+        label: "Cupons de Desconto - Cervejaria"
+        name: "cupons_cerveja"
+        fields:
+          - label: "Lista de Cupons"
+            name: "cupons"
+            widget: "list"
+            fields:
+              - { label: "Código", name: "codigo", widget: "string" }
+              - { label: "Tipo", name: "tipo", widget: "select", options: ["porcentagem", "fixo"] }
+              - { label: "Valor", name: "valor", widget: "number", value_type: "float" }
               - { label: "Ativo?", name: "ativo", widget: "boolean", default: true }
