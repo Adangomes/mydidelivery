@@ -389,7 +389,10 @@ async function enviarWhatsApp() {
         obs_cozinha: "Nenhuma"
     };
     try {
-        await db.ref('pedidos').push(pedidoFirebase);
+        // AJUSTE AQUI: Salvando dentro da pasta específica da loja
+        // Se for o site do Kings Burger, mude para 'pedidos/kings_burger'
+        await db.ref('pedidos/snoop_lanche').push(pedidoFirebase);
+        console.log("Pedido registrado no banco de dados com sucesso!");
     } catch (e) {
         console.error("Erro ao salvar no banco:", e);
     }
@@ -616,6 +619,7 @@ function mostrarToast(nomeProduto) {
         toast.classList.remove("show");
     }, 2000);
 }
+
 
 
 
