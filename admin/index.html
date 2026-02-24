@@ -8,16 +8,21 @@
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-  <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
+  <script src="https://unpkg.com/netlify-cms@^2.10.192/dist/netlify-cms.js"></script>
 
   <script>
-    // 3. Script de segurança para redirecionamento
+    // Verifica se o widget do Netlify Identity está carregado
     if (window.netlifyIdentity) {
-      // Quando o usuário fizer login, ele garante que permanece no /admin/
-      window.netlifyIdentity.on("login", () => {
-        document.location.href = "/admin/";
+      window.netlifyIdentity.on("init", user => {
+        if (!user) {
+          window.netlifyIdentity.on("login", () => {
+            // Só redireciona se o usuário acabou de logar
+            document.location.href = "/admin/";
+          });
+        }
       });
-      // Quando deslogar, ele volta para a página inicial do site
+      
+      // Ao deslogar, vai para a home
       window.netlifyIdentity.on("logout", () => {
         document.location.href = "/";
       });
