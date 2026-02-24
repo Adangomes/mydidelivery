@@ -232,9 +232,9 @@ body { background: #fff; color: #333; overflow-x: hidden; }
     bottom: 40px; /* Sobe para 40px quando aparece */
 }
 
-.toast { 
-    /* ... seus outros estilos ... */
-    z-index: 10000 !important; 
+.toast {
+    transition: opacity 0.2s, bottom 0.3s ease-out; /* Ficou mais rápido e fluido */
+    z-index: 10000;
 }
 
 /* ESTILOS DO MODAL DE PIZZA */
@@ -581,4 +581,5 @@ footer {
     margin-top: 5px;
     min-height: 15px; /* Evita que o layout "pule" quando a msg aparece */
 }
+
 
