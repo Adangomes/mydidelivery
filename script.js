@@ -597,3 +597,23 @@ function voltarParaEntrega() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
+
+/* ============================================================
+   FUNÇÃO DO TOAST (PARA O FINAL DO SEU SCRIPT.JS)
+   ============================================================ */
+function mostrarToast(mensagem) {
+    let toast = document.getElementById("toast");
+    if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "toast";
+        toast.className = "toast";
+        document.body.appendChild(toast);
+    }
+    toast.innerText = mensagem;
+    toast.classList.add("show");
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, 3000);
+}
+
