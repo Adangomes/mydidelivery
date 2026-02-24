@@ -3,29 +3,48 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel Administrativo | Snoop & Cervejaria</title>
-  
+  <title>Painel Administrativo</title>
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
   <script src="https://unpkg.com/netlify-cms@^2.10.192/dist/netlify-cms.js"></script>
-
   <script>
-    // Verifica se o widget do Netlify Identity está carregado
+    // Pega o nome do site pela URL
+    const isCervejaria = window.location.hostname.includes("casadacerveja");
+
+    CMS.registerEventListener({
+      name: 'prePublish',
+      handler: ({ entry }) => {
+        return entry.get('data');
+      },
+    });
+
+    // Aguarda o CMS carregar para filtrar as coleções visualmente
+    window.addEventListener('DOMContentLoaded', () => {
+        const style = document.createElement('style');
+        if (isCervejaria) {
+            // Se estiver na URL da cervejaria, ESCONDE o Snoop Lanche da barra lateral
+            style.innerHTML = `
+                a[href*="collections/snoop_lanche"] { display: none !important; }
+            `;
+            console.log("Modo: Casa da Cerveja - Escondendo Snoop");
+        } else {
+            // Se estiver em outra URL (Snoop), ESCONDE a Casa da Cerveja
+            style.innerHTML = `
+                a[href*="collections/casa_da_cerveja"] { display: none !important; }
+            `;
+            console.log("Modo: Snoop Lanche - Escondendo Cervejaria");
+        }
+        document.head.appendChild(style);
+    });
+
     if (window.netlifyIdentity) {
       window.netlifyIdentity.on("init", user => {
         if (!user) {
-          window.netlifyIdentity.on("login", () => {
-            // Só redireciona se o usuário acabou de logar
-            document.location.href = "/admin/";
-          });
+          window.netlifyIdentity.on("login", () => { document.location.href = "/admin/"; });
         }
       });
-      
-      // Ao deslogar, vai para a home
-      window.netlifyIdentity.on("logout", () => {
-        document.location.href = "/";
-      });
+      window.netlifyIdentity.on("logout", () => { document.location.href = "/"; });
     }
   </script>
 </body>
