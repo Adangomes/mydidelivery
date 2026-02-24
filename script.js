@@ -614,7 +614,8 @@ function mostrarToast(nomeProduto) {
     toast.classList.add("show");
     setTimeout(() => {
         toast.classList.remove("show");
-    }, 1500);
+    }, 2000);
 }
+
 
 
