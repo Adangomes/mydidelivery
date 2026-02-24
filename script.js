@@ -1,151 +1,64 @@
 // CONFIGURAÇÕES GLOBAIS
-
 const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";
-
 const RESTAURANTE_COORD = [-49.024909, -26.464334]; 
-
 const TAXA_BASE = 5;
-
 const VALOR_POR_KM = 1.5;
-
 const WHATSAPP_NUMERO = "5547992745867";
-
-
-
 let carrinho = [];
-
 let produtosGeral = [];
-
 let taxaEntregaCalculada = 0;
-
-
-
 // Controle de Pizza e Porção
-
 let pizzaPrincipal = null;
-
 let saboresSelecionados = []; 
-
 let tamanhoSelecionado = null;
-
 let limiteSabores = 1;
-
 let itemTemporarioPorcao = null; // Nova variável para controlar a porção antes de confirmar
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
-
     carregarStatusLoja();
-
     carregarCardapioCompleto();
-
     carregarCarrinhoStorage();
-
 });
-
-
-
 // --- CARREGAMENTO DO CARDÁPIO ---
-
 async function carregarCardapioCompleto() {
-
     try {
-
         const res = await fetch("content/produtos.json?v=" + Date.now());
-
         const data = await res.json();
-
         produtosGeral = data.produtos;
-
-
-
         const corpo = document.getElementById("cardapio-corpo");
-
         const nav = document.getElementById("categorias-scroll");
-
         corpo.innerHTML = ""; nav.innerHTML = "";
-
-
-
         const categorias = {};
-
         produtosGeral.forEach(p => {
-
             if (!categorias[p.categoria]) categorias[p.categoria] = [];
-
             categorias[p.categoria].push(p);
-
         });
-
-
-
         Object.keys(categorias).forEach((cat, index) => {
-
             const idCat = `cat-${cat.replace(/\s+/g, '-')}`;
-
-            
-
             const link = document.createElement("a");
-
             link.href = `#${idCat}`;
-
             link.className = `cat-link ${index === 0 ? 'active' : ''}`;
-
             link.innerText = cat.toUpperCase();
-
             link.onclick = (e) => {
-
                 e.preventDefault();
-
                 document.getElementById(idCat).scrollIntoView({ behavior: 'smooth' });
-
             };
-
             nav.appendChild(link);
-
-
-
             const section = document.createElement("section");
-
             section.className = "secao-categoria";
-
             section.id = idCat;
-
             section.innerHTML = `<h2 class="titulo-categoria-lista">${cat}</h2>`;
-
-
-
             categorias[cat].forEach(p => {
-
                 if (p.categoria.toLowerCase() === 'pizza' && !p.title.toUpperCase().includes("PIZZA")) return; 
-
-                
-
                 // Esconde sabores de porção da lista principal
-
                 if (p.categoria.toLowerCase() === 'porcao' && !p.title.toUpperCase().includes("600G") && !p.title.toUpperCase().includes("1KG")) {
-
                     return;
-
                 }
-
-
-
-                const pJson = JSON.stringify(p).replace(/"/g, '&quot;');
-
-                
-
+                const pJson = JSON.stringify(p).replace(/"/g, '&quot;');      
                 let acao = "";
-
                 if(p.categoria.toLowerCase() === 'pizza') {
-
                     acao = `abrirModalPizza('${p.title}')`;
-
                 } 
-
                 else if (p.categoria.toLowerCase() === 'porcao') {
-
                     acao = `abrirModalDinamico('porcao', '${p.title}')`;
 
                 }
@@ -1261,3 +1174,4 @@ function voltarParaEntrega() {
     document.getElementById("form-entrega").style.display = "block";
 
 }
+
