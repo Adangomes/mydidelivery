@@ -117,20 +117,29 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 🔐 LOGIN ADMIN
-        const SENHA_ADMIN = "snoop2026"; 
+        // ==========================================
+        // 🔐 LOGIN ADMIN (AJUSTADO PARA DUAS SENHAS)
+        // ==========================================
+        const SENHAS = {
+            "snoop_lanche": "snoop2026",      // Senha do Snoop
+            "casa_da_cerveja": "cerveja2026"   // Senha da Casa da Cerveja
+        };
 
         function verificarSenha() {
-            const senha = document.getElementById("senhaAdmin").value;
-            if (senha === SENHA_ADMIN) {
+            const senhaDigitada = document.getElementById("senhaAdmin").value;
+            const senhaCorreta = SENHAS[LOJA_ID]; // Pega a senha baseada na loja detectada no topo
+
+            if (senhaDigitada === senhaCorreta) {
                 document.getElementById("login-admin").style.display = "none";
-                localStorage.setItem("admin_logado", "true");
+                // Salva o login específico desta loja para não deslogar a outra
+                localStorage.setItem("admin_logado_" + LOJA_ID, "true");
             } else {
                 document.getElementById("erro-senha").style.display = "block";
             }
         }
 
-        if (localStorage.getItem("admin_logado") === "true") {
+        // Verifica se o admin já está logado nesta loja específica
+        if (localStorage.getItem("admin_logado_" + LOJA_ID) === "true") {
             document.getElementById("login-admin").style.display = "none";
         }
 
@@ -148,7 +157,7 @@
             }).catch(() => alert("Erro: certifique-se que o arquivo 'alert.mpeg' existe."));
         }
 
-        // 🚀 ESCUTA APENAS A PASTA DA LOJA ATUAL (pedidos/LOJA_ID)
+        // 🚀 ESCUTA APENAS A PASTA DA LOJA ATUAL
         db.ref('pedidos/' + LOJA_ID).on('child_added', (snap) => {
             const p = snap.val();
             const id = snap.key;
@@ -222,7 +231,6 @@
             if(confirm("Deseja concluir este pedido?")){
                 const refOrigem = db.ref(`pedidos/${LOJA_ID}/${id}`);
                 refOrigem.once('value', s => {
-                    // Salva no histórico da loja correta
                     db.ref(`relatorios/${LOJA_ID}/${id}`).set(s.val()).then(() => {
                         refOrigem.remove();
                         document.getElementById('card-'+id).remove();
@@ -253,7 +261,6 @@
             }
         }
 
-        // CONTROLE ABERTO/FECHADO
         const statusRef = db.ref(`configuracoes/${LOJA_ID}/status`);
         function alternarStatusLoja() {
             statusRef.once('value', (snap) => {
