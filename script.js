@@ -400,3 +400,4 @@ function carregarCarrinhoStorage() {
     const salvo = localStorage.getItem("carrinho");
     if(salvo) { carrinho = JSON.parse(salvo); atualizarCarrinho(); }
 }
+
