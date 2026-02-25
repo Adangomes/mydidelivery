@@ -78,26 +78,32 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
-            // ===============================
-    // 🔐 CONFIG SENHA ADMIN
-    // ===============================
-    const SENHA_ADMIN = "snoop2026";
+        // ==========================================
+        // 2. IDENTIFICAÇÃO AUTOMÁTICA DA LOJA
+        // ==========================================
+        const host = window.location.hostname;
+        let LOJA_ID = "snoop_lanche"; // Padrão
 
-    function verificarSenha() {
-        const senha = document.getElementById("senhaAdmin").value;
-
-        if (senha === SENHA_ADMIN) {
-            document.getElementById("login-admin").style.display = "none";
-            localStorage.setItem("admin_logado", "true");
-        } else {
-            document.getElementById("erro-senha").style.display = "block";
+        // Se o domínio contiver "casadacerveja", muda a "chave" do banco de dados
+        if (host.includes("casadacerveja")) {
+            LOJA_ID = "casa_da_cerveja";
         }
-    }
 
-    if (localStorage.getItem("admin_logado") === "true") {
-        document.getElementById("login-admin").style.display = "none";
-    }
+        // Ajusta os nomes na tela assim que carregar
+        document.addEventListener("DOMContentLoaded", () => {
+            const titulo = document.querySelector(".admin-header h1");
+            const loginTitulo = document.querySelector("#login-admin h2");
+            
+            if (LOJA_ID === "casa_da_cerveja") {
+                if(titulo) titulo.innerHTML = "CASA DA <span>CERVEJA</span>";
+                if(loginTitulo) loginTitulo.innerText = "CASA DA CERVEJA ADMIN";
+                document.title = "CASA DA CERVEJA - Admin";
+            }
+        });
 
+        // ==========================================
+        // 3. CONFIGURAÇÃO FIREBASE (SUA CONTA)
+        // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
             authDomain: "myproject26-10f0e.firebaseapp.com",
@@ -107,23 +113,43 @@
             messagingSenderId: "884850608032",
             appId: "1:884850608032:web:79db6983346c3c20edc6c5"
         };
+        
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-        
+
+        // 🔐 LOGIN ADMIN
+        const SENHA_ADMIN = "snoop2026"; 
+
+        function verificarSenha() {
+            const senha = document.getElementById("senhaAdmin").value;
+            if (senha === SENHA_ADMIN) {
+                document.getElementById("login-admin").style.display = "none";
+                localStorage.setItem("admin_logado", "true");
+            } else {
+                document.getElementById("erro-senha").style.display = "block";
+            }
+        }
+
+        if (localStorage.getItem("admin_logado") === "true") {
+            document.getElementById("login-admin").style.display = "none";
+        }
+
+        // ==========================================
+        // 4. CONTROLE DE SOM E RECEBIMENTO
+        // ==========================================
         let prontoParaTocar = false;
-        let audioLiberado = false;
 
         function ativarSomEDestravar() {
             const context = new (window.AudioContext || window.webkitAudioContext)();
             if (context.state === 'suspended') context.resume();
             new Audio('alert.mpeg').play().then(() => {
-                audioLiberado = true;
                 prontoParaTocar = true;
                 document.getElementById('container-ativacao').style.display = 'none';
-            }).catch(() => alert("Arquivo alert.mpeg não encontrado!"));
+            }).catch(() => alert("Erro: certifique-se que o arquivo 'alert.mpeg' existe."));
         }
 
-       db.ref('pedidos').on('child_added', (snap) => {
+        // 🚀 ESCUTA APENAS A PASTA DA LOJA ATUAL (pedidos/LOJA_ID)
+        db.ref('pedidos/' + LOJA_ID).on('child_added', (snap) => {
             const p = snap.val();
             const id = snap.key;
             const li = document.createElement('li');
@@ -132,36 +158,26 @@
             
             let itensHtml = Array.isArray(p.itens) ? p.itens.map(i => 
                 `• ${i.qtd}x ${i.produto} <small style="color:#888;">(R$ ${parseFloat(i.precoUn || 0).toFixed(2)})</small>`
-            ).join('<br>') : "Erro";
+            ).join('<br>') : "Erro nos itens";
 
             li.innerHTML = `
                 <h3>${p.cliente} <span class="badge-pagamento">${p.pagamento}</span></h3>
                 <div class="info"><b> Horário:</b> ${p.horario}</div>
                 <div class="info"><b> Endereço:</b> ${p.endereco}</div>
                 <div class="info"><b> Ref:</b> ${p.referencia || 'Não informada'}</div>
-                
                 <div class="itens-box">
                     <b style="color:var(--primary);"> ITENS DO PEDIDO:</b><br>
                     <div style="margin-top:5px;">${itensHtml}</div>
                 </div>
-                
                 <div class="info-obs">💬 OBS: ${p.obs_cozinha || 'Nenhuma'}</div>
-                
                 <div class="financeiro-box">
-    <div style="display:flex; justify-content:space-between; font-size:13px;">
-        <span>Produtos: R$ ${parseFloat(p.subtotal || 0).toFixed(2)}</span>
-        <span>Taxa: R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2)}</span>
-    </div>
-
-    ${p.desconto > 0 ? `
-    <div style="display:flex; justify-content:space-between; font-size:13px; color: #d35400; font-weight: bold;">
-        <span>Cupom Desconto:</span>
-        <span>- R$ ${parseFloat(p.desconto).toFixed(2)}</span>
-    </div>` : ''}
-
-    <div class="total">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</div>
-</div>
-
+                    <div style="display:flex; justify-content:space-between; font-size:13px;">
+                        <span>Produtos: R$ ${parseFloat(p.subtotal || 0).toFixed(2)}</span>
+                        <span>Taxa: R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2)}</span>
+                    </div>
+                    ${p.desconto > 0 ? `<div style="color: #d35400; font-weight: bold;">Cupom: - R$ ${parseFloat(p.desconto).toFixed(2)}</div>` : ''}
+                    <div class="total">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</div>
+                </div>
                 <div class="btn-group">
                     <button class="btn-cozinha" onclick="imprimir('cozinha', '${id}')">COZINHA</button>
                     <button class="btn-motoboy" onclick="imprimir('motoboy', '${id}')">MOTOBOY</button>
@@ -173,67 +189,52 @@
             if (prontoParaTocar) new Audio('alert.mpeg').play().catch(()=>{});
         });
 
+        // ==========================================
+        // 5. IMPRESSÃO, CONCLUSÃO E RELATÓRIOS
+        // ==========================================
         function imprimir(tipo, id) {
-    db.ref('pedidos/'+id).once('value', s => {
-        const p = s.val();
-        let lista = Array.isArray(p.itens) ? p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>') : "";
-        
-        let html = "";
-        
-        if (tipo === 'cozinha') {
-            html = `<div style="width:72mm;font-family:Arial;text-align:center;">
-                        <h2>SNOOP LANCHE</h2><h3>COZINHA (${p.horario})</h3><hr>
-                        <div style="text-align:left;">
-                            <b>CLIENTE:</b> ${p.cliente}<br>
-                            <b>ITENS:</b><br>
-                            <div style="font-size:18px;font-weight:bold;">${lista}</div><hr>
-                            <b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}
-                        </div>
-                    </div>`;
-        } else {
-            html = `<div style="width:72mm;font-family:Arial;font-size:14px;">
-                        <center><h2>SNOOP LANCHE</h2>
-                        <b>HORÁRIO: ${p.horario}</b></center><hr>
-                        <b>CLIENTE:</b> ${p.cliente}<br>
-                        <b>ENDEREÇO:</b> ${p.endereco}<br>
-                        <b>REF:</b> ${p.referencia || 'Não informado'}<br>
-                        <b>PAGAMENTO:</b> ${p.pagamento}<br><hr>
-                        
-                        <b>PRODUTOS:</b><br>
-                        <div style="font-size:16px;font-weight:bold;">${lista}</div><br>
-                        
-                        Produtos: R$ ${parseFloat(p.subtotal || 0).toFixed(2)}<br>
-                        Taxa: R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2)}<br>
-                        
-                        ${p.desconto > 0 ? `Cupom Desconto: - R$ ${parseFloat(p.desconto).toFixed(2)}<br>` : ''}
-                        
-                        <b style="font-size:18px;">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</b><hr>
-                        <b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}
-                    </div>`;
+            db.ref(`pedidos/${LOJA_ID}/${id}`).once('value', s => {
+                const p = s.val();
+                let lista = Array.isArray(p.itens) ? p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>') : "";
+                let nomeLoja = LOJA_ID === "casa_da_cerveja" ? "CASA DA CERVEJA" : "SNOOP LANCHE";
+                
+                let html = `<div style="width:72mm;font-family:Arial;text-align:center;">
+                                <h2>${nomeLoja}</h2>
+                                <h3>${tipo.toUpperCase()} (${p.horario})</h3><hr>
+                                <div style="text-align:left;">
+                                    <b>CLIENTE:</b> ${p.cliente}<br>
+                                    ${tipo === 'motoboy' ? `<b>ENDEREÇO:</b> ${p.endereco}<br><b>PAGAMENTO:</b> ${p.pagamento}<br>` : ''}
+                                    <hr><b>ITENS:</b><br>
+                                    <div style="font-size:16px;font-weight:bold;">${lista}</div><hr>
+                                    <b>TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</b><br>
+                                    <b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}
+                                </div>
+                            </div>`;
+                
+                const win = document.getElementById('iframe-impressao').contentWindow;
+                win.document.open(); 
+                win.document.write(`<html><body style="margin:0;" onload="window.print()">${html}</body></html>`); 
+                win.document.close();
+            });
         }
-        
-        const win = document.getElementById('iframe-impressao').contentWindow;
-        win.document.open(); 
-        win.document.write(`<html><body style="margin:0;" onload="window.print()">${html}</body></html>`); 
-        win.document.close();
-    });
-}
 
         function concluirPedido(id) {
             if(confirm("Deseja concluir este pedido?")){
-                const ref = db.ref('pedidos/'+id);
-                ref.once('value', s => {
-                    db.ref('relatorios').child(id).set(s.val()).then(() => {
-                        ref.remove();
+                const refOrigem = db.ref(`pedidos/${LOJA_ID}/${id}`);
+                refOrigem.once('value', s => {
+                    // Salva no histórico da loja correta
+                    db.ref(`relatorios/${LOJA_ID}/${id}`).set(s.val()).then(() => {
+                        refOrigem.remove();
                         document.getElementById('card-'+id).remove();
                     });
                 });
             }
         }
+
         function abrirRelatorio() {
             const t = document.getElementById('tabela-relatorio'); t.innerHTML = '';
             let soma = 0; let q = 0;
-            db.ref('relatorios').once('value', s => {
+            db.ref(`relatorios/${LOJA_ID}`).once('value', s => {
                 s.forEach(c => {
                     const r = c.val(); soma += parseFloat(r.total); q++;
                     t.innerHTML += `<tr><td>${r.horario}</td><td>${r.cliente}</td><td>R$ ${parseFloat(r.total).toFixed(2)}</td></tr>`;
@@ -243,26 +244,24 @@
                 document.getElementById('modal-relatorio').style.display = 'block';
             });
         }
-        // ==========================================
-// CONTROLE DE STATUS DA LOJA (ABERTO/FECHADO)
-// ==========================================
 
-const statusRef = db.ref('configuracoes/status');
-function alternarStatusLoja() {
-    statusRef.once('value', (snap) => {
-        const statusAtual = snap.val();
-        // Se estiver true, vira false. Se for false, vira true.
-        statusRef.set(!statusAtual);
-    });
-}    
         function fecharRelatorio() { document.getElementById('modal-relatorio').style.display = 'none'; }
-        function limparRelatorio() { if(confirm("Limpar todo o histórico?")) db.ref('relatorios').remove().then(() => abrirRelatorio()); }
+        
+        function limparRelatorio() { 
+            if(confirm("Limpar todo o histórico desta loja?")) {
+                db.ref(`relatorios/${LOJA_ID}`).remove().then(() => abrirRelatorio()); 
+            }
+        }
+
+        // CONTROLE ABERTO/FECHADO
+        const statusRef = db.ref(`configuracoes/${LOJA_ID}/status`);
+        function alternarStatusLoja() {
+            statusRef.once('value', (snap) => {
+                const statusAtual = snap.val();
+                statusRef.set(!statusAtual);
+            });
+        }    
     </script>
-</body>
-</html>
-
-
-
 
 
 
