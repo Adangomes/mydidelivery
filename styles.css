@@ -1,120 +1,252 @@
 /* ============================================================
-   RESET & FONTS
+   CONFIGURAÇÕES GERAIS E RESET
    ============================================================ */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap');
-
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-body { background: #fff; color: #333; overflow-x: hidden; }
-
-/* ============================================================
-   HEADER & STATUS
-   ============================================================ */
-.header { position: sticky; top: 0; background: #000; color: #fff; padding: 12px 16px; z-index: 1000; height: 65px; }
-.header-top { display: flex; justify-content: space-between; align-items: center; }
-.logo { font-weight: 800; font-size: 1.1rem; text-transform: uppercase; }
-
-.status { font-size: 11px; position: absolute; top: 38px; left: 16px; font-weight: 700; text-transform: uppercase; }
-.status.aberto { color: #28a745 !important; }
-.status.fechado { color: #dc3545 !important; }
-
-.cart { font-size: 1.5rem; cursor: pointer; }
-
-/* ============================================================
-   NAV CATEGORIAS
-   ============================================================ */
-.categorias-nav { position: sticky; top: 65px; background: #fff; z-index: 999; border-bottom: 1px solid #eee; }
-.categorias-scroll { display: flex; overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
-.categorias-scroll::-webkit-scrollbar { display: none; }
-.cat-link { color: #666; text-decoration: none !important; font-size: 0.85rem; font-weight: 500; padding: 15px 20px; display: inline-block; transition: 0.3s; border-bottom: 3px solid transparent; }
-.cat-link.active { color: #e67e22; font-weight: 700; border-bottom: 3px solid #e67e22; }
-
-/* ============================================================
-   LISTA DE PRODUTOS (AJUSTE DE ALINHAMENTO)
-   ============================================================ */
-.container-main { padding: 10px 16px; max-width: 600px; margin: 0 auto; }
-.secao-categoria { scroll-margin-top: 130px; margin-top: 20px; }
-.titulo-categoria-lista { font-size: 0.9rem; font-weight: 800; margin-bottom: 15px; color: #e67e22; text-transform: uppercase; }
-
-/* AQUI ESTÁ O AJUSTE DE ALINHAMENTO VERTICAL */
-.item-produto-lista { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; /* Centraliza texto e imagem na mesma linha */
-    padding: 15px 0; 
-    border-bottom: 1px solid #eee; 
-    gap: 15px; 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
 }
 
-.info-produto { flex: 1; }
-.nome-produto-lista { font-size: 0.95rem; color: #000; font-weight: 700; text-transform: uppercase; }
-.desc-produto-lista { font-size: 0.8rem; color: #777; margin: 4px 0; line-height: 1.4; }
-.preco-unico { color: #27ae60; font-weight: 700; font-size: 1rem; display: block; }
-
-.foto-produto-lista { position: relative; width: 90px; height: 90px; flex-shrink: 0; }
-.foto-produto-lista img { width: 100%; height: 100%; object-fit: cover; border-radius: 12px; }
-.btn-add-lista { position: absolute; bottom: -5px; right: -5px; background: #e67e22; color: #fff; border: none; border-radius: 50%; width: 30px; height: 30px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.2); cursor: pointer; }
-
-/* ============================================================
-   CARRINHO E MODAIS (SEM ESPAÇOS VAZIOS)
-   ============================================================ */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 2000; backdrop-filter: blur(3px); }
-
-.modal-box, .cart-box { 
-    background: #fff; 
-    width: 92%; 
-    max-width: 420px; 
-    border-radius: 20px; 
-    overflow: hidden; 
-    display: flex; 
-    flex-direction: column;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+body {
+    background-color: #fff;
+    color: #333;
 }
 
-.modal-header-clean { padding: 15px; background: #f8f8f8; border-bottom: 1px solid #eee; text-align: center; position: relative; }
-.modal-header-clean h3 { font-size: 1rem; font-weight: 800; text-transform: uppercase; }
-
-/* ITENS DENTRO DO CARRINHO - AJUSTADO */
-.item-sabor-fatia {
+/* ============================================================
+   CABEÇALHO (Logo em cima, Status abaixo)
+   ============================================================ */
+.header {
+    background-color: #000;
+    padding: 15px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px !important; 
-    border-bottom: 1px solid #f1f1f1;
 }
 
-.item-sabor-fatia div { flex: 1; font-weight: 600; font-size: 0.9rem; }
+.header-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
 
-.item-sabor-fatia button {
-    background: #000 !important;
-    color: #fff !important;
+.logo {
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.status span {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status.aberto span { color: #2ecc71; }
+.status.fechado span { color: #e74c3c; }
+
+.cart-btn {
+    background: none;
     border: none;
-    border-radius: 8px;
-    width: 32px;
-    height: 32px;
+    color: #fff;
+    font-size: 1.4rem;
     cursor: pointer;
+}
+
+/* ============================================================
+   CATEGORIAS (Navegação Horizontal)
+   ============================================================ */
+.categorias-wrapper {
+    background: #fff;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 65px; /* Ajuste conforme altura do header */
+    z-index: 999;
+    padding: 10px 0;
+}
+
+#categorias-scroll {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0 15px;
+    gap: 20px;
+    scrollbar-width: none;
+}
+
+#categorias-scroll::-webkit-scrollbar { display: none; }
+
+.cat-link {
+    text-decoration: none;
+    color: #888;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    padding-bottom: 5px;
+}
+
+.cat-link.active {
+    color: #f37021;
+    border-bottom: 2px solid #f37021;
+}
+
+/* ============================================================
+   LISTA DE PRODUTOS (Compacta e Alinhada)
+   ============================================================ */
+.container-main {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 10px 15px;
+}
+
+.titulo-categoria-lista {
+    font-size: 1.1rem;
+    color: #f37021;
+    text-transform: uppercase;
+    margin: 20px 0 10px 0;
+}
+
+.item-produto-lista {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    padding: 15px 0 !important;
+    border-bottom: 1px solid #f2f2f2;
+    cursor: pointer;
+    gap: 12px;
+}
+
+.info-produto {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.nome-produto-lista {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 4px;
+}
+
+.desc-produto-lista {
+    font-size: 0.8rem;
+    color: #666;
+    line-height: 1.3;
+    margin-bottom: 8px;
+}
+
+.preco-unico {
+    color: #2e7d32;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+/* Foto e Botão de Adicionar */
+.foto-produto-lista {
+    position: relative;
+    width: 85px;
+    height: 85px;
     flex-shrink: 0;
 }
 
+.foto-produto-lista img {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.btn-add-lista {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    background: #f37021;
+    color: #fff;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
 /* ============================================================
-   CUPOM E FINALIZAÇÃO
+   MODAIS (Carrinho e Opções)
    ============================================================ */
-.cupom-secao { padding: 15px 20px; border-top: 1px solid #eee; }
-.cupom-container { display: flex; gap: 8px; }
-#input-cupom { flex: 2; padding: 10px; border-radius: 10px; border: 1px solid #ddd; text-transform: uppercase; }
-#btn-aplicar-cupom { flex: 1; background: #111; color: #fff; border: none; border-radius: 10px; font-weight: 700; }
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    z-index: 2000;
+    justify-content: center;
+    align-items: flex-end; /* Abre de baixo para cima no mobile */
+}
 
-.summary-box { padding: 15px 20px; background: #fafafa; }
-.summary-line { display: flex; justify-content: space-between; font-size: 0.9rem; margin-bottom: 4px; }
-.summary-line.total { font-weight: 800; font-size: 1.1rem; color: #000; border-top: 1px solid #eee; padding-top: 8px; margin-top: 8px; }
+.modal-box {
+    background: #fff;
+    width: 100%;
+    max-width: 500px;
+    border-radius: 20px 20px 0 0;
+    padding: 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
 
-.modal-actions { padding: 15px 20px; display: flex; flex-direction: column; gap: 8px; }
-.btn-finalizar { background: #28a745; color: #fff; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-.btn-continuar { background: #eee; color: #333; border: none; padding: 10px; border-radius: 12px; font-weight: 600; cursor: pointer; }
+/* Botões de Ação */
+.btn-confirmar {
+    background: #000;
+    color: #fff;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-weight: 700;
+    margin-top: 15px;
+}
+
+.btn-voltar {
+    background: #eee;
+    color: #333;
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    margin-top: 10px;
+}
 
 /* ============================================================
-   TOAST E AUXILIARES
+   ESTILO DO CUPOM NO CARRINHO
    ============================================================ */
-.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 10px 20px; border-radius: 50px; font-size: 0.8rem; opacity: 0; z-index: 10000; transition: 0.3s; }
-.toast.show { opacity: 1; bottom: 40px; }
+.cupom-container {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0;
+}
 
-footer { padding: 20px; text-align: center; font-size: 0.8rem; color: #999; background: #fdfdfd; }
+#input-cupom {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    text-transform: uppercase;
+}
+
+#btn-aplicar-cupom {
+    background: #000;
+    color: #fff;
+    border: none;
+    padding: 0 15px;
+    border-radius: 8px;
+    font-weight: 600;
+}
