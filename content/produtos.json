@@ -8,7 +8,7 @@
       },
       "categoria": "pizza",
       "ingredientes": "Escolha 1 sabor",
-      "image": "/imagens/margerita.jpeg",
+      "image": "imagens/margerita.jpeg",
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
     },
@@ -19,7 +19,7 @@
       },
       "categoria": "pizza",
       "ingredientes": "Escolha até 2 sabores",
-      "image": "/imagens/margerita.jpeg",
+      "image": "imagens/margerita.jpeg",
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
     },
@@ -30,7 +30,7 @@
       },
       "categoria": "pizza",
       "ingredientes": "Escolha até 3 sabores",
-      "image": "/imagens/margerita.jpeg",
+      "image": "imagens/margerita.jpeg",
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
     },
@@ -40,7 +40,7 @@
       "oldPrice": 48,
       "categoria": "burger",
       "ingredientes": "Pão, humbúrguer,queijo, presunto, bife, tomate, alface",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -51,7 +51,7 @@
       },
       "categoria": "porcao",
       "ingredientes": "Opções de Batatas",
-      "image": "/imagens/fritas.jpeg",
+      "image": "imagens/fritas.jpeg",
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": false
     },
@@ -62,7 +62,7 @@
       },
       "categoria": "porcao",
       "ingredientes": "Opções de Batata",
-      "image": "/imagens/fritas.jpeg",
+      "image": "imagens/fritas.jpeg",
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": false
     },
@@ -72,7 +72,7 @@
       "oldPrice": 45,
       "categoria": "burger",
       "ingredientes": "Pão, humbúrguer,queijo, presunto, bacon, milho, ervilha, tomate, alface",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -81,7 +81,7 @@
       "price": 40,
       "categoria": "burger",
       "ingredientes": "Pão, humbúrguer,queijo, presunto, calabresa, milho, ervilha, tomate, alface",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -90,7 +90,7 @@
       "price": 25,
       "categoria": "dog",
       "ingredientes": "Pão, salsicha, bacon, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
-      "image": "/imagens/dog.jpeg",
+      "image": "imagens/dog.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -99,7 +99,7 @@
       "price": 6.9,
       "categoria": "bebida",
       "ingredientes": "350ml",
-      "image": "/imagens/coca-cola.jpeg",
+      "image": "imagens/coca-cola.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -108,7 +108,7 @@
       "price": 6.5,
       "categoria": "bebida",
       "ingredientes": "350ml",
-      "image": "/imagens/guarana-lata.jpeg",
+      "image": "imagens/guarana-lata.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -117,7 +117,7 @@
       "price": 8,
       "categoria": "bebida",
       "ingredientes": "600ml",
-      "image": "/imagens/coca-600.jpeg",
+      "image": "imagens/coca-600.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -126,7 +126,7 @@
       "price": 8,
       "categoria": "bebida",
       "ingredientes": "600ml",
-      "image": "/imagens/guarana600.jpeg",
+      "image": "imagens/guarana600.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -135,7 +135,7 @@
       "price": 40,
       "categoria": "burger",
       "ingredientes": "Pão, humbúrguer,queijo, presunto, coração, milho, ervilha, tomate, alface",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -143,7 +143,7 @@
       "title": "X SNOOP",
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, queijo, presunto, calabresa, frango, coração, bacon, ovo, requeijão, tomate, alface",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "price": 55,
       "prices": {
         "M": -2
@@ -156,7 +156,7 @@
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, queijo, presunto",
       "price": 15,
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -164,7 +164,7 @@
       "title": "X SALADA",
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, queijo, presunto, tomate, alface, milho, ervilha",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "price": 20,
       "prices": {
         "P": -1
@@ -176,7 +176,7 @@
       "title": "X GALINHA",
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, queijo, presunto, frango, milho, ervilha, tomate, alface",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "prices": {
         "P": -1
       },
@@ -188,7 +188,7 @@
       "title": "X TICK",
       "categoria": "burger",
       "ingredientes": "Pão, frango, queijo, requeijão",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "price": 22,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -197,7 +197,7 @@
       "title": "X EGG",
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, queijo, presunto, ovo, milho, ervilha, tomate, alface",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "price": 21,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -207,7 +207,7 @@
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, presunto, queijo, salsicha, milho, ervilha, tomate, alface",
       "price": 21,
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -216,7 +216,7 @@
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, queijo, presunto, strogonoff frango, batata palha, alface",
       "price": 19,
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "tipo_escolha": "direto",
       "tem_adicionais": false
     },
@@ -224,7 +224,7 @@
       "title": "X SICILIANO",
       "categoria": "burger",
       "ingredientes": "Pão, hambúrguer, queijo, bacon, requeijão, alface",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "price": 21,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -233,7 +233,7 @@
       "title": "PORTUGUESA",
       "categoria": "pizza",
       "ingredientes": "Muçarela, presunto, ovo, cebola, orégano",
-      "image": "/imagens/margerita.jpeg",
+      "image": "imagens/margerita.jpeg",
       "price": 0,
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
@@ -242,7 +242,7 @@
       "title": "BACON",
       "categoria": "pizza",
       "ingredientes": "Muçarela, bacon, tomate, orégano",
-      "image": "/imagens/margerita.jpeg",
+      "image": "imagens/margerita.jpeg",
       "price": 0,
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
@@ -251,7 +251,7 @@
       "title": "MUSSARELA",
       "categoria": "pizza",
       "ingredientes": "Muçarela, requeijão, cheddar, orégano",
-      "image": "/imagens/margerita.jpeg",
+      "image": "imagens/margerita.jpeg",
       "price": 0,
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
@@ -260,7 +260,7 @@
       "title": "FRANGO",
       "categoria": "pizza",
       "ingredientes": "Muçarela, frango, requeijão, orégano",
-      "image": "/imagens/margerita.jpeg",
+      "image": "imagens/margerita.jpeg",
       "price": 0,
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
@@ -269,7 +269,7 @@
       "title": "CALABRESA",
       "categoria": "pizza",
       "ingredientes": "Muçarela, calabresa, orégano",
-      "image": "/imagens/margerita.jpeg",
+      "image": "imagens/margerita.jpeg",
       "price": 0,
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
@@ -278,7 +278,7 @@
       "title": "BATATA FRITA",
       "categoria": "porcao",
       "ingredientes": "batata frita",
-      "image": "/imagens/fritas.jpeg",
+      "image": "imagens/fritas.jpeg",
       "price": 0,
       "prices": {
         "P": 30,
@@ -291,7 +291,7 @@
       "title": "BATATA FRITA C/BACON",
       "categoria": "porcao",
       "ingredientes": "batata frita com bacon",
-      "image": "/imagens/fritas.jpeg",
+      "image": "imagens/fritas.jpeg",
       "price": 0,
       "prices": {
         "P": 40,
@@ -304,7 +304,7 @@
       "title": "BATATA FRITA COMPLETA",
       "categoria": "porcao",
       "ingredientes": "Frango, bacon, calabresa, cheddar, requeijão",
-      "image": "/imagens/fritas.jpeg",
+      "image": "imagens/fritas.jpeg",
       "prices": {
         "P": 54,
         "G": 71
@@ -316,7 +316,7 @@
       "title": "FRANGO À PARMEGIANA",
       "categoria": "parmediana",
       "ingredientes": "Frango à parmegiana, coberto de molho de tomate e queijo derretido, acompanhado de arroz branco soltinho e salada fresca",
-      "image": "/imagens/parmediana.jpeg",
+      "image": "imagens/parmediana.jpeg",
       "price": 140,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -325,7 +325,7 @@
       "title": "BIFE À PARMEGIANA",
       "ingredientes": "Suculento bife à parmegiana acompanhado de arroz soltinho e salada fresca",
       "categoria": "parmediana",
-      "image": "/imagens/parmediana.jpeg",
+      "image": "imagens/parmediana.jpeg",
       "price": 160,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -334,7 +334,7 @@
       "title": "DOG DUPLO",
       "categoria": "dog",
       "ingredientes": "Pão, 2 salsicha, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
-      "image": "/imagens/dog.jpeg",
+      "image": "imagens/dog.jpeg",
       "price": 14,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -343,7 +343,7 @@
       "title": "DOG FRANGO",
       "categoria": "dog",
       "ingredientes": "Pão, salsicha, frango, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
-      "image": "/imagens/dog.jpeg",
+      "image": "imagens/dog.jpeg",
       "price": 22,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -352,7 +352,7 @@
       "title": "DOG CORAÇÃO",
       "categoria": "dog",
       "ingredientes": "Pão, salsicha, coração, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
-      "image": "/imagens/dog.jpeg",
+      "image": "imagens/dog.jpeg",
       "price": 30,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -370,7 +370,7 @@
       "title": "DOG CATUPIRY",
       "categoria": "dog",
       "ingredientes": "Pão, salsicha, catupiry, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
-      "image": "/imagens/dog.jpeg",
+      "image": "imagens/dog.jpeg",
       "price": 24,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -379,7 +379,7 @@
       "title": "DOG BIFE",
       "categoria": "dog",
       "ingredientes": "Pão, salsicha, bife(coxão mole), tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
-      "image": "/imagens/dog.jpeg",
+      "image": "imagens/dog.jpeg",
       "price": 25,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -388,7 +388,7 @@
       "title": "kaiser lata",
       "categoria": "bebida",
       "ingredientes": "350ml",
-      "image": "/imagens/kaiser.jpeg",
+      "image": "imagens/kaiser.jpeg",
       "price": 7,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -397,7 +397,7 @@
       "title": "Amstel lata",
       "categoria": "bebida",
       "ingredientes": "350 ml",
-      "image": "/imagens/kaiser-lata.jpeg",
+      "image": "imagens/kaiser-lata.jpeg",
       "price": 7,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -415,7 +415,7 @@
       "title": "GUARANÁ ANTÁRTICA 2L",
       "categoria": "bebida",
       "ingredientes": "2l",
-      "image": "/imagens/guarana2l.jpeg",
+      "image": "imagens/guarana2l.jpeg",
       "price": 15,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -423,7 +423,7 @@
     {
       "title": "LARANJINHA",
       "price": 10,
-      "image": "/imagens/laranjinha.jpeg",
+      "image": "imagens/laranjinha.jpeg",
       "categoria": "bebida",
       "ingredientes": "2l",
       "tipo_escolha": "direto",
@@ -433,7 +433,7 @@
       "title": "FRAMBOESA 2L",
       "categoria": "bebida",
       "ingredientes": "2l",
-      "image": "/imagens/framboesa.jpeg",
+      "image": "imagens/framboesa.jpeg",
       "price": 10,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -442,7 +442,7 @@
       "title": "DOG PIZZA",
       "categoria": "dog",
       "ingredientes": "Pão, salsicha, presunto, requeijão, queijo, orégano, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
-      "image": "/imagens/dog.jpeg",
+      "image": "imagens/dog.jpeg",
       "price": 23,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -451,7 +451,7 @@
       "title": "DOG SICILANO",
       "categoria": "dog",
       "ingredientes": "Pão, salsicha, bacon, requeijão, queijo, tomate, milho, ervilha, purê de batata, farofa, maionese caseira, batata palha",
-      "image": "/imagens/dog.jpeg",
+      "image": "imagens/dog.jpeg",
       "price": 32,
       "tipo_escolha": "direto",
       "tem_adicionais": false
@@ -460,7 +460,7 @@
       "title": "HAVAINA",
       "categoria": "pizza",
       "ingredientes": "Chocolate branco, abacaxi, morango",
-      "image": "/imagens/pizza1.jpeg",
+      "image": "imagens/pizza1.jpeg",
       "price": 0,
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
@@ -469,7 +469,7 @@
       "title": "BRASILEIRA",
       "categoria": "pizza",
       "ingredientes": "Chocolate preto, abacaxi, morango",
-      "image": "/imagens/pizza1.jpeg",
+      "image": "imagens/pizza1.jpeg",
       "price": 0,
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
@@ -478,7 +478,7 @@
       "title": "SENSAÇÃO",
       "categoria": "pizza",
       "ingredientes": "Chocolate preto, morango",
-      "image": "/imagens/pizza1.jpeg",
+      "image": "imagens/pizza1.jpeg",
       "price": 0,
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
@@ -487,7 +487,7 @@
       "title": "BANANA NEVADA",
       "categoria": "pizza",
       "ingredientes": "Chocolate branco, banana, canela",
-      "image": "/imagens/pizza1.jpeg",
+      "image": "imagens/pizza1.jpeg",
       "price": 0,
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
@@ -496,7 +496,7 @@
       "title": "X BACON + COCA LATA 350ml",
       "categoria": "promocao",
       "ingredientes": "Pão, humbúrguer,queijo, presunto, bacon, milho, ervilha, tomate, alface + coca lata 350ml",
-      "image": "/imagens/xsalada.jpeg",
+      "image": "imagens/xsalada.jpeg",
       "price": 34.99,
       "oldPrice": 40,
       "tipo_escolha": "direto",
