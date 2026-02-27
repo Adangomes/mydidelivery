@@ -8,7 +8,7 @@
       },
       "categoria": "pizza",
       "ingredientes": "Escolha 1 sabor",
-      "image": "/imagens/margerita.jpeg",
+      "image": "imagens/margerita.jpeg",
       "tipo_escolha": "abrir_modal",
       "tem_adicionais": true
     },
