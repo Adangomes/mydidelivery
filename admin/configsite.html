@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurações do Restaurante</title>
+
+<link rel="stylesheet" href="admin.css">
+
+<style>
+.container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+}
+
+h2 {
+    margin-bottom: 20px;
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: #00c853;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.status {
+    margin-top: 10px;
+    text-align: center;
+    font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h2>⚙️ Configurações do Site</h2>
+
+    <input id="nome" placeholder="Nome do Restaurante">
+    <input id="whatsapp" placeholder="WhatsApp (ex: 47999999999)">
+    <input id="taxa" placeholder="Taxa de entrega (R$)">
+    
+    <input id="abertura" type="time">
+    <input id="fechamento" type="time">
+
+    <select id="status">
+        <option value="aberto">🟢 Aberto</option>
+        <option value="fechado">🔴 Fechado</option>
+    </select>
+
+    <button onclick="salvar()">Salvar Configurações</button>
+
+    <div class="status" id="msg"></div>
+</div>
+
+<script type="module">
+import { db } from "./firebase.js";
+import { doc, setDoc, getDoc } from "firebase/firestore";
+
+const idRestaurante = "snoop"; // pode dinamizar depois
+
+async function carregar() {
+    const ref = doc(db, "config", idRestaurante);
+    const snap = await getDoc(ref);
+
+    if (snap.exists()) {
+        const d = snap.data();
+
+        nome.value = d.nome || "";
+        whatsapp.value = d.whatsapp || "";
+        taxa.value = d.taxa || "";
+        abertura.value = d.abertura || "";
+        fechamento.value = d.fechamento || "";
+        status.value = d.status || "aberto";
+    }
+}
+
+window.salvar = async () => {
+    const data = {
+        nome: nome.value,
+        whatsapp: whatsapp.value,
+        taxa: taxa.value,
+        abertura: abertura.value,
+        fechamento: fechamento.value,
+        status: status.value
+    };
+
+    await setDoc(doc(db, "config", idRestaurante), data);
+
+    msg.innerText = "✅ Salvo com sucesso!";
+};
+
+carregar();
+</script>
+
+</body>
+</html>
