@@ -32,8 +32,8 @@ header h1 {
     display: flex;
     overflow-x: auto;
     background: #fff;
-    padding: 10px;
-    gap: 20px;
+    padding: 12px 10px;
+    gap: 18px;
     border-bottom: 1px solid #eee;
 }
 
@@ -63,12 +63,12 @@ header h1 {
 
 /* SEÇÃO */
 .secao-categoria {
-    padding: 15px;
+    padding: 12px 10px;
 }
 
 .titulo-categoria-lista {
     font-size: 16px;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     color: #333;
     position: relative;
 }
@@ -85,31 +85,34 @@ header h1 {
 /* ITEM PRODUTO */
 .item-produto-lista {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    padding: 12px 0;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 5px;
     border-bottom: 1px solid #eee;
 }
 
 /* TEXTO */
 .info-produto {
-    width: 65%;
+    flex: 1;
+    padding-right: 5px;
 }
 
 .nome-produto-lista {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: bold;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
 }
 
 .desc-produto-lista {
     font-size: 13px;
     color: #777;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
+    line-height: 1.4;
 }
 
 .preco-unico {
-    font-size: 15px;
+    font-size: 16px;
     font-weight: bold;
     color: #00a650;
 }
@@ -117,41 +120,53 @@ header h1 {
 /* IMAGEM */
 .foto-produto-lista {
     position: relative;
-    width: 80px;
-    height: 80px;
+    width: 95px;
+    height: 95px;
+    flex-shrink: 0;
 }
 
 .foto-produto-lista img {
     width: 100%;
     height: 100%;
-    border-radius: 12px;
+    border-radius: 14px;
     object-fit: cover;
+    display: block;
 }
 
-/* BOTÃO + */
+/* BOTÃO + (DESTAQUE CERTO) */
 .btn-add-lista {
     position: absolute;
-    bottom: -5px;
-    right: -5px;
-    width: 32px;
-    height: 32px;
+    bottom: -6px;
+    right: -6px;
+
+    width: 36px;
+    height: 36px;
+
     border-radius: 50%;
     border: none;
+
     background: #ff6b00;
     color: #fff;
-    font-size: 20px;
+    font-size: 22px;
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
     cursor: pointer;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
 }
 
-/* RESPONSIVO EXTRA (TELAS MAIORES) */
+/* RESPONSIVO EXTRA */
 @media (min-width: 768px) {
     .item-produto-lista {
-        padding: 15px;
+        padding: 16px;
     }
 
     .nome-produto-lista {
-        font-size: 17px;
+        font-size: 18px;
     }
 
     .desc-produto-lista {
@@ -159,7 +174,7 @@ header h1 {
     }
 
     .foto-produto-lista {
-        width: 100px;
-        height: 100px;
+        width: 110px;
+        height: 110px;
     }
 }
