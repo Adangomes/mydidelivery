@@ -1,6 +1,4 @@
-/* ============================================================
-   FORÇAR RESET E CONFIGURAÇÕES GERAIS
-   ============================================================ */
+/* ================= RESET ================= */
 * {
     margin: 0;
     padding: 0;
@@ -9,245 +7,236 @@
 }
 
 body {
-    background-color: #fff;
-    color: #333;
+    background: #fff;
+    color: #1c1c1c;
     overflow-x: hidden;
 }
 
-/* ============================================================
-   CABEÇALHO COMPACTO (MATANDO A FAIXA PRETA ENORME)
-   ============================================================ */
+/* ================= HEADER (FINO E LIMPO) ================= */
 .header {
-    background-color: #000 !important;
-    padding: 6px 0 !important; /* Ajuste para ficar ultra-fino */
-    height: auto !important;
-    min-height: 50px !important;
+    background: #000;
+    padding: 8px 12px;
     position: sticky;
     top: 0;
     z-index: 1000;
 }
 
 .header-top {
-    display: flex !important;
-    flex-direction: column !important; /* Snoop em cima, Status embaixo */
-    align-items: center !important;
-    justify-content: center !important;
-    position: relative !important;
-    width: 100% !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
+/* BLOCO CENTRAL (LOGO + STATUS) */
+.header-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+/* LOGO */
 .logo {
-    color: #fff !important;
-    font-size: 1.1rem !important;
-    font-weight: 800 !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    text-align: center !important;
-    text-transform: uppercase;
+    color: #fff;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 1px;
 }
 
+/* STATUS */
 .status {
-    color: #2ecc71 !important; /* Verde padrão aberto */
-    font-size: 10px !important;
-    font-weight: 700 !important;
-    margin-top: -2px !important; /* Cola no nome da logo */
-    text-transform: uppercase;
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #2ecc71;
+    margin-top: -2px;
 }
 
+/* CARRINHO */
 .cart {
-    position: absolute !important;
-    right: 15px !important;
-    top: 50% !important;
-    transform: translateY(-50%) !important;
-    font-size: 1.2rem !important;
+    color: #fff;
+    font-size: 1.2rem;
     cursor: pointer;
 }
 
-/* ============================================================
-   NAVEGAÇÃO DE CATEGORIAS
-   ============================================================ */
+/* ================= CATEGORIAS ================= */
 .categorias-nav {
     background: #fff;
     border-bottom: 1px solid #eee;
     position: sticky;
-    top: 50px; /* Alinhado com a nova altura do header */
+    top: 48px;
     z-index: 999;
-    padding: 10px 0;
 }
 
 .categorias-scroll {
     display: flex;
     overflow-x: auto;
-    white-space: nowrap;
-    padding: 0 15px;
-    gap: 20px;
+    gap: 18px;
+    padding: 10px 15px;
     scrollbar-width: none;
 }
 
-.categorias-scroll::-webkit-scrollbar { display: none; }
+.categorias-scroll::-webkit-scrollbar {
+    display: none;
+}
 
 .cat-link {
     text-decoration: none;
-    color: #888;
+    color: #999;
+    font-size: 0.75rem;
     font-weight: 600;
-    font-size: 0.85rem;
     text-transform: uppercase;
+    white-space: nowrap;
 }
 
 .cat-link.active {
     color: #f37021;
     border-bottom: 2px solid #f37021;
+    padding-bottom: 3px;
 }
 
-/* ============================================================
-   PRODUTOS (IGUAL À REFERÊNCIA)
-   ============================================================ */
+/* ================= CONTAINER ================= */
 .container-main {
     max-width: 600px;
     margin: 0 auto;
-    padding: 0 15px !important;
-    margin-top: 10px !important;
+    padding: 0 12px;
 }
 
+/* ================= PRODUTOS ================= */
 .item-produto-lista {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: flex-start !important;
-    padding: 15px 0 !important;
-    border-bottom: 1px solid #f2f2f2 !important;
-    gap: 10px !important;
-    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 0;
+    border-bottom: 1px solid #f1f1f1;
 }
 
+/* INFO */
 .info-produto {
-    flex: 1 !important;
-    text-align: left !important;
+    flex: 1;
 }
 
 .nome-produto-lista {
-    font-size: 1rem !important;
-    font-weight: 700 !important;
-    margin-bottom: 4px !important;
-    display: block !important;
+    font-size: 0.95rem;
+    font-weight: 700;
     color: #000;
 }
 
 .desc-produto-lista {
-    font-size: 0.8rem;
-    color: #666;
-    line-height: 1.3;
-    margin-bottom: 8px;
+    font-size: 0.75rem;
+    color: #777;
+    margin: 4px 0 6px;
 }
 
-/* Preço em verde como no Netlify */
-.preco-unico, .ver-opcoes-link {
-    color: #2e7d32 !important;
-    font-weight: 700 !important;
-    font-size: 1.1rem !important;
-    margin-top: 8px !important;
-    display: block !important;
-    text-decoration: none;
+/* PREÇO */
+.preco-unico,
+.ver-opcoes-link {
+    color: #2e7d32;
+    font-weight: 700;
+    font-size: 0.95rem;
 }
 
+/* FOTO */
 .foto-produto-lista {
-    width: 85px !important;
-    height: 85px !important;
-    position: relative !important;
-    flex-shrink: 0 !important;
+    width: 80px;
+    height: 80px;
+    position: relative;
 }
 
 .foto-produto-lista img {
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 12px !important;
-    object-fit: cover !important;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    object-fit: cover;
 }
 
-/* Botão Laranja em cima da foto */
+/* BOTÃO ADD */
 .btn-add-lista {
-    position: absolute !important;
-    bottom: -5px !important;
-    right: -5px !important;
-    background: #f37021 !important;
-    color: #fff !important;
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 50% !important;
-    border: 2px solid #fff !important;
-    display: flex !important;
-    align-items: center !important;
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    width: 26px;
+    height: 26px;
+    background: #f37021;
+    color: #fff;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    display: flex;
+    align-items: center;
     justify-content: center;
     font-weight: bold;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
-/* ============================================================
-   MODAIS (CARRINHO E ENTREGA)
-   ============================================================ */
+/* ================= MODAIS ================= */
 .modal-overlay {
     display: none;
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
+    inset: 0;
     background: rgba(0,0,0,0.6);
     z-index: 2000;
-    justify-content: center;
-    align-items: flex-end;
+    justify-content: flex-end;
 }
 
-.cart-box, .modal-box {
-    background: #fff;
+.cart-box,
+.modal-box {
     width: 100%;
     max-width: 500px;
+    background: #fff;
     border-radius: 20px 20px 0 0;
-    padding: 20px;
+    padding: 18px;
     max-height: 90vh;
     overflow-y: auto;
 }
 
-.btn-finalizar, .btn-principal {
+/* BOTÕES */
+.btn-finalizar,
+.btn-principal {
     background: #000;
     color: #fff;
     width: 100%;
-    padding: 15px;
-    border: none;
+    padding: 14px;
     border-radius: 10px;
     font-weight: 700;
-    margin-top: 15px;
+    border: none;
 }
 
-.btn-continuar, .btn-secundario {
+.btn-continuar,
+.btn-secundario {
     background: #eee;
     color: #333;
     width: 100%;
     padding: 12px;
-    border: none;
     border-radius: 10px;
-    margin-top: 10px;
+    border: none;
+    margin-top: 8px;
 }
 
-/* ============================================================
-   CUPOM
-   ============================================================ */
+/* ================= CUPOM ================= */
 .cupom-container {
     display: flex;
-    gap: 10px;
-    margin: 15px 0;
+    gap: 8px;
+    margin: 12px 0;
 }
 
 #input-cupom {
     flex: 1;
     padding: 10px;
-    border: 1px solid #ddd;
     border-radius: 8px;
-    text-transform: uppercase;
+    border: 1px solid #ddd;
+    font-size: 0.85rem;
 }
 
 #btn-aplicar-cupom {
     background: #000;
     color: #fff;
-    border: none;
-    padding: 0 15px;
     border-radius: 8px;
+    padding: 0 14px;
     font-weight: 600;
+}
+
+/* ================= FOOTER ================= */
+footer {
+    text-align: center;
+    font-size: 0.7rem;
+    color: #999;
+    padding: 15px 0;
 }
