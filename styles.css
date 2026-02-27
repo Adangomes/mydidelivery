@@ -1,242 +1,165 @@
-/* ================= RESET ================= */
+/* RESET */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
 }
 
 body {
-    background: #fff;
-    color: #1c1c1c;
-    overflow-x: hidden;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f5f5f5;
+    color: #222;
 }
 
-/* ================= HEADER (FINO E LIMPO) ================= */
-.header {
+/* HEADER */
+header {
     background: #000;
-    padding: 8px 12px;
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-}
-
-.header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* BLOCO CENTRAL (LOGO + STATUS) */
-.header-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-}
-
-/* LOGO */
-.logo {
     color: #fff;
-    font-size: 0.95rem;
-    font-weight: 800;
-    letter-spacing: 1px;
+    padding: 15px;
 }
 
-/* STATUS */
+header h1 {
+    font-size: 18px;
+}
+
 .status {
-    font-size: 0.65rem;
-    font-weight: 600;
-    color: #2ecc71;
-    margin-top: -2px;
+    font-size: 12px;
+    color: #00c853;
 }
 
-/* CARRINHO */
-.cart {
-    color: #fff;
-    font-size: 1.2rem;
-    cursor: pointer;
-}
-
-/* ================= CATEGORIAS ================= */
-.categorias-nav {
-    background: #fff;
-    border-bottom: 1px solid #eee;
-    position: sticky;
-    top: 48px;
-    z-index: 999;
-}
-
-.categorias-scroll {
+/* CATEGORIAS SCROLL */
+#categorias-scroll {
     display: flex;
     overflow-x: auto;
-    gap: 18px;
-    padding: 10px 15px;
-    scrollbar-width: none;
-}
-
-.categorias-scroll::-webkit-scrollbar {
-    display: none;
+    background: #fff;
+    padding: 10px;
+    gap: 20px;
+    border-bottom: 1px solid #eee;
 }
 
 .cat-link {
+    font-size: 14px;
+    color: #777;
     text-decoration: none;
-    color: #999;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
     white-space: nowrap;
+    position: relative;
+    padding-bottom: 5px;
 }
 
 .cat-link.active {
-    color: #f37021;
-    border-bottom: 2px solid #f37021;
-    padding-bottom: 3px;
+    color: #ff6b00;
+    font-weight: bold;
 }
 
-/* ================= CONTAINER ================= */
-.container-main {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 0 12px;
+.cat-link.active::after {
+    content: "";
+    position: absolute;
+    height: 2px;
+    width: 100%;
+    background: #ff6b00;
+    bottom: 0;
+    left: 0;
 }
 
-/* ================= PRODUTOS ================= */
+/* SEÇÃO */
+.secao-categoria {
+    padding: 15px;
+}
+
+.titulo-categoria-lista {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #333;
+    position: relative;
+}
+
+.titulo-categoria-lista::after {
+    content: "";
+    width: 30px;
+    height: 3px;
+    background: #ff6b00;
+    display: block;
+    margin-top: 5px;
+}
+
+/* ITEM PRODUTO */
 .item-produto-lista {
     display: flex;
     justify-content: space-between;
-    gap: 10px;
-    padding: 14px 0;
-    border-bottom: 1px solid #f1f1f1;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
 }
 
-/* INFO */
+/* TEXTO */
 .info-produto {
-    flex: 1;
+    width: 65%;
 }
 
 .nome-produto-lista {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #000;
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
 .desc-produto-lista {
-    font-size: 0.75rem;
+    font-size: 13px;
     color: #777;
-    margin: 4px 0 6px;
+    margin-bottom: 5px;
 }
 
-/* PREÇO */
-.preco-unico,
-.ver-opcoes-link {
-    color: #2e7d32;
-    font-weight: 700;
-    font-size: 0.95rem;
+.preco-unico {
+    font-size: 15px;
+    font-weight: bold;
+    color: #00a650;
 }
 
-/* FOTO */
+/* IMAGEM */
 .foto-produto-lista {
+    position: relative;
     width: 80px;
     height: 80px;
-    position: relative;
 }
 
 .foto-produto-lista img {
     width: 100%;
     height: 100%;
-    border-radius: 10px;
+    border-radius: 12px;
     object-fit: cover;
 }
 
-/* BOTÃO ADD */
+/* BOTÃO + */
 .btn-add-lista {
     position: absolute;
-    bottom: -6px;
-    right: -6px;
-    width: 26px;
-    height: 26px;
-    background: #f37021;
-    color: #fff;
+    bottom: -5px;
+    right: -5px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: 2px solid #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-/* ================= MODAIS ================= */
-.modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    z-index: 2000;
-    justify-content: flex-end;
-}
-
-.cart-box,
-.modal-box {
-    width: 100%;
-    max-width: 500px;
-    background: #fff;
-    border-radius: 20px 20px 0 0;
-    padding: 18px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-/* BOTÕES */
-.btn-finalizar,
-.btn-principal {
-    background: #000;
-    color: #fff;
-    width: 100%;
-    padding: 14px;
-    border-radius: 10px;
-    font-weight: 700;
     border: none;
-}
-
-.btn-continuar,
-.btn-secundario {
-    background: #eee;
-    color: #333;
-    width: 100%;
-    padding: 12px;
-    border-radius: 10px;
-    border: none;
-    margin-top: 8px;
-}
-
-/* ================= CUPOM ================= */
-.cupom-container {
-    display: flex;
-    gap: 8px;
-    margin: 12px 0;
-}
-
-#input-cupom {
-    flex: 1;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    font-size: 0.85rem;
-}
-
-#btn-aplicar-cupom {
-    background: #000;
+    background: #ff6b00;
     color: #fff;
-    border-radius: 8px;
-    padding: 0 14px;
-    font-weight: 600;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
 }
 
-/* ================= FOOTER ================= */
-footer {
-    text-align: center;
-    font-size: 0.7rem;
-    color: #999;
-    padding: 15px 0;
+/* RESPONSIVO EXTRA (TELAS MAIORES) */
+@media (min-width: 768px) {
+    .item-produto-lista {
+        padding: 15px;
+    }
+
+    .nome-produto-lista {
+        font-size: 17px;
+    }
+
+    .desc-produto-lista {
+        font-size: 14px;
+    }
+
+    .foto-produto-lista {
+        width: 100px;
+        height: 100px;
+    }
 }
