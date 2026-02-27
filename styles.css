@@ -1,200 +1,111 @@
 /* ============================================================
-   RESET E CONFIGURAÇÕES GERAIS
-   ============================================================ */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Inter', sans-serif;
-}
-
-body {
-    background-color: #fff;
-    color: #333;
-}
-
-/* ============================================================
-   CABEÇALHO (Removendo o "Preto Enorme")
+   FORÇAR RESET E TOPO COMPACTO
    ============================================================ */
 .header {
-    background-color: #000;
-    padding: 10px 15px; /* Reduzido para ficar fino como na referência */
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    background-color: #000 !important;
+    padding: 8px 0 !important; /* Deixa a faixa preta bem fininha */
+    height: auto !important;
+    min-height: 50px !important;
 }
 
 .header-top {
-    display: flex;
-    flex-direction: column; /* Snoop em cima, Aberto embaixo */
-    align-items: center;    /* Centraliza tudo horizontalmente */
-    position: relative;     /* Para o carrinho ficar no canto */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    width: 100% !important;
 }
 
 .logo {
-    color: #fff;
-    font-size: 1.1rem;
-    font-weight: 800;
-    text-transform: uppercase;
-    margin-bottom: 0;
+    color: #fff !important;
+    font-size: 1.1rem !important;
+    font-weight: 800 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-align: center !important;
 }
 
 .status {
-    font-size: 0.65rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: #2ecc71; /* Verde "Aberto Agora" */
+    color: #2ecc71 !important; /* Verde */
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    margin-top: -2px !important; /* Cola no nome */
 }
 
 .cart {
-    position: absolute;
-    right: 5px;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 1.3rem;
-    cursor: pointer;
-    color: #fff;
+    position: absolute !important;
+    right: 15px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    font-size: 1.2rem !important;
 }
 
 /* ============================================================
-   NAVEGAÇÃO DE CATEGORIAS
-   ============================================================ */
-.categorias-nav {
-    background: #fff;
-    border-bottom: 1px solid #eee;
-    position: sticky;
-    top: 55px; /* Ajustado conforme nova altura do header */
-    z-index: 999;
-    padding: 12px 0;
-}
-
-.categorias-scroll {
-    display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 0 15px;
-    gap: 20px;
-    scrollbar-width: none;
-}
-
-.categorias-scroll::-webkit-scrollbar { display: none; }
-
-/* ============================================================
-   LISTA DE PRODUTOS (Alinhamento e Espaçamento)
+   PRODUTOS IGUAL À REFERÊNCIA (SEM ESPAÇO)
    ============================================================ */
 .container-main {
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 10px 15px;
+    padding: 0 15px !important;
+    margin-top: 10px !important;
 }
 
 .item-produto-lista {
     display: flex !important;
+    flex-direction: row !important;
     justify-content: space-between !important;
     align-items: flex-start !important;
     padding: 15px 0 !important;
-    border-bottom: 1px solid #f2f2f2;
-    gap: 12px;
+    border-bottom: 1px solid #f2f2f2 !important;
+    gap: 10px !important;
 }
 
 .info-produto {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+    flex: 1 !important;
+    text-align: left !important;
 }
 
 .nome-produto-lista {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: #000;
-    margin-bottom: 2px;
+    font-size: 1rem !important;
+    font-weight: 700 !important;
+    margin-bottom: 4px !important;
+    display: block !important;
 }
 
-.desc-produto-lista {
-    font-size: 0.8rem;
-    color: #666;
-    line-height: 1.3;
-}
-
-/* Cor Verde nos Preços e Links (Igual referência) */
+/* Preço em verde como no Netlify */
 .preco-unico, .ver-opcoes-link {
     color: #2e7d32 !important;
     font-weight: 700 !important;
-    font-size: 1rem;
-    margin-top: 5px;
-    text-decoration: none;
+    font-size: 1.1rem !important;
+    margin-top: 8px !important;
+    display: block !important;
 }
 
-/* Foto com Botão Laranja Emcima */
 .foto-produto-lista {
-    position: relative;
-    width: 85px;
-    height: 85px;
-    flex-shrink: 0;
+    width: 85px !important;
+    height: 85px !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
 }
 
 .foto-produto-lista img {
-    width: 100%;
-    height: 100%;
-    border-radius: 12px;
-    object-fit: cover;
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 12px !important;
+    object-fit: cover !important;
 }
 
+/* Botão Laranja em cima da foto */
 .btn-add-lista {
-    position: absolute;
-    bottom: -5px;
-    right: -5px;
-    background: #f37021;
-    color: #fff;
-    border: 2px solid #fff;
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-}
-
-/* ============================================================
-   MODAIS E CARRINHO (Ajuste Visual)
-   ============================================================ */
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
-    z-index: 2000;
-    display: flex;
-    justify-content: center;
-    align-items: flex-end; /* Abre de baixo pra cima no celular */
-}
-
-.cart-box, .modal-box {
-    background: #fff;
-    width: 100%;
-    max-width: 500px;
-    border-radius: 20px 20px 0 0;
-    padding: 20px;
-}
-
-.btn-finalizar {
-    background: #000;
-    color: #fff;
-    border: none;
-    padding: 15px;
-    border-radius: 12px;
-    font-weight: 700;
-    width: 100%;
-}
-
-.btn-continuar {
-    background: #eee;
-    color: #333;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
-    margin-top: 10px;
-    width: 100%;
+    position: absolute !important;
+    bottom: -5px !important;
+    right: -5px !important;
+    background: #f37021 !important;
+    color: #fff !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    border: 2px solid #fff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
