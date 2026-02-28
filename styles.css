@@ -161,21 +161,72 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
 .footer-creditos {
     text-align: center; padding: 30px 10px; color: #888; font-size: 12px;
 }
-
 /* BOTÕES DE AÇÃO */
 .btn-finalizar, .btn-whatsapp, .btn-principal {
     background: #ff6b00; color: #fff; border: none; padding: 15px;
     width: 100%; border-radius: 12px; font-weight: 800; font-size: 16px; margin-top: 10px;
 }
-
 .btn-continuar, .btn-secundario {
     background: none; color: #ff6b00; border: none; width: 100%;
     padding: 10px; font-weight: 700; margin-top: 5px;
 }
-
 /* RESPONSIVIDADE PARA CELULARES PEQUENOS */
 @media (max-width: 360px) {
     .logo { font-size: 1rem; }
     .foto-produto-lista { width: 70px; height: 70px; }
     .nome-produto-lista { font-size: 14px; }
+}
+
+/* SEÇÃO DE CUPOM */
+.cupom-secao {
+    margin: 15px 0;
+    padding: 10px 0;
+    border-top: 1px dashed #ddd;
+}
+.cupom-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+#input-cupom {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+#input-cupom:focus {
+    border-color: #ff6b00;
+}
+#btn-aplicar-cupom {
+    background: #222;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+#btn-aplicar-cupom:active {
+    transform: scale(0.95);
+    background: #000;
+}
+/* MENSAGENS DE FEEDBACK */
+.cupom-msg-erro {
+    font-size: 12px;
+    margin-top: 5px;
+    font-weight: 600;
+    display: none; /* O JS controla a exibição */
+}
+.cupom-sucesso {
+    color: #00a650;
+}
+
+.cupom-erro {
+    color: #ff4d4f;
 }
