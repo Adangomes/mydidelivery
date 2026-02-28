@@ -21,9 +21,10 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarStatusLoja();
     carregarCardapioCompleto();
     carregarCarrinhoStorage();
+    configurarEventosCupom();
 });
 
-// --- CARREGAMENTO DO CARDÁPIO ---
+// --- 1. CARREGAMENTO DO CARDÁPIO ---
 async function carregarCardapioCompleto() {
     try {
         const res = await fetch("content/produtos.json?v=" + Date.now());
@@ -43,7 +44,7 @@ async function carregarCardapioCompleto() {
         Object.keys(categorias).forEach((cat, index) => {
             const idCat = `cat-${cat.replace(/\s+/g, '-')}`;
             
-            // Link da Navegação
+            // Navegação
             const link = document.createElement("a");
             link.href = `#${idCat}`;
             link.className = `cat-link ${index === 0 ? 'active' : ''}`;
@@ -54,28 +55,24 @@ async function carregarCardapioCompleto() {
             };
             nav.appendChild(link);
 
-            // Seção de Itens
+            // Seção
             const section = document.createElement("section");
             section.className = "secao-categoria";
             section.id = idCat;
             section.innerHTML = `<h2>${cat.toUpperCase()}</h2>`;
 
             categorias[cat].forEach(p => {
-                // Lógica de exibição: 
-                // Não mostra "sabores" de pizza (preço 0) ou porções genéricas na lista principal
-                const ehSaborPizza = p.categoria.toLowerCase() === 'pizza' && p.price === 0;
-                const ehSaborPorcao = p.categoria.toLowerCase() === 'porcao' && p.price === 0 && !p.title.includes("600g") && !p.title.includes("1kg");
-                
-                if (ehSaborPizza || ehSaborPorcao) return;
+                // REGRA: Esconde sabores individuais (preço 0) da lista principal
+                if (p.categoria === 'pizza' && p.price === 0) return;
 
                 const pJson = JSON.stringify(p).replace(/"/g, '&quot;');
                 let acao = `adicionarCarrinhoPorProduto(${pJson})`;
-                let textoPreco = `R$ ${p.price ? p.price.toFixed(2) : '0.00'}`;
+                let textoPreco = `R$ ${(p.price || 0).toFixed(2)}`;
 
-                if (p.categoria.toLowerCase() === 'pizza') {
+                if (p.categoria === 'pizza' && p.tipo_escolha === 'abrir_modal') {
                     acao = `abrirModalPizza('${p.title}')`;
-                    textoPreco = "Ver Opções";
-                } else if (p.categoria.toLowerCase() === 'porcao' && p.prices) {
+                    textoPreco = "Escolher Sabores";
+                } else if (p.prices && !p.price) {
                     acao = `abrirModalDinamico('porcao', '${p.title}')`;
                     textoPreco = "Ver Opções";
                 }
@@ -100,7 +97,7 @@ async function carregarCardapioCompleto() {
     } catch (e) { console.error("Erro ao carregar JSON:", e); }
 }
 
-// --- LOGICA DE PIZZAS ---
+// --- 2. LÓGICA DE PIZZAS ---
 function abrirModalPizza(nome) {
     pizzaPrincipal = produtosGeral.find(p => p.title === nome);
     saboresSelecionados = [];
@@ -110,9 +107,7 @@ function abrirModalPizza(nome) {
     else if (nome.includes("PIZZA G")) { tamanhoSelecionado = "G"; limiteSabores = 3; }
 
     document.getElementById("pizza-modal-title").innerText = nome;
-    document.getElementById("pizza-sizes-container").style.display = "none";
     document.getElementById("secao-sabores").style.display = "block";
-    
     renderizarSabores();
     document.getElementById("pizza-options-modal").style.display = "flex";
 }
@@ -120,22 +115,16 @@ function abrirModalPizza(nome) {
 function renderizarSabores() {
     const grid = document.getElementById("lista-sabores-meia");
     grid.innerHTML = "";
-    
-    // Filtra apenas os sabores (itens com preço 0 na categoria pizza)
     const sabores = produtosGeral.filter(p => p.categoria === 'pizza' && p.price === 0);
 
     sabores.forEach(s => {
         const sel = saboresSelecionados.includes(s.title);
         grid.innerHTML += `
             <div class="item-sabor-wizard ${sel ? 'selecionado' : ''}" onclick="toggleSabor('${s.title}')">
-                <div>
-                    <strong>${s.title}</strong><br>
-                    <small>${s.ingredientes}</small>
-                </div>
+                <div><strong>${s.title}</strong><br><small>${s.ingredientes}</small></div>
                 <span>${sel ? '✅' : '+'}</span>
             </div>`;
     });
-    atualizarBotaoConfirmar();
 }
 
 function toggleSabor(nome) {
@@ -145,38 +134,50 @@ function toggleSabor(nome) {
     renderizarSabores();
 }
 
-// --- LOGICA DE PORÇÕES ---
+function confirmarPizza() {
+    if (itemTemporarioPorcao) {
+        carrinho.push(itemTemporarioPorcao);
+    } else {
+        if (saboresSelecionados.length === 0) return alert("Escolha pelo menos 1 sabor!");
+        const precoBase = pizzaPrincipal.prices[tamanhoSelecionado];
+        carrinho.push({
+            title: pizzaPrincipal.title,
+            sabor: saboresSelecionados.join(" / "),
+            price: precoBase,
+            qtd: 1
+        });
+    }
+    itemTemporarioPorcao = null;
+    document.getElementById("pizza-options-modal").style.display = "none";
+    atualizarCarrinho();
+}
+
+// --- 3. LÓGICA DE PORÇÕES ---
 function abrirModalDinamico(cat, tituloMestre) {
     const mestre = produtosGeral.find(p => p.title === tituloMestre);
     const container = document.getElementById("lista-sabores-meia");
-    
     document.getElementById("pizza-modal-title").innerText = tituloMestre;
-    document.getElementById("pizza-sizes-container").style.display = "none";
     container.innerHTML = "";
-    itemTemporarioPorcao = null;
 
-    // Se o item mestre já tiver preços definidos (P ou G)
-    if (mestre.prices) {
-        Object.keys(mestre.prices).forEach(tam => {
-            const preco = mestre.prices[tam];
-            const div = document.createElement("div");
-            div.className = "item-sabor-wizard";
-            div.innerHTML = `<strong>Opção ${tam === 'P' ? '600g' : '1kg'}</strong> <span>R$ ${preco.toFixed(2)}</span>`;
-            div.onclick = () => {
-                itemTemporarioPorcao = { title: `${mestre.title} (${tam === 'P' ? '600g' : '1kg'})`, price: preco, qtd: 1 };
-                confirmarPizza();
-            };
-            container.appendChild(div);
-        });
-    }
+    Object.keys(mestre.prices).forEach(tam => {
+        const preco = mestre.prices[tam];
+        const div = document.createElement("div");
+        div.className = "item-sabor-wizard";
+        div.innerHTML = `<strong>Opção ${tam === 'P' ? 'Pequena' : 'Grande'}</strong> <span>R$ ${preco.toFixed(2)}</span>`;
+        div.onclick = () => {
+            itemTemporarioPorcao = { title: `${mestre.title} (${tam})`, price: preco, qtd: 1 };
+            confirmarPizza();
+        };
+        container.appendChild(div);
+    });
     document.getElementById("pizza-options-modal").style.display = "flex";
 }
 
-// --- CARRINHO E FINALIZAÇÃO ---
+// --- 4. CARRINHO ---
 function adicionarCarrinhoPorProduto(p) {
     let item = carrinho.find(i => i.title === p.title);
     if(item) item.qtd++;
-    else carrinho.push({...p, qtd: 1});
+    else carrinho.push({...p, qtd: 1, price: p.price || 0});
     atualizarCarrinho();
     mostrarToast(p.title);
 }
@@ -187,46 +188,82 @@ function atualizarCarrinho() {
     box.innerHTML = "";
     
     carrinho.forEach((i, idx) => {
-        sub += (i.price * i.qtd);
+        const precoTotalItem = i.price * i.qtd;
+        sub += precoTotalItem;
         box.innerHTML += `
             <div class="cart-item-row">
-                <div>
+                <div style="flex:1">
                     <strong>${i.qtd}x ${i.title}</strong><br>
-                    <small>${i.sabor || ''}</small>
+                    <small>${i.sabor || i.ingredientes || ''}</small>
                 </div>
-                <span>R$ ${(i.price * i.qtd).toFixed(2)}</span>
-                <button onclick="removerItem(${idx})">✕</button>
+                <div style="margin-right:10px">R$ ${precoTotalItem.toFixed(2)}</div>
+                <button onclick="removerItem(${idx})" class="btn-remove">✕</button>
             </div>`;
     });
 
     const total = sub - descontoAplicado;
     document.getElementById("subtotal").innerText = `R$ ${sub.toFixed(2)}`;
     document.getElementById("total").innerText = `R$ ${Math.max(0, total).toFixed(2)}`;
-    
-    const badge = document.getElementById("cart-count");
-    badge.innerText = carrinho.length;
-    document.getElementById("cart-icon-container").classList.toggle("tem-itens", carrinho.length > 0);
-    
+    document.getElementById("cart-count").innerText = carrinho.length;
     localStorage.setItem("carrinho", JSON.stringify(carrinho));
 }
 
-function confirmarPizza() {
-    if (itemTemporarioPorcao) {
-        carrinho.push(itemTemporarioPorcao);
-    } else {
-        const precoBase = pizzaPrincipal.prices[tamanhoSelecionado];
-        carrinho.push({
-            title: pizzaPrincipal.title,
-            sabor: saboresSelecionados.join(" / "),
-            price: precoBase,
-            qtd: 1
-        });
-    }
-    document.getElementById("pizza-options-modal").style.display = "none";
-    atualizarCarrinho();
+function removerItem(idx) { carrinho.splice(idx, 1); atualizarCarrinho(); }
+
+// --- 5. CUPOM ---
+function configurarEventosCupom() {
+    document.getElementById("btn-aplicar-cupom").addEventListener("click", () => {
+        const cupom = document.getElementById("input-cupom").value.toUpperCase();
+        const feedback = document.getElementById("msg-cupom-feedback");
+        
+        if (cupom === "SNOOP10") {
+            descontoAplicado = 10;
+            feedback.innerText = "Desconto de R$ 10 aplicado!";
+            feedback.className = "cupom-msg-erro cupom-sucesso";
+        } else {
+            descontoAplicado = 0;
+            feedback.innerText = "Cupom inválido.";
+            feedback.className = "cupom-msg-erro cupom-erro";
+        }
+        feedback.style.display = "block";
+        atualizarCarrinho();
+    });
 }
 
-// Funções de apoio (Toast, Status, etc) mantêm-se como na versão anterior
+// --- 6. FINALIZAÇÃO E WHATSAPP ---
+function abrirDelivery() {
+    if(carrinho.length === 0) return alert("Seu carrinho está vazio!");
+    document.getElementById("cart-modal").style.display = "none";
+    document.getElementById("delivery-modal").style.display = "flex";
+}
+
+function enviarWhatsApp() {
+    const nome = document.getElementById("nomeCliente").value;
+    const rua = document.getElementById("rua").value;
+    const num = document.getElementById("numero").value;
+    const bairro = document.getElementById("bairro").value;
+    const pag = document.getElementById("pagamento").value;
+
+    if(!nome || !rua) return alert("Preencha os dados de entrega!");
+
+    let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n\n`;
+    msg += `*Cliente:* ${nome}\n`;
+    msg += `*Endereço:* ${rua}, ${num} - ${bairro}\n`;
+    msg += `*Pagamento:* ${pag}\n\n`;
+    msg += `*ITENS:*\n`;
+
+    carrinho.forEach(i => {
+        msg += `- ${i.qtd}x ${i.title} ${i.sabor ? '('+i.sabor+')' : ''}\n`;
+    });
+
+    const totalFinal = document.getElementById("total").innerText;
+    msg += `\n*TOTAL:* ${totalFinal}`;
+
+    const url = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`;
+    window.open(url, "_blank");
+}
+
+// --- AUXILIARES ---
 function mostrarToast(txt) {
     const t = document.getElementById("toast-geral");
     t.innerText = txt + " adicionado!";
@@ -234,6 +271,24 @@ function mostrarToast(txt) {
     setTimeout(() => t.style.display = "none", 2000);
 }
 
-function removerItem(idx) { carrinho.splice(idx, 1); atualizarCarrinho(); }
-function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
+function carregarStatusLoja() {
+    const status = document.getElementById("status-loja");
+    const hora = new Date().getHours();
+    if(hora >= 18 || hora <= 23) {
+        status.innerText = "ABERTO";
+        status.className = "status aberto";
+    } else {
+        status.innerText = "FECHADO";
+        status.className = "status fechado";
+    }
+}
+
+function carregarCarrinhoStorage() {
+    const salvo = localStorage.getItem("carrinho");
+    if(salvo) { carrinho = JSON.parse(salvo); atualizarCarrinho(); }
+}
+
 function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
+function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
+function toggleTroco(val) { document.getElementById("div-troco").style.display = val === 'Dinheiro' ? 'block' : 'none'; }
+function ativarScrollSpy() { /* Lógica de scroll opcional */ }
