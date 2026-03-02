@@ -105,6 +105,11 @@
             <button class="btn-principal w-100 mt-3" onclick="processarResumoGeo()">Próximo</button>
         </div>
 
+        <div id="loading-geral" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:9999; flex-direction:column; justify-content:center; align-items:center;">
+    <div class="spinner"></div>
+    <p style="margin-top:15px; font-weight:bold; color:#ff4500;">Calculando taxa de entrega...</p>
+</div>
+
         <div id="resumo-pedido" style="display:none;">
             <div class="modal-header-clean"><h3>Resumo Final</h3></div>
             <div id="resumo-itens" class="resumo-lista"></div>
@@ -135,5 +140,6 @@
 <script src="script.js"></script>
 </body>
 </html>
+
 
 
