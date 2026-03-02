@@ -273,40 +273,5 @@ function carregarCarrinhoStorage() {
     if(s) { carrinho = JSON.parse(s); atualizarCarrinho(); }
 }
 
-/* --- STATUS SIMPLES: SÓ A COR DO VERDE DO BOTÃO --- */
-.status {
-    font-size: 11px;
-    font-weight: 800; /* Deixei um pouco mais grosso para destacar */
-    margin-top: 4px;
-    color: #888; /* Cor neutra enquanto verifica */
-    text-transform: uppercase;
-    transition: color 0.3s ease;
-}
 
-/* Quando o JS colocar a classe 'aberto', ele puxa o verde das opções */
-.status.aberto {
-    color: #00a650 !important; 
-}
 
-/* Quando estiver fechado */
-.status.fechado {
-    color: #ff4d4f !important;
-}
-
-/* --- BOTÃO EXCLUIR PROFISSIONAL (Ajustado) --- */
-.btn-excluir-item {
-    background: #fff1f0;
-    color: #ff4d4f;
-    border: 1px solid #ffa39e;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-excluir-item:hover {
-    background: #ff4d4f;
-    color: #fff;
-}
