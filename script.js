@@ -1,287 +1,141 @@
-// CONFIGURAÇÕES GLOBAIS
-const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";
-const RESTAURANTE_COORD = [-49.024909, -26.464334]; 
-const WHATSAPP_NUMERO = "5547992745867";
-
-let carrinho = [];
-let produtosGeral = [];
-let taxaEntregaCalculada = 0;
-let descontoAplicado = 0;
-
-let itemMestreTemporario = null; 
-let saboresSelecionados = [];
-let limiteSabores = 0;
-let tamanhoSelecionadoGlobal = ""; 
-
-document.addEventListener("DOMContentLoaded", () => {
-    carregarStatusLoja();
-    carregarCardapioCompleto();
-    carregarCarrinhoStorage();
-    window.addEventListener("scroll", sincronizarScrollMenu);
-});
-
-// --- 1. CARREGAMENTO E RENDERIZAÇÃO ---
-async function carregarCardapioCompleto() {
-    try {
-        const res = await fetch("content/produtos.json?v=" + Date.now());
-        const data = await res.json();
-        produtosGeral = data.produtos;
-        renderizarCardapio();
-    } catch (e) { console.error("Erro JSON:", e); }
+/* --- RESET E BASE SNOOP LANCHE (MANTIDO VISUAL ORIGINAL) --- */
+* {
+    margin: 0; padding: 0; box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    -webkit-tap-highlight-color: transparent;
 }
 
-function renderizarCardapio() {
-    const corpo = document.getElementById("cardapio-corpo");
-    const nav = document.getElementById("categorias-scroll");
-    corpo.innerHTML = "";
-    nav.innerHTML = "";
+body { background: #f8f8f8; color: #222; overflow-x: hidden; }
 
-    const categorias = [...new Set(produtosGeral.map(p => p.categoria))];
+/* HEADER */
+.header {
+    background: #000; padding: 12px 16px;
+    position: sticky; top: 0; z-index: 1100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.header-top { display: flex; justify-content: space-between; align-items: center; }
+.logo-container { display: flex; flex-direction: column; }
+.logo { color: #fff; font-size: 1.2rem; font-weight: 800; text-transform: uppercase; }
 
-    categorias.forEach((cat, idx) => {
-        const btn = document.createElement("button");
-        btn.className = `cat-item ${idx === 0 ? 'active' : ''}`;
-        btn.innerText = cat.toUpperCase();
-        btn.onclick = () => scrollToCategoria(cat);
-        btn.setAttribute("data-categoria", cat);
-        nav.appendChild(btn);
+/* --- 1. STATUS AJUSTADO (SÓ TEXTO VERDE/VERMELHO, SEM BOLINHA OU PULSAR) --- */
+.status {
+    font-size: 11px; font-weight: 800; margin-top: 4px;
+    color: #888; text-transform: uppercase;
+    display: flex; align-items: center; gap: 4px; /* Ajuste para o texto ficar limpo */
+}
+.status.aberto { color: #00a650 !important; }  /* Verde direto do botão */
+.status.fechado { color: #ff4d4f !important; }
 
-        const section = document.createElement("section");
-        section.className = "secao-categoria";
-        section.id = `secao-${cat}`;
-        section.innerHTML = `<h2 class="titulo-categoria">${cat.toUpperCase()}</h2>`;
-
-        produtosGeral.filter(p => p.categoria === cat).forEach(p => {
-            // TRAVA PARA PORÇÃO: No cardápio principal, só mostra se tiver "600g" ou "1kg"
-            if (p.categoria === 'porcao') {
-                if (!p.title.includes("600g") && !p.title.includes("1kg")) return;
-            }
-            
-            // TRAVA PARA PIZZA: Só mostra as "P, M, G"
-            if (p.categoria === 'pizza') {
-                if (!p.title.includes("PIZZA ")) return;
-            }
-
-            const precoExibido = p.price > 0 ? `R$ ${p.price.toFixed(2)}` : "Escolher Opções";
-
-            section.innerHTML += `
-                <div class="item-produto-lista" onclick="decidirFluxo('${p.title}')">
-                    <div class="info-produto">
-                        <h3>${p.title}</h3>
-                        <p>${p.ingredientes || ""}</p>
-                        <span class="preco-unico">${precoExibido}</span>
-                    </div>
-                    <div class="foto-produto-lista">
-                        <img src="${p.image}" onerror="this.src='imagens/placeholder.png'">
-                        <button class="btn-add-lista">+</button>
-                    </div>
-                </div>`;
-        });
-        corpo.appendChild(section);
-    });
+/* CARRINHO ICONE E BADGE */
+.cart { position: relative; cursor: pointer; background: #222; padding: 8px; border-radius: 12px; }
+.cart.tem-itens { background: #ff6b00; animation: bounce 0.5s ease infinite alternate; }
+@keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
+.cart-badge {
+    position: absolute; top: -5px; right: -5px; background: #fff; color: #ff6b00;
+    font-size: 10px; font-weight: 900; width: 18px; height: 18px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
 }
 
-// --- 2. LÓGICA DE CLIQUES ---
-function decidirFluxo(nome) {
-    const p = produtosGeral.find(prod => prod.title === nome);
-    if (p.categoria === 'pizza' || p.categoria === 'porcao') {
-        abrirModalSelecao(nome);
-    } else {
-        adicionarAoCarrinho(p.title, p.price, "");
-    }
+/* --- 2. CATEGORIAS ESTILO APP COM LINHA LARANJA --- */
+.categorias-nav { background: #fff; position: sticky; top: 56px; z-index: 1000; border-bottom: 1px solid #eee; }
+.categorias-scroll { display: flex; overflow-x: auto; padding: 0 15px; gap: 20px; height: 48px; align-items: center; scrollbar-width: none; }
+.categorias-scroll::-webkit-scrollbar { display: none; }
+.cat-item {
+    font-size: 13px; font-weight: 600; color: #666; border: none; background: none;
+    text-transform: uppercase; white-space: nowrap; cursor: pointer;
+    transition: all 0.2s ease; border-bottom: 3px solid transparent;
+}
+.cat-item.active { color: #ff6b00; border-bottom: 3px solid #ff6b00; font-weight: 800; }
+
+/* PRODUTOS E BOTÃO ADICIONAR */
+.container-main { padding: 15px; max-width: 600px; margin: auto; }
+.item-produto-lista {
+    background: #fff; display: flex; justify-content: space-between;
+    padding: 15px; border-radius: 15px; margin-bottom: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03); gap: 10px;
+}
+.info-produto strong { font-size: 14px; font-weight: 700; color: #333; display: block; margin-bottom: 4px; }
+.info-produto span { font-size: 13px; font-weight: 700; color: #00a650; } /* Verde do botão escolher */
+.foto-produto-lista { position: relative; width: 85px; height: 85px; flex-shrink: 0; }
+.foto-produto-lista img { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; }
+.btn-add-lista {
+    position: absolute; bottom: -8px; right: -8px; width: 32px; height: 32px;
+    background: #ff6b00; color: #fff; border: 3px solid #fff; border-radius: 10px;
+    cursor: pointer; font-size: 18px; font-weight: bold;
 }
 
-function abrirModalSelecao(nome) {
-    itemMestreTemporario = produtosGeral.find(p => p.title === nome);
-    saboresSelecionados = [];
-    
-    const modal = document.getElementById("pizza-options-modal");
-    const pergunta = document.getElementById("pergunta-qtd-sabores");
-    const lista = document.getElementById("secao-sabores");
+/* --- 3. SELEÇÃO DE SABORES PROFISSIONAL (SEM BOLINHA SELECIONADORA) --- */
+.secao-sabores h3 { margin-bottom: 15px; }
+.instrucao-modal { font-size: 14px; color: #666; margin-bottom: 20px; }
 
-    document.getElementById("pizza-modal-title").innerText = nome;
-    pergunta.style.display = "none";
-    lista.style.display = "none";
-    document.getElementById("lista-sabores-meia").classList.remove("limite-atingido");
-
-    if (itemMestreTemporario.categoria === 'pizza') {
-        if (nome.includes("PIZZA P")) {
-            tamanhoSelecionadoGlobal = "P";
-            montarListaSabores(1, 'pizza');
-        } else {
-            pergunta.style.display = "block";
-            const max = nome.includes("PIZZA M") ? 2 : 3;
-            tamanhoSelecionadoGlobal = nome.includes("PIZZA M") ? "M" : "G";
-            const containerBotoes = document.getElementById("botoes-qtd-sabores");
-            containerBotoes.innerHTML = "";
-            for (let i = 1; i <= max; i++) {
-                containerBotoes.innerHTML += `<button class="btn-principal m-1" onclick="montarListaSabores(${i}, 'pizza')">${i} Sabor${i>1?'es':''}</button>`;
-            }
-        }
-    } else {
-        // BATATAS: Identifica se o clique foi na de 600g (P) ou 1kg (G)
-        tamanhoSelecionadoGlobal = nome.includes("600g") ? "P" : "G";
-        montarListaSabores(1, 'porcao');
-    }
-    modal.style.display = "flex";
+/* Remove os botões de rádio originais e posiciona o efeito visual */
+.lista-check-custom input[type="radio"], .lista-check-custom input[type="checkbox"] {
+    position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0;
 }
 
-function montarListaSabores(n, tipo) {
-    limiteSabores = n;
-    document.getElementById("pergunta-qtd-sabores").style.display = "none";
-    document.getElementById("secao-sabores").style.display = "block";
-    
-    const grid = document.getElementById("lista-sabores-meia");
-    grid.innerHTML = "";
-
-    // FILTRO PARA O MODAL: Mostra só o que NÃO tem P, M, G, 600g ou 1kg no título
-    const opcoes = (tipo === 'pizza') 
-        ? produtosGeral.filter(p => p.categoria === 'pizza' && !p.title.includes("PIZZA ")) 
-        : produtosGeral.filter(p => p.categoria === 'porcao' && !p.title.includes("600g") && !p.title.includes("1kg"));
-
-    opcoes.forEach(opt => {
-        grid.innerHTML += `
-            <div class="item-sabor-wizard" onclick="toggleSabor('${opt.title}')">
-                <div><strong>${opt.title}</strong><br><small>${opt.ingredientes || ""}</small></div>
-                <span class="check-icon"></span>
-            </div>`;
-    });
+/* Estiliza o elemento inteiro como uma opção clicável */
+.item-sabor-wizard {
+    border: 1px solid #ddd; border-radius: 12px; padding: 15px;
+    margin-bottom: 10px; cursor: pointer; display: flex;
+    justify-content: space-between; align-items: center; transition: all 0.2s;
+    background-color: #fff; /* Fundo original */
 }
 
-function toggleSabor(nome) {
-    const idx = saboresSelecionados.indexOf(nome);
-    const container = document.getElementById("lista-sabores-meia");
-
-    if (idx > -1) {
-        saboresSelecionados.splice(idx, 1);
-    } else if (saboresSelecionados.length < limiteSabores) {
-        if (limiteSabores === 1) saboresSelecionados = [];
-        saboresSelecionados.push(nome);
-    }
-
-    container.classList.toggle("limite-atingido", saboresSelecionados.length >= limiteSabores);
-    
-    document.querySelectorAll(".item-sabor-wizard").forEach(el => {
-        const txt = el.querySelector("strong").innerText;
-        const sel = saboresSelecionados.includes(txt);
-        el.classList.toggle("selecionado", sel);
-        el.querySelector(".check-icon").innerText = sel ? "✅" : "⚪";
-    });
+/* Efeito visual ao selecionar: A opção fica com borda verde e fundo suave */
+.lista-check-custom input:checked + .item-sabor-wizard {
+    border-color: #00a650; background-color: #f1fff3; /* Verde iFood suave */
 }
 
-function confirmarSelecao() {
-    if (saboresSelecionados.length === 0) return alert("Selecione uma opção!");
-
-    let precoFinal = 0;
-    let tituloItem = itemMestreTemporario.title;
-
-    if (itemMestreTemporario.categoria === 'pizza') {
-        precoFinal = itemMestreTemporario.prices[tamanhoSelecionadoGlobal];
-        tituloItem += ` (${saboresSelecionados.join("/")})`;
-    } else {
-        // Pega o preço da batata escolhida baseado no tamanho do item mestre
-        const opt = produtosGeral.find(p => p.title === saboresSelecionados[0]);
-        precoFinal = opt.prices[tamanhoSelecionadoGlobal];
-        tituloItem += ` - ${saboresSelecionados[0]}`;
-    }
-
-    adicionarAoCarrinho(tituloItem, precoFinal, "");
-    fecharModalSelecao();
+/* Substitui a bolinha original por um check visual apenas quando selecionado */
+.check-icon { display: none; } /* Esconde o check vazio */
+.lista-check-custom input:checked + .item-sabor-wizard .check-icon {
+    display: block; font-size: 16px; color: #00a650; /* Check verde visual */
 }
 
-function adicionarAoCarrinho(titulo, preco, sabor) {
-    carrinho.push({ title: titulo, price: preco, sabor: sabor });
-    atualizarCarrinho();
-    mostrarToast(titulo);
+/* --- 4. CARRINHO AJUSTADO COM BOTÃO DE EXCLUSÃO CIRCULAR COM 'X' E CORES AJUSTADAS --- */
+.cart-items-list { max-height: 280px; overflow-y: auto; margin-bottom: 10px; padding-right: 8px; border-bottom: 1px solid #eee; }
+.cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #f0f0f0; }
+
+.cart-item-info strong { font-size: 14px; font-weight: 700; color: #333; display: block; margin-bottom: 4px; }
+.cart-item-info span { font-size: 13px; font-weight: 700; color: #00a650; } /* Verde do botão escolher */
+
+/* Estilo para o botão de exclusão circular escuro com um 'X' branco centralizado, como solicitado */
+.btn-excluir-item-x {
+    background-color: #222; /* Fundo escuro conforme solicitado */
+    color: #fff; /* 'X' branco */
+    border: none; width: 36px; height: 36px; /* Tamanho circular */
+    border-radius: 5px; /* Arredondamento conforme solicitado */
+    font-size: 20px; font-weight: 800; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    padding: 0; transition: background-color 0.3s;
 }
+.btn-excluir-item-x:hover { background-color: #ff4d4f; } /* Fica vermelho ao passar o mouse */
 
-function atualizarCarrinho() {
-    const box = document.getElementById("cart-items");
-    box.innerHTML = "";
-    let sub = 0;
+/* --- 5. CUPOM E RESUMO DE VALORES COM ESPAÇAMENTO PROFISSIONAL --- */
+.cupom-secao { margin: 20px 0; padding-top: 15px; border-top: 1px dashed #ddd; }
+.cupom-container { display: flex; gap: 8px; align-items: center; margin-bottom: 15px; /* Espaço para não colar no Subtotal */ }
+#input-cupom { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; outline: none; transition: border-color 0.3s; }
+#input-cupom:focus { border-color: #ff6b00; }
+#btn-aplicar-cupom { background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; }
 
-    carrinho.forEach((item, index) => {
-        sub += item.price;
-        box.innerHTML += `
-            <div class="cart-item-row">
-                <div style="flex:1">
-                    <strong>${item.title}</strong><br>
-                    <b style="color: #28a745;">R$ ${item.price.toFixed(2)}</b>
-                </div>
-                // Mude para esta linha. Eu mudei a classe para facilitar o estilo.
-              <button onclick="removerItem(${index})" class="btn-excluir-apenas-x">X</button>
-            </div>`;
-    });
+.summary-box { background: #f9f9f9; padding: 15px; border-radius: 15px; margin-top: 10px; margin-bottom: 20px; }
+.summary-line { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+.summary-line span:last-child { font-weight: 700; color: #00a650; /* Preço verde no resumo */ }
+.total { font-weight: 800; font-size: 18px; color: #000; border-top: 1px dashed #ccc; padding-top: 8px; margin-top: 5px; }
 
-    document.getElementById("subtotal").innerText = `R$ ${sub.toFixed(2)}`;
-    document.getElementById("total").innerText = `R$ ${(sub - descontoAplicado).toFixed(2)}`;
-    document.getElementById("cart-count").innerText = carrinho.length;
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-}
+/* MODAIS GERAIS (MANTIDO VISUAL ORIGINAL STYLE IFOOD) */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: flex; align-items: flex-end; justify-content: center; }
+.modal-box { background: #fff; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 20px; max-height: 85vh; overflow-y: auto; }
+.modal-header-clean { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.btn-fechar-modal { background: #f0f0f0; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer; }
 
-function removerItem(idx) {
-    carrinho.splice(idx, 1);
-    atualizarCarrinho();
-}
+/* FORMULÁRIO ENTREGA GERAL (MANTIDO VISUAL ORIGINAL) */
+.form-grid input, .form-grid select, .form-grid textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
+.row-inputs { display: flex; gap: 10px; }
 
-function scrollToCategoria(cat) {
-    const el = document.getElementById(`secao-${cat}`);
-    const offset = 140; 
-    window.scrollTo({ top: el.offsetTop - offset, behavior: "smooth" });
-}
+/* BOTÕES DE AÇÃO GERAIS (MANTIDO VISUAL ORIGINAL) */
+.btn-finalizar, .btn-whatsapp, .btn-principal { background: #ff6b00; color: #fff; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: 800; font-size: 16px; margin-top: 10px; cursor: pointer; }
+.btn-continuar, .btn-secundario { background: none; color: #ff6b00; border: none; width: 100%; padding: 10px; font-weight: 700; cursor: pointer; text-align: center; display: block; text-decoration: none; }
 
-function sincronizarScrollMenu() {
-    const secoes = document.querySelectorAll(".secao-categoria");
-    const botoes = document.querySelectorAll(".cat-item");
-    let atual = "";
-
-    secoes.forEach(s => {
-        if (pageYOffset >= s.offsetTop - 160) {
-            atual = s.getAttribute("id").replace("secao-", "");
-        }
-    });
-
-    botoes.forEach(btn => {
-        btn.classList.toggle("active", btn.getAttribute("data-categoria") === atual);
-        if (btn.classList.contains("active")) {
-            btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-        }
-    });
-}
-
-function fecharModalSelecao() { document.getElementById("pizza-options-modal").style.display = "none"; }
-function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
-function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
-function abrirDelivery() { 
-    if(carrinho.length === 0) return alert("Adicione algo ao carrinho primeiro!");
-    fecharCarrinho();
-    document.getElementById("delivery-modal").style.display = "flex"; 
-}
-function mostrarToast(t) { 
-    const el = document.getElementById("toast-geral");
-    el.innerText = t + " adicionado! ✅"; el.style.display = "block";
-    setTimeout(() => el.style.display = "none", 2000);
-}
-function carregarStatusLoja() {
-    const el = document.getElementById("status-loja");
-    const agora = new Date();
-    const horaAtual = agora.getHours();
-    const minAtual = agora.getMinutes();
-    const tempoAtual = (horaAtual * 60) + minAtual;
-    const tempoAbre = (9 * 60) + 0;   // 09:00 -> 540 minutos
-    const tempoFecha = (23 * 60) + 30; // 23:30 -> 1410 minutos
-    const aberto = tempoAtual >= tempoAbre && tempoAtual <= tempoFecha;
-    el.innerText = aberto ? "ABERTO" : "FECHADO";
-    el.className = `status ${aberto ? 'aberto' : 'fechado'}`;
-}
-
-function carregarCarrinhoStorage() {
-    const s = localStorage.getItem("carrinho");
-    if(s) { carrinho = JSON.parse(s); atualizarCarrinho(); }
-}
-
-
-
-
-
-
+/* TOAST ADICIONAR PRODUTO (MANTIDO VISUAL ORIGINAL) */
+.toast-custom { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 25px; border-radius: 30px; font-weight: 600; display: none; z-index: 3000; }
