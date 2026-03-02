@@ -313,23 +313,23 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
         }
 
 /* --- AJUSTES PROFISSIONAIS ADAN --- */
-
-/* 1. STATUS ABERTO (Verde Profissional) */
+/* --- 1. STATUS ABERTO (Verde iFood com Bolinha Pulsante) --- */
 .status.aberto {
-    color: #00a650; /* Verde iFood/WhatsApp */
+    color: #00a650; 
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px; /* Espaço entre bolinha e texto */
     text-transform: uppercase;
-    font-size: 10px;
+    font-size: 11px;
+    font-weight: 800;
     letter-spacing: 0.5px;
 }
 
-/* Bolinha piscando ao lado do Aberto */
+/* A bolinha viva */
 .status.aberto::before {
     content: "";
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     background-color: #00a650;
     border-radius: 50%;
     display: inline-block;
@@ -337,24 +337,25 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
 }
 
 @keyframes pulse-green {
-    0% { shadow: 0 0 0 0 rgba(0, 166, 80, 0.7); transform: scale(0.95); }
-    70% { box-shadow: 0 0 0 6px rgba(0, 166, 80, 0); transform: scale(1); }
-    100% { box-shadow: 0 0 0 0 rgba(0, 166, 80, 0); transform: scale(0.95); }
+    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0, 166, 80, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 166, 80, 0); }
+    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0, 166, 80, 0); }
 }
 
 .status.fechado {
     color: #ff4d4f;
+    font-size: 11px;
+    font-weight: 700;
     opacity: 0.8;
 }
 
-/* 2. CATEGORIAS ESTILO APP (Nav Profissional) */
+/* --- 2. CATEGORIAS ESTILO APP (Nav com Linha Laranja) --- */
 .categorias-nav {
     background: #fff;
     position: sticky;
-    top: 54px; /* Ajuste conforme a altura do seu header */
+    top: 54px; /* Ajuste se o seu header for mais alto */
     z-index: 1000;
     border-bottom: 1px solid #f2f2f2;
-    padding: 0;
 }
 
 .categorias-scroll {
@@ -362,22 +363,24 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
     overflow-x: auto;
     padding: 0 15px;
     gap: 20px;
-    height: 45px;
+    height: 48px;
     align-items: center;
+    scrollbar-width: none; /* Esconde barra no Firefox */
 }
 
-.cat-item { /* Se você usa a tag <button> ou <a> */
+.categorias-scroll::-webkit-scrollbar { display: none; } /* Esconde no Chrome/Safari */
+
+.cat-item {
     font-size: 13px;
     font-weight: 600;
     color: #666;
-    text-decoration: none;
     text-transform: uppercase;
     white-space: nowrap;
     border: none;
     background: none;
-    padding: 10px 0;
+    padding: 12px 0;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.2s ease;
     border-bottom: 3px solid transparent;
 }
 
@@ -387,28 +390,7 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
     font-weight: 800;
 }
 
-/* 3. BOTÃO EXCLUIR PRODUTO NO CARRINHO */
-.btn-excluir-item {
-    background: #fff1f0; /* Fundo vermelho bem clarinho */
-    color: #ff4d4f;      /* Texto vermelho */
-    border: 1px solid #ffa39e;
-    padding: 5px 10px;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.btn-excluir-item:hover {
-    background: #ff4d4f;
-    color: #fff;
-}
-
-/* Ajuste na linha do produto no carrinho */
+/* --- 3. BOTÃO EXCLUIR E LINHA DO CARRINHO --- */
 .cart-item-row {
     display: flex;
     justify-content: space-between;
@@ -417,18 +399,25 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
     border-bottom: 1px solid #f5f5f5;
 }
 
-.cart-item-info {
+.btn-excluir-item {
+    background: #fff1f0; 
+    color: #ff4d4f;      
+    border: 1px solid #ffa39e;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
     display: flex;
-    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: 0.2s;
 }
 
-.cart-item-info strong {
-    font-size: 14px;
-    color: #333;
+.btn-excluir-item:hover {
+    background: #ff4d4f;
+    color: #fff;
 }
-
-.cart-item-info span {
-    font-size: 13px;
-    color: #00a650;
     font-weight: 700;
 }
+
