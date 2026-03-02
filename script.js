@@ -263,16 +263,18 @@ function mostrarToast(t) {
     setTimeout(() => el.style.display = "none", 2000);
 }
 function carregarStatusLoja() {
-    const h = new Date().getHours();
     const el = document.getElementById("status-loja");
-    const aberto = h >= 18 || (h >= 0 && h <= 1); // Exemplo: aberto das 18h à 01h
+    const h = new Date().getHours();
+    const aberto = (h >= 18 || (h >= 0 && h <= 1)); // Aberto das 18h à 1h 
     el.innerText = aberto ? "ABERTO" : "FECHADO";
-    el.className = `status ${aberto ? 'aberto' : 'hechado'}`;
+    el.className = `status ${aberto ? 'aberto' : 'fechado'}`;
 }
+
 function carregarCarrinhoStorage() {
     const s = localStorage.getItem("carrinho");
     if(s) { carrinho = JSON.parse(s); atualizarCarrinho(); }
 }
+
 
 
 
