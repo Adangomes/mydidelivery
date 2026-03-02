@@ -1,8 +1,6 @@
 // CONFIGURAÇÕES GLOBAIS
 const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";
 const RESTAURANTE_COORD = [-49.024909, -26.464334]; 
-const TAXA_BASE = 5;
-const VALOR_POR_KM = 1.5;
 const WHATSAPP_NUMERO = "5547992745867";
 
 let carrinho = [];
@@ -19,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarStatusLoja();
     carregarCardapioCompleto();
     carregarCarrinhoStorage();
-    // Ativa a sincronização do menu de categorias ao rolar
     window.addEventListener("scroll", sincronizarScrollMenu);
 });
 
@@ -42,7 +39,6 @@ function renderizarCardapio() {
     const categorias = [...new Set(produtosGeral.map(p => p.categoria))];
 
     categorias.forEach((cat, idx) => {
-        // Criar Botão de Categoria no Topo
         const btn = document.createElement("button");
         btn.className = `cat-item ${idx === 0 ? 'active' : ''}`;
         btn.innerText = cat.toUpperCase();
@@ -50,22 +46,23 @@ function renderizarCardapio() {
         btn.setAttribute("data-categoria", cat);
         nav.appendChild(btn);
 
-        // Criar Seção de Produtos
         const section = document.createElement("section");
         section.className = "secao-categoria";
         section.id = `secao-${cat}`;
         section.innerHTML = `<h2 class="titulo-categoria">${cat.toUpperCase()}</h2>`;
 
         produtosGeral.filter(p => p.categoria === cat).forEach(p => {
-            // FILTRO DE EXIBIÇÃO:
-            // Esconde sabores de pizza (só mostra os tamanhos P/M/G)
-            // Esconde sabores de batata (só mostra os tamanhos 600g/1kg)
-            const ehSaborAvulsoPizza = (p.categoria === 'pizza' && (!p.prices || p.price === 0));
-            const ehOpcaoAvulsaBatata = (p.categoria === 'porcao' && !p.prices);
+            // TRAVA PARA PORÇÃO: No cardápio principal, só mostra se tiver "600g" ou "1kg"
+            if (p.categoria === 'porcao') {
+                if (!p.title.includes("600g") && !p.title.includes("1kg")) return;
+            }
+            
+            // TRAVA PARA PIZZA: Só mostra as "P, M, G"
+            if (p.categoria === 'pizza') {
+                if (!p.title.includes("PIZZA ")) return;
+            }
 
-            if (ehSaborAvulsoPizza || ehOpcaoAvulsaBatata) return; 
-
-            const precoExibido = p.price > 0 ? `R$ ${p.price.toFixed(2)}` : "Escolher Sabores";
+            const precoExibido = p.price > 0 ? `R$ ${p.price.toFixed(2)}` : "Escolher Opções";
 
             section.innerHTML += `
                 <div class="item-produto-lista" onclick="decidirFluxo('${p.title}')">
@@ -87,11 +84,9 @@ function renderizarCardapio() {
 // --- 2. LÓGICA DE CLIQUES ---
 function decidirFluxo(nome) {
     const p = produtosGeral.find(prod => prod.title === nome);
-    // Abre modal para Pizzas ou Porções (Batatas)
     if (p.categoria === 'pizza' || p.categoria === 'porcao') {
         abrirModalSelecao(nome);
     } else {
-        // Adiciona direto (Hambúrguer, Bebida, Dog)
         adicionarAoCarrinho(p.title, p.price, "");
     }
 }
@@ -124,7 +119,7 @@ function abrirModalSelecao(nome) {
             }
         }
     } else {
-        // BATATAS: Identifica se é 600g (P) ou 1kg (G)
+        // BATATAS: Identifica se o clique foi na de 600g (P) ou 1kg (G)
         tamanhoSelecionadoGlobal = nome.includes("600g") ? "P" : "G";
         montarListaSabores(1, 'porcao');
     }
@@ -139,9 +134,10 @@ function montarListaSabores(n, tipo) {
     const grid = document.getElementById("lista-sabores-meia");
     grid.innerHTML = "";
 
+    // FILTRO PARA O MODAL: Mostra só o que NÃO tem P, M, G, 600g ou 1kg no título
     const opcoes = (tipo === 'pizza') 
-        ? produtosGeral.filter(p => p.categoria === 'pizza' && !p.prices) 
-        : produtosGeral.filter(p => p.categoria === 'porcao' && !p.prices);
+        ? produtosGeral.filter(p => p.categoria === 'pizza' && !p.title.includes("PIZZA ")) 
+        : produtosGeral.filter(p => p.categoria === 'porcao' && !p.title.includes("600g") && !p.title.includes("1kg"));
 
     opcoes.forEach(opt => {
         grid.innerHTML += `
@@ -183,6 +179,7 @@ function confirmarSelecao() {
         precoFinal = itemMestreTemporario.prices[tamanhoSelecionadoGlobal];
         tituloItem += ` (${saboresSelecionados.join("/")})`;
     } else {
+        // Pega o preço da batata escolhida baseado no tamanho do item mestre
         const opt = produtosGeral.find(p => p.title === saboresSelecionados[0]);
         precoFinal = opt.prices[tamanhoSelecionadoGlobal];
         tituloItem += ` - ${saboresSelecionados[0]}`;
@@ -192,9 +189,7 @@ function confirmarSelecao() {
     fecharModalSelecao();
 }
 
-// --- 3. CARRINHO (INDIVIDUAL) ---
 function adicionarAoCarrinho(titulo, preco, sabor) {
-    // Adiciona como novo item sempre, para aparecer repetido se for o caso
     carrinho.push({ title: titulo, price: preco, sabor: sabor });
     atualizarCarrinho();
     mostrarToast(titulo);
@@ -208,12 +203,12 @@ function atualizarCarrinho() {
     carrinho.forEach((item, index) => {
         sub += item.price;
         box.innerHTML += `
-            <div class="cart-item-row" style="border-left: 5px solid #ff6b00; padding: 12px; background: #fff; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+            <div class="cart-item-row">
                 <div style="flex:1">
-                    <strong style="font-size: 1rem;">${item.title}</strong><br>
+                    <strong>${item.title}</strong><br>
                     <b style="color: #28a745;">R$ ${item.price.toFixed(2)}</b>
                 </div>
-                <button onclick="removerItem(${index})" style="background: #dc3545; color: #fff; border: none; padding: 8px 12px; border-radius: 6px; font-weight: bold; font-size: 0.8rem;">EXCLUIR 🗑️</button>
+                <button onclick="removerItem(${index})" class="btn-excluir-cart">EXCLUIR 🗑️</button>
             </div>`;
     });
 
@@ -228,10 +223,9 @@ function removerItem(idx) {
     atualizarCarrinho();
 }
 
-// --- 4. CATEGORIAS E SCROLL ---
 function scrollToCategoria(cat) {
     const el = document.getElementById(`secao-${cat}`);
-    const offset = 140; // Espaço para não cobrir o título
+    const offset = 140; 
     window.scrollTo({ top: el.offsetTop - offset, behavior: "smooth" });
 }
 
@@ -254,7 +248,6 @@ function sincronizarScrollMenu() {
     });
 }
 
-// --- UTILITÁRIOS ---
 function fecharModalSelecao() { document.getElementById("pizza-options-modal").style.display = "none"; }
 function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
 function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
@@ -271,9 +264,9 @@ function mostrarToast(t) {
 function carregarStatusLoja() {
     const h = new Date().getHours();
     const el = document.getElementById("status-loja");
-    const aberto = h >= 18 || h <= 23;
+    const aberto = h >= 18 || (h >= 0 && h <= 1); // Exemplo: aberto das 18h à 01h
     el.innerText = aberto ? "ABERTO" : "FECHADO";
-    el.className = `status ${aberto ? 'aberto' : 'fechado'}`;
+    el.className = `status ${aberto ? 'aberto' : 'hechado'}`;
 }
 function carregarCarrinhoStorage() {
     const s = localStorage.getItem("carrinho");
