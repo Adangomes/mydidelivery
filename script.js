@@ -207,10 +207,12 @@ async function processarResumoGeo() {
     const num = document.getElementById("numero")?.value || document.getElementById("input-numero")?.value;
 
     if (!nome || !rua || !num) return alert("Por favor, preencha Nome, Rua e Número para calcular a entrega!");
-
-    // 1. MOSTRAR O LOADING (O CÍRCULO GIRANDO)
+    
+// 1. ATIVA O EFEITO (O Círculo Girando)
     const loader = document.getElementById("loading-geral");
-    if(loader) loader.style.display = "flex";
+    if (loader) {
+        loader.style.display = "flex"; 
+    }
 
     try {
         // 2. CHAMADA DA API GEOAPIFY
@@ -358,3 +360,4 @@ function voltarParaEntrega() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+
