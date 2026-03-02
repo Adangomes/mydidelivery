@@ -6,8 +6,20 @@
     <title>SNOOP LANCHE</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="styles.css" />
+    <style>
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+        }
+    </style>
 </head>
 <body>
+
+<div id="loading-geral" class="loading-overlay" style="display:none;">
+    <div class="spinner-border text-warning" role="status"></div>
+    <p class="mt-2">Calculando entrega...</p>
+</div>
 
 <div id="toast-geral" class="toast-custom">Produto adicionado! ✅</div>
 
@@ -28,54 +40,45 @@
     <div id="categorias-scroll" class="categorias-scroll"></div>
 </nav>
 
-<main id="cardapio-corpo" class="container-main">
-    </main>
+<main id="cardapio-corpo" class="container-main"></main>
 
 <div id="pizza-options-modal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
         <div class="modal-header-clean">
-            <h3 id="pizza-modal-title">Escolha os Sabores</h3>
-            <button onclick="document.getElementById('pizza-options-modal').style.display='none'" class="btn-fechar-modal">✕</button>
+            <h3 id="pizza-modal-title">Escolha</h3>
+            <button onclick="fecharModalSelecao()" class="btn-fechar-modal">✕</button>
         </div>
         
-        <div id="pizza-sizes-container" style="display:none;"></div>
-        
-        <div id="secao-sabores">
-            <p class="instrucao-modal">Selecione conforme o limite do tamanho:</p>
-            <div id="lista-sabores-meia" class="lista-check-custom"></div>
+        <div id="pergunta-qtd-sabores" class="text-center p-3" style="display:none;">
+            <p>Deseja quantos sabores?</p>
+            <div class="d-flex justify-content-center gap-2" id="botoes-qtd-sabores"></div>
         </div>
 
-        <div class="modal-actions mt-3">
-            <button id="btn-confirmar-pizza" class="btn-principal" onclick="confirmarPizza()">Confirmar Seleção</button>
+        <div id="secao-sabores" style="display:none;">
+            <p class="instrucao-modal" id="instrucao-limite"></p>
+            <div id="lista-sabores-meia" class="lista-check-custom"></div>
+            <div class="modal-actions mt-3">
+                <button id="btn-confirmar-pizza" class="btn-principal" onclick="confirmarSelecao()">Confirmar</button>
+            </div>
         </div>
     </div>
 </div>
 
 <div id="cart-modal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
-        <div class="modal-header-clean">
-            <h3>Meu Carrinho</h3>
-            <button onclick="fecharCarrinho()" class="btn-fechar-modal">✕</button>
-        </div>
-
+        <div class="modal-header-clean"><h3>Meu Carrinho</h3><button onclick="fecharCarrinho()" class="btn-fechar-modal">✕</button></div>
         <div id="cart-items" class="cart-items-list"></div>
-
         <div class="cupom-secao">
-            <div class="cupom-container">
-                <input type="text" id="input-cupom" placeholder="Cupom de desconto">
-                <button id="btn-aplicar-cupom">Aplicar</button>
-            </div>
+            <div class="cupom-container"><input type="text" id="input-cupom" placeholder="Cupom"><button id="btn-aplicar-cupom">Ok</button></div>
             <div id="msg-cupom-feedback" class="cupom-msg-erro"></div>
         </div>
-
         <div class="summary-box">
             <div class="summary-line"><span>Subtotal</span><span id="subtotal">R$ 0,00</span></div>
             <div class="summary-line total"><span>Total</span><span id="total">R$ 0,00</span></div>
         </div>
-
         <div class="modal-actions">
             <button class="btn-finalizar" onclick="abrirDelivery()">Finalizar Pedido</button>
-            <button class="btn-continuar" onclick="fecharCarrinho()">Continuar Comprando</button>
+            <button class="btn-continuar" onclick="fecharCarrinho()">Continuar</button>
         </div>
     </div>
 </div>
@@ -83,49 +86,43 @@
 <div id="delivery-modal" class="modal-overlay" style="display:none;">
     <div class="modal-box">
         <div id="form-entrega">
-            <div class="modal-header-clean">
-                <h3>Dados para Entrega</h3>
-                <button onclick="document.getElementById('delivery-modal').style.display='none'" class="btn-fechar-modal">✕</button>
-            </div>
+            <div class="modal-header-clean"><h3>Entrega</h3><button onclick="document.getElementById('delivery-modal').style.display='none'" class="btn-fechar-modal">✕</button></div>
             <div class="form-grid">
                 <input type="text" id="nomeCliente" placeholder="Seu Nome">
                 <select id="cidade">
                     <option value="Jaraguá do Sul">Jaraguá do Sul</option>
                     <option value="Guaramirim">Guaramirim</option>
+                    <option value="Schroeder">Schroeder</option>
                 </select>
                 <div class="row-inputs">
                     <input type="text" id="rua" placeholder="Rua" style="flex:3">
                     <input type="text" id="numero" placeholder="Nº" style="flex:1">
                 </div>
                 <input type="text" id="bairro" placeholder="Bairro">
+                <input type="text" id="referencia" placeholder="Ponto de Referência">
+                <textarea id="obsPedido" placeholder="Observações (ex: Sem cebola)" rows="2" class="form-control mb-2"></textarea>
                 <select id="pagamento" onchange="toggleTroco(this.value)">
                     <option value="Pix">Pix</option>
                     <option value="Dinheiro">Dinheiro</option>
                     <option value="Cartão">Cartão</option>
                 </select>
-                <div id="div-troco" style="display:none;">
-                    <input type="text" id="trocoPara" placeholder="Troco para quanto?">
-                </div>
+                <div id="div-troco" style="display:none;"><input type="text" id="trocoPara" placeholder="Troco para?"></div>
             </div>
-            <button class="btn-principal w-100 mt-3" onclick="mostrarResumo()">Próximo</button>
+            <button class="btn-principal w-100 mt-3" onclick="processarResumoGeo()">Próximo</button>
         </div>
 
         <div id="resumo-pedido" style="display:none;">
             <div class="modal-header-clean"><h3>Resumo Final</h3></div>
             <div id="resumo-itens" class="resumo-lista"></div>
-            <div id="resumo-taxa" class="resumo-valores"></div>
+            <div id="resumo-taxa" class="resumo-valores p-2 bg-light rounded"></div>
             <h4 id="resumo-total" class="resumo-total-final text-center mt-3"></h4>
             <div class="modal-actions">
                 <button class="btn-secundario" onclick="voltarParaEntrega()">Voltar</button>
-                <button class="btn-whatsapp" onclick="enviarWhatsApp()">Enviar para WhatsApp</button>
+                <button class="btn-whatsapp" onclick="enviarWhatsApp()">Pedir no WhatsApp</button>
             </div>
         </div>
     </div>
 </div>
-
-<footer class="footer-creditos">
-    <p>Sistema Desenvolvido por <strong>Adan Gomes</strong></p>
-</footer>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
