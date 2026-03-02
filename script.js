@@ -10,12 +10,10 @@ let produtosGeral = [];
 let taxaEntregaCalculada = 0;
 let descontoAplicado = 0;
 
-// Controle de Pizza e Porção
-let pizzaPrincipal = null;
-let saboresSelecionados = []; 
-let tamanhoSelecionado = null;
-let limiteSabores = 1;
-let itemTemporarioPorcao = null;
+// Estados de seleção
+let itemPrincipal = null; // Pizza ou Batata mestre
+let saboresSelecionados = [];
+let limiteSabores = 0;
 
 document.addEventListener("DOMContentLoaded", () => {
     carregarStatusLoja();
@@ -24,222 +22,201 @@ document.addEventListener("DOMContentLoaded", () => {
     configurarEventosCupom();
 });
 
-// --- 1. CARREGAMENTO DO CARDÁPIO ---
+// --- 1. CARREGAMENTO ---
 async function carregarCardapioCompleto() {
     try {
         const res = await fetch("content/produtos.json?v=" + Date.now());
         const data = await res.json();
         produtosGeral = data.produtos;
-
-        const corpo = document.getElementById("cardapio-corpo");
-        const nav = document.getElementById("categorias-scroll");
-        corpo.innerHTML = ""; nav.innerHTML = "";
-
-        const categorias = {};
-        produtosGeral.forEach(p => {
-            if (!categorias[p.categoria]) categorias[p.categoria] = [];
-            categorias[p.categoria].push(p);
-        });
-
-        Object.keys(categorias).forEach((cat, index) => {
-            const idCat = `cat-${cat.replace(/\s+/g, '-')}`;
-            
-            const link = document.createElement("a");
-            link.href = `#${idCat}`;
-            link.className = `cat-link ${index === 0 ? 'active' : ''}`;
-            link.innerText = cat.toUpperCase();
-            link.onclick = (e) => {
-                e.preventDefault();
-                document.getElementById(idCat).scrollIntoView({ behavior: 'smooth' });
-            };
-            nav.appendChild(link);
-
-            const section = document.createElement("section");
-            section.className = "secao-categoria";
-            section.id = idCat;
-            section.innerHTML = `<h2>${cat.toUpperCase()}</h2>`;
-
-            categorias[cat].forEach(p => {
-                if (p.categoria === 'pizza' && p.price === 0) return;
-
-                const pJson = JSON.stringify(p).replace(/"/g, '&quot;');
-                let acao = `adicionarCarrinhoPorProduto(${pJson})`;
-                let textoPreco = `R$ ${(p.price || 0).toFixed(2)}`;
-
-                if (p.categoria === 'pizza' && p.tipo_escolha === 'abrir_modal') {
-                    acao = `abrirModalPizza('${p.title}')`;
-                    textoPreco = "Escolher Sabores";
-                } else if (p.prices && !p.price) {
-                    acao = `abrirModalDinamico('porcao', '${p.title}')`;
-                    textoPreco = "Ver Opções";
-                }
-
-                section.innerHTML += `
-                    <div class="item-produto-lista" onclick="${acao}">
-                        <div class="info-produto">
-                            <h3 class="nome-produto-lista">${p.title}</h3>
-                            <p class="desc-produto-lista">${p.ingredientes || ""}</p>
-                            <span class="preco-unico">${textoPreco}</span>
-                        </div>
-                        <div class="foto-produto-lista">
-                            <img src="${p.image}" onerror="this.src='imagens/placeholder.png'">
-                            <button class="btn-add-lista">+</button>
-                        </div>
-                    </div>`;
-            });
-            corpo.appendChild(section);
-        });
-    } catch (e) { console.error("Erro ao carregar JSON:", e); }
+        renderizarCardapio();
+    } catch (e) { console.error("Erro JSON:", e); }
 }
 
-// --- 2. LÓGICA DE PIZZAS E PORÇÕES ---
-function abrirModalPizza(nome) {
-    pizzaPrincipal = produtosGeral.find(p => p.title === nome);
+function renderizarCardapio() {
+    const corpo = document.getElementById("cardapio-corpo");
+    corpo.innerHTML = "";
+    const categorias = [...new Set(produtosGeral.map(p => p.categoria))];
+
+    categorias.forEach(cat => {
+        const section = document.createElement("section");
+        section.className = "secao-categoria";
+        section.innerHTML = `<h2>${cat.toUpperCase()}</h2>`;
+
+        produtosGeral.filter(p => p.categoria === cat).forEach(p => {
+            // Regra: Sabores com preço 0 não aparecem sozinhos
+            if (p.price === 0) return;
+
+            const acao = p.tipo_escolha === 'abrir_modal' || p.prices 
+                ? `abrirSelecao('${p.title}')` 
+                : `adicionarDireto(${JSON.stringify(p).replace(/"/g, '&quot;')})`;
+
+            section.innerHTML += `
+                <div class="item-produto-lista" onclick="${acao}">
+                    <div class="info-produto">
+                        <h3>${p.title}</h3>
+                        <p>${p.ingredientes || ""}</p>
+                        <span class="preco-unico">${p.price ? 'R$ '+p.price.toFixed(2) : 'Ver Opções'}</span>
+                    </div>
+                    <div class="foto-produto-lista">
+                        <img src="${p.image}" onerror="this.src='imagens/placeholder.png'">
+                        <button class="btn-add-lista">+</button>
+                    </div>
+                </div>`;
+        });
+        corpo.appendChild(section);
+    });
+}
+
+// --- 2. LÓGICA DE SELEÇÃO (PIZZA E BATATA) ---
+function abrirSelecao(nome) {
+    itemPrincipal = produtosGeral.find(p => p.title === nome);
     saboresSelecionados = [];
-    if (nome.includes("PIZZA P")) { tamanhoSelecionado = "P"; limiteSabores = 1; }
-    else if (nome.includes("PIZZA M")) { tamanhoSelecionado = "M"; limiteSabores = 2; }
-    else if (nome.includes("PIZZA G")) { tamanhoSelecionado = "G"; limiteSabores = 3; }
+    const modal = document.getElementById("pizza-options-modal");
+    const containerBotoes = document.getElementById("botoes-qtd-sabores");
+    const pergunta = document.getElementById("pergunta-qtd-sabores");
+    const lista = document.getElementById("secao-sabores");
+
     document.getElementById("pizza-modal-title").innerText = nome;
-    renderizarSabores();
-    document.getElementById("pizza-options-modal").style.display = "flex";
+    containerBotoes.innerHTML = "";
+    pergunta.style.display = "none";
+    lista.style.display = "none";
+
+    // Lógica para PIZZA
+    if (itemPrincipal.categoria === 'pizza') {
+        if (nome.includes("PIZZA P")) {
+            configurarLimiteSabores(1);
+        } else {
+            pergunta.style.display = "block";
+            const max = nome.includes("PIZZA M") ? 2 : 3;
+            for (let i = 1; i <= max; i++) {
+                containerBotoes.innerHTML += `<button class="btn-secundario m-1" onclick="configurarLimiteSabores(${i})">${i} Sabor${i>1?'es':''}</button>`;
+            }
+        }
+    } 
+    // Lógica para BATATA (Mestre 1kg abre opções)
+    else if (itemPrincipal.prices) {
+        configurarLimiteSabores(1, true); // Batata 1kg sempre escolhe 1 opção da lista
+    }
+
+    modal.style.display = "flex";
 }
 
-function renderizarSabores() {
+function configurarLimiteSabores(n, isBatata = false) {
+    limiteSabores = n;
+    document.getElementById("pergunta-qtd-sabores").style.display = "none";
+    document.getElementById("secao-sabores").style.display = "block";
+    document.getElementById("instrucao-limite").innerText = `Selecione até ${n} opção(ões):`;
+    
     const grid = document.getElementById("lista-sabores-meia");
     grid.innerHTML = "";
-    const sabores = produtosGeral.filter(p => p.categoria === 'pizza' && p.price === 0);
-    sabores.forEach(s => {
-        const sel = saboresSelecionados.includes(s.title);
+
+    // Se for pizza, pega itens com preço 0. Se for batata 1kg, pega as outras batatas da categoria.
+    const opcoes = isBatata 
+        ? produtosGeral.filter(p => p.categoria === 'porcao' && !p.prices)
+        : produtosGeral.filter(p => p.categoria === 'pizza' && p.price === 0);
+
+    opcoes.forEach(s => {
         grid.innerHTML += `
-            <div class="item-sabor-wizard ${sel ? 'selecionado' : ''}" onclick="toggleSabor('${s.title}')">
-                <div><strong>${s.title}</strong><br><small>${s.ingredientes}</small></div>
-                <span>${sel ? '✅' : '+'}</span>
+            <div class="item-sabor-wizard" id="sabor-${s.title.replace(/\s/g, '')}" onclick="toggleSabor('${s.title}')">
+                <div><strong>${s.title}</strong><br><small>${s.ingredientes || ""}</small></div>
+                <span class="check-icon">⚪</span>
             </div>`;
     });
 }
 
 function toggleSabor(nome) {
     const idx = saboresSelecionados.indexOf(nome);
-    if (idx > -1) saboresSelecionados.splice(idx, 1);
-    else if (saboresSelecionados.length < limiteSabores) saboresSelecionados.push(nome);
-    renderizarSabores();
-}
-
-function confirmarPizza() {
-    if (itemTemporarioPorcao) {
-        carrinho.push(itemTemporarioPorcao);
-    } else {
-        if (saboresSelecionados.length === 0) return alert("Escolha pelo menos 1 sabor!");
-        const precoBase = pizzaPrincipal.prices[tamanhoSelecionado];
-        carrinho.push({ title: pizzaPrincipal.title, sabor: saboresSelecionados.join(" / "), price: precoBase, qtd: 1 });
+    if (idx > -1) {
+        saboresSelecionados.splice(idx, 1);
+    } else if (saboresSelecionados.length < limiteSabores) {
+        saboresSelecionados.push(nome);
     }
-    itemTemporarioPorcao = null;
-    document.getElementById("pizza-options-modal").style.display = "none";
+    
+    // Atualiza visual
+    document.querySelectorAll(".item-sabor-wizard").forEach(el => {
+        const txt = el.querySelector("strong").innerText;
+        el.classList.toggle("selecionado", saboresSelecionados.includes(txt));
+        el.querySelector(".check-icon").innerText = saboresSelecionados.includes(txt) ? "✅" : "⚪";
+    });
+}
+
+function confirmarSelecao() {
+    if (saboresSelecionados.length === 0) return alert("Selecione pelo menos 1!");
+    
+    const preco = itemPrincipal.price || itemPrincipal.prices["1kg"];
+    carrinho.push({
+        title: itemPrincipal.title,
+        sabor: saboresSelecionados.join(" / "),
+        price: preco,
+        qtd: 1
+    });
+    
+    fecharModalSelecao();
     atualizarCarrinho();
 }
 
-function abrirModalDinamico(cat, tituloMestre) {
-    const mestre = produtosGeral.find(p => p.title === tituloMestre);
-    const container = document.getElementById("lista-sabores-meia");
-    document.getElementById("pizza-modal-title").innerText = tituloMestre;
-    container.innerHTML = "";
-    Object.keys(mestre.prices).forEach(tam => {
-        const preco = mestre.prices[tam];
-        const div = document.createElement("div");
-        div.className = "item-sabor-wizard";
-        div.innerHTML = `<strong>Opção ${tam}</strong> <span>R$ ${preco.toFixed(2)}</span>`;
-        div.onclick = () => {
-            itemTemporarioPorcao = { title: `${mestre.title} (${tam})`, price: preco, qtd: 1 };
-            confirmarPizza();
-        };
-        container.appendChild(div);
-    });
-    document.getElementById("pizza-options-modal").style.display = "flex";
-}
-
-// --- 3. CARRINHO E CUPOM ---
-function adicionarCarrinhoPorProduto(p) {
-    let item = carrinho.find(i => i.title === p.title);
-    if(item) item.qtd++;
-    else carrinho.push({...p, qtd: 1, price: p.price || 0});
-    atualizarCarrinho();
-    mostrarToast(p.title);
-}
-
-function atualizarCarrinho() {
-    const box = document.getElementById("cart-items");
-    let sub = 0;
-    box.innerHTML = "";
-    carrinho.forEach((i, idx) => {
-        sub += (i.price * i.qtd);
-        box.innerHTML += `
-            <div class="cart-item-row">
-                <div style="flex:1"><strong>${i.qtd}x ${i.title}</strong><br><small>${i.sabor || ''}</small></div>
-                <span>R$ ${(i.price * i.qtd).toFixed(2)}</span>
-                <button onclick="removerItem(${idx})" class="btn-remove">✕</button>
-            </div>`;
-    });
-    const total = sub - descontoAplicado;
-    document.getElementById("subtotal").innerText = `R$ ${sub.toFixed(2)}`;
-    document.getElementById("total").innerText = `R$ ${Math.max(0, total).toFixed(2)}`;
-    document.getElementById("cart-count").innerText = carrinho.length;
-    localStorage.setItem("carrinho", JSON.stringify(carrinho));
-}
-
-function removerItem(idx) { carrinho.splice(idx, 1); atualizarCarrinho(); }
-
-function configurarEventosCupom() {
-    document.getElementById("btn-aplicar-cupom").addEventListener("click", () => {
-        const cupom = document.getElementById("input-cupom").value.toUpperCase();
-        const feedback = document.getElementById("msg-cupom-feedback");
-        if (cupom === "SNOOP10") {
-            descontoAplicado = 10;
-            feedback.innerText = "Desconto de R$ 10,00 aplicado!";
-            feedback.className = "cupom-msg-erro cupom-sucesso";
-        } else {
-            descontoAplicado = 0;
-            feedback.innerText = "Cupom inválido.";
-            feedback.className = "cupom-msg-erro cupom-erro";
-        }
-        feedback.style.display = "block";
-        atualizarCarrinho();
-    });
-}
-
-// --- 4. RESUMO, WHATSAPP E FIREBASE ---
-function abrirDelivery() {
-    if(carrinho.length === 0) return alert("Carrinho vazio!");
-    document.getElementById("cart-modal").style.display = "none";
-    document.getElementById("delivery-modal").style.display = "flex";
-}
-
-function mostrarResumo() {
-    const nome = document.getElementById("nomeCliente").value;
+// --- 3. GEOAPIFY E TAXA ---
+async function processarResumoGeo() {
     const rua = document.getElementById("rua").value;
-    if(!nome || !rua) return alert("Preencha os dados de entrega!");
+    const num = document.getElementById("numero").value;
+    const cid = document.getElementById("cidade").value;
 
-    const listaResumo = document.getElementById("resumo-itens");
-    listaResumo.innerHTML = "";
-    
-    let subtotal = 0;
+    if (!rua || !num) return alert("Preencha o endereço!");
+
+    document.getElementById("loading-geral").style.display = "flex";
+
+    try {
+        const query = encodeURIComponent(`${rua}, ${num}, ${cid}, SC, Brasil`);
+        const resp = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${query}&apiKey=${GEOAPIFY_KEY}`);
+        const data = await resp.json();
+
+        if (data.features.length > 0) {
+            const [lon, lat] = data.features[0].geometry.coordinates;
+            const dist = calcularDistancia(RESTAURANTE_COORD[1], RESTAURANTE_COORD[0], lat, lon);
+            taxaEntregaCalculada = TAXA_BASE + (dist * VALOR_POR_KM);
+            mostrarResumo();
+        } else {
+            alert("Endereço não encontrado. Verifique a rua e número.");
+        }
+    } catch (e) {
+        taxaEntregaCalculada = TAXA_BASE; // Fallback
+        mostrarResumo();
+    } finally {
+        document.getElementById("loading-geral").style.display = "none";
+    }
+}
+
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)));
+}
+
+// --- 4. FINALIZAÇÃO ---
+function mostrarResumo() {
+    const lista = document.getElementById("resumo-itens");
+    lista.innerHTML = "";
+    let sub = 0;
+
     carrinho.forEach(i => {
-        subtotal += (i.price * i.qtd);
-        listaResumo.innerHTML += `<div class="resumo-linha"><span>${i.qtd}x ${i.title}</span> <span>R$ ${(i.price * i.qtd).toFixed(2)}</span></div>`;
+        sub += (i.price * i.qtd);
+        lista.innerHTML += `<div class="resumo-linha"><span>${i.qtd}x ${i.title}</span> <span>R$ ${(i.price*i.qtd).toFixed(2)}</span></div>`;
     });
 
-    let resumoValores = `Subtotal: R$ ${subtotal.toFixed(2)}<br>`;
-    if(descontoAplicado > 0) resumoValores += `Desconto: - R$ ${descontoAplicado.toFixed(2)}<br>`;
+    const totalFinal = sub + taxaEntregaCalculada - descontoAplicado;
     
-    document.getElementById("resumo-taxa").innerHTML = resumoValores;
-    document.getElementById("resumo-total").innerText = `Total: ${document.getElementById("total").innerText}`;
+    document.getElementById("resumo-taxa").innerHTML = `
+        Subtotal: R$ ${sub.toFixed(2)}<br>
+        Entrega: R$ ${taxaEntregaCalculada.toFixed(2)}<br>
+        ${descontoAplicado > 0 ? 'Desconto: - R$ '+descontoAplicado.toFixed(2) : ''}
+    `;
+    document.getElementById("resumo-total").innerText = `Total: R$ ${totalFinal.toFixed(2)}`;
     
     document.getElementById("form-entrega").style.display = "none";
     document.getElementById("resumo-pedido").style.display = "block";
-}
-
-function voltarParaEntrega() {
-    document.getElementById("form-entrega").style.display = "block";
-    document.getElementById("resumo-pedido").style.display = "none";
 }
 
 function enviarWhatsApp() {
@@ -247,31 +224,30 @@ function enviarWhatsApp() {
     const rua = document.getElementById("rua").value;
     const num = document.getElementById("numero").value;
     const bairro = document.getElementById("bairro").value;
+    const ref = document.getElementById("referencia").value;
+    const obs = document.getElementById("obsPedido").value;
     const pag = document.getElementById("pagamento").value;
-    const total = document.getElementById("total").innerText;
+    const total = document.getElementById("resumo-total").innerText;
 
-    const pedidoData = {
+    const pedido = {
         cliente: nome,
         endereco: `${rua}, ${num} - ${bairro}`,
+        referencia: ref,
+        obs: obs,
         itens: carrinho,
         pagamento: pag,
         total: total,
-        desconto: descontoAplicado,
         data: new Date().toLocaleString()
     };
 
-    // Enviar para Firebase
-    try {
-        firebase.database().ref('pedidos').push(pedidoData);
-    } catch(e) { console.error("Erro Firebase:", e); }
+    firebase.database().ref('pedidos').push(pedido);
 
-    // Mensagem Whats
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n\n`;
-    msg += `*Cliente:* ${nome}\n*Endereço:* ${rua}, ${num} - ${bairro}\n*Pagamento:* ${pag}\n\n`;
-    msg += `*ITENS:*\n`;
-    carrinho.forEach(i => { msg += `- ${i.qtd}x ${i.title} ${i.sabor ? '('+i.sabor+')' : ''}\n`; });
-    if(descontoAplicado > 0) msg += `\n*Desconto:* R$ ${descontoAplicado.toFixed(2)}`;
-    msg += `\n*TOTAL:* ${total}`;
+    msg += `👤 *Cliente:* ${nome}\n📍 *Endereço:* ${rua}, ${num} - ${bairro}\n🏠 *Ref:* ${ref}\n`;
+    msg += `💬 *Obs:* ${obs}\n💳 *Pagamento:* ${pag}\n\n`;
+    msg += `📝 *ITENS:*\n`;
+    carrinho.forEach(i => msg += `- ${i.qtd}x ${i.title} (${i.sabor})\n`);
+    msg += `\n💰 *${total}*`;
 
     window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
     localStorage.removeItem("carrinho");
@@ -279,26 +255,57 @@ function enviarWhatsApp() {
 }
 
 // --- AUXILIARES ---
-function mostrarToast(txt) {
-    const t = document.getElementById("toast-geral");
-    t.innerText = txt + " adicionado!";
-    t.style.display = "block";
-    setTimeout(() => t.style.display = "none", 2000);
+function adicionarDireto(p) {
+    let item = carrinho.find(i => i.title === p.title);
+    if(item) item.qtd++; else carrinho.push({...p, qtd: 1});
+    atualizarCarrinho();
+    mostrarToast(p.title);
 }
 
-function carregarStatusLoja() {
-    const status = document.getElementById("status-loja");
-    const hora = new Date().getHours();
-    const aberto = (hora >= 18 || hora <= 23);
-    status.innerText = aberto ? "ABERTO" : "FECHADO";
-    status.className = `status ${aberto ? 'aberto' : 'fechado'}`;
+function atualizarCarrinho() {
+    let sub = 0;
+    carrinho.forEach(i => sub += (i.price * i.qtd));
+    document.getElementById("subtotal").innerText = `R$ ${sub.toFixed(2)}`;
+    document.getElementById("total").innerText = `R$ ${(sub - descontoAplicado).toFixed(2)}`;
+    document.getElementById("cart-count").innerText = carrinho.length;
+    localStorage.setItem("carrinho", JSON.stringify(carrinho));
 }
 
-function carregarCarrinhoStorage() {
-    const salvo = localStorage.getItem("carrinho");
-    if(salvo) { carrinho = JSON.parse(salvo); atualizarCarrinho(); }
-}
-
+function fecharModalSelecao() { document.getElementById("pizza-options-modal").style.display = "none"; }
 function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
-function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
-function toggleTroco(val) { document.getElementById("div-troco").style.display = val === 'Dinheiro' ? 'block' : 'none'; }
+function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; atualizarCarrinho(); }
+function abrirDelivery() { 
+    if(carrinho.length === 0) return alert("Vazio!");
+    fecharCarrinho(); 
+    document.getElementById("delivery-modal").style.display = "flex"; 
+}
+function toggleTroco(v) { document.getElementById("div-troco").style.display = v === 'Dinheiro' ? 'block' : 'none'; }
+function mostrarToast(t) { 
+    const el = document.getElementById("toast-geral");
+    el.innerText = t + " adicionado!"; el.style.display = "block";
+    setTimeout(() => el.style.display = "none", 2000);
+}
+function carregarStatusLoja() {
+    const h = new Date().getHours();
+    const aberto = h >= 18 || h <= 23;
+    const el = document.getElementById("status-loja");
+    el.innerText = aberto ? "ABERTO" : "FECHADO";
+    el.className = `status ${aberto ? 'aberto' : 'fechado'}`;
+}
+function carregarCarrinhoStorage() {
+    const s = localStorage.getItem("carrinho");
+    if(s) { carrinho = JSON.parse(s); atualizarCarrinho(); }
+}
+function configurarEventosCupom() {
+    document.getElementById("btn-aplicar-cupom").onclick = () => {
+        if(document.getElementById("input-cupom").value === "SNOOP10") {
+            descontoAplicado = 10;
+            document.getElementById("msg-cupom-feedback").innerText = "Desconto Aplicado!";
+            atualizarCarrinho();
+        }
+    };
+}
+function voltarParaEntrega() {
+    document.getElementById("form-entrega").style.display = "block";
+    document.getElementById("resumo-pedido").style.display = "none";
+}
