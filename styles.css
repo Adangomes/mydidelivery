@@ -104,3 +104,26 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
 
 /* TOAST */
 .toast-custom { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 25px; border-radius: 30px; font-weight: 600; display: none; z-index: 3000; }
+
+
+/* --- ESTILO PARA O BOTÃO SÓ COM 'X' (Pedido Adan) --- */
+.btn-excluir-apenas-x {
+    background-color: #222; /* Fundo escuro */
+    color: #fff;            /* 'X' branco */
+    border: none;
+    width: 36px;            /* Largura circular */
+    height: 36px;           /* Altura circular */
+    border-radius: 5px;     /* Borda levemente arredondada (igual ao Ok) */
+    font-size: 20px;        /* Tamanho do X */
+    font-weight: 800;       /* X bem grosso */
+    cursor: pointer;
+    display: flex;          /* Para centralizar */
+    align-items: center;    /* Centraliza vertical */
+    justify-content: center; /* Centraliza horizontal */
+    padding: 0;
+    transition: background-color 0.3s;
+}
+
+.btn-excluir-apenas-x:hover {
+    background-color: #ff4d4f; /* Fica vermelho ao passar o mouse */
+}
