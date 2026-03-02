@@ -230,3 +230,79 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
 .cupom-erro {
     color: #ff4d4f;
 }
+
+/* --- 1. ESTÉTICA DO CARRINHO (SCROLL INTERNO) --- */
+.cart-items-list {
+    max-height: 280px;          /* Altura fixa para não empurrar os botões para baixo */
+    overflow-y: auto;           /* Habilita o scroll para "correr o dedo" */
+    padding-right: 8px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Customização da barra de rolagem para ficar discreta */
+.cart-items-list::-webkit-scrollbar {
+    width: 4px;
+}
+.cart-items-list::-webkit-scrollbar-thumb {
+    background-color: #ff6b00; /* Cor do Snoop Lanche */
+    border-radius: 10px;
+}
+
+.cart-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed #f0f0f0;
+}
+
+/* --- 2. SELEÇÃO DE SABORES (VERDE E OPACIDADE) --- */
+.item-sabor-wizard {
+    border: 2px solid #eee;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Estágio Selecionado: Fica Verde */
+.item-sabor-wizard.selecionado {
+    border-color: #28a745;
+    background-color: #f1fff3;
+}
+
+.item-sabor-wizard.selecionado .check-icon {
+    color: #28a745;
+}
+
+/* Estágio Bloqueado: Quando atinge o limite, os outros "apagam" */
+.lista-check-custom.limite-atingido .item-sabor-wizard:not(.selecionado) {
+    opacity: 0.4;
+    filter: grayscale(0.8);
+    pointer-events: none; /* Impede novos cliques enquanto estiver opaco */
+}
+
+/* --- 3. BOTÕES E INPUTS DO DELIVERY --- */
+.btn-principal {
+    background-color: #ff6b00; /* Laranja da logo */
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px;
+    font-weight: bold;
+    width: 100%;
+}
+
+.form-grid input, .form-grid select {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 8px;
+    width: 100%;
+}
