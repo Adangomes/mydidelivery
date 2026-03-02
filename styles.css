@@ -311,3 +311,124 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
             background: rgba(0,0,0,0.8); z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
         }
+
+/* --- AJUSTES PROFISSIONAIS ADAN --- */
+
+/* 1. STATUS ABERTO (Verde Profissional) */
+.status.aberto {
+    color: #00a650; /* Verde iFood/WhatsApp */
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    text-transform: uppercase;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+}
+
+/* Bolinha piscando ao lado do Aberto */
+.status.aberto::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    background-color: #00a650;
+    border-radius: 50%;
+    display: inline-block;
+    animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+    0% { shadow: 0 0 0 0 rgba(0, 166, 80, 0.7); transform: scale(0.95); }
+    70% { box-shadow: 0 0 0 6px rgba(0, 166, 80, 0); transform: scale(1); }
+    100% { box-shadow: 0 0 0 0 rgba(0, 166, 80, 0); transform: scale(0.95); }
+}
+
+.status.fechado {
+    color: #ff4d4f;
+    opacity: 0.8;
+}
+
+/* 2. CATEGORIAS ESTILO APP (Nav Profissional) */
+.categorias-nav {
+    background: #fff;
+    position: sticky;
+    top: 54px; /* Ajuste conforme a altura do seu header */
+    z-index: 1000;
+    border-bottom: 1px solid #f2f2f2;
+    padding: 0;
+}
+
+.categorias-scroll {
+    display: flex;
+    overflow-x: auto;
+    padding: 0 15px;
+    gap: 20px;
+    height: 45px;
+    align-items: center;
+}
+
+.cat-item { /* Se você usa a tag <button> ou <a> */
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    text-decoration: none;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border: none;
+    background: none;
+    padding: 10px 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+}
+
+.cat-item.active {
+    color: #ff6b00;
+    border-bottom: 3px solid #ff6b00;
+    font-weight: 800;
+}
+
+/* 3. BOTÃO EXCLUIR PRODUTO NO CARRINHO */
+.btn-excluir-item {
+    background: #fff1f0; /* Fundo vermelho bem clarinho */
+    color: #ff4d4f;      /* Texto vermelho */
+    border: 1px solid #ffa39e;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.btn-excluir-item:hover {
+    background: #ff4d4f;
+    color: #fff;
+}
+
+/* Ajuste na linha do produto no carrinho */
+.cart-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 0;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.cart-item-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.cart-item-info strong {
+    font-size: 14px;
+    color: #333;
+}
+
+.cart-item-info span {
+    font-size: 13px;
+    color: #00a650;
+    font-weight: 700;
+}
