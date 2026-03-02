@@ -200,38 +200,84 @@ function removerItem(idx) {
 }
 
 // --- 4. RESUMO E ENTREGA (GEOAPIFY) ---
+// --- 4. RESUMO E ENTREGA (GEOAPIFY + LOADING) ---
 async function processarResumoGeo() {
     const nome = document.getElementById("nomeCliente")?.value || document.getElementById("input-nome")?.value;
     const rua = document.getElementById("rua")?.value || document.getElementById("input-rua")?.value;
     const num = document.getElementById("numero")?.value || document.getElementById("input-numero")?.value;
 
-    if (!nome || !rua || !num) return alert("Preencha Nome, Rua e Número!");
+    if (!nome || !rua || !num) return alert("Por favor, preencha Nome, Rua e Número para calcular a entrega!");
 
-    // Se tiver um loading no seu HTML, ele ativa aqui
+    // 1. MOSTRAR O LOADING (O CÍRCULO GIRANDO)
     const loader = document.getElementById("loading-geral");
     if(loader) loader.style.display = "flex";
 
     try {
+        // 2. CHAMADA DA API GEOAPIFY
         const query = encodeURIComponent(`${rua}, ${num}, Guaramirim, SC, Brasil`);
         const resp = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${query}&apiKey=${GEOAPIFY_KEY}`);
         const data = await resp.json();
 
+        // 3. FORÇAR UM DELAY DE 2 SEGUNDOS (Para o usuário ver que está processando)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
         if (data.features && data.features.length > 0) {
             const [lon, lat] = data.features[0].geometry.coordinates;
             const dist = calcularDistancia(RESTAURANTE_COORD[1], RESTAURANTE_COORD[0], lat, lon);
+            
+            // Cálculo da taxa: Base + (KM * Valor)
             taxaEntregaCalculada = TAXA_BASE + (dist * VALOR_POR_KM);
         } else {
+            // Se não achar a rua, coloca a taxa base padrão
             taxaEntregaCalculada = TAXA_BASE;
         }
+
+        // 4. MOSTRAR RESULTADO FINAL
         mostrarResumoFinal();
+
     } catch (e) {
+        console.error("Erro ao calcular taxa:", e);
         taxaEntregaCalculada = TAXA_BASE;
         mostrarResumoFinal();
     } finally {
+        // 5. ESCONDER O LOADING
         if(loader) loader.style.display = "none";
     }
 }
 
+// FUNÇÃO PARA ENVIAR (WhatsApp + Local para Firebase)
+function enviarWhatsApp() {
+    const nome = document.getElementById("nomeCliente")?.value || document.getElementById("input-nome")?.value;
+    const rua = document.getElementById("rua")?.value || document.getElementById("input-rua")?.value;
+    const num = document.getElementById("numero")?.value || document.getElementById("input-numero")?.value;
+    const bairro = document.getElementById("bairro")?.value || document.getElementById("input-bairro")?.value;
+    const pag = document.getElementById("pagamento")?.value || "A combinar";
+    const totalMsg = document.getElementById("resumo-total")?.innerText || "";
+
+    // FORMATANDO A MENSAGEM
+    let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n`;
+    msg += `------------------------------\n`;
+    msg += ` *Cliente:* ${nome}\n`;
+    msg += ` *Endereço:* ${rua}, ${num}\n`;
+    msg += ` *Bairro:* ${bairro}\n`;
+    msg += ` *Pagamento:* ${pag}\n`;
+    msg += `------------------------------\n`;
+    msg += ` *ITENS:*\n`;
+    carrinho.forEach(i => msg += `• ${i.title} - R$ ${i.price.toFixed(2)}\n`);
+    msg += `------------------------------\n`;
+    msg += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2)}\n`;
+    msg += ` *${totalMsg}*`;
+
+    // AQUI VOCÊ PODE CHAMAR SUA FUNÇÃO DO FIREBASE:
+    // salvarPedidoFirebase({ nome, rua, num, bairro, carrinho, total: totalMsg });
+
+    // ABRE O WHATSAPP
+    window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
+    
+    // LIMPA TUDO
+    localStorage.removeItem("carrinho");
+    location.reload();
+}
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -265,25 +311,7 @@ function mostrarResumoFinal() {
     document.getElementById("resumo-pedido").style.display = "block";
 }
 
-function enviarWhatsApp() {
-    const nome = document.getElementById("nomeCliente")?.value || document.getElementById("input-nome")?.value;
-    const rua = document.getElementById("rua")?.value || document.getElementById("input-rua")?.value;
-    const num = document.getElementById("numero")?.value || document.getElementById("input-numero")?.value;
-    const bairro = document.getElementById("bairro")?.value || document.getElementById("input-bairro")?.value;
-    const pag = document.getElementById("pagamento")?.value || "A combinar";
-    const totalMsg = document.getElementById("resumo-total")?.innerText || "";
 
-    let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n\n`;
-    msg += `👤 *Cliente:* ${nome}\n📍 *Endereço:* ${rua}, ${num} - ${bairro}\n`;
-    msg += `💳 *Pagamento:* ${pag}\n\n`;
-    msg += `📝 *ITENS:*\n`;
-    carrinho.forEach(i => msg += `- ${i.title}\n`);
-    msg += `\n💰 *${totalMsg}*`;
-
-    window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
-    localStorage.removeItem("carrinho");
-    location.reload();
-}
 
 // --- OUTROS ---
 function carregarStatusLoja() {
@@ -325,3 +353,4 @@ function sincronizarScrollMenu() {
     secoes.forEach(s => { if (pageYOffset >= s.offsetTop - 160) atual = s.getAttribute("id").replace("secao-", ""); });
     botoes.forEach(btn => btn.classList.toggle("active", btn.getAttribute("data-categoria") === atual));
 }
+
