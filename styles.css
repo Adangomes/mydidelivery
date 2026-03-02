@@ -17,12 +17,12 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
 .logo-container { display: flex; flex-direction: column; }
 .logo { color: #fff; font-size: 1.2rem; font-weight: 800; text-transform: uppercase; }
 
-/* --- 1. STATUS AJUSTADO (SÓ COR VERDE) --- */
+/* --- 1. STATUS (CORRIGIDO PARA VERDE 'ESCOLHER OPÇÕES') --- */
 .status {
     font-size: 11px; font-weight: 800; margin-top: 4px;
     color: #888; text-transform: uppercase;
 }
-.status.aberto { color: #00a650 !important; } 
+.status.aberto { color: #00a650 !important; }  /* Verde idêntico ao botão */
 .status.fechado { color: #ff4d4f !important; }
 
 /* CARRINHO ICONE */
@@ -35,7 +35,7 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
 }
 
-/* --- 2. CATEGORIAS ESTILO APP --- */
+/* CATEGORIAS */
 .categorias-nav { background: #fff; position: sticky; top: 56px; z-index: 1000; border-bottom: 1px solid #eee; }
 .categorias-scroll { display: flex; overflow-x: auto; padding: 12px; gap: 20px; scrollbar-width: none; }
 .categorias-scroll::-webkit-scrollbar { display: none; }
@@ -61,32 +61,46 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
     background: #ff6b00; color: #fff; border: 3px solid #fff; border-radius: 10px;
 }
 
-/* MODAIS (IFOOD STYLE) */
+/* MODAIS */
 .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: flex; align-items: flex-end; justify-content: center; }
 .modal-box { background: #fff; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 20px; max-height: 85vh; overflow-y: auto; }
 .modal-header-clean { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
-.btn-fechar-modal { background: #f0f0f0; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; }
+.btn-fechar-modal { background: #f0f0f0; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; cursor: pointer; }
 
-/* CARRINHO E EXCLUIR */
-.cart-items-list { max-height: 280px; overflow-y: auto; margin-bottom: 15px; border-bottom: 1px solid #eee; }
-.cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #f0f0f0; }
+/* CARRINHO - LISTA DE ITENS */
+.cart-items-list { max-height: 280px; overflow-y: auto; margin-bottom: 10px; }
+.cart-item-row { 
+    display: flex; justify-content: space-between; align-items: center; 
+    padding: 12px 0; border-bottom: 1px dashed #f0f0f0; 
+}
 
-/* --- 3. BOTÃO EXCLUIR PROFISSIONAL --- */
+/* --- 2. BOTÃO EXCLUIR (CORRIGIDO PARA O CARRINHO) --- */
 .btn-excluir-item {
     background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e;
-    padding: 6px 12px; border-radius: 8px; font-size: 11px;
+    padding: 6px 10px; border-radius: 8px; font-size: 11px;
     font-weight: 700; cursor: pointer; text-transform: uppercase;
+    display: flex; align-items: center; gap: 4px;
 }
 .btn-excluir-item:hover { background: #ff4d4f; color: #fff; }
 
-/* FORMULÁRIO E CUPOM */
+/* --- 3. CUPOM E VALORES (COM ESPAÇAMENTO PROFISSIONAL) --- */
+.cupom-secao { margin: 15px 0; padding-top: 10px; border-top: 1px solid #eee; }
+.cupom-container { display: flex; gap: 8px; align-items: center; margin-bottom: 15px; }
+#input-cupom { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
+#btn-aplicar-cupom { background: #222; color: #fff; border: none; padding: 10px 15px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+
+.summary-box { background: #f9f9f9; padding: 15px; border-radius: 15px; margin-top: 10px; }
+.summary-line { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; }
+.summary-line span:last-child { font-weight: 700; color: #00a650; } /* Preço verde no carrinho */
+.total { font-weight: 800; font-size: 18px; color: #000; border-top: 1px dashed #ccc; padding-top: 8px; margin-top: 5px; }
+
+/* FORMULÁRIO ENTREGA */
 .form-grid input, .form-grid select, .form-grid textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
-.cupom-container { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
-#btn-aplicar-cupom { background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; }
+.row-inputs { display: flex; gap: 10px; }
 
 /* BOTÕES DE AÇÃO */
 .btn-finalizar, .btn-whatsapp, .btn-principal { background: #ff6b00; color: #fff; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: 800; font-size: 16px; margin-top: 10px; cursor: pointer; }
-.btn-continuar, .btn-secundario { background: none; color: #ff6b00; border: none; width: 100%; padding: 10px; font-weight: 700; cursor: pointer; }
+.btn-continuar, .btn-secundario { background: none; color: #ff6b00; border: none; width: 100%; padding: 10px; font-weight: 700; cursor: pointer; text-align: center; display: block; text-decoration: none; }
 
 /* TOAST */
 .toast-custom { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 25px; border-radius: 30px; font-weight: 600; display: none; z-index: 3000; }
