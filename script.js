@@ -143,7 +143,7 @@ function montarListaSabores(n, tipo) {
         grid.innerHTML += `
             <div class="item-sabor-wizard" onclick="toggleSabor('${opt.title}')">
                 <div><strong>${opt.title}</strong><br><small>${opt.ingredientes || ""}</small></div>
-                <span class="check-icon">⚪</span>
+                <span class="check-icon"></span>
             </div>`;
     });
 }
@@ -208,7 +208,8 @@ function atualizarCarrinho() {
                     <strong>${item.title}</strong><br>
                     <b style="color: #28a745;">R$ ${item.price.toFixed(2)}</b>
                 </div>
-                <button onclick="removerItem(${index})" class="btn-excluir-cart">EXCLUIR 🗑️</button>
+                // Mude para esta linha. Eu mudei a classe para facilitar o estilo.
+              <button onclick="removerItem(${index})" class="btn-excluir-apenas-x">X</button>
             </div>`;
     });
 
@@ -272,6 +273,7 @@ function carregarCarrinhoStorage() {
     const s = localStorage.getItem("carrinho");
     if(s) { carrinho = JSON.parse(s); atualizarCarrinho(); }
 }
+
 
 
 
