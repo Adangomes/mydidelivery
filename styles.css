@@ -139,3 +139,51 @@ body { background: #f8f8f8; color: #222; overflow-x: hidden; }
 
 /* TOAST ADICIONAR PRODUTO (MANTIDO VISUAL ORIGINAL) */
 .toast-custom { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 25px; border-radius: 30px; font-weight: 600; display: none; z-index: 3000; }
+/* --- SELEÇÃO DE PIZZA PROFISSIONAL --- */
+.item-sabor-wizard {
+    border: 2px solid #eee;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+/* Quando a pizza é clicada (Fica Verde) */
+.item-sabor-wizard.selecionado {
+    border-color: #00a650 !important;
+    background-color: #f1fff3 !important; /* Fundo verde clarinho */
+}
+/* Quando atinge o limite (3 sabores), as que NÃO estão selecionadas ficam opacas */
+.limite-atingido .item-sabor-wizard:not(.selecionado) {
+    opacity: 0.5;
+    filter: grayscale(1);
+    cursor: not-allowed;
+}
+.check-icon {
+    font-size: 18px;
+}
+/* --- BOTÃO X PRETO (FIXO) --- */
+.btn-excluir-apenas-x {
+    background-color: #000 !important; /* Preto total */
+    color: #fff !important;            /* X Branco */
+    border: none !important;
+    width: 35px !important;
+    height: 35px !important;
+    border-radius: 8px !important;    /* Levemente arredondado */
+    font-size: 18px !important;
+    font-weight: 900 !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    transition: transform 0.2s !important;
+}
+.btn-excluir-apenas-x:hover {
+    background-color: #ff4d4f !important; /* Fica vermelho ao passar o mouse */
+    transform: scale(1.1);
+}
