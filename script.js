@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
     carregarStatusLoja();
     carregarCardapioCompleto();
     carregarCarrinhoStorage();
+    window.addEventListener("scroll", sincronizarScrollMenu);
 });
 
 // --- 1. CARREGAMENTO E RENDERIZAÇÃO ---
@@ -28,28 +29,47 @@ async function carregarCardapioCompleto() {
         const data = await res.json();
         produtosGeral = data.produtos;
         renderizarCardapio();
-    } catch (e) { console.error("Erro ao carregar produtos:", e); }
+    } catch (e) { console.error("Erro JSON:", e); }
 }
 
 function renderizarCardapio() {
     const corpo = document.getElementById("cardapio-corpo");
+    const nav = document.getElementById("categorias-scroll");
     corpo.innerHTML = "";
+    nav.innerHTML = "";
+
     const categorias = [...new Set(produtosGeral.map(p => p.categoria))];
 
-    categorias.forEach(cat => {
+    categorias.forEach((cat, idx) => {
+        // Gerar Botão da Categoria no Topo
+        const btn = document.createElement("button");
+        btn.className = `cat-item ${idx === 0 ? 'active' : ''}`;
+        btn.innerText = cat.toUpperCase();
+        btn.onclick = () => scrollToCategoria(cat);
+        btn.setAttribute("data-categoria", cat);
+        nav.appendChild(btn);
+
+        // Gerar Seção de Produtos
         const section = document.createElement("section");
         section.className = "secao-categoria";
+        section.id = `secao-${cat}`;
         section.innerHTML = `<h2 class="titulo-categoria">${cat.toUpperCase()}</h2>`;
 
         produtosGeral.filter(p => p.categoria === cat).forEach(p => {
-            // Regras de exibição para evitar poluição
-            if (p.price === 0 && p.categoria === 'pizza') return; // Esconde sabores de pizza soltos
-            if (p.categoria === 'porcao' && !p.prices) return; // Esconde opções de batata soltas
+            // REGRA MATADORA: O que aparece no cardápio principal?
+            // 1. Pizzas que têm preços (P, M, G)
+            // 2. Porções que têm preços (Batata 600g / 1kg)
+            // 3. Produtos normais (Bebidas, Dogs, etc) com preço único
+            
+            const ehSaborAvulsoPizza = (p.categoria === 'pizza' && (!p.prices || p.price === 0));
+            const ehOpcaoAvulsaBatata = (p.categoria === 'porcao' && !p.prices);
 
-            const precoExibido = p.price > 0 ? `R$ ${p.price.toFixed(2)}` : "Ver Opções";
+            if (ehSaborAvulsoPizza || ehOpcaoAvulsaBatata) return; 
+
+            const precoExibido = p.price > 0 ? `R$ ${p.price.toFixed(2)}` : "Escolher Opções";
 
             section.innerHTML += `
-                <div class="item-produto-lista" onclick="decidirFluxoClique('${p.title}')">
+                <div class="item-produto-lista" onclick="decidirFluxo('${p.title}')">
                     <div class="info-produto">
                         <h3>${p.title}</h3>
                         <p>${p.ingredientes || ""}</p>
@@ -65,67 +85,52 @@ function renderizarCardapio() {
     });
 }
 
-// --- 2. FLUXO DE ADIÇÃO (DIRETO OU MODAL) ---
-function decidirFluxoClique(nome) {
-    const produto = produtosGeral.find(p => p.title === nome);
-    
-    // Se for Pizza ou Porção (Batata), abre o Modal de escolhas
-    if (produto.categoria === 'pizza' || produto.categoria === 'porcao') {
-        abrirSelecao(nome);
+// --- 2. LOGICA DE CLIQUES E MODAL ---
+function decidirFluxo(nome) {
+    const p = produtosGeral.find(prod => prod.title === nome);
+    if (p.categoria === 'pizza' || p.categoria === 'porcao') {
+        abrirModalSelecao(nome);
     } else {
-        // Se for Burguer, Dog, Bebida, vai Direto para o carrinho
-        adicionarDireto(produto);
+        adicionarAoCarrinho(p.title, p.price, "");
     }
 }
 
-function adicionarDireto(p) {
-    carrinho.push({
-        title: p.title,
-        price: p.price,
-        qtd: 1,
-        sabor: ""
-    });
-    atualizarCarrinho();
-    mostrarToast(p.title);
-}
-
-// --- 3. LÓGICA DO MODAL (PIZZAS E PORÇÕES) ---
-function abrirSelecao(nome) {
+function abrirModalSelecao(nome) {
     itemMestreTemporario = produtosGeral.find(p => p.title === nome);
     saboresSelecionados = [];
     
     const modal = document.getElementById("pizza-options-modal");
     const containerBotoes = document.getElementById("botoes-qtd-sabores");
     const pergunta = document.getElementById("pergunta-qtd-sabores");
-    const secaoSabores = document.getElementById("secao-sabores");
+    const lista = document.getElementById("secao-sabores");
 
     document.getElementById("pizza-modal-title").innerText = nome;
     pergunta.style.display = "none";
-    secaoSabores.style.display = "none";
-    containerBotoes.innerHTML = "";
+    lista.style.display = "none";
     document.getElementById("lista-sabores-meia").classList.remove("limite-atingido");
 
     if (itemMestreTemporario.categoria === 'pizza') {
         if (nome.includes("PIZZA P")) {
             tamanhoSelecionadoGlobal = "P";
-            configurarListaOpcoes(1, 'pizza');
+            montarListaOpcoes(1, 'pizza');
         } else {
             pergunta.style.display = "block";
             const max = nome.includes("PIZZA M") ? 2 : 3;
             tamanhoSelecionadoGlobal = nome.includes("PIZZA M") ? "M" : "G";
+            containerBotoes.innerHTML = "";
             for (let i = 1; i <= max; i++) {
-                containerBotoes.innerHTML += `<button class="btn-principal m-1" onclick="configurarListaOpcoes(${i}, 'pizza')">${i} Sabor${i>1?'es':''}</button>`;
+                containerBotoes.innerHTML += `<button class="btn-principal m-1" onclick="montarListaOpcoes(${i}, 'pizza')">${i} Sabor${i>1?'es':''}</button>`;
             }
         }
-    } else if (itemMestreTemporario.categoria === 'porcao') {
-        // Para Batatas, seleciona 1 opção (Bacon, Calabresa ou Cheddar)
+    } else {
+        // BATATAS: Define tamanho P (600g) ou G (1kg) baseado no título clicado
         tamanhoSelecionadoGlobal = nome.includes("600g") ? "P" : "G";
-        configurarListaOpcoes(1, 'porcao');
+        montarListaOpcoes(1, 'porcao');
     }
     modal.style.display = "flex";
 }
 
-function configurarListaOpcoes(n, tipo) {
+function montarListaOpcoes(n, tipo) {
     limiteSabores = n;
     document.getElementById("pergunta-qtd-sabores").style.display = "none";
     document.getElementById("secao-sabores").style.display = "block";
@@ -133,8 +138,8 @@ function configurarListaOpcoes(n, tipo) {
     const grid = document.getElementById("lista-sabores-meia");
     grid.innerHTML = "";
 
-    let opcoes = (tipo === 'pizza') 
-        ? produtosGeral.filter(p => p.categoria === 'pizza' && p.price === 0)
+    const opcoes = (tipo === 'pizza') 
+        ? produtosGeral.filter(p => p.categoria === 'pizza' && !p.prices) 
         : produtosGeral.filter(p => p.categoria === 'porcao' && !p.prices);
 
     opcoes.forEach(opt => {
@@ -153,7 +158,7 @@ function toggleSabor(nome) {
     if (idx > -1) {
         saboresSelecionados.splice(idx, 1);
     } else if (saboresSelecionados.length < limiteSabores) {
-        if (limiteSabores === 1) saboresSelecionados = []; 
+        if (limiteSabores === 1) saboresSelecionados = [];
         saboresSelecionados.push(nome);
     }
 
@@ -171,52 +176,43 @@ function confirmarSelecao() {
     if (saboresSelecionados.length === 0) return alert("Selecione uma opção!");
 
     let precoFinal = 0;
-    let nomeExibicao = itemMestreTemporario.title;
+    let tituloItem = itemMestreTemporario.title;
 
     if (itemMestreTemporario.categoria === 'pizza') {
         precoFinal = itemMestreTemporario.prices[tamanhoSelecionadoGlobal];
+        tituloItem += ` (${saboresSelecionados.join("/")})`;
     } else {
-        // Para porção, pega o preço definido no tamanho P ou G daquela opção específica
-        const opcaoDados = produtosGeral.find(p => p.title === saboresSelecionados[0]);
-        precoFinal = opcaoDados.prices[tamanhoSelecionadoGlobal];
-        nomeExibicao += ` - ${saboresSelecionados[0]}`;
+        // Busca o preço da opção escolhida (ex: Bacon) para o tamanho global (P ou G)
+        const opt = produtosGeral.find(p => p.title === saboresSelecionados[0]);
+        precoFinal = opt.prices[tamanhoSelecionadoGlobal];
+        tituloItem += ` - ${saboresSelecionados[0]}`;
     }
 
-    // Adiciona cada item como uma entrada ÚNICA no carrinho (conforme seu pedido)
-    carrinho.push({
-        title: nomeExibicao,
-        sabor: itemMestreTemporario.categoria === 'pizza' ? saboresSelecionados.join(" / ") : "",
-        price: precoFinal,
-        qtd: 1
-    });
-
+    adicionarAoCarrinho(tituloItem, precoFinal, "");
     fecharModalSelecao();
-    atualizarCarrinho();
-    mostrarToast(nomeExibicao);
 }
 
-// --- 4. CARRINHO (LISTAGEM INDIVIDUAL) ---
+// --- 3. CARRINHO (CADA ITEM É ÚNICO) ---
+function adicionarAoCarrinho(titulo, preco, sabor) {
+    carrinho.push({ title: titulo, price: preco, sabor: sabor });
+    atualizarCarrinho();
+    mostrarToast(titulo);
+}
+
 function atualizarCarrinho() {
     const box = document.getElementById("cart-items");
     box.innerHTML = "";
     let sub = 0;
 
-    // Listando um por um para não confundir sabores diferentes do mesmo item
     carrinho.forEach((item, index) => {
         sub += item.price;
         box.innerHTML += `
-            <div class="cart-item-row" style="border-left: 4px solid #ff6b00; padding-left: 10px; margin-bottom: 10px; background: #f9f9f9;">
+            <div class="cart-item-row" style="border-left: 5px solid #ff6b00; padding: 10px; background: #fff; margin-bottom: 8px; border-radius: 5px;">
                 <div style="flex:1">
-                    <strong style="color: #333;">${item.title}</strong><br>
-                    <small style="color: #666;">${item.sabor || "Simples"}</small><br>
+                    <strong>${item.title}</strong><br>
                     <b style="color: #28a745;">R$ ${item.price.toFixed(2)}</b>
                 </div>
-                <div class="text-end">
-                    <button onclick="removerItem(${index})" class="btn-remove-item" 
-                            style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; font-size: 12px; font-weight: bold;">
-                        REMOVER 🗑️
-                    </button>
-                </div>
+                <button onclick="removerItem(${index})" style="background: #dc3545; color: #fff; border: none; padding: 8px; border-radius: 5px; font-weight: bold;">EXCLUIR 🗑️</button>
             </div>`;
     });
 
@@ -231,16 +227,47 @@ function removerItem(idx) {
     atualizarCarrinho();
 }
 
-// --- 5. INTERFACE ---
-function fecharModalSelecao() { document.getElementById("pizza-options-modal").style.display = "none"; }
-function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
-function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
-function mostrarToast(t) { 
-    const el = document.getElementById("toast-geral");
-    el.innerText = "Adicionado: " + t; el.style.display = "block";
-    setTimeout(() => el.style.display = "none", 2000);
+// --- 4. NAVEGAÇÃO E CATEGORIAS ---
+function scrollToCategoria(cat) {
+    const el = document.getElementById(`secao-${cat}`);
+    const offset = 130; 
+    const pos = el.offsetTop - offset;
+    window.scrollTo({ top: pos, behavior: "smooth" });
 }
 
+function sincronizarScrollMenu() {
+    const secoes = document.querySelectorAll(".secao-categoria");
+    const botoes = document.querySelectorAll(".cat-item");
+    let atual = "";
+
+    secoes.forEach(s => {
+        if (pageYOffset >= s.offsetTop - 160) {
+            atual = s.getAttribute("id").replace("secao-", "");
+        }
+    });
+
+    botoes.forEach(btn => {
+        btn.classList.toggle("active", btn.getAttribute("data-categoria") === atual);
+        if (btn.classList.contains("active")) {
+            btn.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+    });
+}
+
+// --- UTILITÁRIOS ---
+function fecharModalSelecao() { document.getElementById("pizza-options-modal").style.display = "none"; }
+function fecharCarrinho() { document.getElementById("cart-modal").style.display = "none"; }
+function abrirCarrinho() { document.getElementById("cart-modal").style.display = "flex"; }
+function abrirDelivery() { 
+    if(carrinho.length === 0) return alert("Adicione algo!");
+    fecharCarrinho();
+    document.getElementById("delivery-modal").style.display = "flex"; 
+}
+function mostrarToast(t) { 
+    const el = document.getElementById("toast-geral");
+    el.innerText = t + " no carrinho! ✅"; el.style.display = "block";
+    setTimeout(() => el.style.display = "none", 2000);
+}
 function carregarStatusLoja() {
     const h = new Date().getHours();
     const el = document.getElementById("status-loja");
@@ -248,7 +275,6 @@ function carregarStatusLoja() {
     el.innerText = aberto ? "ABERTO" : "FECHADO";
     el.className = `status ${aberto ? 'aberto' : 'fechado'}`;
 }
-
 function carregarCarrinhoStorage() {
     const s = localStorage.getItem("carrinho");
     if(s) { carrinho = JSON.parse(s); atualizarCarrinho(); }
