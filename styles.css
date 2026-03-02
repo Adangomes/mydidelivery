@@ -7,454 +7,86 @@
 
 body { background: #f8f8f8; color: #222; overflow-x: hidden; }
 
-/* HEADER RESPONSIVO */
+/* HEADER */
 .header {
-    background: #000;
-    padding: 12px 16px;
+    background: #000; padding: 12px 16px;
     position: sticky; top: 0; z-index: 1100;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
-
-.header-top {
-    display: flex; justify-content: space-between; align-items: center;
-}
-
+.header-top { display: flex; justify-content: space-between; align-items: center; }
 .logo-container { display: flex; flex-direction: column; }
+.logo { color: #fff; font-size: 1.2rem; font-weight: 800; text-transform: uppercase; }
 
-.logo {
-    color: #fff; font-size: 1.2rem; font-weight: 800;
-    text-transform: uppercase; line-height: 1;
-}
-
+/* --- 1. STATUS AJUSTADO (SÓ COR VERDE) --- */
 .status {
-    font-size: 11px; font-weight: 700; margin-top: 4px;
+    font-size: 11px; font-weight: 800; margin-top: 4px;
+    color: #888; text-transform: uppercase;
 }
+.status.aberto { color: #00a650 !important; } 
+.status.fechado { color: #ff4d4f !important; }
 
-/* CARRINHO COM DESTAQUE */
-.cart {
-    position: relative; cursor: pointer;
-    background: #222; padding: 8px; border-radius: 12px;
-    transition: transform 0.2s;
-}
-
-.cart.tem-itens {
-    background: #ff6b00;
-    animation: bounce 0.5s ease infinite alternate;
-}
-
-@keyframes bounce {
-    from { transform: scale(1); }
-    to { transform: scale(1.1); }
-}
-
-.cart-emoji { font-size: 20px; }
-
+/* CARRINHO ICONE */
+.cart { position: relative; cursor: pointer; background: #222; padding: 8px; border-radius: 12px; }
+.cart.tem-itens { background: #ff6b00; animation: bounce 0.5s ease infinite alternate; }
+@keyframes bounce { from { transform: scale(1); } to { transform: scale(1.1); } }
 .cart-badge {
-    position: absolute; top: -5px; right: -5px;
-    background: #fff; color: #ff6b00;
-    font-size: 10px; font-weight: 900;
-    width: 18px; height: 18px;
-    border-radius: 50%; display: flex;
-    align-items: center; justify-content: center;
+    position: absolute; top: -5px; right: -5px; background: #fff; color: #ff6b00;
+    font-size: 10px; font-weight: 900; width: 18px; height: 18px;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
 }
 
-/* CATEGORIAS */
-.categorias-nav {
-    background: #fff; position: sticky; top: 56px; z-index: 1000;
-    border-bottom: 1px solid #eee;
-}
-
-.categorias-scroll {
-    display: flex; overflow-x: auto; padding: 12px; gap: 15px;
-    scrollbar-width: none;
-}
-
+/* --- 2. CATEGORIAS ESTILO APP --- */
+.categorias-nav { background: #fff; position: sticky; top: 56px; z-index: 1000; border-bottom: 1px solid #eee; }
+.categorias-scroll { display: flex; overflow-x: auto; padding: 12px; gap: 20px; scrollbar-width: none; }
 .categorias-scroll::-webkit-scrollbar { display: none; }
-
-.cat-link {
-    font-size: 12px; font-weight: 700; color: #888;
-    text-decoration: none; text-transform: uppercase; white-space: nowrap;
+.cat-item {
+    font-size: 12px; font-weight: 700; color: #888; border: none; background: none;
+    text-transform: uppercase; white-space: nowrap; cursor: pointer;
 }
-
-.cat-link.active { color: #ff6b00; border-bottom: 2px solid #ff6b00; }
+.cat-item.active { color: #ff6b00; border-bottom: 2px solid #ff6b00; }
 
 /* PRODUTOS */
 .container-main { padding: 15px; max-width: 600px; margin: auto; }
-
-.secao-categoria h2 {
-    font-size: 18px; font-weight: 800; margin: 20px 0 10px; color: #333;
-}
-
+.secao-categoria h2 { font-size: 18px; font-weight: 800; margin: 20px 0 10px; color: #333; }
 .item-produto-lista {
     background: #fff; display: flex; justify-content: space-between;
     padding: 15px; border-radius: 15px; margin-bottom: 12px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.03); gap: 10px;
 }
-
-.nome-produto-lista { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
-.desc-produto-lista { font-size: 12px; color: #666; margin-bottom: 8px; }
 .preco-unico { font-size: 15px; font-weight: 800; color: #00a650; }
-
-.foto-produto-lista {
-    position: relative; width: 85px; height: 85px; flex-shrink: 0;
-}
-
-.foto-produto-lista img {
-    width: 100%; height: 100%; border-radius: 12px; object-fit: cover;
-}
-
-/* BOTÃO MAIS ABAIXO E BONITO */
+.foto-produto-lista { position: relative; width: 85px; height: 85px; flex-shrink: 0; }
+.foto-produto-lista img { width: 100%; height: 100%; border-radius: 12px; object-fit: cover; }
 .btn-add-lista {
-    position: absolute; bottom: -8px; right: -8px;
-    width: 32px; height: 32px; background: #ff6b00;
-    color: #fff; border: 3px solid #fff; border-radius: 10px;
-    font-size: 18px; font-weight: bold; cursor: pointer;
-    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    position: absolute; bottom: -8px; right: -8px; width: 32px; height: 32px;
+    background: #ff6b00; color: #fff; border: 3px solid #fff; border-radius: 10px;
 }
 
-/* MODAL ESTILO IFOOD */
-.modal-overlay {
-    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-    z-index: 2000; display: flex; align-items: flex-end; justify-content: center;
+/* MODAIS (IFOOD STYLE) */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 2000; display: flex; align-items: flex-end; justify-content: center; }
+.modal-box { background: #fff; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 20px; max-height: 85vh; overflow-y: auto; }
+.modal-header-clean { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+.btn-fechar-modal { background: #f0f0f0; border: none; width: 30px; height: 30px; border-radius: 50%; font-weight: bold; }
+
+/* CARRINHO E EXCLUIR */
+.cart-items-list { max-height: 280px; overflow-y: auto; margin-bottom: 15px; border-bottom: 1px solid #eee; }
+.cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px dashed #f0f0f0; }
+
+/* --- 3. BOTÃO EXCLUIR PROFISSIONAL --- */
+.btn-excluir-item {
+    background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e;
+    padding: 6px 12px; border-radius: 8px; font-size: 11px;
+    font-weight: 700; cursor: pointer; text-transform: uppercase;
 }
+.btn-excluir-item:hover { background: #ff4d4f; color: #fff; }
 
-.modal-box {
-    background: #fff; width: 100%; max-width: 500px;
-    border-radius: 25px 25px 0 0; padding: 20px;
-    max-height: 85vh; overflow-y: auto;
-}
+/* FORMULÁRIO E CUPOM */
+.form-grid input, .form-grid select, .form-grid textarea { width: 100%; padding: 12px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; }
+.cupom-container { display: flex; gap: 8px; align-items: center; margin-top: 10px; }
+#btn-aplicar-cupom { background: #222; color: #fff; border: none; padding: 10px 20px; border-radius: 10px; font-weight: 700; }
 
-.modal-header-clean {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 10px;
-}
-
-.btn-fechar-modal {
-    background: #f0f0f0; border: none; width: 30px; height: 30px;
-    border-radius: 50%; font-weight: bold;
-}
-
-/* FORMULÁRIO E RESUMO */
-.form-grid input, .form-grid select, .form-grid textarea {
-    width: 100%; padding: 12px; margin-bottom: 10px;
-    border: 1px solid #ddd; border-radius: 10px; font-size: 14px;
-}
-
-.row-inputs { display: flex; gap: 10px; }
-
-.summary-box {
-    background: #f9f9f9; padding: 15px; border-radius: 15px; margin: 15px 0;
-}
-
-.summary-line { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; }
-.total { font-weight: 800; font-size: 18px; color: #000; border-top: 1px dashed #ccc; padding-top: 5px; }
+/* BOTÕES DE AÇÃO */
+.btn-finalizar, .btn-whatsapp, .btn-principal { background: #ff6b00; color: #fff; border: none; padding: 15px; width: 100%; border-radius: 12px; font-weight: 800; font-size: 16px; margin-top: 10px; cursor: pointer; }
+.btn-continuar, .btn-secundario { background: none; color: #ff6b00; border: none; width: 100%; padding: 10px; font-weight: 700; cursor: pointer; }
 
 /* TOAST */
-.toast-custom {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    background: #333; color: #fff; padding: 12px 25px;
-    border-radius: 30px; font-weight: 600; font-size: 14px;
-    z-index: 3000; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-/* RODAPÉ */
-.footer-creditos {
-    text-align: center; padding: 30px 10px; color: #888; font-size: 12px;
-}
-/* BOTÕES DE AÇÃO */
-.btn-finalizar, .btn-whatsapp, .btn-principal {
-    background: #ff6b00; color: #fff; border: none; padding: 15px;
-    width: 100%; border-radius: 12px; font-weight: 800; font-size: 16px; margin-top: 10px;
-}
-.btn-continuar, .btn-secundario {
-    background: none; color: #ff6b00; border: none; width: 100%;
-    padding: 10px; font-weight: 700; margin-top: 5px;
-}
-/* RESPONSIVIDADE PARA CELULARES PEQUENOS */
-@media (max-width: 360px) {
-    .logo { font-size: 1rem; }
-    .foto-produto-lista { width: 70px; height: 70px; }
-    .nome-produto-lista { font-size: 14px; }
-}
-
-/* SEÇÃO DE CUPOM */
-.cupom-secao {
-    margin: 15px 0;
-    padding: 10px 0;
-    border-top: 1px dashed #ddd;
-}
-.cupom-container {
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
-#input-cupom {
-    flex: 1;
-    padding: 10px 15px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.3s;
-}
-#input-cupom:focus {
-    border-color: #ff6b00;
-}
-#btn-aplicar-cupom {
-    background: #222;
-    color: #fff;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 10px;
-    font-weight: 700;
-    font-size: 13px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-#btn-aplicar-cupom:active {
-    transform: scale(0.95);
-    background: #000;
-}
-/* MENSAGENS DE FEEDBACK */
-.cupom-msg-erro {
-    font-size: 12px;
-    margin-top: 5px;
-    font-weight: 600;
-    display: none; /* O JS controla a exibição */
-}
-.cupom-sucesso {
-    color: #00a650;
-}
-
-.cupom-erro {
-    color: #ff4d4f;
-}
-
-/* --- 1. ESTÉTICA DO CARRINHO (SCROLL INTERNO) --- */
-.cart-items-list {
-    max-height: 280px;          /* Altura fixa para não empurrar os botões para baixo */
-    overflow-y: auto;           /* Habilita o scroll para "correr o dedo" */
-    padding-right: 8px;
-    margin-bottom: 15px;
-    border-bottom: 1px solid #eee;
-}
-
-/* Customização da barra de rolagem para ficar discreta */
-.cart-items-list::-webkit-scrollbar {
-    width: 4px;
-}
-.cart-items-list::-webkit-scrollbar-thumb {
-    background-color: #ff6b00; /* Cor do Snoop Lanche */
-    border-radius: 10px;
-}
-
-.cart-item-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px dashed #f0f0f0;
-}
-
-/* --- 2. SELEÇÃO DE SABORES (VERDE E OPACIDADE) --- */
-.item-sabor-wizard {
-    border: 2px solid #eee;
-    border-radius: 12px;
-    padding: 15px;
-    margin-bottom: 10px;
-    transition: all 0.2s ease;
-    cursor: pointer;
-    background: #fff;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-/* Estágio Selecionado: Fica Verde */
-.item-sabor-wizard.selecionado {
-    border-color: #28a745;
-    background-color: #f1fff3;
-}
-
-.item-sabor-wizard.selecionado .check-icon {
-    color: #28a745;
-}
-
-/* Estágio Bloqueado: Quando atinge o limite, os outros "apagam" */
-.lista-check-custom.limite-atingido .item-sabor-wizard:not(.selecionado) {
-    opacity: 0.4;
-    filter: grayscale(0.8);
-    pointer-events: none; /* Impede novos cliques enquanto estiver opaco */
-}
-
-/* --- 3. BOTÕES E INPUTS DO DELIVERY --- */
-.btn-principal {
-    background-color: #ff6b00; /* Laranja da logo */
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 12px;
-    font-weight: bold;
-    width: 100%;
-}
-
-.form-grid input, .form-grid select {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 8px;
-    width: 100%;
-}
-.loading-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
-        }
-
-/* --- AJUSTES PROFISSIONAIS ADAN --- */
-/* --- 1. STATUS ABERTO (Verde iFood com Bolinha Pulsante) --- */
-.status.aberto {
-    color: #00a650; 
-    display: flex;
-    align-items: center;
-    gap: 6px; /* Espaço entre bolinha e texto */
-    text-transform: uppercase;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.5px;
-}
-
-/* A bolinha viva */
-.status.aberto::before {
-    content: "";
-    width: 8px;
-    height: 8px;
-    background-color: #00a650;
-    border-radius: 50%;
-    display: inline-block;
-    animation: pulse-green 2s infinite;
-}
-
-@keyframes pulse-green {
-    0% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0, 166, 80, 0.7); }
-    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 166, 80, 0); }
-    100% { transform: scale(0.9); box-shadow: 0 0 0 0 rgba(0, 166, 80, 0); }
-}
-
-.status.fechado {
-    color: #ff4d4f;
-    font-size: 11px;
-    font-weight: 700;
-    opacity: 0.8;
-}
-
-/* --- 2. CATEGORIAS ESTILO APP (Nav com Linha Laranja) --- */
-.categorias-nav {
-    background: #fff;
-    position: sticky;
-    top: 54px; /* Ajuste se o seu header for mais alto */
-    z-index: 1000;
-    border-bottom: 1px solid #f2f2f2;
-}
-
-.categorias-scroll {
-    display: flex;
-    overflow-x: auto;
-    padding: 0 15px;
-    gap: 20px;
-    height: 48px;
-    align-items: center;
-    scrollbar-width: none; /* Esconde barra no Firefox */
-}
-
-.categorias-scroll::-webkit-scrollbar { display: none; } /* Esconde no Chrome/Safari */
-
-.cat-item {
-    font-size: 13px;
-    font-weight: 600;
-    color: #666;
-    text-transform: uppercase;
-    white-space: nowrap;
-    border: none;
-    background: none;
-    padding: 12px 0;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    border-bottom: 3px solid transparent;
-}
-
-.cat-item.active {
-    color: #ff6b00;
-    border-bottom: 3px solid #ff6b00;
-    font-weight: 800;
-}
-
-/* --- 3. BOTÃO EXCLUIR E LINHA DO CARRINHO --- */
-.cart-item-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid #f5f5f5;
-}
-
-.btn-excluir-item {
-    background: #fff1f0; 
-    color: #ff4d4f;      
-    border: 1px solid #ffa39e;
-    padding: 6px 10px;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    transition: 0.2s;
-}
-
-.btn-excluir-item:hover {
-    background: #ff4d4f;
-    color: #fff;
-}
-    font-weight: 700;
-}
-
-/* --- STATUS SIMPLES: SÓ A COR DO VERDE DO BOTÃO --- */
-.status {
-    font-size: 11px;
-    font-weight: 800; /* Deixei um pouco mais grosso para destacar */
-    margin-top: 4px;
-    color: #888; /* Cor neutra enquanto verifica */
-    text-transform: uppercase;
-    transition: color 0.3s ease;
-}
-
-/* Quando o JS colocar a classe 'aberto', ele puxa o verde das opções */
-.status.aberto {
-    color: #00a650 !important; 
-}
-
-/* Quando estiver fechado */
-.status.fechado {
-    color: #ff4d4f !important;
-}
-
-/* --- BOTÃO EXCLUIR PROFISSIONAL (Ajustado) --- */
-.btn-excluir-item {
-    background: #fff1f0;
-    color: #ff4d4f;
-    border: 1px solid #ffa39e;
-    padding: 6px 12px;
-    border-radius: 8px;
-    font-size: 11px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-excluir-item:hover {
-    background: #ff4d4f;
-    color: #fff;
-}
+.toast-custom { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 12px 25px; border-radius: 30px; font-weight: 600; display: none; z-index: 3000; }
