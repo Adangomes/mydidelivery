@@ -264,8 +264,13 @@ function mostrarToast(t) {
 }
 function carregarStatusLoja() {
     const el = document.getElementById("status-loja");
-    const h = new Date().getHours();
-    const aberto = (h >= 18 || (h >= 0 && h <= 1)); // Aberto das 18h à 1h 
+    const agora = new Date();
+    const horaAtual = agora.getHours();
+    const minAtual = agora.getMinutes();
+    const tempoAtual = (horaAtual * 60) + minAtual;
+    const tempoAbre = (9 * 60) + 0;   // 09:00 -> 540 minutos
+    const tempoFecha = (23 * 60) + 30; // 23:30 -> 1410 minutos
+    const aberto = tempoAtual >= tempoAbre && tempoAtual <= tempoFecha;
     el.innerText = aberto ? "ABERTO" : "FECHADO";
     el.className = `status ${aberto ? 'aberto' : 'fechado'}`;
 }
@@ -274,6 +279,7 @@ function carregarCarrinhoStorage() {
     const s = localStorage.getItem("carrinho");
     if(s) { carrinho = JSON.parse(s); atualizarCarrinho(); }
 }
+
 
 
 
