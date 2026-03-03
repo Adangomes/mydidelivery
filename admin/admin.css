@@ -116,42 +116,65 @@ body {
 }
 
 /* Botões Grandes para o Dedo no Celular */
+/* --- AJUSTE FINAL: BOTÕES GRANDES PARA CELULAR --- */
 .btn-actions {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
+    flex-direction: column; /* Um botão embaixo do outro no celular */
+    gap: 12px;              /* Espaço maior entre os botões para não errar o toque */
     margin-top: 15px;
 }
 
-button {
-    padding: 14px; /* Mais alto para facilitar o toque */
-    border: none;
-    border-radius: 8px;
-    font-weight: bold;
-    cursor: pointer;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    transition: filter 0.2s;
+/* No computador (telas maiores), eles voltam a ficar lado a lado */
+@media (min-width: 768px) {
+    .btn-actions {
+        flex-direction: row;
+    }
+    .btn-actions button {
+        flex: 1;
+    }
 }
 
+button {
+    padding: 16px 10px;    /* Mais alto para facilitar o toque com o polegar */
+    border: none;
+    border-radius: 10px;   /* Cantos mais arredondados e modernos */
+    font-weight: 900;      /* Texto bem negrito */
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 1rem;       /* Fonte levemente maior para leitura rápida */
+    transition: transform 0.1s, filter 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* Sombra para parecer um botão real */
+}
+
+/* Feedback ao clicar/tocar */
 button:active {
-    filter: brightness(1.3); /* Feedback visual ao tocar */
+    filter: brightness(1.2);
+    transform: scale(0.98); /* Efeito de "afundar" ao clicar */
 }
 
 .btn-success { background: var(--success); color: white; }
 .btn-warning { background: var(--warning); color: white; }
 .btn-info { background: var(--info); color: white; }
 .btn-danger { background: var(--danger); color: white; }
+
 .btn-relatorio { 
     background: var(--primary); 
     color: black; 
-    padding: 8px 15px; 
-    font-size: 0.8rem; 
+    padding: 10px 20px; 
+    font-size: 0.85rem;
+    border-radius: 8px;
 }
 
-/* Overlay de ativação */
+/* Overlay de ativação (Ajustado para celular) */
 #container-ativacao button {
-    width: 80%;
-    max-width: 300px;
-    font-size: 1.1rem;
+    width: 85%;
+    max-width: 320px;
+    font-size: 1.2rem;
+    padding: 25px;
+    line-height: 1.2;
+}
+
+/* Estilo para a Iframe de Impressão não afetar o layout */
+#iframe-impressao {
+    display: none;
 }
