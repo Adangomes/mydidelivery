@@ -8,13 +8,19 @@
 </head>
 <body>
     <div id="container-ativacao">
-        <button onclick="ativarSom()">INICIAR E ATIVAR SOM</button>
+        <button onclick="ativarSom()">🔊 INICIAR E ATIVAR SOM</button>
     </div>
 
     <header class="admin-header">
         <h1>SNOOP <span>LANCHE</span></h1>
-        <button class="btn-relatorio" onclick="location.reload()">ATUALIZAR</button>
+        <button class="btn-refresh" onclick="location.reload()">🔄</button>
     </header>
+
+    <nav class="tabs">
+        <button class="tab-btn active" onclick="filtrarPedidos('pendente', this)">NOVOS</button>
+        <button class="tab-btn" onclick="filtrarPedidos('preparando', this)">COZINHA</button>
+        <button class="tab-btn" onclick="filtrarPedidos('entrega', this)">ENTREGA</button>
+    </nav>
 
     <ul id="pedidos-container"></ul>
 
@@ -36,50 +42,104 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Configuração do Áudio
         const audioAlerta = new Audio('alert.mpeg');
         audioAlerta.loop = true;
+        let statusAtual = 'pendente';
 
         function ativarSom() {
             document.getElementById('container-ativacao').style.display = 'none';
-            // Play/Pause rápido para destravar o áudio no navegador/celular
             audioAlerta.play().then(() => audioAlerta.pause());
+        }
+
+        function filtrarPedidos(status, btn) {
+            statusAtual = status;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            carregarPedidos();
+        }
+
+        function carregarPedidos() {
+            db.ref('pedidos').on('value', (snapshot) => {
+                const container = document.getElementById('pedidos-container');
+                container.innerHTML = "";
+                let temPendente = false;
+
+                snapshot.forEach(child => {
+                    const p = child.val();
+                    const id = child.key;
+                    const status = p.status || 'pendente';
+                    
+                    if(status === 'pendente') temPendente = true;
+                    if(status !== statusAtual) return;
+
+                    const li = document.createElement('li');
+                    li.className = `pedido-card`;
+
+                    let botoes = "";
+                    if (status === 'pendente') {
+                        botoes = `<button class="btn-success" onclick="db.ref('pedidos/${id}').update({status:'preparando'})">ACEITAR PEDIDO</button>`;
+                    } else if (status === 'preparando') {
+                        botoes = `
+                            <button class="btn-warning" onclick="imprimirPedido('${id}')">IMPRIMIR CUPOM</button>
+                            <button class="btn-info" onclick="db.ref('pedidos/${id}').update({status:'entrega'})">SAIU PARA ENTREGA</button>`;
+                    } else if (status === 'entrega') {
+                        botoes = `<button class="btn-success" onclick="concluirPedido('${id}')">CONCLUIR E FINALIZAR</button>`;
+                    }
+
+                    li.innerHTML = `
+                        <div class="card-header">
+                            <span class="cliente-nome">${p.cliente}</span>
+                            <span class="hora">${p.horario}</span>
+                        </div>
+                        <p class="info"><b>Endereço:</b> ${p.endereco}</p>
+                        <p class="info"><b>Pagamento:</b> ${p.pagamento || 'Pix'}</p>
+                        <div class="itens-box">
+                            ${p.itens.map(i => `<b>${i.qtd}x</b> ${i.produto}`).join('<br>')}
+                        </div>
+                        <p class="obs"><b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}</p>
+                        <div class="total-area">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</div>
+                        <div class="btn-actions">${botoes}</div>
+                    `;
+                    container.appendChild(li);
+                });
+
+                if (temPendente) audioAlerta.play().catch(() => {});
+                else { audioAlerta.pause(); audioAlerta.currentTime = 0; }
+            });
         }
 
         function imprimirPedido(id) {
             db.ref('pedidos/' + id).once('value', (snapshot) => {
                 const p = snapshot.val();
-                if (!snapshot.exists()) return;
-
-                const itensHtml = p.itens.map(i => `
-                    <tr>
-                        <td style="vertical-align:top; padding:2px 0; width:30px;">${i.qtd}x</td>
-                        <td style="padding:2px 0;">${i.produto}</td>
-                    </tr>
-                `).join('');
-
                 const cupom = `
                     <html>
-                    <body style="font-family:'Courier New',monospace; width:80mm; padding:0; margin:0; font-size:14px; color:#000;">
-                        <div style="text-align:center; font-weight:bold; border-bottom:1px dashed #000; padding-bottom:5px;">
-                            SNOOP LANCHE - ${p.horario}
+                    <body style="font-family:Arial,sans-serif; width:80mm; padding:0; margin:0; color:#000;">
+                        <div style="text-align:center; border-bottom:2px solid #000; padding:10px 0;">
+                            <b style="font-size:24px;">SNOOP LANCHE</b><br>
+                            <span style="font-size:18px;">CUPOM DE ENTREGA</span>
                         </div>
-                        <div style="margin:5px 0;">
-                            <b>CLIENTE:</b> ${p.cliente}<br>
-                            <b>PGTO:</b> ${p.pagamento || 'A combinar'}
+                        <div style="padding:10px 0; font-size:18px; border-bottom:1px dashed #000;">
+                            <b>CLIENTE:</b> ${p.cliente.toUpperCase()}<br>
+                            <b>HORA:</b> ${p.horario}<br>
+                            <b>PGTO:</b> ${p.pagamento || 'Pix'}
                         </div>
-                        <table style="width:100%; border-bottom:1px dashed #000; margin-bottom:5px;">
-                            ${itensHtml}
-                        </table>
-                        <div style="font-size:13px;">
+                        <div style="padding:10px 0; font-size:20px; font-weight:bold;">
+                            ${p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>')}
+                        </div>
+                        <div style="padding:10px; background:#eee; font-size:16px;">
                             <b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}<br>
-                            <b>REF:</b> ${p.referencia || 'Não informado'}<br>
-                            <b>END:</b> ${p.endereco}
+                            <b>REF:</b> ${p.referencia || 'Não informada'}
+                        </div>
+                        <div style="padding:10px 0; font-size:20px; border-top:1px dashed #000;">
+                            <b>ENDEREÇO:</b><br>
+                            <span style="display:block; margin-top:5px;">${p.endereco}</span>
+                        </div>
+                        <div style="text-align:center; font-size:26px; font-weight:bold; margin-top:10px; border:2px solid #000; padding:5px;">
+                            TOTAL: R$ ${parseFloat(p.total).toFixed(2)}
                         </div>
                     </body>
                     </html>
                 `;
-
                 const frame = document.getElementById('iframe-impressao');
                 const doc = frame.contentWindow.document;
                 doc.open(); doc.write(cupom); doc.close();
@@ -87,63 +147,13 @@
             });
         }
 
-        db.ref('pedidos').on('value', (snapshot) => {
-            const container = document.getElementById('pedidos-container');
-            container.innerHTML = "";
-            let temPendente = false;
-
-            snapshot.forEach(child => {
-                const p = child.val();
-                const id = child.key;
-                const status = p.status || 'pendente';
-                if(status === 'pendente') temPendente = true;
-
-                const li = document.createElement('li');
-                li.className = `pedido-card status-${status}`;
-
-                let botoes = "";
-                if (status === 'pendente') {
-                    botoes = `
-                        <button class="btn-success" onclick="db.ref('pedidos/${id}').update({status:'preparando'})">ACEITAR PEDIDO</button>
-                        <button class="btn-danger" onclick="db.ref('pedidos/${id}').remove()">RECUSAR</button>`;
-                } else if (status === 'preparando') {
-                    botoes = `
-                        <button class="btn-warning" onclick="imprimirPedido('${id}')">IMPRIMIR COZINHA</button>
-                        <button class="btn-info" onclick="db.ref('pedidos/${id}').update({status:'entrega'})">ENVIAR P/ ENTREGA</button>`;
-                } else if (status === 'entrega') {
-                    botoes = `<button class="btn-success" onclick="concluirPedido('${id}')">CONCLUIR PEDIDO</button>`;
-                }
-
-                li.innerHTML = `
-                    <div class="status-tag">${status.toUpperCase()}</div>
-                    <h3>${p.cliente}</h3>
-                    <p class="info">${p.endereco}</p>
-                    <p class="info"><b>PGTO:</b> ${p.pagamento || 'A combinar'}</p>
-                    <div class="itens-box">
-                        <b>ITENS:</b><br>
-                        ${p.itens.map(i => `• ${i.qtd}x ${i.produto}`).join('<br>')}
-                    </div>
-                    <p class="obs"><b>OBS:</b> ${p.obs_cozinha || 'Sem observações'}</p>
-                    <div class="total">R$ ${parseFloat(p.total).toFixed(2)}</div>
-                    <div class="btn-actions">${botoes}</div>
-                `;
-                container.appendChild(li);
-            });
-
-            // Controle do som alert.mpeg
-            if (temPendente) {
-                audioAlerta.play().catch(e => console.log("Aguardando interação para som"));
-            } else {
-                audioAlerta.pause();
-                audioAlerta.currentTime = 0;
-            }
-        });
-
         function concluirPedido(id) {
             db.ref('pedidos/' + id).once('value', s => {
                 db.ref('relatorios').push(s.val()).then(() => db.ref('pedidos/' + id).remove());
             });
         }
+
+        carregarPedidos();
     </script>
 </body>
 </html>
