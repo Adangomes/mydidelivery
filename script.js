@@ -366,30 +366,41 @@ function voltarParaEntrega() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
-// --- CONFIGURAÇÃO FIREBASE (COLE NO FINAL DO ARQUIVO) ---
-const firebaseConfig = {
-    apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
-    authDomain: "myproject26-10f0e.firebaseapp.com",
-    databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
-    projectId: "myproject26-10f0e",
-    storageBucket: "myproject26-10f0e.firebasestorage.app",
-    messagingSenderId: "884850608032",
-    appId: "1:884850608032:web:79db6983346c3c20edc6c5"
-};
 
-// Inicializa o Firebase se ainda não foi inicializado
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+// --- CONFIGURAÇÃO FIREBASE (VERSÃO SEGURA) ---
+function inicializarFirebase() {
+    if (typeof firebase !== 'undefined') {
+        const firebaseConfig = {
+            apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
+            authDomain: "myproject26-10f0e.firebaseapp.com",
+            databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
+            projectId: "myproject26-10f0e",
+            storageBucket: "myproject26-10f0e.firebasestorage.app",
+            messagingSenderId: "884850608032",
+            appId: "1:884850608032:web:79db6983346c3c20edc6c5"
+        };
+
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+        return firebase.database();
+    }
+    return null;
 }
-const db = firebase.database();
 
-// Função para enviar os dados para o seu Painel Admin
+const db = inicializarFirebase();
+
 function salvarPedidoFirebase(dados) {
+    if (!db) {
+        console.error("Firebase não carregado!");
+        return Promise.resolve(); // Deixa seguir para o Zap mesmo com erro
+    }
+    
     const novoPedidoRef = db.ref('pedidos').push();
     return novoPedidoRef.set({
         cliente: dados.nome,
         endereco: `${dados.rua}, ${dados.num} - ${dados.bairro}`,
-        referencia: document.getElementById("referencia")?.value || document.getElementById("input-referencia")?.value || "Não informada",
+        referencia: document.getElementById("referencia")?.value || "Não informada",
         pagamento: dados.pag,
         itens: carrinho.map(item => ({
             produto: item.title,
@@ -404,6 +415,7 @@ function salvarPedidoFirebase(dados) {
         obs_cozinha: document.getElementById("obs-pedido")?.value || "Nenhuma"
     });
 }
+
 
 
 
