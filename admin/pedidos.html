@@ -10,12 +10,12 @@
 
 <body>
     <div id="container-ativacao">
-        <button onclick="ativarSom()">ATIVAR SOM E INICIAR PAINEL</button>
+        <button onclick="ativarSom()">🔊 ATIVAR SOM E INICIAR PAINEL</button>
     </div>
 
     <header class="admin-header">
         <h1>SNOOP <span>LANCHE</span></h1>
-        <button class="btn-relatorio" onclick="abrirRelatorio()">HISTÓRICO</button>
+        <button class="btn-relatorio" onclick="abrirRelatorio()">📊 HISTÓRICO</button>
     </header>
 
     <ul id="pedidos-container"></ul>
@@ -43,56 +43,39 @@
         }
 
         // --- FUNÇÃO DE IMPRESSÃO ---
-        // --- FUNÇÃO DE IMPRESSÃO AJUSTADA (CURTA E COMPLETA) ---
-function imprimirPedido(id) {
-    db.ref('pedidos/' + id).once('value', (snapshot) => {
-        const p = snapshot.val();
-        if (!snapshot.exists()) return;
+        function imprimirPedido(id) {
+            db.ref('pedidos/' + id).once('value', (snapshot) => {
+                const p = snapshot.val();
+                if (!p) return;
 
-        const itensHtml = p.itens.map(i => `
-            <tr>
-                <td style="vertical-align:top; padding:2px 0;">${i.qtd}x</td>
-                <td style="padding:2px 0;">${i.produto}</td>
-            </tr>
-        `).join('');
+                const itensHtml = p.itens.map(i => `
+                    <tr>
+                        <td style="width:30px">${i.qtd}x</td>
+                        <td>${i.produto}</td>
+                    </tr>
+                `).join('');
 
-        const cupom = `
-            <html>
-            <body style="font-family:'Courier New',monospace; width:80mm; padding:0; margin:0; font-size:14px; color:#000;">
-                <div style="text-align:center; font-weight:bold; border-bottom:1px dashed #000; padding-bottom:5px;">
-                    SNOOP LANCHE<br>CUPOM DE COZINHA - ${p.horario}
-                </div>
-                
-                <div style="margin:5px 0;">
-                    <b>CLIENTE:</b> ${p.cliente}<br>
-                    <b>PGTO:</b> ${p.pagamento || 'Não informado'}
-                </div>
-
-                <table style="width:100%; border-bottom:1px dashed #000; margin-bottom:5px;">
-                    ${itensHtml}
-                </table>
-
-                <div style="font-size:13px;">
-                    <b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}<br>
-                    <b>REF:</b> ${p.referencia || 'Não informada'}<br>
-                    <b>END:</b> ${p.endereco}
-                </div>
-                <div style="text-align:center; margin-top:5px; border-top:1px dashed #000; padding-top:5px; font-size:10px;">
-                    * SNOOP LANCHE SISTEMAS *
-                </div>
-            </body>
-            </html>
-        `;
-
-        const frame = document.getElementById('iframe-impressao');
-        const doc = frame.contentWindow.document;
-        doc.open();
-        doc.write(cupom);
-        doc.close();
-        
-        setTimeout(() => { frame.contentWindow.print(); }, 500);
-    });
-}
+                const cupom = `
+                    <html>
+                    <body style="font-family: 'Courier New', monospace; width: 80mm; padding: 10px;">
+                        <center>
+                            <h2 style="margin:0">SNOOP LANCHE</h2>
+                            <p>--------------------------------</p>
+                            <h3 style="margin:5px 0">CUPOM DE COZINHA</h3>
+                            <p>${p.horario}</p>
+                        </center>
+                        <p><strong>CLIENTE:</strong> ${p.cliente}</p>
+                        <p>--------------------------------</p>
+                        <table style="width:100%; border-collapse: collapse;">
+                            ${itensHtml}
+                        </table>
+                        <p>--------------------------------</p>
+                        <p><strong>OBS:</strong> ${p.obs_cozinha || 'Nenhuma'}</p>
+                        <p><strong>ENDEREÇO:</strong> ${p.endereco}</p>
+                        <center><p>--------------------------------</p></center>
+                    </body>
+                    </html>
+                `;
 
                 const win = document.getElementById('iframe-impressao').contentWindow;
                 win.document.open();
@@ -151,4 +134,3 @@ function imprimirPedido(id) {
 </body>
 
 </html>
-
