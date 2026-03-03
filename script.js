@@ -259,7 +259,7 @@ function enviarWhatsApp() {
 
     if (!nome || !rua) return alert("Preencha os dados de entrega!");
 
-    // 1. FORMATANDO A MENSAGEM
+    // 1. MONTAGEM DA MENSAGEM
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n`;
     msg += `------------------------------\n`;
     msg += ` *Cliente:* ${nome}\n`;
@@ -275,31 +275,43 @@ function enviarWhatsApp() {
 
     const urlZap = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`;
 
-    // BOTÃO DE STATUS
-    const btn = document.querySelector("#resumo-pedido button");
-    if(btn) {
-        btn.innerText = "ENVIANDO...";
-        btn.disabled = true; // Evita cliques duplos que travam o navegador
+    // 2. INTERFACE: Trava o botão para não clicar duas vezes
+    const btnWhats = document.querySelector("#resumo-pedido button");
+    if(btnWhats) {
+        btnWhats.innerText = "PROCESSANDO...";
+        btnWhats.disabled = true;
     }
 
-    // 2. LÓGICA DE ENVIO
+    // 3. FUNÇÃO PARA LIMPAR E REINICIAR O SITE
+    const finalizarEVoltarInicio = () => {
+        localStorage.removeItem("carrinho"); // Limpa o carrinho no banco do navegador
+        window.location.href = urlZap; // Abre o WhatsApp
+        
+        // Dá um tempo para o celular abrir o Zap e depois reseta o site ao fundo
+        setTimeout(() => {
+            location.reload(); 
+        }, 1500);
+    };
+
+    // 4. ENVIO COM SEGURANÇA (FIREBASE + WHATSAPP)
     if (typeof salvarPedidoFirebase === 'function') {
+        // Se o Firebase falhar ou demorar mais de 4s, ele envia o Zap do mesmo jeito
+        const segurancaTimeout = setTimeout(() => {
+            finalizarEVoltarInicio();
+        }, 4000);
+
         salvarPedidoFirebase({ nome, rua, num, bairro, pag })
-        .then(() => {
-            // SUCESSO: LIMPA TUDO PRIMEIRO
-            localStorage.removeItem("carrinho");
-            // DEPOIS ABRE O WHATSAPP (A última coisa que o código faz)
-            window.location.replace(urlZap); 
-        })
-        .catch(err => {
-            console.error("Erro Firebase:", err);
-            // FALHA: LIMPA E ABRE DO MESMO JEITO
-            localStorage.removeItem("carrinho");
-            window.location.replace(urlZap);
-        });
+            .then(() => {
+                clearTimeout(segurancaTimeout);
+                finalizarEVoltarInicio();
+            })
+            .catch(err => {
+                console.error("Erro Firebase:", err);
+                clearTimeout(segurancaTimeout);
+                finalizarEVoltarInicio();
+            });
     } else {
-        localStorage.removeItem("carrinho");
-        window.location.replace(urlZap);
+        finalizarEVoltarInicio();
     }
 }
 function calcularDistancia(lat1, lon1, lat2, lon2) {
@@ -431,6 +443,7 @@ function salvarPedidoFirebase(dados) {
         obs_cozinha: document.getElementById("obs-pedido")?.value || "Nenhuma"
     });
 }
+
 
 
 
