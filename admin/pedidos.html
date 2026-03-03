@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Painel Snoop Lanche - Gestão</title>
     <link rel="stylesheet" href="admin.css">
 </head>
-
 <body>
     <div id="container-ativacao">
-        <button onclick="ativarSom()">🔊 ATIVAR SOM E INICIAR PAINEL</button>
+        <button onclick="ativarSom()">INICIAR E ATIVAR SOM</button>
     </div>
 
     <header class="admin-header">
         <h1>SNOOP <span>LANCHE</span></h1>
-        <button class="btn-relatorio" onclick="abrirRelatorio()">📊 HISTÓRICO</button>
+        <button class="btn-relatorio" onclick="location.reload()">ATUALIZAR</button>
     </header>
 
     <ul id="pedidos-container"></ul>
@@ -38,91 +36,107 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Configuração do Áudio
+        const audioAlerta = new Audio('alert.mpeg');
+        audioAlerta.loop = true;
+
         function ativarSom() {
             document.getElementById('container-ativacao').style.display = 'none';
+            // Play/Pause rápido para destravar o áudio no navegador/celular
+            audioAlerta.play().then(() => audioAlerta.pause());
         }
 
-        // --- FUNÇÃO DE IMPRESSÃO ---
         function imprimirPedido(id) {
             db.ref('pedidos/' + id).once('value', (snapshot) => {
                 const p = snapshot.val();
-                if (!p) return;
+                if (!snapshot.exists()) return;
 
                 const itensHtml = p.itens.map(i => `
                     <tr>
-                        <td style="width:30px">${i.qtd}x</td>
-                        <td>${i.produto}</td>
+                        <td style="vertical-align:top; padding:2px 0; width:30px;">${i.qtd}x</td>
+                        <td style="padding:2px 0;">${i.produto}</td>
                     </tr>
                 `).join('');
 
                 const cupom = `
                     <html>
-                    <body style="font-family: 'Courier New', monospace; width: 80mm; padding: 10px;">
-                        <center>
-                            <h2 style="margin:0">SNOOP LANCHE</h2>
-                            <p>--------------------------------</p>
-                            <h3 style="margin:5px 0">CUPOM DE COZINHA</h3>
-                            <p>${p.horario}</p>
-                        </center>
-                        <p><strong>CLIENTE:</strong> ${p.cliente}</p>
-                        <p>--------------------------------</p>
-                        <table style="width:100%; border-collapse: collapse;">
+                    <body style="font-family:'Courier New',monospace; width:80mm; padding:0; margin:0; font-size:14px; color:#000;">
+                        <div style="text-align:center; font-weight:bold; border-bottom:1px dashed #000; padding-bottom:5px;">
+                            SNOOP LANCHE - ${p.horario}
+                        </div>
+                        <div style="margin:5px 0;">
+                            <b>CLIENTE:</b> ${p.cliente}<br>
+                            <b>PGTO:</b> ${p.pagamento || 'A combinar'}
+                        </div>
+                        <table style="width:100%; border-bottom:1px dashed #000; margin-bottom:5px;">
                             ${itensHtml}
                         </table>
-                        <p>--------------------------------</p>
-                        <p><strong>OBS:</strong> ${p.obs_cozinha || 'Nenhuma'}</p>
-                        <p><strong>ENDEREÇO:</strong> ${p.endereco}</p>
-                        <center><p>--------------------------------</p></center>
+                        <div style="font-size:13px;">
+                            <b>OBS:</b> ${p.obs_cozinha || 'Nenhuma'}<br>
+                            <b>REF:</b> ${p.referencia || 'Não informado'}<br>
+                            <b>END:</b> ${p.endereco}
+                        </div>
                     </body>
                     </html>
                 `;
 
-                const win = document.getElementById('iframe-impressao').contentWindow;
-                win.document.open();
-                win.document.write(cupom);
-                win.document.close();
-                setTimeout(() => {
-                    win.print();
-                }, 500);
+                const frame = document.getElementById('iframe-impressao');
+                const doc = frame.contentWindow.document;
+                doc.open(); doc.write(cupom); doc.close();
+                setTimeout(() => { frame.contentWindow.print(); }, 500);
             });
         }
 
-        // --- GESTÃO DE STATUS ---
         db.ref('pedidos').on('value', (snapshot) => {
-                    const container = document.getElementById('pedidos-container');
-                    container.innerHTML = "";
-                    snapshot.forEach(child => {
-                                const p = child.val();
-                                const id = child.key;
-                                const status = p.status || 'pendente';
+            const container = document.getElementById('pedidos-container');
+            container.innerHTML = "";
+            let temPendente = false;
 
-                                const li = document.createElement('li');
-                                li.className = `pedido-card status-${status}`;
+            snapshot.forEach(child => {
+                const p = child.val();
+                const id = child.key;
+                const status = p.status || 'pendente';
+                if(status === 'pendente') temPendente = true;
 
-                                let botoes = "";
-                                if (status === 'pendente') {
-                                    botoes = `
-                        <button class="btn-success" onclick="db.ref('pedidos/${id}').update({status:'preparando'})">ACEITAR</button>
+                const li = document.createElement('li');
+                li.className = `pedido-card status-${status}`;
+
+                let botoes = "";
+                if (status === 'pendente') {
+                    botoes = `
+                        <button class="btn-success" onclick="db.ref('pedidos/${id}').update({status:'preparando'})">ACEITAR PEDIDO</button>
                         <button class="btn-danger" onclick="db.ref('pedidos/${id}').remove()">RECUSAR</button>`;
-                                } else if (status === 'preparando') {
-                                    botoes = `
-                        <button class="btn-warning" onclick="imprimirPedido('${id}')">COZINHA</button>
-                        <button class="btn-info" onclick="db.ref('pedidos/${id}').update({status:'entrega'})"> SAIR PARA ENTREGA</button>`;
-                                } else if (status === 'entrega') {
-                                    botoes = `<button class="btn-success" onclick="concluirPedido('${id}')"> CONCLUIR</button>`;
-                                }
+                } else if (status === 'preparando') {
+                    botoes = `
+                        <button class="btn-warning" onclick="imprimirPedido('${id}')">IMPRIMIR COZINHA</button>
+                        <button class="btn-info" onclick="db.ref('pedidos/${id}').update({status:'entrega'})">ENVIAR P/ ENTREGA</button>`;
+                } else if (status === 'entrega') {
+                    botoes = `<button class="btn-success" onclick="concluirPedido('${id}')">CONCLUIR PEDIDO</button>`;
+                }
 
-                                li.innerHTML = `
+                li.innerHTML = `
                     <div class="status-tag">${status.toUpperCase()}</div>
                     <h3>${p.cliente}</h3>
-                    <p class="info"> ${p.endereco}</p>
-                    <div class="itens-box">${p.itens.map(i => `• ${i.produto}<br>`).join('')}</div>
-                    <p class="obs"> ${p.obs_cozinha || 'Sem observações'}</p>
+                    <p class="info">${p.endereco}</p>
+                    <p class="info"><b>PGTO:</b> ${p.pagamento || 'A combinar'}</p>
+                    <div class="itens-box">
+                        <b>ITENS:</b><br>
+                        ${p.itens.map(i => `• ${i.qtd}x ${i.produto}`).join('<br>')}
+                    </div>
+                    <p class="obs"><b>OBS:</b> ${p.obs_cozinha || 'Sem observações'}</p>
                     <div class="total">R$ ${parseFloat(p.total).toFixed(2)}</div>
                     <div class="btn-actions">${botoes}</div>
                 `;
                 container.appendChild(li);
             });
+
+            // Controle do som alert.mpeg
+            if (temPendente) {
+                audioAlerta.play().catch(e => console.log("Aguardando interação para som"));
+            } else {
+                audioAlerta.pause();
+                audioAlerta.currentTime = 0;
+            }
         });
 
         function concluirPedido(id) {
@@ -132,5 +146,4 @@
         }
     </script>
 </body>
-
 </html>
