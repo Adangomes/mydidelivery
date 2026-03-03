@@ -256,7 +256,7 @@ function enviarWhatsApp() {
     const pag = document.getElementById("pagamento")?.value || "A combinar";
     const totalMsg = document.getElementById("resumo-total")?.innerText || "";
 
-    // FORMATANDO A MENSAGEM
+    // 1. FORMATANDO A MENSAGEM DO WHATSAPP
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n`;
     msg += `------------------------------\n`;
     msg += ` *Cliente:* ${nome}\n`;
@@ -270,12 +270,18 @@ function enviarWhatsApp() {
     msg += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2)}\n`;
     msg += ` *${totalMsg}*`;
 
-    // AQUI VOCÊ PODE CHAMAR SUA FUNÇÃO DO FIREBASE:
-    // salvarPedidoFirebase({ nome, rua, num, bairro, carrinho, total: totalMsg });
-
-    // ABRE O WHATSAPP
-    window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
-    
+    // 2. SALVAR NO FIREBASE ANTES DE ABRIR O WHATSAPP
+    salvarPedidoFirebase({ nome, rua, num, bairro, pag }).then(() => {
+        // Abre o WhatsApp apenas se salvou com sucesso no banco
+        window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
+        localStorage.removeItem("carrinho");
+        location.reload();
+    }).catch(err => {
+        console.error("Erro Firebase:", err);
+        alert("Erro ao salvar no sistema, mas enviando pelo WhatsApp...");
+        window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
+    });
+}
     // LIMPA TUDO
     localStorage.removeItem("carrinho");
     location.reload();
@@ -360,5 +366,44 @@ function voltarParaEntrega() {
     document.getElementById("resumo-pedido").style.display = "none";
     document.getElementById("form-entrega").style.display = "block";
 }
+// --- CONFIGURAÇÃO FIREBASE (COLE NO FINAL DO ARQUIVO) ---
+const firebaseConfig = {
+    apiKey: "AIzaSyCXA1yP1F-riNkzOX5zJs5gsQ82EzsT7Qg",
+    authDomain: "myproject26-10f0e.firebaseapp.com",
+    databaseURL: "https://myproject26-10f0e-default-rtdb.firebaseio.com",
+    projectId: "myproject26-10f0e",
+    storageBucket: "myproject26-10f0e.firebasestorage.app",
+    messagingSenderId: "884850608032",
+    appId: "1:884850608032:web:79db6983346c3c20edc6c5"
+};
+
+// Inicializa o Firebase se ainda não foi inicializado
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+
+// Função para enviar os dados para o seu Painel Admin
+function salvarPedidoFirebase(dados) {
+    const novoPedidoRef = db.ref('pedidos').push();
+    return novoPedidoRef.set({
+        cliente: dados.nome,
+        endereco: `${dados.rua}, ${dados.num} - ${dados.bairro}`,
+        referencia: document.getElementById("referencia")?.value || document.getElementById("input-referencia")?.value || "Não informada",
+        pagamento: dados.pag,
+        itens: carrinho.map(item => ({
+            produto: item.title,
+            qtd: 1,
+            precoUn: item.price
+        })),
+        subtotal: carrinho.reduce((acc, i) => acc + i.price, 0),
+        taxaEntrega: taxaEntregaCalculada,
+        desconto: descontoAplicado,
+        total: (carrinho.reduce((acc, i) => acc + i.price, 0) + taxaEntregaCalculada - descontoAplicado),
+        horario: new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}),
+        obs_cozinha: document.getElementById("obs-pedido")?.value || "Nenhuma"
+    });
+}
+
 
 
