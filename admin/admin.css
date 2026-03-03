@@ -9,19 +9,24 @@
 }
 
 * {
-    box-sizing: border-box; /* Garante que o padding não quebre a largura */
+    box-sizing: border-box;
+    /* Garante que o padding não quebre a largura */
 }
 
 body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg);
     color: white;
-    padding: 10px; /* Reduzi para ganhar espaço no celular */
+    padding: 10px;
+    /* Reduzi para ganhar espaço no celular */
     margin: 0;
-    -webkit-tap-highlight-color: transparent; /* Remove o brilho chato ao tocar no iPhone */
+    -webkit-tap-highlight-color: transparent;
+    /* Remove o brilho chato ao tocar no iPhone */
 }
 
+
 /* Cabeçalho Responsivo */
+
 .admin-header {
     display: flex;
     flex-direction: row;
@@ -30,21 +35,26 @@ body {
     border-bottom: 2px solid var(--primary);
     padding-bottom: 10px;
     margin-bottom: 20px;
-    position: sticky; /* Mantém o topo visível ao rolar */
+    position: sticky;
+    /* Mantém o topo visível ao rolar */
     top: 0;
     background: var(--bg);
     z-index: 100;
 }
 
 .admin-header h1 {
-    font-size: 1.2rem; /* Tamanho adaptável */
+    font-size: 1.2rem;
+    /* Tamanho adaptável */
     margin: 0;
 }
 
+
 /* Ajuste do Container de Pedidos */
+
 #pedidos-container {
     display: grid;
-    grid-template-columns: 1fr; /* Padrão: 1 coluna (Celular) */
+    grid-template-columns: 1fr;
+    /* Padrão: 1 coluna (Celular) */
     gap: 15px;
     padding: 0;
     list-style: none;
@@ -52,7 +62,9 @@ body {
     margin: 0 auto;
 }
 
+
 /* Se a tela for maior que 768px (Tablet/PC), mostra 2 ou mais colunas */
+
 @media (min-width: 768px) {
     #pedidos-container {
         grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -60,19 +72,29 @@ body {
     }
 }
 
+
 /* Card do Pedido Otimizado para Toque */
+
 .pedido-card {
     background: var(--card-bg);
     border-radius: 12px;
     padding: 15px;
     position: relative;
     border-top: 5px solid #444;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
-.status-pendente { border-top-color: var(--primary); }
-.status-preparando { border-top-color: var(--warning); }
-.status-entrega { border-top-color: var(--info); }
+.status-pendente {
+    border-top-color: var(--primary);
+}
+
+.status-preparando {
+    border-top-color: var(--warning);
+}
+
+.status-entrega {
+    border-top-color: var(--info);
+}
 
 .status-tag {
     position: absolute;
@@ -88,7 +110,8 @@ body {
 .pedido-card h3 {
     margin-top: 5px;
     font-size: 1.1rem;
-    padding-right: 70px; /* Evita que o nome do cliente bata no status */
+    padding-right: 70px;
+    /* Evita que o nome do cliente bata no status */
 }
 
 .info {
@@ -99,7 +122,7 @@ body {
 }
 
 .itens-box {
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     padding: 12px;
     border-radius: 8px;
     margin: 12px 0;
@@ -115,66 +138,65 @@ body {
     margin: 10px 0;
 }
 
+
 /* Botões Grandes para o Dedo no Celular */
-/* --- AJUSTE FINAL: BOTÕES GRANDES PARA CELULAR --- */
+
 .btn-actions {
     display: flex;
-    flex-direction: column; /* Um botão embaixo do outro no celular */
-    gap: 12px;              /* Espaço maior entre os botões para não errar o toque */
+    flex-direction: column;
+    gap: 10px;
     margin-top: 15px;
 }
 
-/* No computador (telas maiores), eles voltam a ficar lado a lado */
-@media (min-width: 768px) {
-    .btn-actions {
-        flex-direction: row;
-    }
-    .btn-actions button {
-        flex: 1;
-    }
-}
-
 button {
-    padding: 16px 10px;    /* Mais alto para facilitar o toque com o polegar */
+    padding: 14px;
+    /* Mais alto para facilitar o toque */
     border: none;
-    border-radius: 10px;   /* Cantos mais arredondados e modernos */
-    font-weight: 900;      /* Texto bem negrito */
+    border-radius: 8px;
+    font-weight: bold;
     cursor: pointer;
     text-transform: uppercase;
-    font-size: 1rem;       /* Fonte levemente maior para leitura rápida */
-    transition: transform 0.1s, filter 0.2s;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.3); /* Sombra para parecer um botão real */
+    font-size: 0.9rem;
+    transition: filter 0.2s;
 }
 
-/* Feedback ao clicar/tocar */
 button:active {
-    filter: brightness(1.2);
-    transform: scale(0.98); /* Efeito de "afundar" ao clicar */
+    filter: brightness(1.3);
+    /* Feedback visual ao tocar */
 }
 
-.btn-success { background: var(--success); color: white; }
-.btn-warning { background: var(--warning); color: white; }
-.btn-info { background: var(--info); color: white; }
-.btn-danger { background: var(--danger); color: white; }
-
-.btn-relatorio { 
-    background: var(--primary); 
-    color: black; 
-    padding: 10px 20px; 
-    font-size: 0.85rem;
-    border-radius: 8px;
+.btn-success {
+    background: var(--success);
+    color: white;
 }
 
-/* Overlay de ativação (Ajustado para celular) */
+.btn-warning {
+    background: var(--warning);
+    color: white;
+}
+
+.btn-info {
+    background: var(--info);
+    color: white;
+}
+
+.btn-danger {
+    background: var(--danger);
+    color: white;
+}
+
+.btn-relatorio {
+    background: var(--primary);
+    color: black;
+    padding: 8px 15px;
+    font-size: 0.8rem;
+}
+
+
+/* Overlay de ativação */
+
 #container-ativacao button {
-    width: 85%;
-    max-width: 320px;
-    font-size: 1.2rem;
-    padding: 25px;
-    line-height: 1.2;
-}
-
-/* Estilo para a Iframe de Impressão não afetar o layout */
-#iframe-impressao {
-    display: none;
+    width: 80%;
+    max-width: 300px;
+    font-size: 1.1rem;
 }
