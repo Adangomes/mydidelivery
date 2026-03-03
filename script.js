@@ -259,7 +259,7 @@ function enviarWhatsApp() {
 
     if (!nome || !rua) return alert("Preencha os dados de entrega!");
 
-    // 1. FORMATANDO A MENSAGEM DO WHATSAPP
+    // 1. FORMATANDO A MENSAGEM
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n`;
     msg += `------------------------------\n`;
     msg += ` *Cliente:* ${nome}\n`;
@@ -275,30 +275,31 @@ function enviarWhatsApp() {
 
     const urlZap = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`;
 
-    // 2. SALVAR NO FIREBASE E DEPOIS IR PARA O WHATS
-    // Mostra um aviso pro usuário não clicar mil vezes
+    // BOTÃO DE STATUS
     const btn = document.querySelector("#resumo-pedido button");
-    if(btn) btn.innerText = "ENVIANDO...";
+    if(btn) {
+        btn.innerText = "ENVIANDO...";
+        btn.disabled = true; // Evita cliques duplos que travam o navegador
+    }
 
+    // 2. LÓGICA DE ENVIO
     if (typeof salvarPedidoFirebase === 'function') {
         salvarPedidoFirebase({ nome, rua, num, bairro, pag })
         .then(() => {
-            console.log("Salvo no Firebase!");
-            // Abre o WhatsApp
-            window.location.href = urlZap;
-            
-            // Limpa o carrinho
+            // SUCESSO: LIMPA TUDO PRIMEIRO
             localStorage.removeItem("carrinho");
+            // DEPOIS ABRE O WHATSAPP (A última coisa que o código faz)
+            window.location.replace(urlZap); 
         })
         .catch(err => {
             console.error("Erro Firebase:", err);
-            // Mesmo se o Firebase falhar, envia o WhatsApp para não perder a venda
-            window.location.href = urlZap;
+            // FALHA: LIMPA E ABRE DO MESMO JEITO
             localStorage.removeItem("carrinho");
+            window.location.replace(urlZap);
         });
     } else {
-        // Se não houver firebase configurado, vai direto
-        window.location.href = urlZap;
+        localStorage.removeItem("carrinho");
+        window.location.replace(urlZap);
     }
 }
 function calcularDistancia(lat1, lon1, lat2, lon2) {
@@ -430,6 +431,7 @@ function salvarPedidoFirebase(dados) {
         obs_cozinha: document.getElementById("obs-pedido")?.value || "Nenhuma"
     });
 }
+
 
 
 
