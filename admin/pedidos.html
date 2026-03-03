@@ -11,8 +11,8 @@
 <body>
     <div id="container-ativacao">
         <div style="text-align: center;">
-            <h2 style="color: #ffcc00; margin-bottom: 20px;">SNOOP LANCHE</h2>
-            <button onclick="ativarSom()">INICIAR SISTEMA DE PEDIDOS</button>
+            <h2 style="color: #ffcc00; margin-bottom: 20px;">SNOOP LANCHE SISTEMA</h2>
+            <button onclick="ativarSom()">🔊 CLIQUE PARA INICIAR E ATIVAR SOM</button>
         </div>
     </div>
 
@@ -25,11 +25,11 @@
         <button class="tab-btn active" onclick="mudarAba('pendente', this)">NOVOS</button>
         <button class="tab-btn" onclick="mudarAba('preparando', this)">COZINHA</button>
         <button class="tab-btn" onclick="mudarAba('entrega', this)">ENTREGA</button>
-        <button class="tab-btn btn-hist" onclick="mudarAba('historico', this)">HISTÓRICO</button>
+        <button class="tab-btn btn-hist" onclick="mudarAba('historico', this)">📊 HISTÓRICO</button>
     </nav>
 
     <div id="area-relatorio" style="display:none; padding: 15px;">
-        <button class="btn-pdf" onclick="gerarPDF()">GERAR PDF DO HISTÓRICO</button>
+        <button class="btn-pdf" onclick="gerarPDF()">📄 GERAR PDF DO HISTÓRICO</button>
     </div>
 
     <ul id="pedidos-container"></ul>
@@ -52,94 +52,81 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- CONFIGURAÇÃO DO SOM ---
-        const audioAlerta = new Audio('alert.mpeg');
-        audioAlerta.loop = false; // Desativado o loop infinito
         
-        let contadorRepeticao = 0;
-        const LIMITE_REPETICAO = 2; // Quantidade de vezes que vai tocar
+        // CONFIGURAÇÃO DO SOM
+    const audioAlerta = new Audio('alert.mpeg');
+    audioAlerta.loop = false; // MUDAMOS PARA FALSE PARA NÃO FICAR INFINITO
+    
+    let contadorRepeticao = 0;
+    const LIMITE_REPETICAO = 2; // COLOQUE AQUI QUANTAS VEZES QUER QUE TOQUE
 
-        // Função que controla a repetição
-        audioAlerta.onended = function() {
-            if (contadorRepeticao < LIMITE_REPETICAO - 1) {
-                contadorRepeticao++;
-                audioAlerta.play();
-            }
-        };
-
-        audioAlerta.onerror = function() {
-            console.log("Arquivo local falhou, usando backup.");
-            audioAlerta.src = "https://raw.githubusercontent.com/rafaelbotazini/admin-painel/main/alert.mp3";
-        };
-
-        let abaAtiva = 'pendente';
-        let iniciado = false;
-
-        function ativarSom() {
-            document.getElementById('container-ativacao').style.display = 'none';
-            iniciado = true;
-            
-            audioAlerta.play().then(() => {
-                audioAlerta.pause();
-                audioAlerta.currentTime = 0;
-                carregarDados();
-            }).catch(e => {
-                console.error("Erro ao liberar audio:", e);
-                carregarDados();
-            });
+    audioAlerta.onended = function() {
+        if (contadorRepeticao < LIMITE_REPETICAO - 1) {
+            contadorRepeticao++;
+            audioAlerta.play();
         }
+    };
 
-        function mudarAba(aba, btn) {
-            abaAtiva = aba;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('area-relatorio').style.display = (aba === 'historico') ? 'block' : 'none';
+    audioAlerta.onerror = function() {
+        audioAlerta.src = "https://raw.githubusercontent.com/rafaelbotazini/admin-painel/main/alert.mp3";
+    };
+
+    let abaAtiva = 'pendente';
+    let iniciado = false;
+
+    function ativarSom() {
+        document.getElementById('container-ativacao').style.display = 'none';
+        iniciado = true;
+        audioAlerta.play().then(() => {
+            audioAlerta.pause();
+            audioAlerta.currentTime = 0;
             carregarDados();
-        }
+        }).catch(e => carregarDados());
+    }
 
-        function carregarDados() {
-            if (!iniciado) return;
+    function mudarAba(aba, btn) {
+        abaAtiva = aba;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('area-relatorio').style.display = (aba === 'historico') ? 'block' : 'none';
+        carregarDados();
+    }
 
-            const path = (abaAtiva === 'historico') ? 'relatorios' : 'pedidos';
+    function carregarDados() {
+        if (!iniciado) return;
+        const path = (abaAtiva === 'historico') ? 'relatorios' : 'pedidos';
 
-            db.ref(path).on('value', (snapshot) => {
-                const container = document.getElementById('pedidos-container');
-                container.innerHTML = "";
-                let temPendente = false;
-                const agora = Date.now();
-                const trintaDias = 30 * 24 * 60 * 60 * 1000;
+        db.ref(path).on('value', (snapshot) => {
+            const container = document.getElementById('pedidos-container');
+            container.innerHTML = "";
+            let temPendente = false;
 
-                snapshot.forEach(child => {
-                    const p = child.val();
-                    const id = child.key;
-                    const status = p.status || 'pendente';
-                    const timestamp = p.concluidoEm || agora;
+            snapshot.forEach(child => {
+                const p = child.val();
+                if ((p.status || 'pendente') === 'pendente') temPendente = true;
 
-                    if (abaAtiva === 'historico') {
-                        if (agora - timestamp > trintaDias) {
-                            db.ref('relatorios/' + id).remove();
-                            return;
-                        }
-                    } else {
-                        if (status === 'pendente') temPendente = true;
-                        if (status !== abaAtiva) return;
-                    }
-
+                if (abaAtiva !== 'historico' && (p.status || 'pendente') === abaAtiva) {
+                    // ... (seu código de gerar o <li> do card continua igual aqui)
                     const li = document.createElement('li');
                     li.className = `pedido-card`;
+                    // (código do li omitido para brevidade, mantenha o seu)
+                    container.appendChild(li);
+                }
+            });
 
-                    let botoes = "";
-                    if (abaAtiva === 'pendente') {
-                        botoes = `<button class="btn-success" onclick="db.ref('pedidos/${id}').update({status:'preparando'})">ACEITAR PEDIDO</button>`;
-                    } else if (abaAtiva === 'preparando') {
-                        botoes = `
-                            <button class="btn-warning" onclick="imprimirPedido('${id}', 'pedidos')">IMPRIMIR CUPOM</button>
-                            <button class="btn-info" onclick="db.ref('pedidos/${id}').update({status:'entrega'})">SAIU PARA ENTREGA</button>`;
-                    } else if (abaAtiva === 'entrega') {
-                        botoes = `<button class="btn-success" onclick="concluirPedido('${id}')">CONCLUIR E FINALIZAR</button>`;
-                    } else {
-                        botoes = `<button class="btn-warning" style="width:100%" onclick="imprimirPedido('${id}', 'relatorios')">REIMPRIMIR CUPOM</button>`;
-                    }
+            // LÓGICA DE ALERTA AJUSTADA PARA 2 VEZES
+            if (temPendente && abaAtiva === 'pendente') {
+                if (audioAlerta.paused && contadorRepeticao === 0) {
+                    contadorRepeticao = 0; // Reseta o contador para começar as 2 vezes
+                    audioAlerta.play();
+                }
+            } else {
+                audioAlerta.pause();
+                audioAlerta.currentTime = 0;
+                contadorRepeticao = 0; // Reseta se não houver mais pendentes
+            }
+        });
+    }
 
                     li.innerHTML = `
                         <div class="card-header">
@@ -147,4 +134,90 @@
                             <span class="hora">${p.horario || ''}</span>
                         </div>
                         <p class="info"><b>Endereço:</b> ${p.endereco}</p>
-                        <p class="info"><b>Taxa Entrega:</b> R$ ${parseFloat
+                        <p class="info"><b>Taxa Entrega:</b> R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2)}</p>
+                        <div class="itens-box">
+                            ${p.itens ? p.itens.map(i => `<b>${i.qtd}x</b> ${i.produto}`).join('<br>') : ''}
+                        </div>
+                        <div class="total-area">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</div>
+                        <div class="btn-actions">${botoes}</div>
+                    `;
+                    container.appendChild(li);
+                });
+
+                // LÓGICA DE ALERTA SONORO
+                if (temPendente && abaAtiva === 'pendente') {
+                    if (audioAlerta.paused) {
+                        audioAlerta.play().catch(e => console.log("Som aguardando interação."));
+                    }
+                } else {
+                    audioAlerta.pause();
+                    audioAlerta.currentTime = 0;
+                }
+            });
+        }
+
+        function concluirPedido(id) {
+            db.ref('pedidos/' + id).once('value', s => {
+                const dados = s.val();
+                dados.concluidoEm = Date.now();
+                db.ref('relatorios').push(dados).then(() => db.ref('pedidos/' + id).remove());
+            });
+        }
+
+        function imprimirPedido(id, pasta) {
+            db.ref(pasta + '/' + id).once('value', (snapshot) => {
+                const p = snapshot.val();
+                const taxa = parseFloat(p.taxaEntrega || 0);
+                const subtotal = parseFloat(p.total) - taxa;
+
+                const cupom = `
+                    <html>
+                    <body style="font-family:Arial,sans-serif; width:80mm; padding:0; margin:0; color:#000;">
+                        <div style="text-align:center; border-bottom:2px solid #000; padding:10px 0;">
+                            <b style="font-size:24px;">SNOOP LANCHE</b><br>
+                            <span style="font-size:18px;">CUPOM DE ENTREGA</span>
+                        </div>
+                        <div style="padding:10px 0; font-size:18px; border-bottom:1px dashed #000;">
+                            <b>CLIENTE:</b> ${p.cliente.toUpperCase()}<br>
+                            <b>HORA:</b> ${p.horario || ''}<br>
+                            <b>PGTO:</b> ${p.pagamento || 'Pix'}
+                        </div>
+                        <div style="padding:10px 0; font-size:20px; font-weight:bold;">
+                            ${p.itens ? p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>') : ''}
+                        </div>
+                        <div style="padding:10px 0; font-size:19px; border-top:1px dashed #000;">
+                            <b>ENDEREÇO:</b><br>${p.endereco}
+                        </div>
+                        <div style="padding:10px 0; font-size:18px; border-top:1px solid #000; margin-top:5px;">
+                            PRODUTOS: R$ ${subtotal.toFixed(2)}<br>
+                            <b>TAXA ENTREGA: R$ ${taxa.toFixed(2)}</b>
+                        </div>
+                        <div style="text-align:center; font-size:28px; font-weight:bold; margin-top:10px; border:3px solid #000; padding:5px;">
+                            TOTAL: R$ ${parseFloat(p.total).toFixed(2)}
+                        </div>
+                    </body>
+                    </html>
+                `;
+                const frame = document.getElementById('iframe-impressao');
+                const doc = frame.contentWindow.document;
+                doc.open(); doc.write(cupom); doc.close();
+                setTimeout(() => { frame.contentWindow.print(); }, 500);
+            });
+        }
+
+        function gerarPDF() {
+            const container = document.getElementById('pedidos-container').cloneNode(true);
+            const win = window.open('', '', 'height=700,width=900');
+            win.document.write('<html><head><title>Relatório Snoop Lanche</title>');
+            win.document.write('<style>body{font-family:sans-serif; color:black;} .pedido-card{border-bottom:2px solid black; padding:20px; list-style:none;} .btn-actions{display:none;}</style>');
+            win.document.write('</head><body>');
+            win.document.write('<h1>Relatório de Vendas (30 dias)</h1>');
+            win.document.write(container.innerHTML);
+            win.document.write('</body></html>');
+            win.document.close();
+            win.print();
+        }
+    </script>
+</body>
+
+</html>
