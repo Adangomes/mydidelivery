@@ -23,12 +23,11 @@ body {
     border-bottom: 2px solid var(--primary);
 }
 
-.admin-header h1 { font-size: 1.4rem; margin: 0; }
+.admin-header h1 { font-size: 1.4rem; margin: 0; font-weight: 800; }
 .admin-header span { color: var(--primary); }
+.btn-refresh { background: var(--primary); border: none; padding: 10px; border-radius: 5px; font-size: 1.2rem; cursor: pointer; }
 
-.btn-refresh { background: var(--primary); border: none; padding: 10px; border-radius: 5px; font-size: 1.2rem; }
-
-/* NAVEGAÇÃO POR ABAS */
+/* ABAS */
 .tabs {
     display: flex;
     background: #222;
@@ -48,6 +47,7 @@ body {
     font-size: 0.8rem;
     border-bottom: 3px solid transparent;
     white-space: nowrap;
+    cursor: pointer;
 }
 
 .tab-btn.active {
@@ -58,10 +58,10 @@ body {
 
 .btn-hist { color: #5dade2 !important; }
 
-/* RELATÓRIO PDF */
-.btn-pdf { width: 100%; background: #e74c3c; color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
+/* RELATÓRIO */
+.btn-pdf { width: 92%; background: #e74c3c; color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; margin: 15px auto; display: block; }
 
-/* CARDS DOS PEDIDOS */
+/* CARDS */
 #pedidos-container { padding: 15px; list-style: none; margin: 0; }
 
 .pedido-card {
@@ -69,7 +69,7 @@ body {
     border-radius: 12px;
     padding: 15px;
     margin-bottom: 20px;
-    border-left: 5px solid var(--primary);
+    border-left: 6px solid var(--primary);
     box-shadow: 0 4px 15px rgba(0,0,0,0.5);
 }
 
@@ -77,7 +77,7 @@ body {
 .cliente-nome { font-size: 1.3rem; font-weight: bold; color: var(--primary); }
 .hora { font-size: 0.9rem; color: #888; }
 
-.info { font-size: 1rem; margin: 5px 0; color: #ccc; }
+.info { font-size: 1rem; margin: 6px 0; color: #ddd; }
 
 .itens-box {
     background: rgba(255,255,255,0.05);
@@ -86,22 +86,25 @@ body {
     margin: 15px 0;
     font-size: 1.1rem;
     line-height: 1.6;
+    border: 1px solid #333;
 }
 
 .total-area {
-    font-size: 1.4rem;
+    font-size: 1.5rem;
     font-weight: 900;
     text-align: right;
     color: var(--primary);
     margin: 10px 0;
+    padding-top: 10px;
+    border-top: 1px solid #333;
 }
 
-/* BOTÕES GIGANTES */
+/* BOTÕES */
 .btn-actions { display: flex; flex-direction: column; gap: 10px; }
 
 button {
     padding: 18px;
-    border-radius: 10px;
+    border-radius: 12px;
     border: none;
     font-weight: bold;
     font-size: 1rem;
@@ -113,11 +116,12 @@ button {
 .btn-warning { background: var(--warning); color: white; }
 .btn-info { background: var(--info); color: white; }
 
+/* TELA INICIAL */
 #container-ativacao {
     position: fixed;
     top: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.95);
+    background: rgba(0,0,0,0.98);
     z-index: 9999;
     display: flex; justify-content: center; align-items: center;
 }
-#container-ativacao button { width: 80%; background: var(--primary); color: black; border-radius: 50px; font-size: 1.1rem; }
+#container-ativacao button { width: 85%; background: var(--primary); color: black; border-radius: 50px; font-size: 1.2rem; padding: 25px; }
