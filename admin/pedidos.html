@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="container-ativacao">
-        <button onclick="ativarSom()">🔊 INICIAR E ATIVAR SOM</button>
+        <button onclick="ativarSom()">INICIAR E ATIVAR SOM</button>
     </div>
 
     <header class="admin-header">
@@ -17,10 +17,15 @@
     </header>
 
     <nav class="tabs">
-        <button class="tab-btn active" onclick="filtrarPedidos('pendente', this)">NOVOS</button>
-        <button class="tab-btn" onclick="filtrarPedidos('preparando', this)">COZINHA</button>
-        <button class="tab-btn" onclick="filtrarPedidos('entrega', this)">ENTREGA</button>
+        <button class="tab-btn active" onclick="mudarAba('pendente', this)">NOVOS</button>
+        <button class="tab-btn" onclick="mudarAba('preparando', this)">COZINHA</button>
+        <button class="tab-btn" onclick="mudarAba('entrega', this)">ENTREGA</button>
+        <button class="tab-btn btn-hist" onclick="mudarAba('historico', this)">HISTÓRICO</button>
     </nav>
+
+    <div id="area-relatorio" style="display:none; padding: 15px;">
+        <button class="btn-pdf" onclick="gerarPDF()">GERAR PDF DO HISTÓRICO</button>
+    </div>
 
     <ul id="pedidos-container"></ul>
 
@@ -44,46 +49,61 @@
 
         const audioAlerta = new Audio('alert.mpeg');
         audioAlerta.loop = true;
-        let statusAtual = 'pendente';
+        let abaAtiva = 'pendente';
 
         function ativarSom() {
             document.getElementById('container-ativacao').style.display = 'none';
             audioAlerta.play().then(() => audioAlerta.pause());
         }
 
-        function filtrarPedidos(status, btn) {
-            statusAtual = status;
+        function mudarAba(aba, btn) {
+            abaAtiva = aba;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            carregarPedidos();
+            document.getElementById('area-relatorio').style.display = (aba === 'historico') ? 'block' : 'none';
+            carregarDados();
         }
 
-        function carregarPedidos() {
-            db.ref('pedidos').on('value', (snapshot) => {
+        function carregarDados() {
+            const path = (abaAtiva === 'historico') ? 'relatorios' : 'pedidos';
+            
+            db.ref(path).on('value', (snapshot) => {
                 const container = document.getElementById('pedidos-container');
                 container.innerHTML = "";
                 let temPendente = false;
+                const agora = Date.now();
+                const trintaDias = 30 * 24 * 60 * 60 * 1000;
 
                 snapshot.forEach(child => {
                     const p = child.val();
                     const id = child.key;
                     const status = p.status || 'pendente';
-                    
-                    if(status === 'pendente') temPendente = true;
-                    if(status !== statusAtual) return;
+                    const timestamp = p.concluidoEm || agora;
+
+                    if (abaAtiva === 'historico') {
+                        if (agora - timestamp > trintaDias) {
+                            db.ref('relatorios/' + id).remove();
+                            return;
+                        }
+                    } else {
+                        if(status === 'pendente') temPendente = true;
+                        if(status !== abaAtiva) return;
+                    }
 
                     const li = document.createElement('li');
                     li.className = `pedido-card`;
 
                     let botoes = "";
-                    if (status === 'pendente') {
+                    if (abaAtiva === 'pendente') {
                         botoes = `<button class="btn-success" onclick="db.ref('pedidos/${id}').update({status:'preparando'})">ACEITAR PEDIDO</button>`;
-                    } else if (status === 'preparando') {
+                    } else if (abaAtiva === 'preparando') {
                         botoes = `
-                            <button class="btn-warning" onclick="imprimirPedido('${id}')">IMPRIMIR CUPOM</button>
+                            <button class="btn-warning" onclick="imprimirPedido('${id}', 'pedidos')">IMPRIMIR CUPOM</button>
                             <button class="btn-info" onclick="db.ref('pedidos/${id}').update({status:'entrega'})">SAIU PARA ENTREGA</button>`;
-                    } else if (status === 'entrega') {
+                    } else if (abaAtiva === 'entrega') {
                         botoes = `<button class="btn-success" onclick="concluirPedido('${id}')">CONCLUIR E FINALIZAR</button>`;
+                    } else {
+                        botoes = `<button class="btn-warning" style="width:100%" onclick="imprimirPedido('${id}', 'relatorios')">REIMPRIMIR CUPOM</button>`;
                     }
 
                     li.innerHTML = `
@@ -103,13 +123,23 @@
                     container.appendChild(li);
                 });
 
-                if (temPendente) audioAlerta.play().catch(() => {});
+                if (abaAtiva === 'pendente' && temPendente) audioAlerta.play().catch(() => {});
                 else { audioAlerta.pause(); audioAlerta.currentTime = 0; }
             });
         }
 
-        function imprimirPedido(id) {
-            db.ref('pedidos/' + id).once('value', (snapshot) => {
+        function concluirPedido(id) {
+            db.ref('pedidos/' + id).once('value', s => {
+                const dados = s.val();
+                dados.concluidoEm = Date.now();
+                db.ref('relatorios').push(dados).then(() => {
+                    db.ref('pedidos/' + id).remove();
+                });
+            });
+        }
+
+        function imprimirPedido(id, pasta) {
+            db.ref(pasta + '/' + id).once('value', (snapshot) => {
                 const p = snapshot.val();
                 const cupom = `
                     <html>
@@ -131,8 +161,7 @@
                             <b>REF:</b> ${p.referencia || 'Não informada'}
                         </div>
                         <div style="padding:10px 0; font-size:20px; border-top:1px dashed #000;">
-                            <b>ENDEREÇO:</b><br>
-                            <span style="display:block; margin-top:5px;">${p.endereco}</span>
+                            <b>ENDEREÇO:</b><br>${p.endereco}
                         </div>
                         <div style="text-align:center; font-size:26px; font-weight:bold; margin-top:10px; border:2px solid #000; padding:5px;">
                             TOTAL: R$ ${parseFloat(p.total).toFixed(2)}
@@ -147,13 +176,19 @@
             });
         }
 
-        function concluirPedido(id) {
-            db.ref('pedidos/' + id).once('value', s => {
-                db.ref('relatorios').push(s.val()).then(() => db.ref('pedidos/' + id).remove());
-            });
+        function gerarPDF() {
+            const container = document.getElementById('pedidos-container').cloneNode(true);
+            const win = window.open('', '', 'height=700,width=900');
+            win.document.write('<html><head><title>Snoop Lanche - Relatório</title>');
+            win.document.write('<style>body{font-family:sans-serif; color:black;} .pedido-card{border-bottom:1px solid #000; padding:10px; list-style:none;} .btn-actions{display:none;}</style>');
+            win.document.write('</head><body><h1>Histórico de Vendas</h1>');
+            win.document.write(container.innerHTML);
+            win.document.write('</body></html>');
+            win.document.close();
+            win.print();
         }
 
-        carregarPedidos();
+        carregarDados();
     </script>
 </body>
 </html>
