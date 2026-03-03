@@ -270,22 +270,25 @@ function enviarWhatsApp() {
     msg += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2)}\n`;
     msg += ` *${totalMsg}*`;
 
-    // 2. SALVAR NO FIREBASE ANTES DE ABRIR O WHATSAPP
-    salvarPedidoFirebase({ nome, rua, num, bairro, pag }).then(() => {
-        // Abre o WhatsApp apenas se salvou com sucesso no banco
-        window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
-        localStorage.removeItem("carrinho");
-        location.reload();
-    }).catch(err => {
-        console.error("Erro Firebase:", err);
-        alert("Erro ao salvar no sistema, mas enviando pelo WhatsApp...");
-        window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
-    });
-}
-    // LIMPA TUDO
-    localStorage.removeItem("carrinho");
-    location.reload();
-}
+    // 2. SALVAR NO FIREBASE E DEPOIS LIMPAR
+    if (typeof salvarPedidoFirebase === 'function') {
+        salvarPedidoFirebase({ nome, rua, num, bairro, pag }).then(() => {
+            // SÓ ENTRA AQUI SE DEU CERTO NO FIREBASE
+            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
+            
+            // --- AQUI QUE O "LIMPA TUDO" DEVE FICAR ---
+            localStorage.removeItem("carrinho");
+            location.reload(); 
+            // -----------------------------------------
+        }).catch(err => {
+            console.error("Erro Firebase:", err);
+            // Se der erro no Firebase, ainda abre o Whats, mas avisa
+            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
+            localStorage.removeItem("carrinho");
+            location.reload();
+        });
+    }
+} // <--- ESTA É A ÚLTIMA CHAVE DA FUNÇÃO. NÃO PODE TER NADA DEPOIS DELA (A MENOS QUE SEJA OUTRA FUNÇÃO)
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -415,6 +418,7 @@ function salvarPedidoFirebase(dados) {
         obs_cozinha: document.getElementById("obs-pedido")?.value || "Nenhuma"
     });
 }
+
 
 
 
