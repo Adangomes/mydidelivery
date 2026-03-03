@@ -11,6 +11,7 @@
         <div style="text-align: center;">
             <h2 style="color: #ffcc00; margin-bottom: 20px; font-family: sans-serif;">SNOOP LANCHE SISTEMA</h2>
             <button onclick="ativarSom()">🔊 CLIQUE PARA INICIAR E ATIVAR SOM</button>
+            <button onclick="testarAudioDireto()" style="margin-top: 20px; background: #555; color: #fff; font-size: 0.8rem; padding: 10px;">TESTAR ARQUIVO DE SOM</button>
         </div>
     </div>
 
@@ -26,12 +27,7 @@
         <button class="tab-btn btn-hist" onclick="mudarAba('historico', this)">📊 HISTÓRICO</button>
     </nav>
 
-    <div id="area-relatorio" style="display:none; padding: 15px;">
-        <button class="btn-pdf" onclick="gerarPDF()">📄 GERAR PDF DO HISTÓRICO</button>
-    </div>
-
     <ul id="pedidos-container"></ul>
-
     <iframe id="iframe-impressao" style="display:none;"></iframe>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -50,86 +46,55 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // --- SISTEMA DE ÁUDIO COM BACKUP ---
-        const audioAlerta = new Audio('alert.mpeg');
+        // Tenta usar o seu arquivo, se falhar usa o link da web
+        let audioAlerta = new Audio('alert.mpeg');
         audioAlerta.loop = true;
-        
-        // Se o seu alert.mpeg falhar, ele usa este link abaixo automaticamente
-        const somBackup = "https://raw.githubusercontent.com/rafaelbotazini/admin-painel/main/alert.mp3";
+
+        function testarAudioDireto() {
+            alert("Vou tentar tocar o som agora para testar...");
+            audioAlerta.play().catch(e => {
+                alert("Erro: " + e.message + " - Vou tentar o som de backup!");
+                audioAlerta.src = "https://raw.githubusercontent.com/rafaelbotazini/admin-painel/main/alert.mp3";
+                audioAlerta.play();
+            });
+        }
 
         function ativarSom() {
             document.getElementById('container-ativacao').style.display = 'none';
-            // Tenta tocar o seu arquivo. Se der erro, troca pelo som de backup da internet
             audioAlerta.play().then(() => {
                 audioAlerta.pause();
                 audioAlerta.currentTime = 0;
-            }).catch(() => {
-                console.log("Arquivo local não carregou, usando backup...");
-                audioAlerta.src = somBackup;
-            });
+            }).catch(e => console.log("Erro ao iniciar áudio:", e));
         }
 
         let abaAtiva = 'pendente';
 
-        function mudarAba(aba, btn) {
-            abaAtiva = aba;
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('area-relatorio').style.display = (aba === 'historico') ? 'block' : 'none';
-            carregarDados();
-        }
-
         function carregarDados() {
-            const path = (abaAtiva === 'historico') ? 'relatorios' : 'pedidos';
-            
-            db.ref(path).on('value', (snapshot) => {
+            db.ref('pedidos').on('value', (snapshot) => {
                 const container = document.getElementById('pedidos-container');
                 container.innerHTML = "";
                 let temPendente = false;
 
                 snapshot.forEach(child => {
                     const p = child.val();
-                    const id = child.key;
-                    const status = p.status || 'pendente';
-
-                    if (abaAtiva !== 'historico') {
-                        if(status === 'pendente') temPendente = true;
-                        if(status !== abaAtiva) return;
-                    }
-
-                    const li = document.createElement('li');
-                    li.className = `pedido-card`;
+                    if (p.status === 'pendente' || !p.status) temPendente = true;
                     
-                    let botoes = "";
-                    if (abaAtiva === 'pendente') {
-                        botoes = `<button class="btn-success" onclick="db.ref('pedidos/${id}').update({status:'preparando'})">ACEITAR PEDIDO</button>`;
-                    } else if (abaAtiva === 'preparando') {
-                        botoes = `<button class="btn-warning" onclick="imprimirPedido('${id}', 'pedidos')">IMPRIMIR CUPOM</button>
-                                  <button class="btn-info" onclick="db.ref('pedidos/${id}').update({status:'entrega'})">SAIU PARA ENTREGA</button>`;
-                    } else if (abaAtiva === 'entrega') {
-                        botoes = `<button class="btn-success" onclick="concluirPedido('${id}')">CONCLUIR E FINALIZAR</button>`;
-                    } else {
-                        botoes = `<button class="btn-warning" style="width:100%" onclick="imprimirPedido('${id}', 'relatorios')">REIMPRIMIR CUPOM</button>`;
+                    if (abaAtiva !== 'historico' && (p.status || 'pendente') === abaAtiva) {
+                        const li = document.createElement('li');
+                        li.className = `pedido-card`;
+                        li.innerHTML = `
+                            <div class="card-header"><span class="cliente-nome">${p.cliente}</span></div>
+                            <div class="total-area">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</div>
+                            <button class="btn-success" onclick="db.ref('pedidos/${child.key}').update({status:'preparando'})">ACEITAR</button>
+                        `;
+                        container.appendChild(li);
                     }
-
-                    li.innerHTML = `
-                        <div class="card-header">
-                            <span class="cliente-nome">${p.cliente}</span>
-                            <span class="hora">${p.horario}</span>
-                        </div>
-                        <p class="info"><b>Endereço:</b> ${p.endereco}</p>
-                        <p class="info"><b>Taxa Entrega:</b> R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2)}</p>
-                        <div class="itens-box">
-                            ${p.itens.map(i => `<b>${i.qtd}x</b> ${i.produto}`).join('<br>')}
-                        </div>
-                        <div class="total-area">TOTAL: R$ ${parseFloat(p.total).toFixed(2)}</div>
-                        <div class="btn-actions">${botoes}</div>
-                    `;
-                    container.appendChild(li);
                 });
 
-                if (abaAtiva === 'pendente' && temPendente) {
-                    audioAlerta.play().catch(() => {});
+                // LÓGICA DE DISPARO
+                if (temPendente && abaAtiva === 'pendente') {
+                    console.log("ALERTA: Pedido novo detectado!");
+                    audioAlerta.play().catch(e => console.log("Navegador bloqueou som:", e));
                 } else {
                     audioAlerta.pause();
                     audioAlerta.currentTime = 0;
@@ -137,55 +102,11 @@
             });
         }
 
-        function concluirPedido(id) {
-            db.ref('pedidos/' + id).once('value', s => {
-                const dados = s.val();
-                dados.concluidoEm = Date.now();
-                db.ref('relatorios').push(dados).then(() => db.ref('pedidos/' + id).remove());
-            });
-        }
-
-        function imprimirPedido(id, pasta) {
-            db.ref(pasta + '/' + id).once('value', (snapshot) => {
-                const p = snapshot.val();
-                const taxa = parseFloat(p.taxaEntrega || 0);
-                const subtotal = parseFloat(p.total) - taxa;
-                const cupom = `
-                    <html>
-                    <body style="font-family:Arial;width:80mm;padding:5px;">
-                        <div style="text-align:center;border-bottom:2px solid #000;padding:10px 0;">
-                            <b style="font-size:22px;">SNOOP LANCHE</b><br>
-                            <span>CUPOM DE ENTREGA</span>
-                        </div>
-                        <div style="padding:10px 0;font-size:18px;">
-                            <b>CLIENTE:</b> ${p.cliente.toUpperCase()}<br>
-                            <b>PGTO:</b> ${p.pagamento || 'Pix'}
-                        </div>
-                        <div style="padding:10px 0;font-size:19px;font-weight:bold;">
-                            ${p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>')}
-                        </div>
-                        <div style="padding:10px 0;border-top:1px solid #000;">
-                            PRODUTOS: R$ ${subtotal.toFixed(2)}<br>
-                            <b>TAXA ENTREGA: R$ ${taxa.toFixed(2)}</b>
-                        </div>
-                        <div style="text-align:center;font-size:26px;font-weight:bold;border:3px solid #000;padding:5px;margin-top:10px;">
-                            TOTAL: R$ ${parseFloat(p.total).toFixed(2)}
-                        </div>
-                    </body>
-                    </html>`;
-                const frame = document.getElementById('iframe-impressao');
-                const doc = frame.contentWindow.document;
-                doc.open(); doc.write(cupom); doc.close();
-                setTimeout(() => { frame.contentWindow.print(); }, 500);
-            });
-        }
-
-        function gerarPDF() {
-            const container = document.getElementById('pedidos-container').cloneNode(true);
-            const win = window.open('', '', 'height=700,width=900');
-            win.document.write('<html><body><h1>Histórico de Vendas</h1>' + container.innerHTML + '</body></html>');
-            win.document.close();
-            win.print();
+        function mudarAba(aba, btn) {
+            abaAtiva = aba;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            carregarDados();
         }
 
         carregarDados();
