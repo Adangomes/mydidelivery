@@ -24,15 +24,18 @@ body {
 }
 
 .admin-header h1 { font-size: 1.4rem; margin: 0; }
+.admin-header span { color: var(--primary); }
+
 .btn-refresh { background: var(--primary); border: none; padding: 10px; border-radius: 5px; font-size: 1.2rem; }
 
-/* ABAS DE NAVEGAÇÃO */
+/* NAVEGAÇÃO POR ABAS */
 .tabs {
     display: flex;
     background: #222;
     position: sticky;
     top: 0;
     z-index: 100;
+    overflow-x: auto;
 }
 
 .tab-btn {
@@ -42,8 +45,9 @@ body {
     border: none;
     color: #888;
     font-weight: bold;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     border-bottom: 3px solid transparent;
+    white-space: nowrap;
 }
 
 .tab-btn.active {
@@ -51,6 +55,11 @@ body {
     border-bottom-color: var(--primary);
     background: rgba(255, 204, 0, 0.05);
 }
+
+.btn-hist { color: #5dade2 !important; }
+
+/* RELATÓRIO PDF */
+.btn-pdf { width: 100%; background: #e74c3c; color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
 /* CARDS DOS PEDIDOS */
 #pedidos-container { padding: 15px; list-style: none; margin: 0; }
@@ -97,6 +106,7 @@ button {
     font-weight: bold;
     font-size: 1rem;
     text-transform: uppercase;
+    cursor: pointer;
 }
 
 .btn-success { background: var(--success); color: white; }
@@ -110,4 +120,4 @@ button {
     z-index: 9999;
     display: flex; justify-content: center; align-items: center;
 }
-#container-ativacao button { width: 80%; background: var(--primary); }
+#container-ativacao button { width: 80%; background: var(--primary); color: black; border-radius: 50px; font-size: 1.1rem; }
