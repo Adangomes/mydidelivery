@@ -116,12 +116,34 @@ button {
 .btn-warning { background: var(--warning); color: white; }
 .btn-info { background: var(--info); color: white; }
 
-/* TELA INICIAL */
+/* TELA INICIAL (AJUSTADA) */
 #container-ativacao {
     position: fixed;
-    top: 0; width: 100%; height: 100%;
+    top: 0; 
+    left: 0; /* ADICIONE ISSO PARA CENTRALIZAR */
+    width: 100%; 
+    height: 100%;
     background: rgba(0,0,0,0.98);
     z-index: 9999;
-    display: flex; justify-content: center; align-items: center;
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
 }
-#container-ativacao button { width: 85%; background: var(--primary); color: black; border-radius: 50px; font-size: 1.2rem; padding: 25px; }
+
+#container-ativacao button { 
+    width: 85%; 
+    background: var(--primary); 
+    color: black; 
+    border-radius: 50px; 
+    font-size: 1.2rem; 
+    padding: 25px; 
+    font-weight: 900;
+    box-shadow: 0 0 20px var(--primary);
+    animation: pulsar 1.5s infinite; /* EFEITO PARA VOCÊ VER O BOTÃO */
+}
+
+@keyframes pulsar {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.05); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
