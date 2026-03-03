@@ -248,6 +248,7 @@ async function processarResumoGeo() {
 }
 
 // FUNÇÃO PARA ENVIAR (WhatsApp + Local para Firebase)
+// --- FUNÇÃO ENVIAR CORRIGIDA ---
 function enviarWhatsApp() {
     const nome = document.getElementById("nomeCliente")?.value || document.getElementById("input-nome")?.value;
     const rua = document.getElementById("rua")?.value || document.getElementById("input-rua")?.value;
@@ -255,6 +256,8 @@ function enviarWhatsApp() {
     const bairro = document.getElementById("bairro")?.value || document.getElementById("input-bairro")?.value;
     const pag = document.getElementById("pagamento")?.value || "A combinar";
     const totalMsg = document.getElementById("resumo-total")?.innerText || "";
+
+    if (!nome || !rua) return alert("Preencha os dados de entrega!");
 
     // 1. FORMATANDO A MENSAGEM DO WHATSAPP
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n`;
@@ -270,25 +273,34 @@ function enviarWhatsApp() {
     msg += ` *Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2)}\n`;
     msg += ` *${totalMsg}*`;
 
-    // 2. SALVAR NO FIREBASE E DEPOIS LIMPAR
+    const urlZap = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`;
+
+    // 2. SALVAR NO FIREBASE E DEPOIS IR PARA O WHATS
+    // Mostra um aviso pro usuário não clicar mil vezes
+    const btn = document.querySelector("#resumo-pedido button");
+    if(btn) btn.innerText = "ENVIANDO...";
+
     if (typeof salvarPedidoFirebase === 'function') {
-        salvarPedidoFirebase({ nome, rua, num, bairro, pag }).then(() => {
-            // SÓ ENTRA AQUI SE DEU CERTO NO FIREBASE
-            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
+        salvarPedidoFirebase({ nome, rua, num, bairro, pag })
+        .then(() => {
+            console.log("Salvo no Firebase!");
+            // Abre o WhatsApp
+            window.location.href = urlZap;
             
-            // --- AQUI QUE O "LIMPA TUDO" DEVE FICAR ---
+            // Limpa o carrinho
             localStorage.removeItem("carrinho");
-            location.reload(); 
-            // -----------------------------------------
-        }).catch(err => {
+        })
+        .catch(err => {
             console.error("Erro Firebase:", err);
-            // Se der erro no Firebase, ainda abre o Whats, mas avisa
-            window.open(`https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`, "_blank");
+            // Mesmo se o Firebase falhar, envia o WhatsApp para não perder a venda
+            window.location.href = urlZap;
             localStorage.removeItem("carrinho");
-            location.reload();
         });
+    } else {
+        // Se não houver firebase configurado, vai direto
+        window.location.href = urlZap;
     }
-} // <--- ESTA É A ÚLTIMA CHAVE DA FUNÇÃO. NÃO PODE TER NADA DEPOIS DELA (A MENOS QUE SEJA OUTRA FUNÇÃO)
+}
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -418,6 +430,7 @@ function salvarPedidoFirebase(dados) {
         obs_cozinha: document.getElementById("obs-pedido")?.value || "Nenhuma"
     });
 }
+
 
 
 
