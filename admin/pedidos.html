@@ -9,8 +9,8 @@
 <body>
     <div id="container-ativacao">
         <div style="text-align: center;">
-            <h2 style="color: #ffcc00; margin-bottom: 20px;">SNOOP LANCHE SISTEMA</h2>
-            <button onclick="ativarSom()">CLIQUE PARA INICIAR E ATIVAR SOM</button>
+            <h2 style="color: #ffcc00; margin-bottom: 20px; font-family: sans-serif;">SNOOP LANCHE SISTEMA</h2>
+            <button onclick="ativarSom()">🔊 CLIQUE PARA INICIAR E ATIVAR SOM</button>
         </div>
     </div>
 
@@ -23,11 +23,11 @@
         <button class="tab-btn active" onclick="mudarAba('pendente', this)">NOVOS</button>
         <button class="tab-btn" onclick="mudarAba('preparando', this)">COZINHA</button>
         <button class="tab-btn" onclick="mudarAba('entrega', this)">ENTREGA</button>
-        <button class="tab-btn btn-hist" onclick="mudarAba('historico', this)">HISTÓRICO</button>
+        <button class="tab-btn btn-hist" onclick="mudarAba('historico', this)">📊 HISTÓRICO</button>
     </nav>
 
     <div id="area-relatorio" style="display:none; padding: 15px;">
-        <button class="btn-pdf" onclick="gerarPDF()">GERAR PDF DO HISTÓRICO</button>
+        <button class="btn-pdf" onclick="gerarPDF()">📄 GERAR PDF DO HISTÓRICO</button>
     </div>
 
     <ul id="pedidos-container"></ul>
@@ -50,22 +50,26 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // CONFIGURAÇÃO DO SOM
+        // --- SISTEMA DE ÁUDIO COM BACKUP ---
         const audioAlerta = new Audio('alert.mpeg');
         audioAlerta.loop = true;
-        audioAlerta.preload = 'auto';
+        
+        // Se o seu alert.mpeg falhar, ele usa este link abaixo automaticamente
+        const somBackup = "https://raw.githubusercontent.com/rafaelbotazini/admin-painel/main/alert.mp3";
 
-        let abaAtiva = 'pendente';
-
-        // FUNÇÃO QUE DESTRAVA O AUDIO NO NAVEGADOR
         function ativarSom() {
             document.getElementById('container-ativacao').style.display = 'none';
+            // Tenta tocar o seu arquivo. Se der erro, troca pelo som de backup da internet
             audioAlerta.play().then(() => {
-                audioAlerta.pause(); // Destrava o audio e pausa até chegar pedido
+                audioAlerta.pause();
                 audioAlerta.currentTime = 0;
-                console.log("Audio liberado com sucesso!");
-            }).catch(e => console.error("Erro ao liberar audio:", e));
+            }).catch(() => {
+                console.log("Arquivo local não carregou, usando backup...");
+                audioAlerta.src = somBackup;
+            });
         }
+
+        let abaAtiva = 'pendente';
 
         function mudarAba(aba, btn) {
             abaAtiva = aba;
@@ -82,36 +86,26 @@
                 const container = document.getElementById('pedidos-container');
                 container.innerHTML = "";
                 let temPendente = false;
-                const agora = Date.now();
-                const trintaDias = 30 * 24 * 60 * 60 * 1000;
 
                 snapshot.forEach(child => {
                     const p = child.val();
                     const id = child.key;
                     const status = p.status || 'pendente';
-                    const timestamp = p.concluidoEm || agora;
 
-                    // Lógica de Limpeza e Filtro
-                    if (abaAtiva === 'historico') {
-                        if (agora - timestamp > trintaDias) {
-                            db.ref('relatorios/' + id).remove();
-                            return;
-                        }
-                    } else {
+                    if (abaAtiva !== 'historico') {
                         if(status === 'pendente') temPendente = true;
                         if(status !== abaAtiva) return;
                     }
 
                     const li = document.createElement('li');
                     li.className = `pedido-card`;
-
+                    
                     let botoes = "";
                     if (abaAtiva === 'pendente') {
                         botoes = `<button class="btn-success" onclick="db.ref('pedidos/${id}').update({status:'preparando'})">ACEITAR PEDIDO</button>`;
                     } else if (abaAtiva === 'preparando') {
-                        botoes = `
-                            <button class="btn-warning" onclick="imprimirPedido('${id}', 'pedidos')">IMPRIMIR CUPOM</button>
-                            <button class="btn-info" onclick="db.ref('pedidos/${id}').update({status:'entrega'})">SAIU PARA ENTREGA</button>`;
+                        botoes = `<button class="btn-warning" onclick="imprimirPedido('${id}', 'pedidos')">IMPRIMIR CUPOM</button>
+                                  <button class="btn-info" onclick="db.ref('pedidos/${id}').update({status:'entrega'})">SAIU PARA ENTREGA</button>`;
                     } else if (abaAtiva === 'entrega') {
                         botoes = `<button class="btn-success" onclick="concluirPedido('${id}')">CONCLUIR E FINALIZAR</button>`;
                     } else {
@@ -134,9 +128,8 @@
                     container.appendChild(li);
                 });
 
-                // GESTÃO DO SOM DE ALERTA
                 if (abaAtiva === 'pendente' && temPendente) {
-                    audioAlerta.play().catch(e => console.log("Aguardando interação."));
+                    audioAlerta.play().catch(() => {});
                 } else {
                     audioAlerta.pause();
                     audioAlerta.currentTime = 0;
@@ -157,35 +150,29 @@
                 const p = snapshot.val();
                 const taxa = parseFloat(p.taxaEntrega || 0);
                 const subtotal = parseFloat(p.total) - taxa;
-
                 const cupom = `
                     <html>
-                    <body style="font-family:Arial,sans-serif; width:80mm; padding:0; margin:0; color:#000;">
-                        <div style="text-align:center; border-bottom:2px solid #000; padding:10px 0;">
-                            <b style="font-size:24px;">SNOOP LANCHE</b><br>
-                            <span style="font-size:18px;">CUPOM DE ENTREGA</span>
+                    <body style="font-family:Arial;width:80mm;padding:5px;">
+                        <div style="text-align:center;border-bottom:2px solid #000;padding:10px 0;">
+                            <b style="font-size:22px;">SNOOP LANCHE</b><br>
+                            <span>CUPOM DE ENTREGA</span>
                         </div>
-                        <div style="padding:10px 0; font-size:18px; border-bottom:1px dashed #000;">
+                        <div style="padding:10px 0;font-size:18px;">
                             <b>CLIENTE:</b> ${p.cliente.toUpperCase()}<br>
-                            <b>HORA:</b> ${p.horario}<br>
                             <b>PGTO:</b> ${p.pagamento || 'Pix'}
                         </div>
-                        <div style="padding:10px 0; font-size:20px; font-weight:bold;">
+                        <div style="padding:10px 0;font-size:19px;font-weight:bold;">
                             ${p.itens.map(i => `${i.qtd}x ${i.produto}`).join('<br>')}
                         </div>
-                        <div style="padding:10px 0; font-size:19px; border-top:1px dashed #000;">
-                            <b>ENDEREÇO:</b><br>${p.endereco}
-                        </div>
-                        <div style="padding:10px 0; font-size:18px; border-top:1px solid #000; margin-top:5px;">
+                        <div style="padding:10px 0;border-top:1px solid #000;">
                             PRODUTOS: R$ ${subtotal.toFixed(2)}<br>
                             <b>TAXA ENTREGA: R$ ${taxa.toFixed(2)}</b>
                         </div>
-                        <div style="text-align:center; font-size:28px; font-weight:bold; margin-top:10px; border:3px solid #000; padding:5px;">
+                        <div style="text-align:center;font-size:26px;font-weight:bold;border:3px solid #000;padding:5px;margin-top:10px;">
                             TOTAL: R$ ${parseFloat(p.total).toFixed(2)}
                         </div>
                     </body>
-                    </html>
-                `;
+                    </html>`;
                 const frame = document.getElementById('iframe-impressao');
                 const doc = frame.contentWindow.document;
                 doc.open(); doc.write(cupom); doc.close();
@@ -196,12 +183,7 @@
         function gerarPDF() {
             const container = document.getElementById('pedidos-container').cloneNode(true);
             const win = window.open('', '', 'height=700,width=900');
-            win.document.write('<html><head><title>Relatório Snoop Lanche</title>');
-            win.document.write('<style>body{font-family:sans-serif; color:black;} .pedido-card{border-bottom:2px solid black; padding:20px; list-style:none;} .btn-actions{display:none;}</style>');
-            win.document.write('</head><body>');
-            win.document.write('<h1>Relatório de Vendas (30 dias)</h1>');
-            win.document.write(container.innerHTML);
-            win.document.write('</body></html>');
+            win.document.write('<html><body><h1>Histórico de Vendas</h1>' + container.innerHTML + '</body></html>');
             win.document.close();
             win.print();
         }
