@@ -8,7 +8,10 @@
 </head>
 <body>
     <div id="container-ativacao">
-        <button onclick="ativarSom()">INICIAR E ATIVAR SOM</button>
+        <div style="text-align: center;">
+            <h2 style="color: #ffcc00; margin-bottom: 20px;">SNOOP LANCHE SISTEMA</h2>
+            <button onclick="ativarSom()">CLIQUE PARA INICIAR E ATIVAR SOM</button>
+        </div>
     </div>
 
     <header class="admin-header">
@@ -47,13 +50,21 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // CONFIGURAÇÃO DO SOM
         const audioAlerta = new Audio('alert.mpeg');
         audioAlerta.loop = true;
+        audioAlerta.preload = 'auto';
+
         let abaAtiva = 'pendente';
 
+        // FUNÇÃO QUE DESTRAVA O AUDIO NO NAVEGADOR
         function ativarSom() {
             document.getElementById('container-ativacao').style.display = 'none';
-            audioAlerta.play().then(() => audioAlerta.pause());
+            audioAlerta.play().then(() => {
+                audioAlerta.pause(); // Destrava o audio e pausa até chegar pedido
+                audioAlerta.currentTime = 0;
+                console.log("Audio liberado com sucesso!");
+            }).catch(e => console.error("Erro ao liberar audio:", e));
         }
 
         function mudarAba(aba, btn) {
@@ -66,18 +77,27 @@
 
         function carregarDados() {
             const path = (abaAtiva === 'historico') ? 'relatorios' : 'pedidos';
+            
             db.ref(path).on('value', (snapshot) => {
                 const container = document.getElementById('pedidos-container');
                 container.innerHTML = "";
                 let temPendente = false;
                 const agora = Date.now();
+                const trintaDias = 30 * 24 * 60 * 60 * 1000;
 
                 snapshot.forEach(child => {
                     const p = child.val();
                     const id = child.key;
                     const status = p.status || 'pendente';
-                    
-                    if (abaAtiva !== 'historico') {
+                    const timestamp = p.concluidoEm || agora;
+
+                    // Lógica de Limpeza e Filtro
+                    if (abaAtiva === 'historico') {
+                        if (agora - timestamp > trintaDias) {
+                            db.ref('relatorios/' + id).remove();
+                            return;
+                        }
+                    } else {
                         if(status === 'pendente') temPendente = true;
                         if(status !== abaAtiva) return;
                     }
@@ -104,7 +124,7 @@
                             <span class="hora">${p.horario}</span>
                         </div>
                         <p class="info"><b>Endereço:</b> ${p.endereco}</p>
-                        <p class="info"><b>Entrega:</b> R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2)}</p>
+                        <p class="info"><b>Taxa Entrega:</b> R$ ${parseFloat(p.taxaEntrega || 0).toFixed(2)}</p>
                         <div class="itens-box">
                             ${p.itens.map(i => `<b>${i.qtd}x</b> ${i.produto}`).join('<br>')}
                         </div>
@@ -114,8 +134,13 @@
                     container.appendChild(li);
                 });
 
-                if (abaAtiva === 'pendente' && temPendente) audioAlerta.play().catch(() => {});
-                else { audioAlerta.pause(); audioAlerta.currentTime = 0; }
+                // GESTÃO DO SOM DE ALERTA
+                if (abaAtiva === 'pendente' && temPendente) {
+                    audioAlerta.play().catch(e => console.log("Aguardando interação."));
+                } else {
+                    audioAlerta.pause();
+                    audioAlerta.currentTime = 0;
+                }
             });
         }
 
@@ -158,9 +183,6 @@
                         <div style="text-align:center; font-size:28px; font-weight:bold; margin-top:10px; border:3px solid #000; padding:5px;">
                             TOTAL: R$ ${parseFloat(p.total).toFixed(2)}
                         </div>
-                        <div style="text-align:center; margin-top:10px; font-size:14px;">
-                            Obrigado pela preferência!
-                        </div>
                     </body>
                     </html>
                 `;
@@ -174,9 +196,10 @@
         function gerarPDF() {
             const container = document.getElementById('pedidos-container').cloneNode(true);
             const win = window.open('', '', 'height=700,width=900');
-            win.document.write('<html><head><title>Snoop Lanche - Relatório</title>');
-            win.document.write('<style>body{font-family:sans-serif; color:black;} .pedido-card{border-bottom:2px solid #000; padding:15px; list-style:none;} .btn-actions{display:none;}</style>');
-            win.document.write('</head><body><h1>Histórico de Vendas</h1>');
+            win.document.write('<html><head><title>Relatório Snoop Lanche</title>');
+            win.document.write('<style>body{font-family:sans-serif; color:black;} .pedido-card{border-bottom:2px solid black; padding:20px; list-style:none;} .btn-actions{display:none;}</style>');
+            win.document.write('</head><body>');
+            win.document.write('<h1>Relatório de Vendas (30 dias)</h1>');
             win.document.write(container.innerHTML);
             win.document.write('</body></html>');
             win.document.close();
