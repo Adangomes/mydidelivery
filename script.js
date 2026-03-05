@@ -1,6 +1,6 @@
 // --- CONFIGURAÇÕES GLOBAIS ---
 const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";
-const RESTAURANTE_COORD = [-49.024909, -26.464334]; 
+const RESTAURANTE_COORD = [-49.0759, -26.4815];
 const TAXA_BASE = 5;
 const VALOR_POR_KM = 4.0;
 const WHATSAPP_NUMERO = "5547992745867";
@@ -202,48 +202,61 @@ function removerItem(idx) {
 // --- 4. RESUMO E ENTREGA (GEOAPIFY) ---
 // --- 4. RESUMO E ENTREGA (GEOAPIFY + LOADING) ---
 async function processarResumoGeo() {
+    // Busca os dados dos campos (suporta os IDs novos e antigos)
     const nome = document.getElementById("nomeCliente")?.value || document.getElementById("input-nome")?.value;
     const rua = document.getElementById("rua")?.value || document.getElementById("input-rua")?.value;
     const num = document.getElementById("numero")?.value || document.getElementById("input-numero")?.value;
+    const bairro = document.getElementById("bairro")?.value || "";
+    const cidadeSel = document.getElementById("cidade")?.value || "Guaramirim";
 
-    if (!nome || !rua || !num) return alert("Por favor, preencha Nome, Rua e Número para calcular a entrega!");
-    
-// 1. ATIVA O EFEITO (O Círculo Girando)
-    const loader = document.getElementById("loading-geral");
-    if (loader) {
-        loader.style.display = "flex"; 
+    // Validação básica
+    if (!nome || !rua || !num) {
+        return alert("Por favor, preencha Nome, Rua e Número para calcular a entrega!");
     }
+    
+    // 1. ATIVA O LOADING
+    const loader = document.getElementById("loading-geral");
+    if (loader) loader.style.display = "flex";
 
     try {
-        // 2. CHAMADA DA API GEOAPIFY
-        const query = encodeURIComponent(`${rua}, ${num}, Guaramirim, SC, Brasil`);
+        // 2. BUSCA NO GEOAPIFY (Refinada com Bairro e Cidade selecionada)
+        const query = encodeURIComponent(`${rua}, ${num}, ${bairro}, ${cidadeSel}, SC, Brasil`);
         const resp = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${query}&apiKey=${GEOAPIFY_KEY}`);
         const data = await resp.json();
 
-        // 3. FORÇAR UM DELAY DE 2 SEGUNDOS (Para o usuário ver que está processando)
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Pequena pausa para o usuário ver que o cálculo está sendo feito
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
         if (data.features && data.features.length > 0) {
-            const [lon, lat] = data.features[0].geometry.coordinates;
-            const dist = calcularDistancia(RESTAURANTE_COORD[1], RESTAURANTE_COORD[0], lat, lon);
+            // API retorna coordenadas em [Longitude, Latitude]
+            const [lonBusca, latBusca] = data.features[0].geometry.coordinates;
             
-            // Cálculo da taxa: Base + (KM * Valor)
+            // 3. CÁLCULO DA DISTÂNCIA REAL
+            // Passamos a Lat/Lon do Restaurante e a Lat/Lon da busca
+            // Nota: RESTAURANTE_COORD[1] é Latitude (-26...) e RESTAURANTE_COORD[0] é Longitude (-49...)
+            const dist = calcularDistancia(RESTAURANTE_COORD[1], RESTAURANTE_COORD[0], latBusca, lonBusca);
+            
+            // 4. DEFINIÇÃO DA TAXA
             taxaEntregaCalculada = TAXA_BASE + (dist * VALOR_POR_KM);
+            
+            // Garante que a taxa nunca seja menor que a mínima ou um erro (NaN)
+            if (taxaEntregaCalculada < TAXA_BASE || isNaN(taxaEntregaCalculada)) {
+                taxaEntregaCalculada = TAXA_BASE;
+            }
         } else {
-            // Se não achar a rua, coloca a taxa base padrão
+            // Se não encontrar o endereço, usa a taxa base
             taxaEntregaCalculada = TAXA_BASE;
         }
 
-        // 4. MOSTRAR RESULTADO FINAL
+        // 5. VAI PARA A TELA DE RESUMO
         mostrarResumoFinal();
 
     } catch (e) {
-        console.error("Erro ao calcular taxa:", e);
+        console.error("Erro no cálculo de entrega:", e);
         taxaEntregaCalculada = TAXA_BASE;
         mostrarResumoFinal();
     } finally {
-        // 5. ESCONDER O LOADING
-        if(loader) loader.style.display = "none";
+        if (loader) loader.style.display = "none";
     }
 }
 
@@ -444,6 +457,14 @@ function salvarPedidoFirebase(dados) {
     });
 }
 
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Raio da Terra em KM
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+}
 
 
 
