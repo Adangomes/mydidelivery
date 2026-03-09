@@ -2,7 +2,7 @@
 
 const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";
 
-const RESTAURANTE_COORD = [-49.024909, -26.464334]; 
+const RESTAURANTE_COORD = [-26.462521, -49.022055]; 
 
 const TAXA_BASE = 5;
 
@@ -887,3 +887,4 @@ function salvarPedidoFirebase(dados) {
     });
 
 }
+
