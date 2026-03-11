@@ -204,25 +204,48 @@ function removerItem(idx) {
 // --- 4. RESUMO E ENTREGA (GEOAPIFY + LOADING) ---
 async function processarResumoGeo() {
     const nome = document.getElementById("nomeCliente")?.value || document.getElementById("input-nome")?.value;
-    const rua = document.getElementById("rua")?.value || document.getElementById("input-rua")?.value;
+    let ruaInput = document.getElementById("rua")?.value || document.getElementById("input-rua")?.value;
     const num = document.getElementById("numero")?.value || document.getElementById("input-numero")?.value;
+    const bairro = document.getElementById("bairro")?.value || document.getElementById("input-bairro")?.value || "";
 
-    if (!nome || !rua || !num) return alert("Por favor, preencha Nome, Rua e Número!");
+    if (!nome || !ruaInput || !num) return alert("Por favor, preencha Nome, Rua e Número!");
+
+    // --- LÓGICA DE LIMPEZA E FORMATAÇÃO ---
+    let ruaFormatada = ruaInput.trim();
+    const termosRua = ["rua", "av", "avenida", "travessa", "rod", "rodovia", "alameda"];
     
+    // Verifica se o que o cliente digitou já começa com algum termo de endereço
+    const jaTemTermo = termosRua.some(termo => ruaFormatada.toLowerCase().startsWith(termo));
+
+    // Se NÃO tiver o termo, a gente adiciona "Rua " na frente para ajudar o GPS
+    if (!jaTemTermo) {
+        ruaFormatada = "Rua " + ruaFormatada;
+    }
+
     const loader = document.getElementById("loading-geral");
     if (loader) loader.style.display = "flex"; 
 
     try {
-        const query = encodeURIComponent(`${rua}, ${num}, Guaramirim, SC, Brasil`);
+        // Agora usamos a ruaFormatada e removemos o "Guaramirim" fixo para aceitar Jaraguá
+        const query = encodeURIComponent(`${ruaFormatada}, ${num}, ${bairro}, SC, Brasil`);
         const resp = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${query}&apiKey=${GEOAPIFY_KEY}`);
         const data = await resp.json();
 
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Aguarda um pouquinho para o loader aparecer (opcional)
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
         if (data.features && data.features.length > 0) {
             const [lon, lat] = data.features[0].geometry.coordinates;
+            
+            // Ordem correta das coordenadas do Snoop Lanche
             const dist = calcularDistancia(RESTAURANTE_COORD[0], RESTAURANTE_COORD[1], lat, lon);
-            taxaEntregaCalculada = TAXA_BASE + (dist * VALOR_POR_KM);
+            
+            // Cálculo da taxa com limitador de segurança
+            let calculo = TAXA_BASE + (dist * VALOR_POR_KM);
+            
+            // Se der mais de 25 reais de taxa, a gente trava em 20 (segurança contra bugs de distância)
+            taxaEntregaCalculada = calculo > 25 ? 20.00 : calculo;
+
         } else {
             taxaEntregaCalculada = TAXA_BASE;
         }
@@ -235,6 +258,7 @@ async function processarResumoGeo() {
         if(loader) loader.style.display = "none";
     }
 }
+
 
 // --- WHATSAPP (SEM FIREBASE) ---
 function enviarWhatsApp() {
