@@ -405,93 +405,73 @@ function removerItem(idx) {
 // --- 4. RESUMO E ENTREGA (GEOAPIFY + LOADING) ---
 
 async function processarResumoGeo() {
-
     const nome = document.getElementById("nomeCliente")?.value || document.getElementById("input-nome")?.value;
-
     const rua = document.getElementById("rua")?.value || document.getElementById("input-rua")?.value;
-
     const num = document.getElementById("numero")?.value || document.getElementById("input-numero")?.value;
-
-
-
-    if (!nome || !rua || !num) return alert("Por favor, preencha Nome, Rua e Número para calcular a entrega!");
-
-    
-
-// 1. ATIVA O EFEITO (O Círculo Girando)
-
+    const bairro = document.getElementById("bairro")?.value || document.getElementById("input-bairro")?.value;
+    if (!nome || !rua || !num) {
+        alert("Por favor, preencha Nome, Rua e Número para calcular a entrega!");
+        return;
+    }
     const loader = document.getElementById("loading-geral");
-
-    if (loader) {
-
-        loader.style.display = "flex"; 
-
-    }
-
-
-
+    if (loader) loader.style.display = "flex";
     try {
-
-        // 2. CHAMADA DA API GEOAPIFY
-
-        const query = encodeURIComponent(`${rua}, ${num}, Guaramirim, SC, Brasil`);
-
-        const resp = await fetch(`https://api.geoapify.com/v1/geocode/search?text=${query}&apiKey=${GEOAPIFY_KEY}`);
-
+        const query = encodeURIComponent(`${rua}, ${num}, ${bairro}`);
+        const url = `https://api.geoapify.com/v1/geocode/search?text=${query}
+        &filter=countrycode:br
+        &bias=proximity:-48.997615,-26.472038
+        &limit=5
+        &apiKey=${GEOAPIFY_KEY}`;
+        const resp = await fetch(url);
         const data = await resp.json();
-
-
-
-        // 3. FORÇAR UM DELAY DE 2 SEGUNDOS (Para o usuário ver que está processando)
-
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-
-
+        await new Promise(r => setTimeout(r, 1200));
         if (data.features && data.features.length > 0) {
+            let resultadoValido = null;
+            for (const lugar of data.features) {
+                const cidade = (lugar.properties.city || "").toLowerCase();
+                if (
+                    cidade.includes("guaramirim") ||
+                    cidade.includes("jaraguá") ||
+                    cidade.includes("schroeder")
+                ) {
+                    resultadoValido = lugar;
+                    break;
+                }
+            }
+            if (!resultadoValido) {
+                alert("Endereço fora da área de entrega.");
+                taxaEntregaCalculada = TAXA_BASE;
+                mostrarResumoFinal();
+                return;
 
-            const [lon, lat] = data.features[0].geometry.coordinates;
+            }
+            const lon = resultadoValido.geometry.coordinates[0];
+            const lat = resultadoValido.geometry.coordinates[1];
 
-            const dist = calcularDistancia(RESTAURANTE_COORD[1], RESTAURANTE_COORD[0], lat, lon);
-
-            
-
-            // Cálculo da taxa: Base + (KM * Valor)
-
-            taxaEntregaCalculada = TAXA_BASE + (dist * VALOR_POR_KM);
-
+            const dist = calcularDistancia(
+                RESTAURANTE_COORD[0],
+                RESTAURANTE_COORD[1],
+                lat,
+                lon
+            );
+            console.log("Distância calculada:", dist);
+            if (dist > 40) {
+                alert("Endereço fora da área de entrega.");
+                taxaEntregaCalculada = TAXA_BASE;
+            } else {
+                taxaEntregaCalculada = TAXA_BASE + (dist * VALOR_POR_KM);
+            }
         } else {
-
-            // Se não achar a rua, coloca a taxa base padrão
-
             taxaEntregaCalculada = TAXA_BASE;
-
         }
-
-
-
-        // 4. MOSTRAR RESULTADO FINAL
-
         mostrarResumoFinal();
-
-
-
     } catch (e) {
-
         console.error("Erro ao calcular taxa:", e);
-
         taxaEntregaCalculada = TAXA_BASE;
-
         mostrarResumoFinal();
-
     } finally {
-
-        // 5. ESCONDER O LOADING
-
-        if(loader) loader.style.display = "none";
-
+        if (loader) loader.style.display = "none";
     }
-
 }
 
 
@@ -887,5 +867,6 @@ function salvarPedidoFirebase(dados) {
     });
 
 }
+
 
 
