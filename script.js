@@ -221,7 +221,7 @@ async function processarResumoGeo() {
 
         if (data.features && data.features.length > 0) {
             const [lon, lat] = data.features[0].geometry.coordinates;
-            const dist = calcularDistancia(RESTAURANTE_COORD[1], RESTAURANTE_COORD[0], lat, lon);
+            const dist = calcularDistancia(RESTAURANTE_COORD[0], RESTAURANTE_COORD[1], lat, lon);
             taxaEntregaCalculada = TAXA_BASE + (dist * VALOR_POR_KM);
         } else {
             taxaEntregaCalculada = TAXA_BASE;
