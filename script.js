@@ -2,7 +2,7 @@
 const GEOAPIFY_KEY = "208f6874a48c45e68761f3d994db6775";
 const RESTAURANTE_COORD = [-26.472038, -48.997615]; 
 const TAXA_BASE = 5;
-const VALOR_POR_KM = 4.0;
+const VALOR_POR_KM = 1.50;
 const WHATSAPP_NUMERO = "5547992745867";
 
 let carrinho = [];
