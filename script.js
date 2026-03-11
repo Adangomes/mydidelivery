@@ -419,7 +419,7 @@ async function processarResumoGeo() {
         const query = encodeURIComponent(`${rua}, ${num}, ${bairro}`);
         const url = `https://api.geoapify.com/v1/geocode/search?text=${query}
         &filter=countrycode:br
-        &bias=proximity:-48.997615,-26.472038
+        &bias=proximity:-49.003861,-26.471628
         &limit=5
         &apiKey=${GEOAPIFY_KEY}`;
         const resp = await fetch(url);
@@ -867,6 +867,7 @@ function salvarPedidoFirebase(dados) {
     });
 
 }
+
 
 
 
