@@ -272,6 +272,26 @@ function enviarWhatsApp() {
 
     if (!nome || !rua) return alert("Preencha os dados de entrega!");
 
+    // 🔥 CALCULA TOTAL NUMÉRICO
+    let totalNumerico = 0;
+    carrinho.forEach(i => totalNumerico += i.price);
+    totalNumerico += taxaEntregaCalculada - descontoAplicado;
+
+    // 🔥 SALVA NO FIREBASE
+    const novoPedidoRef = db.ref("pedidos/snoop_lanche").push();
+
+    novoPedidoRef.set({
+        cliente: nome,
+        endereco: `${rua}, ${num} - ${bairro}`,
+        pagamento: pag,
+        itens: carrinho,
+        total: totalNumerico,
+        obs: obs,
+        status: "novo",
+        data: new Date().toISOString()
+    });
+
+    // 🔥 MENSAGEM WHATSAPP
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n`;
     msg += `------------------------------\n`;
     msg += `*Cliente:* ${nome}\n`;
@@ -284,11 +304,11 @@ function enviarWhatsApp() {
     carrinho.forEach(i => msg += `• ${i.title} - R$ ${i.price.toFixed(2)}\n`);
     msg += `------------------------------\n`;
     msg += `*Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2)}\n`;
-    msg += `*${totalMsg}*`;
+    msg += `*Total:* R$ ${totalNumerico.toFixed(2)}`;
 
     const urlZap = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`;
 
-    // Trava botão e limpa tudo antes de enviar
+    // 🔒 trava botão
     const btnWhats = document.querySelector("#resumo-pedido button");
     if(btnWhats) {
         btnWhats.innerText = "ENVIANDO...";
@@ -297,10 +317,9 @@ function enviarWhatsApp() {
 
     localStorage.removeItem("carrinho");
     window.location.href = urlZap;
-    
+
     setTimeout(() => { location.reload(); }, 2000);
 }
-
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
