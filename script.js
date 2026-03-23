@@ -311,13 +311,21 @@ async function enviarWhatsApp() {
 }
 
 // 2. NOVA FUNÇÃO DE SALVAMENTO (REGISTRO BLINDADO)
+// 2. NOVA FUNÇÃO DE SALVAMENTO (REGISTRO BLINDADO COM AUTH)
 function salvarPedidoFirebase(dados) {
-    if (!db) return Promise.resolve();
+    // Verifica se o Firebase e o usuário autenticado existem
+    const user = firebase.auth().currentUser;
+    
+    if (!db || !user) {
+        console.warn("Aguardando autenticação para salvar faturamento...");
+        return Promise.resolve(); 
+    }
+
     if (dados.nome.toLowerCase().includes("teste")) return Promise.resolve();
 
-    const ID_LOJA = "snoop_lanche"; 
+    const ID_LOJA = "snoop_lanches"; 
 
-    // REGISTRO ACUMULADO (Para sua comissão no Painel Admin)
+    // REGISTRO ACUMULADO (Sua comissão de 10% protegida pelo Auth)
     db.ref(`faturamento_acumulado/${ID_LOJA}/vendas`).transaction((val) => (val || 0) + dados.subtotal);
 
     // REGISTRO DETALHADO (Para consulta da loja)
@@ -333,9 +341,11 @@ function salvarPedidoFirebase(dados) {
         total: dados.totalGeral,
         horario: new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}),
         obs: dados.obs,
+        uid: user.uid, // Agora guardamos o ID único do cliente
         data: new Date().toISOString()
     });
 }
+
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
