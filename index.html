@@ -132,6 +132,7 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
     const firebaseConfig = {
@@ -144,12 +145,22 @@
         appId: "1:884850608032:web:79db6983346c3c20edc6c5"
     };
 
+    // Inicializa o Firebase
     firebase.initializeApp(firebaseConfig);
 
-   
+    // --- LOGIN ANÔNIMO PARA SEGURANÇA DO MYDI DELIVERY ---
+    firebase.auth().signInAnonymously()
+        .then(() => {
+            console.log("Snoop Lanches: Autenticado com sucesso! ✅");
+        })
+        .catch((error) => {
+            console.error("Erro na autenticação:", error.message);
+        });
+
     const db = firebase.database();
 </script>
 <script src="script.js"></script>
+
 </body>
 </html>
 
