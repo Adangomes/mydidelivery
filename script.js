@@ -494,11 +494,12 @@ function abrirCarrinho() {
 }
 
 // Atualize a função visual do status (aquela que fica no topo do site)
+// No seu carregarStatusLoja, mude para usar a sua função isLojaAberta()
 function carregarStatusLoja() {
     const el = document.getElementById("status-loja");
     if (!el) return;
     
-    const aberto = isLojaAberta();
+    const aberto = isLojaAberta(); // Usa a regra de 16:00 às 22:30
     el.innerText = aberto ? "ABERTO" : "FECHADO";
     el.className = `status ${aberto ? 'aberto' : 'fechado'}`;
 }
