@@ -312,23 +312,25 @@ async function enviarWhatsApp() {
 
 // 2. NOVA FUNÇÃO DE SALVAMENTO (REGISTRO BLINDADO)
 // 2. NOVA FUNÇÃO DE SALVAMENTO (REGISTRO BLINDADO COM AUTH)
-function salvarPedidoFirebase(dados) {
-    // Verifica se o Firebase e o usuário autenticado existem
-    const user = firebase.auth().currentUser;
-    
-    if (!db || !user) {
-        console.warn("Aguardando autenticação para salvar faturamento...");
-        return Promise.resolve(); 
+async function salvarPedidoFirebase(dados) {
+    // 1. Força autenticação anônima se não houver usuário
+    if (!firebase.auth().currentUser) {
+        try {
+            await firebase.auth().signInAnonymously();
+        } catch (e) {
+            console.error("Erro ao autenticar cliente:", e);
+            return; 
+        }
     }
 
-    if (dados.nome.toLowerCase().includes("teste")) return Promise.resolve();
-
+    const user = firebase.auth().currentUser;
     const ID_LOJA = "snoop_lanches"; 
 
-    // REGISTRO ACUMULADO (Sua comissão de 10% protegida pelo Auth)
-    db.ref(`faturamento_acumulado/${ID_LOJA}/vendas`).transaction((val) => (val || 0) + dados.subtotal);
+    // 2. REGISTRO ACUMULADO - Usando o valor do servidor para evitar bugs de soma local
+    const faturamentoRef = db.ref(`faturamento_acumulado/${ID_LOJA}/vendas`);
+    await faturamentoRef.transaction((val) => (val || 0) + dados.subtotal);
 
-    // REGISTRO DETALHADO (Para consulta da loja)
+    // 3. REGISTRO DETALHADO
     const novoPedidoRef = db.ref(`pedidos/${ID_LOJA}`).push();
     return novoPedidoRef.set({
         cliente: dados.nome,
@@ -337,15 +339,12 @@ function salvarPedidoFirebase(dados) {
         itens: carrinho.map(i => ({ produto: i.title, qtd: 1, precoUn: i.price })),
         subtotal: dados.subtotal,
         taxaEntrega: taxaEntregaCalculada,
-        desconto: descontoAplicado,
         total: dados.totalGeral,
-        horario: new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}),
-        obs: dados.obs,
-        uid: user.uid, // Agora guardamos o ID único do cliente
+        horario: new Date().toLocaleTimeString('pt-BR'),
+        uid: user.uid,
         data: new Date().toISOString()
     });
 }
-
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371;
     const dLat = (lat2 - lat1) * Math.PI / 180;
