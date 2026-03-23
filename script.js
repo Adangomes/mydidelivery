@@ -413,7 +413,7 @@ function voltarParaEntrega() {
 
 
 // --- NOVAS CONFIGURAÇÕES DE HORÁRIO ---
-const H_ABERTURA = 10;
+const H_ABERTURA = 18;
 const M_ABERTURA = 00; // 18:00
 const H_FECHAMENTO = 22;
 const M_FECHAMENTO = 30; // 22:30
