@@ -261,37 +261,30 @@ async function processarResumoGeo() {
 
 
 // --- WHATSAPP (SEM FIREBASE) ---
-function enviarWhatsApp() {
+// 1. NOVA FUNÇÃO DE ENVIO (CHAMA O SALVAMENTO ANTES)
+async function enviarWhatsApp() {
     const nome = document.getElementById("nomeCliente")?.value || document.getElementById("input-nome")?.value;
     const rua = document.getElementById("rua")?.value || document.getElementById("input-rua")?.value;
     const num = document.getElementById("numero")?.value || document.getElementById("input-numero")?.value;
     const bairro = document.getElementById("bairro")?.value || document.getElementById("input-bairro")?.value;
     const pag = document.getElementById("pagamento")?.value || "A combinar";
-    const totalMsg = document.getElementById("resumo-total")?.innerText || "";
     const obs = document.getElementById("obs-pedido")?.value || "Nenhuma";
 
     if (!nome || !rua) return alert("Preencha os dados de entrega!");
 
-    // 🔥 CALCULA TOTAL NUMÉRICO
-    let totalNumerico = 0;
-    carrinho.forEach(i => totalNumerico += i.price);
-    totalNumerico += taxaEntregaCalculada - descontoAplicado;
+    const subtotal = carrinho.reduce((acc, i) => acc + i.price, 0);
+    const totalGeral = subtotal + taxaEntregaCalculada - descontoAplicado;
 
-    // 🔥 SALVA NO FIREBASE
-    const novoPedidoRef = db.ref("pedidos/snoop_lanche").push();
+    // --- SALVAMENTO SEGURO ---
+    // Tentamos salvar no Firebase. Se demorar mais de 3s, ele pula pro Zap para não travar o cliente.
+    try {
+        const timeoutFirebase = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 3000));
+        await Promise.race([salvarPedidoFirebase({ nome, rua, num, bairro, pag, obs, subtotal, totalGeral }), timeoutFirebase]);
+    } catch (e) {
+        console.warn("Firebase demorou ou falhou, seguindo para o WhatsApp...");
+    }
 
-    novoPedidoRef.set({
-        cliente: nome,
-        endereco: `${rua}, ${num} - ${bairro}`,
-        pagamento: pag,
-        itens: carrinho,
-        total: totalNumerico,
-        obs: obs,
-        status: "novo",
-        data: new Date().toISOString()
-    });
-
-    // 🔥 MENSAGEM WHATSAPP
+    // --- MONTAGEM DA MENSAGEM ---
     let msg = `*NOVO PEDIDO - SNOOP LANCHE*\n`;
     msg += `------------------------------\n`;
     msg += `*Cliente:* ${nome}\n`;
@@ -304,21 +297,44 @@ function enviarWhatsApp() {
     carrinho.forEach(i => msg += `• ${i.title} - R$ ${i.price.toFixed(2)}\n`);
     msg += `------------------------------\n`;
     msg += `*Taxa de Entrega:* R$ ${taxaEntregaCalculada.toFixed(2)}\n`;
-    msg += `*Total:* R$ ${totalNumerico.toFixed(2)}`;
+    msg += `*Total:* R$ ${totalGeral.toFixed(2)}`;
 
     const urlZap = `https://api.whatsapp.com/send?phone=${WHATSAPP_NUMERO}&text=${encodeURIComponent(msg)}`;
 
-    // 🔒 trava botão
+    // Bloqueia botão e limpa carrinho
     const btnWhats = document.querySelector("#resumo-pedido button");
-    if(btnWhats) {
-        btnWhats.innerText = "ENVIANDO...";
-        btnWhats.disabled = true;
-    }
+    if(btnWhats) { btnWhats.innerText = "ENVIANDO..."; btnWhats.disabled = true; }
 
     localStorage.removeItem("carrinho");
     window.location.href = urlZap;
-
     setTimeout(() => { location.reload(); }, 2000);
+}
+
+// 2. NOVA FUNÇÃO DE SALVAMENTO (REGISTRO BLINDADO)
+function salvarPedidoFirebase(dados) {
+    if (!db) return Promise.resolve();
+    if (dados.nome.toLowerCase().includes("teste")) return Promise.resolve();
+
+    const ID_LOJA = "snoop_lanche"; 
+
+    // REGISTRO ACUMULADO (Para sua comissão no Painel Admin)
+    db.ref(`faturamento_acumulado/${ID_LOJA}/vendas`).transaction((val) => (val || 0) + dados.subtotal);
+
+    // REGISTRO DETALHADO (Para consulta da loja)
+    const novoPedidoRef = db.ref(`pedidos/${ID_LOJA}`).push();
+    return novoPedidoRef.set({
+        cliente: dados.nome,
+        endereco: `${dados.rua}, ${dados.num} - ${dados.bairro}`,
+        pagamento: dados.pag,
+        itens: carrinho.map(i => ({ produto: i.title, qtd: 1, precoUn: i.price })),
+        subtotal: dados.subtotal,
+        taxaEntrega: taxaEntregaCalculada,
+        desconto: descontoAplicado,
+        total: dados.totalGeral,
+        horario: new Date().toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'}),
+        obs: dados.obs,
+        data: new Date().toISOString()
+    });
 }
 function calcularDistancia(lat1, lon1, lat2, lon2) {
     const R = 6371;
