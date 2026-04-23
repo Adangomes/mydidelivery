@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mydi Delivery</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <header>
+        <h1>MYDI DELIVERY</h1>
+        <div class="search-bar">
+            <input type="text" placeholder="Pesquisar...">
+        </div>
+    </header>
+
+    <main class="product-grid">
+        <div class="card" onclick="abrirProduto('X-Burger', 'R$ 19,90', 'burger-img.png')">
+            <img src="https://via.placeholder.com/150" alt="Burger">
+            <h3>X-Burger</h3>
+            <p class="price">R$ 19,90</p>
+        </div>
+        <div class="card" onclick="abrirProduto('X-Burger Especial', 'R$ 25,90', 'burger-img.png')">
+            <img src="https://via.placeholder.com/150" alt="Burger">
+            <h3>X-Burger Especial</h3>
+            <p class="price">R$ 25,90</p>
+        </div>
+    </main>
+
+    <div id="modalProduto" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="fecharModal()">&times;</span>
+            <img id="modalImg" src="" alt="Produto Grande">
+            <h2 id="modalNome"></h2>
+            <p id="modalPreco" class="price"></p>
+            <p>Descrição detalhada do produto delicioso aqui.</p>
+            <button class="add-cart">Adicionar ao Carrinho</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
