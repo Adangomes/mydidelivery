@@ -3,42 +3,226 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mydi Delivery</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Mydi Delivery - Trabalho Faculdade</title>
+    
+    <style>
+        /* CSS - Estilização da Interface */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            text-align: center;
+            background: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 24px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+        }
+
+        .search-bar {
+            width: 90%;
+            margin: 0 auto;
+            border: 2px solid #000;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            padding: 5px 10px;
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            padding: 8px;
+            font-size: 16px;
+        }
+
+        /* Grid de Produtos */
+        .product-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            padding: 20px;
+            max-width: 500px;
+        }
+
+        .card {
+            background: white;
+            border: 2px solid #000;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-align: center;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .card img {
+            width: 100%;
+            height: auto;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            margin: 10px 0 5px;
+            font-size: 16px;
+        }
+
+        .price {
+            color: #D32F2F;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        /* MODAL (O segredo da função de abrir grande) */
+        .modal {
+            display: none; /* Escondido por padrão */
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 85%;
+            max-width: 400px;
+            padding: 20px;
+            border-radius: 20px;
+            position: relative;
+            text-align: center;
+            animation: surgir 0.3s ease-out;
+        }
+
+        @keyframes surgir {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        #modalImg {
+            width: 80%;
+            border-radius: 10px;
+        }
+
+        .add-btn {
+            background-color: #D32F2F;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+
+    </style>
 </head>
 <body>
 
     <header>
         <h1>MYDI DELIVERY</h1>
         <div class="search-bar">
-            <input type="text" placeholder="Pesquisar...">
+            <input type="text" placeholder="O que você quer comer hoje?">
+            <span>🔍</span>
         </div>
     </header>
 
     <main class="product-grid">
-        <div class="card" onclick="abrirProduto('X-Burger', 'R$ 19,90', 'burger-img.png')">
-            <img src="https://via.placeholder.com/150" alt="Burger">
+        <div class="card" onclick="abrirModal('X-Burger Tradicional', 'R$ 19,90', 'Pão, carne bovina 120g, queijo cheddar e maionese especial.')">
+            <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="Burger">
             <h3>X-Burger</h3>
             <p class="price">R$ 19,90</p>
         </div>
-        <div class="card" onclick="abrirProduto('X-Burger Especial', 'R$ 25,90', 'burger-img.png')">
-            <img src="https://via.placeholder.com/150" alt="Burger">
-            <h3>X-Burger Especial</h3>
-            <p class="price">R$ 25,90</p>
+
+        <div class="card" onclick="abrirModal('X-Burger Bacon', 'R$ 24,90', 'O clássico com generosas fatias de bacon crocante.')">
+            <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="Burger">
+            <h3>X-Burger Bacon</h3>
+            <p class="price">R$ 24,90</p>
+        </div>
+
+        <div class="card" onclick="abrirModal('Combo Mydi', 'R$ 35,00', 'X-Burger + Batata Frita M + Refrigerante Lata.')">
+            <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="Burger">
+            <h3>Combo Mydi</h3>
+            <p class="price">R$ 35,00</p>
+        </div>
+
+        <div class="card" onclick="abrirModal('X-Salada', 'R$ 21,00', 'Pão, carne, queijo, alface, tomate e maionese.')">
+            <img src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="Burger">
+            <h3>X-Salada</h3>
+            <p class="price">R$ 21,00</p>
         </div>
     </main>
 
     <div id="modalProduto" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="fecharModal()">&times;</span>
-            <img id="modalImg" src="" alt="Produto Grande">
+            <img id="modalImg" src="https://cdn-icons-png.flaticon.com/512/3075/3075977.png" alt="Zoom">
             <h2 id="modalNome"></h2>
-            <p id="modalPreco" class="price"></p>
-            <p>Descrição detalhada do produto delicioso aqui.</p>
-            <button class="add-cart">Adicionar ao Carrinho</button>
+            <p id="modalDesc"></p>
+            <h3 id="modalPreco" class="price"></h3>
+            <button class="add-btn">ADICIONAR AO CARRINHO</button>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // JS - Lógica para abrir e fechar a modal
+        function abrirModal(nome, preco, descricao) {
+            const modal = document.getElementById('modalProduto');
+            
+            // Preenche os campos da modal com os dados do produto clicado
+            document.getElementById('modalNome').innerText = nome;
+            document.getElementById('modalPreco').innerText = preco;
+            document.getElementById('modalDesc').innerText = descricao;
+
+            // Mostra a modal
+            modal.style.display = 'flex';
+        }
+
+        function fecharModal() {
+            document.getElementById('modalProduto').style.display = 'none';
+        }
+
+        // Fecha a modal se o usuário clicar fora do conteúdo branco
+        window.onclick = function(event) {
+            const modal = document.getElementById('modalProduto');
+            if (event.target == modal) {
+                fecharModal();
+            }
+        }
+    </script>
+
 </body>
 </html>
