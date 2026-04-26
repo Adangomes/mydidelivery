@@ -2,41 +2,41 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Tiger Slot - Special Edition</title>
+    <title>Tiger Slot - Marcos e Rose Edition</title>
     <style>
-        body { background: #1a1a1a; color: gold; font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        body { background: #1a1a1a; color: gold; font-family: 'Arial', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
         .slot-machine { border: 10px solid #d4af37; background: #8b0000; padding: 20px; border-radius: 15px; box-shadow: 0 0 50px rgba(212, 175, 55, 0.5); }
         .reels { display: flex; gap: 10px; margin-bottom: 20px; }
-        .reel { width: 100px; height: 100px; background: white; border: 5px solid gold; font-size: 50px; display: flex; align-items: center; justify-content: center; color: black; border-radius: 10px; transition: transform 0.1s; }
+        .reel { width: 100px; height: 100px; background: white; border: 5px solid gold; font-size: 50px; display: flex; align-items: center; justify-content: center; color: black; border-radius: 10px; }
         .controls { text-align: center; }
-        button { padding: 15px 30px; font-size: 20px; background: linear-gradient(#ffd700, #b8860b); border: none; cursor: pointer; border-radius: 5px; font-weight: bold; color: #444; text-shadow: 1px 1px 1px white; }
-        button:disabled { background: #555; color: #888; cursor: not-allowed; }
-        .balance { margin-bottom: 10px; font-size: 24px; font-weight: bold; }
+        button { padding: 15px 30px; font-size: 20px; background: linear-gradient(#ffd700, #b8860b); border: none; cursor: pointer; border-radius: 5px; font-weight: bold; color: #444; text-shadow: 1px 1px 1px white; transition: 0.2s; }
+        button:hover { transform: scale(1.05); }
+        button:disabled { background: #555; color: #888; cursor: not-allowed; transform: none; }
+        .balance { margin-bottom: 10px; font-size: 24px; font-weight: bold; color: #fff; }
+        #balance { color: #00ff00; }
         
         /* Modal de Vitória */
         #winModal { 
             display: none; position: fixed; z-index: 10; left: 0; top: 0; width: 100%; height: 100%; 
             background-color: rgba(0,0,0,0.9); align-items: center; justify-content: center; flex-direction: column;
         }
-        .modal-content {
-            text-align: center; animation: spinRotate 2s infinite linear;
-        }
-        .modal-content h1 { font-size: 80px; margin: 0; color: #fff; text-shadow: 0 0 20px #ffd700; }
-        .modal-content p { font-size: 40px; color: gold; }
+        .modal-content { text-align: center; animation: spinRotate 2s infinite linear; }
+        .modal-content h1 { font-size: 80px; margin: 0; color: #fff; text-shadow: 0 0 20px #ffd700, 0 0 40px #ff4500; }
+        .modal-content p { font-size: 50px; color: gold; font-weight: bold; }
         
         @keyframes spinRotate {
-            0% { transform: scale(0.5) rotate(0deg); }
-            50% { transform: scale(1.2) rotate(180deg); }
-            100% { transform: scale(0.5) rotate(360deg); }
+            0% { transform: scale(0.6) rotate(0deg); }
+            50% { transform: scale(1.3) rotate(180deg); }
+            100% { transform: scale(0.6) rotate(360deg); }
         }
     </style>
 </head>
 <body>
 
-    <h2>Slot Marcos e Rose</h2>
-    <div class="balance">Saldo: R$ <span id="balance">10.00</span></div>
+    <div class="balance">SALDO: R$ <span id="balance">10.00</span></div>
     
     <div class="slot-machine">
+        <h2 style="text-align: center; margin-top: 0; color: #fff;">MARCOS & ROSE SLOT</h2>
         <div class="reels">
             <div id="reel1" class="reel">🐯</div>
             <div id="reel2" class="reel">🐯</div>
@@ -47,34 +47,36 @@
         </div>
     </div>
 
-    <h3 id="result"></h3>
+    <h3 id="result" style="height: 30px;"></h3>
 
     <div id="winModal">
         <div class="modal-content">
-            <h1>💎 BIG WIN 💎</h1>
-            <p id="winAmountText">R$ 20,00</p>
+            <h1 id="winTitle">💎 BIG WIN 💎</h1>
+            <p id="winAmountText">R$ 0,00</p>
         </div>
     </div>
 
     <script>
         let balance = 10.00;
-        let spinCount = 0; // Contador de rodadas
+        let spinCount = 0;
         const symbols = ['🐯', '💰', '🧧', '🍊', '💎'];
         const reelElements = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
         const balanceEl = document.getElementById('balance');
         const resultEl = document.getElementById('result');
         const spinBtn = document.getElementById('spinBtn');
         const winModal = document.getElementById('winModal');
+        const winTitle = document.getElementById('winTitle');
 
         function spin() {
             if (balance < 1) return alert("Saldo insuficiente!");
 
             balance -= 1;
-            spinCount++; // Aumenta a cada clique
+            spinCount++;
             updateUI();
             
             spinBtn.disabled = true;
             resultEl.innerText = "Girando...";
+            resultEl.style.color = "gold";
 
             let count = 0;
             const interval = setInterval(() => {
@@ -83,44 +85,56 @@
                 });
                 count++;
 
-                if (count > 20) {
+                if (count > 25) {
                     clearInterval(interval);
                     
-                    // Lógica Forçada: Na 4ª rodada, todos viram Diamante
+                    // Lógica das rodadas pagadoras
                     if (spinCount === 4) {
                         reelElements.forEach(reel => reel.innerText = '💎');
+                    } else if (spinCount === 7) {
+                        reelElements.forEach(reel => reel.innerText = '🐯');
                     }
                     
                     checkWin();
                 }
-            }, 50);
+            }, 60);
         }
 
         function checkWin() {
             const results = reelElements.map(r => r.innerText);
             spinBtn.disabled = false;
 
-            // Se for diamante (especialmente na 4ª rodada)
+            // Vitória Especial da 4ª Rodada (Diamantes)
             if (results[0] === '💎' && results[1] === '💎' && results[2] === '💎') {
-                let prize = 20.00; // 20x o valor da rodada (R$ 1,00 * 20)
+                let prize = 20.00;
                 balance += prize;
+                winTitle.innerText = "💎 BIG WIN 💎";
                 showWinModal(prize);
             } 
+            // Vitória Especial da 7ª Rodada (Tigrinho)
+            else if (results[0] === '🐯' && results[1] === '🐯' && results[2] === '🐯') {
+                let prize = 10.00;
+                balance += prize;
+                winTitle.innerText = "🐯 TIGER WIN 🐯";
+                showWinModal(prize);
+            }
+            // Outras vitórias aleatórias
             else if (results[0] === results[1] && results[1] === results[2]) {
                 let prize = 5.00;
                 balance += prize;
-                resultEl.innerText = `GANHOU! + R$ ${prize.toFixed(2)}`;
+                resultEl.innerText = `VITÓRIA! + R$ ${prize.toFixed(2)}`;
+                resultEl.style.color = "#00ff00";
             } else {
                 resultEl.innerText = "Tente novamente!";
+                resultEl.style.color = "#ff4444";
             }
             updateUI();
         }
 
         function showWinModal(amount) {
-            document.getElementById('winAmountText').innerText = `PAGAMENTO: R$ ${amount.toFixed(2)}`;
+            document.getElementById('winAmountText').innerText = `PAGOU R$ ${amount.toFixed(2)}`;
             winModal.style.display = 'flex';
             
-            // Fecha o modal após 4 segundos para continuar jogando
             setTimeout(() => {
                 winModal.style.display = 'none';
                 resultEl.innerText = "GRANDE VITÓRIA!";
