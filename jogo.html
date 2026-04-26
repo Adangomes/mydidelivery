@@ -2,164 +2,148 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Tiger Slot - Deluxe Edition</title>
+    <title>Tiger Slot - Marcos & Rose Pro</title>
     <style>
-        :root { --gold: #d4af37; --red: #8b0000; }
+        :root { --gold: #d4af37; --red: #8b0000; --neon: #00ff00; }
         body { background: #0a0a0a; color: gold; font-family: 'Arial Black', sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; overflow: hidden; }
         
-        .balance { font-size: 28px; margin-bottom: 15px; text-shadow: 2px 2px 4px #000; }
-        #balance { color: #00ff00; }
+        .balance-box { background: rgba(255,255,255,0.1); padding: 10px 30px; border-radius: 50px; border: 2px solid var(--gold); margin-bottom: 15px; }
+        .balance-box span { color: var(--neon); font-size: 28px; }
 
-        .slot-machine { border: 8px solid var(--gold); background: var(--red); padding: 15px; border-radius: 20px; box-shadow: 0 0 40px rgba(212, 175, 55, 0.4); }
-        
-        /* Grade 3x3 */
-        .grid { display: grid; grid-template-columns: repeat(3, 100px); grid-template-rows: repeat(3, 100px); gap: 10px; }
-        .reel { width: 100px; height: 100px; background: #fff; border: 4px solid var(--gold); font-size: 50px; display: flex; align-items: center; justify-content: center; border-radius: 12px; box-shadow: inset 0 0 10px rgba(0,0,0,0.2); }
+        .slot-machine { border: 8px solid var(--gold); background: var(--red); padding: 15px; border-radius: 20px; box-shadow: 0 0 50px rgba(212, 175, 55, 0.4); }
+        .grid { display: grid; grid-template-columns: repeat(3, 100px); gap: 10px; }
+        .reel { width: 100px; height: 100px; background: #fff; border: 4px solid var(--gold); font-size: 50px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }
 
         .controls { text-align: center; margin-top: 20px; }
-        button { padding: 15px 40px; font-size: 22px; background: linear-gradient(180deg, #ffd700, #b8860b); border: none; cursor: pointer; border-radius: 50px; font-weight: bold; color: #333; box-shadow: 0 5px 0 #664d00; transition: 0.1s; }
-        button:active { transform: translateY(3px); box-shadow: 0 2px 0 #664d00; }
-        button:disabled { background: #444; color: #888; box-shadow: none; cursor: not-allowed; }
+        button { padding: 15px 40px; font-size: 22px; background: linear-gradient(180deg, #ffd700, #b8860b); border: none; cursor: pointer; border-radius: 50px; font-weight: bold; color: #333; box-shadow: 0 5px 0 #664d00; }
+        button:disabled { background: #444; color: #888; box-shadow: none; transform: translateY(3px); }
 
-        /* Modais */
-        #specialModal { 
+        /* Modal de Bônus */
+        #bonusModal { 
             display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.95); align-items: center; justify-content: center; text-align: center;
         }
-        .modal-body { animation: pulse 1.5s infinite; }
-        .modal-body h1 { font-size: 70px; color: #fff; text-shadow: 0 0 20px #ff0000, 0 0 40px #ffd700; margin: 0; }
-        .modal-body p { font-size: 35px; color: #ffd700; }
-
-        @keyframes pulse {
-            0% { transform: scale(1); filter: hue-rotate(0deg); }
-            50% { transform: scale(1.1); filter: hue-rotate(45deg); }
-            100% { transform: scale(1); filter: hue-rotate(0deg); }
-        }
-
-        .free-spin-active { border-color: #00ff00 !important; box-shadow: 0 0 30px #00ff00 !important; }
+        .modal-content { animation: pulse 1s infinite alternate; }
+        .modal-content h1 { font-size: 60px; color: #fff; text-shadow: 0 0 20px var(--neon); margin: 0; }
+        
+        @keyframes pulse { from { transform: scale(0.9); } to { transform: scale(1.1); } }
+        .free-spin-mode { border-color: var(--neon) !important; box-shadow: 0 0 30px var(--neon) !important; }
     </style>
 </head>
 <body>
 
-    <div class="balance">SALDO: R$ <span id="balance">10.00</span></div>
+    <div class="balance-box">SALDO: R$ <span id="balance">10.00</span></div>
     
     <div class="slot-machine" id="machine">
         <div class="grid" id="slotGrid">
             <div class="reel" id="r0">🐯</div><div class="reel" id="r1">💰</div><div class="reel" id="r2">🧧</div>
-            <div class="reel" id="r3">🍊</div><div class="reel" id="r4">💎</div><div class="reel" id="r5">🐯</div>
-            <div class="reel" id="r6">🧧</div><div class="reel" id="r7">💰</div><div class="reel" id="r8">🍊</div>
+            <div class="reel" id="r3">💎</div><div class="reel" id="r4">🐯</div><div class="reel" id="r5">💎</div>
+            <div class="reel" id="r6">🧧</div><div class="reel" id="r7">💰</div><div class="reel" id="r8">🐯</div>
         </div>
         <div class="controls">
-            <button id="spinBtn" onclick="processSpin()">GIRAR (R$ 1,00)</button>
+            <button id="spinBtn" onclick="initSpin()">GIRAR (R$ 1,00)</button>
         </div>
     </div>
 
-    <h3 id="statusMsg">BOA SORTE!</h3>
+    <h3 id="statusMsg" style="color: white; margin-top: 15px;">MARCOS & ROSE SLOT</h3>
 
-    <div id="specialModal">
-        <div class="modal-body">
-            <h1 id="modalTitle">BÔNUS ATIVADO!</h1>
-            <p id="modalDetail">10 GIROS GRÁTIS + BANCA DUPLICADA</p>
+    <div id="bonusModal">
+        <div class="modal-content">
+            <h1 id="modalTitle">MODO BÔNUS!</h1>
+            <p id="modalDetail" style="font-size: 30px; color: gold;"></p>
         </div>
     </div>
 
     <script>
         let balance = 10.00;
         let spinCount = 0;
-        let isFreeSpinning = false;
+        let autoSpinsRemaining = 0;
         const symbols = ['🐯', '💰', '🧧', '🍊', '💎'];
         const gridEls = Array.from({length: 9}, (_, i) => document.getElementById(`r${i}`));
-        
-        async function processSpin() {
-            if (balance < 1 && !isFreeSpinning) return alert("Sem saldo!");
+
+        async function initSpin() {
+            if (balance < 1 && autoSpinsRemaining <= 0) return alert("Sem saldo!");
             
-            if (!isFreeSpinning) {
+            if (autoSpinsRemaining <= 0) {
                 balance -= 1;
                 spinCount++;
+            } else {
+                autoSpinsRemaining--;
             }
-            
+
             updateUI();
             toggleControls(false);
 
-            // Animação de giro
-            let timer = 0;
-            const interval = setInterval(() => {
+            // Animação de Giro
+            let ticks = 0;
+            const timer = setInterval(() => {
                 gridEls.forEach(el => el.innerText = symbols[Math.floor(Math.random() * symbols.length)]);
-                timer++;
-                if (timer > 20) {
-                    clearInterval(interval);
-                    finalizeSpin();
+                ticks++;
+                if (ticks > 20) {
+                    clearInterval(timer);
+                    applyLogic();
                 }
-            }, 50);
+            }, 60);
         }
 
-        function finalizeSpin() {
-            // Lógica da 15ª Rodada (Bônus)
-            if (spinCount === 15 && !isFreeSpinning) {
-                triggerMegaBonus();
-                return;
+        function applyLogic() {
+            // 4ª Rodada: DIAMANTES (R$ 20)
+            if (spinCount === 4 && autoSpinsRemaining === 0) {
+                gridEls.forEach(el => el.innerText = '💎');
+                balance += 20;
+                showModal("💎 BIG WIN 💎", "VOCÊ GANHOU R$ 20,00!");
+            }
+            // 7ª Rodada: 10 GIROS AUTOMÁTICOS
+            else if (spinCount === 7 && autoSpinsRemaining === 0) {
+                gridEls.forEach(el => el.innerText = '🐯');
+                autoSpinsRemaining = 10;
+                showModal("🐯 TIGER FREE SPINS 🐯", "10 GIROS GRÁTIS ATIVADOS!");
+            }
+            // 15ª Rodada: DUPLICA BANCA
+            else if (spinCount === 15 && autoSpinsRemaining === 0) {
+                balance *= 2;
+                showModal("💰 BANCA DUPLICADA 💰", "SEU SALDO DOBROU!");
+            }
+            else {
+                checkLines();
             }
 
-            checkResults();
-            toggleControls(true);
+            finalizeStep();
         }
 
-        function checkResults() {
-            let winAmount = 0;
+        function checkLines() {
             const g = gridEls.map(el => el.innerText);
+            const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8]];
+            let win = 0;
 
-            // Definição de linhas (Horizontal: 012, 345, 678 | Vertical: 036, 147, 258)
-            const lines = [
-                [0,1,2], [3,4,5], [6,7,8], // Horizontais
-                [0,3,6], [1,4,7], [2,5,8]  // Verticais
-            ];
-
-            lines.forEach(line => {
-                if (g[line[0]] === g[line[1]] && g[line[1]] === g[line[2]]) {
-                    // Paga 0.5% do saldo total por linha
-                    winAmount += (balance * 0.005);
-                }
+            lines.forEach(l => {
+                if (g[l[0]] === g[l[1]] && g[l[1]] === g[l[2]]) win += (balance * 0.005);
             });
 
-            if (winAmount > 0) {
-                balance += winAmount;
-                document.getElementById('statusMsg').innerText = `GANHOU R$ ${winAmount.toFixed(2)}!`;
-                document.getElementById('statusMsg').style.color = "#00ff00";
+            if (win > 0) {
+                balance += win;
+                document.getElementById('statusMsg').innerText = `VITÓRIA: R$ ${win.toFixed(2)}`;
+            }
+            updateUI();
+        }
+
+        function finalizeStep() {
+            if (autoSpinsRemaining > 0) {
+                document.getElementById('machine').classList.add('free-spin-mode');
+                document.getElementById('statusMsg').innerText = `GIROS RESTANTES: ${autoSpinsRemaining}`;
+                setTimeout(initSpin, 1500);
             } else {
-                document.getElementById('statusMsg').innerText = "Tente novamente!";
-                document.getElementById('statusMsg').style.color = "gold";
-            }
-            updateUI();
-        }
-
-        function triggerMegaBonus() {
-            const modal = document.getElementById('specialModal');
-            modal.style.display = 'flex';
-            
-            // Duplica a banca
-            balance *= 2;
-            updateUI();
-
-            setTimeout(() => {
-                modal.style.display = 'none';
-                startFreeSpins(10);
-            }, 3000);
-        }
-
-        async function startFreeSpins(remaining) {
-            if (remaining <= 0) {
-                isFreeSpinning = false;
-                document.getElementById('machine').classList.remove('free-spin-active');
+                document.getElementById('machine').classList.remove('free-spin-mode');
                 toggleControls(true);
-                return;
             }
+        }
 
-            isFreeSpinning = true;
-            document.getElementById('machine').classList.add('free-spin-active');
-            document.getElementById('statusMsg').innerText = `GIROS GRÁTIS: ${remaining}`;
-            
-            await processSpin();
-            setTimeout(() => startFreeSpins(remaining - 1), 1500);
+        function showModal(title, detail) {
+            const modal = document.getElementById('bonusModal');
+            document.getElementById('modalTitle').innerText = title;
+            document.getElementById('modalDetail').innerText = detail;
+            modal.style.display = 'flex';
+            setTimeout(() => modal.style.display = 'none', 3000);
         }
 
         function updateUI() {
