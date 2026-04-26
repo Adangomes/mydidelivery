@@ -2,44 +2,75 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Road Fighter - Acadêmico</title>
+    <title>Road Fighter Acadêmico V2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
         body {
             margin: 0;
-            background: #222;
+            background: #1a1a1a;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
             color: white;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             overflow: hidden;
+            touch-action: manipulation;
         }
         #game-container {
             position: relative;
-            border: 4px solid #fff;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            border: 4px solid #444;
+            background: #333;
         }
-        canvas {
-            display: block;
-            background: #333; /* Cor do asfalto */
-        }
+        canvas { display: block; }
         #ui {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            pointer-events: none;
+            top: 10px; left: 10px; right: 10px;
+            display: flex;
+            justify-content: space-between;
+            background: rgba(0,0,0,0.6);
+            padding: 5px 10px;
+            font-weight: bold;
+            font-size: 14px;
         }
-        .msg {
+        .controls {
+            display: flex;
+            width: 100%;
+            max-width: 400px;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .btn {
+            width: 80px;
+            height: 80px;
+            background: #555;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            user-select: none;
+            cursor: pointer;
+        }
+        .btn:active { background: #888; }
+        #msg {
             position: absolute;
-            top: 50%;
-            left: 50%;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            background: rgba(0,0,0,0.8);
-            padding: 20px;
+            background: rgba(0,0,0,0.9);
+            padding: 30px;
+            border: 2px solid yellow;
             display: none;
+            z-index: 10;
+        }
+        #timer-bar-container {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none;
+        }
+        #progress {
+            position: absolute; bottom: 0; left: 0; height: 5px; background: #00ff00; width: 0%;
         }
     </style>
 </head>
@@ -48,221 +79,196 @@
     <div id="game-container">
         <canvas id="gameCanvas"></canvas>
         <div id="ui">
-            <div>FASE: <span id="level">1</span>/20</div>
-            <div>COMBUSTÍVEL: <span id="fuel">100</span>%</div>
-            <div>DISTÂNCIA: <span id="dist">0</span>m</div>
+            <div>FASE: <span id="level">1</span></div>
+            <div>TEMPO: <span id="timer">60</span>s</div>
+            <div>BÔNUS: <span id="score">0</span></div>
         </div>
-        <div id="msg" class="msg">
+        <div id="progress"></div>
+        <div id="msg">
             <h1 id="title">GAME OVER</h1>
-            <p id="desc">Pressione 'R' para Reiniciar</p>
+            <p id="desc">Pressione R ou o botão central</p>
+            <button onclick="resetGame()" style="padding: 10px 20px; cursor:pointer">REINICIAR</button>
         </div>
+    </div>
+
+    <div class="controls">
+        <div class="btn" id="btnLeft">◀</div>
+        <div class="btn" id="btnRight">▶</div>
     </div>
 
 <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
-    const uiLevel = document.getElementById('level');
-    const uiFuel = document.getElementById('fuel');
-    const uiDist = document.getElementById('dist');
-    const msgBox = document.getElementById('msg');
-
-    // Configurações do Jogo
-    canvas.width = 400;
-    canvas.height = 600;
+    
+    // Configurações
+    canvas.width = 360;
+    canvas.height = 500;
     
     let gameActive = true;
     let level = 1;
     let score = 0;
-    let fuel = 100;
-    let distanceToFinish = 2000; // Distância por fase
-    let speed = 5;
-    let roadX = 50;
-    let roadWidth = 300;
+    let speed = 6;
+    let timeLeft = 60; // 1 minuto por fase
+    let finishLineY = -1000; // Começa longe
+    let showingFinish = false;
+    let crossFinish = false;
 
-    const player = {
-        x: canvas.width / 2 - 15,
-        y: canvas.height - 100,
-        w: 30,
-        h: 50,
-        color: '#ff0000',
-        targetX: canvas.width / 2 - 15
-    };
-
+    const player = { x: 165, y: 400, w: 30, h: 50, color: '#ff0000' };
     let enemies = [];
-    let fuelItems = [];
-    let trees = [];
+    let bonuses = [];
+    let roadOffset = 0;
 
-    // Controles
+    // Teclado e Botões
     const keys = {};
     window.addEventListener('keydown', e => keys[e.key] = true);
     window.addEventListener('keyup', e => keys[e.key] = false);
 
+    let moveLeft = false;
+    let moveRight = false;
+    document.getElementById('btnLeft').onmousedown = document.getElementById('btnLeft').ontouchstart = () => moveLeft = true;
+    document.getElementById('btnLeft').onmouseup = document.getElementById('btnLeft').ontouchend = () => moveLeft = false;
+    document.getElementById('btnRight').onmousedown = document.getElementById('btnRight').ontouchstart = () => moveRight = true;
+    document.getElementById('btnRight').onmouseup = document.getElementById('btnRight').ontouchend = () => moveRight = false;
+
     function spawnEnemy() {
-        if (Math.random() < 0.02 + (level * 0.005)) {
+        if (Math.random() < 0.03 && !showingFinish) {
             enemies.push({
-                x: roadX + Math.random() * (roadWidth - 30),
-                y: -50,
-                w: 30,
-                h: 50,
-                speed: 2 + Math.random() * level,
+                x: 60 + Math.random() * 210,
+                y: -60, w: 30, h: 50,
+                speed: 1 + Math.random() * 3,
+                type: 'enemy',
                 color: '#0055ff'
             });
         }
-    }
-
-    function spawnFuel() {
-        if (Math.random() < 0.005) {
-            fuelItems.push({
-                x: roadX + Math.random() * (roadWidth - 20),
-                y: -50,
-                w: 20,
-                h: 20
+        // Carrinho Colorido (Bônus)
+        if (Math.random() < 0.005 && !showingFinish) {
+            bonuses.push({
+                x: 60 + Math.random() * 210,
+                y: -60, w: 30, h: 50,
+                color: `hsl(${Math.random() * 360}, 100%, 50%)`
             });
-        }
-    }
-
-    function drawCar(x, y, w, h, color, isPlayer = false) {
-        // Corpo principal
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, w, h);
-        // Teto/Vidro
-        ctx.fillStyle = 'rgba(255,255,255,0.3)';
-        ctx.fillRect(x + 5, y + 10, w - 10, 15);
-        // Rodas
-        ctx.fillStyle = '#000';
-        ctx.fillRect(x - 2, y + 5, 4, 10);
-        ctx.fillRect(x + w - 2, y + 5, 4, 10);
-        ctx.fillRect(x - 2, y + h - 15, 4, 10);
-        ctx.fillRect(x + w - 2, y + h - 15, 4, 10);
-
-        if(isPlayer) {
-            // Efeito de sombra realista simples
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = "black";
-        } else {
-            ctx.shadowBlur = 0;
         }
     }
 
     function update() {
-        if (!gameActive) {
-            if (keys['r'] || keys['R']) resetGame();
-            return;
+        if (!gameActive) return;
+
+        // Movimentação
+        if ((keys['ArrowLeft'] || moveLeft) && player.x > 55) player.x -= 6;
+        if ((keys['ArrowRight'] || moveRight) && player.x < 275) player.x += 6;
+
+        // Timer e Lógica de Fase
+        timeLeft -= 1/60;
+        document.getElementById('timer').innerText = Math.max(0, Math.ceil(timeLeft));
+        document.getElementById('progress').style.width = ((60 - timeLeft) / 60 * 100) + "%";
+
+        if (timeLeft <= 0 && !showingFinish) {
+            showingFinish = true;
+            finishLineY = -100;
         }
 
-        // Movimento Lateral
-        if (keys['ArrowLeft'] && player.x > roadX) player.x -= 7;
-        if (keys['ArrowRight'] && player.x < roadX + roadWidth - player.w) player.x += 7;
-
-        // Combustível e Distância
-        fuel -= 0.05;
-        distanceToFinish -= speed * 0.1;
-
-        if (fuel <= 0) gameOver("FALTA DE COMBUSTÍVEL");
-        if (distanceToFinish <= 0) nextLevel();
-
-        // Inimigos
-        spawnEnemy();
-        enemies.forEach((en, index) => {
+        // Movimentar Inimigos
+        enemies.forEach((en, i) => {
             en.y += speed + en.speed;
-            if (en.y > canvas.height) enemies.splice(index, 1);
-
-            // Colisão Inimigo
             if (player.x < en.x + en.w && player.x + player.w > en.x &&
                 player.y < en.y + en.h && player.y + player.h > en.y) {
-                gameOver("VOCÊ BATEU!");
+                endGame("VOCÊ BATEU!");
             }
+            if (en.y > canvas.height) enemies.splice(i, 1);
         });
 
-        // Itens de Combustível
-        spawnFuel();
-        fuelItems.forEach((f, index) => {
-            f.y += speed;
-            if (f.y > canvas.height) fuelItems.splice(index, 1);
-
-            if (player.x < f.x + f.w && player.x + player.w > f.x &&
-                player.y < f.y + f.h && player.y + player.h > f.y) {
-                fuel = Math.min(fuel + 20, 100);
-                fuelItems.splice(index, 1);
+        // Movimentar Bônus
+        bonuses.forEach((b, i) => {
+            b.y += speed + 2;
+            if (player.x < b.x + b.w && player.x + player.w > b.x &&
+                player.y < b.y + b.h && player.y + player.h > b.y) {
+                score += 500;
+                document.getElementById('score').innerText = score;
+                bonuses.splice(i, 1);
             }
+            if (b.y > canvas.height) bonuses.splice(i, 1);
         });
 
-        // Atualiza UI
-        uiFuel.innerText = Math.floor(fuel);
-        uiLevel.innerText = level;
-        uiDist.innerText = Math.floor(distanceToFinish);
+        // Linha de Chegada
+        if (showingFinish) {
+            finishLineY += speed;
+            if (finishLineY > player.y && !crossFinish) {
+                crossFinish = true;
+                setTimeout(nextLevel, 1000);
+            }
+        }
+
+        spawnEnemy();
+        roadOffset += speed;
     }
 
-    let offset = 0; // Para o efeito da estrada se movendo
+    function drawCar(x, y, color, isPlayer = false) {
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, 30, 50); // Corpo
+        ctx.fillStyle = "#000";
+        ctx.fillRect(x-2, y+5, 5, 10); ctx.fillRect(x+27, y+5, 5, 10); // Rodas
+        ctx.fillRect(x-2, y+35, 5, 10); ctx.fillRect(x+27, y+35, 5, 10);
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.fillRect(x+5, y+8, 20, 12); // Para-brisa
+    }
+
     function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#2d5a27"; // Grama
+        ctx.fillRect(0,0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = "#444"; // Estrada
+        ctx.fillRect(50, 0, 260, canvas.height);
 
-        // Grama lateral
-        ctx.fillStyle = '#2d5a27';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Estrada
-        ctx.fillStyle = '#444';
-        ctx.fillRect(roadX, 0, roadWidth, canvas.height);
-
-        // Faixas da estrada (Efeito de Movimento)
-        ctx.strokeStyle = '#fff';
+        // Faixas brancas
+        ctx.strokeStyle = "#fff";
         ctx.setLineDash([20, 30]);
-        ctx.lineDashOffset = -offset;
+        ctx.lineDashOffset = -roadOffset;
+        ctx.lineWidth = 4;
         ctx.beginPath();
-        ctx.moveTo(canvas.width / 2, 0);
-        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.moveTo(180, 0); ctx.lineTo(180, canvas.height);
         ctx.stroke();
-        offset += speed;
 
-        // Desenhar Itens
-        fuelItems.forEach(f => {
-            ctx.fillStyle = '#ffff00';
-            ctx.fillRect(f.x, f.y, f.w, f.h);
-            ctx.fillStyle = '#000';
-            ctx.fillText("F", f.x + 5, f.y + 15);
-        });
+        // Linha de Chegada
+        if (showingFinish) {
+            ctx.fillStyle = "#fff";
+            for(let i=0; i<6; i++) {
+                for(let j=0; j<2; j++) {
+                    if((i+j)%2==0) ctx.fillRect(50 + (i*43.3), finishLineY + (j*20), 43.3, 20);
+                }
+            }
+        }
 
-        // Desenhar Carros
-        enemies.forEach(en => drawCar(en.x, en.y, en.w, en.h, en.color));
-        drawCar(player.x, player.y, player.w, player.h, player.color, true);
+        bonuses.forEach(b => drawCar(b.x, b.y, b.color));
+        enemies.forEach(en => drawCar(en.x, en.y, en.color));
+        drawCar(player.x, player.y, player.color, true);
 
-        requestAnimationFrame(() => {
-            update();
-            draw();
-        });
-    }
-
-    function gameOver(text) {
-        gameActive = false;
-        msgBox.style.display = 'block';
-        document.getElementById('title').innerText = text;
+        update();
+        requestAnimationFrame(draw);
     }
 
     function nextLevel() {
-        if (level >= 20) {
-            gameOver("VOCÊ VENCEU O JOGO!");
-            document.getElementById('desc').innerText = "Parabéns, Piloto!";
+        level++;
+        if (level > 20) {
+            endGame("CAMPEÃO MUNDIAL!");
             return;
         }
-        level++;
-        speed += 1;
-        fuel = 100;
-        distanceToFinish = 2000 + (level * 500);
+        speed += 1.5;
+        timeLeft = 60;
+        showingFinish = false;
+        crossFinish = false;
         enemies = [];
-        fuelItems = [];
+        bonuses = [];
+        document.getElementById('level').innerText = level;
+    }
+
+    function endGame(msg) {
+        gameActive = false;
+        document.getElementById('msg').style.display = "block";
+        document.getElementById('title').innerText = msg;
     }
 
     function resetGame() {
-        level = 1;
-        speed = 5;
-        fuel = 100;
-        distanceToFinish = 2000;
-        enemies = [];
-        fuelItems = [];
-        gameActive = true;
-        msgBox.style.display = 'none';
-        player.x = canvas.width / 2 - 15;
+        location.reload();
     }
 
     draw();
