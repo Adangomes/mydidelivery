@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Road Fighter - Acadêmico</title>
+    <style>
+        body {
+            margin: 0;
+            background: #222;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            overflow: hidden;
+        }
+        #game-container {
+            position: relative;
+            border: 4px solid #fff;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+        canvas {
+            display: block;
+            background: #333; /* Cor do asfalto */
+        }
+        #ui {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            pointer-events: none;
+        }
+        .msg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui">
+            <div>FASE: <span id="level">1</span>/20</div>
+            <div>COMBUSTÍVEL: <span id="fuel">100</span>%</div>
+            <div>DISTÂNCIA: <span id="dist">0</span>m</div>
+        </div>
+        <div id="msg" class="msg">
+            <h1 id="title">GAME OVER</h1>
+            <p id="desc">Pressione 'R' para Reiniciar</p>
+        </div>
+    </div>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const uiLevel = document.getElementById('level');
+    const uiFuel = document.getElementById('fuel');
+    const uiDist = document.getElementById('dist');
+    const msgBox = document.getElementById('msg');
+
+    // Configurações do Jogo
+    canvas.width = 400;
+    canvas.height = 600;
+    
+    let gameActive = true;
+    let level = 1;
+    let score = 0;
+    let fuel = 100;
+    let distanceToFinish = 2000; // Distância por fase
+    let speed = 5;
+    let roadX = 50;
+    let roadWidth = 300;
+
+    const player = {
+        x: canvas.width / 2 - 15,
+        y: canvas.height - 100,
+        w: 30,
+        h: 50,
+        color: '#ff0000',
+        targetX: canvas.width / 2 - 15
+    };
+
+    let enemies = [];
+    let fuelItems = [];
+    let trees = [];
+
+    // Controles
+    const keys = {};
+    window.addEventListener('keydown', e => keys[e.key] = true);
+    window.addEventListener('keyup', e => keys[e.key] = false);
+
+    function spawnEnemy() {
+        if (Math.random() < 0.02 + (level * 0.005)) {
+            enemies.push({
+                x: roadX + Math.random() * (roadWidth - 30),
+                y: -50,
+                w: 30,
+                h: 50,
+                speed: 2 + Math.random() * level,
+                color: '#0055ff'
+            });
+        }
+    }
+
+    function spawnFuel() {
+        if (Math.random() < 0.005) {
+            fuelItems.push({
+                x: roadX + Math.random() * (roadWidth - 20),
+                y: -50,
+                w: 20,
+                h: 20
+            });
+        }
+    }
+
+    function drawCar(x, y, w, h, color, isPlayer = false) {
+        // Corpo principal
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, w, h);
+        // Teto/Vidro
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.fillRect(x + 5, y + 10, w - 10, 15);
+        // Rodas
+        ctx.fillStyle = '#000';
+        ctx.fillRect(x - 2, y + 5, 4, 10);
+        ctx.fillRect(x + w - 2, y + 5, 4, 10);
+        ctx.fillRect(x - 2, y + h - 15, 4, 10);
+        ctx.fillRect(x + w - 2, y + h - 15, 4, 10);
+
+        if(isPlayer) {
+            // Efeito de sombra realista simples
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "black";
+        } else {
+            ctx.shadowBlur = 0;
+        }
+    }
+
+    function update() {
+        if (!gameActive) {
+            if (keys['r'] || keys['R']) resetGame();
+            return;
+        }
+
+        // Movimento Lateral
+        if (keys['ArrowLeft'] && player.x > roadX) player.x -= 7;
+        if (keys['ArrowRight'] && player.x < roadX + roadWidth - player.w) player.x += 7;
+
+        // Combustível e Distância
+        fuel -= 0.05;
+        distanceToFinish -= speed * 0.1;
+
+        if (fuel <= 0) gameOver("FALTA DE COMBUSTÍVEL");
+        if (distanceToFinish <= 0) nextLevel();
+
+        // Inimigos
+        spawnEnemy();
+        enemies.forEach((en, index) => {
+            en.y += speed + en.speed;
+            if (en.y > canvas.height) enemies.splice(index, 1);
+
+            // Colisão Inimigo
+            if (player.x < en.x + en.w && player.x + player.w > en.x &&
+                player.y < en.y + en.h && player.y + player.h > en.y) {
+                gameOver("VOCÊ BATEU!");
+            }
+        });
+
+        // Itens de Combustível
+        spawnFuel();
+        fuelItems.forEach((f, index) => {
+            f.y += speed;
+            if (f.y > canvas.height) fuelItems.splice(index, 1);
+
+            if (player.x < f.x + f.w && player.x + player.w > f.x &&
+                player.y < f.y + f.h && player.y + player.h > f.y) {
+                fuel = Math.min(fuel + 20, 100);
+                fuelItems.splice(index, 1);
+            }
+        });
+
+        // Atualiza UI
+        uiFuel.innerText = Math.floor(fuel);
+        uiLevel.innerText = level;
+        uiDist.innerText = Math.floor(distanceToFinish);
+    }
+
+    let offset = 0; // Para o efeito da estrada se movendo
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Grama lateral
+        ctx.fillStyle = '#2d5a27';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Estrada
+        ctx.fillStyle = '#444';
+        ctx.fillRect(roadX, 0, roadWidth, canvas.height);
+
+        // Faixas da estrada (Efeito de Movimento)
+        ctx.strokeStyle = '#fff';
+        ctx.setLineDash([20, 30]);
+        ctx.lineDashOffset = -offset;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 0);
+        ctx.lineTo(canvas.width / 2, canvas.height);
+        ctx.stroke();
+        offset += speed;
+
+        // Desenhar Itens
+        fuelItems.forEach(f => {
+            ctx.fillStyle = '#ffff00';
+            ctx.fillRect(f.x, f.y, f.w, f.h);
+            ctx.fillStyle = '#000';
+            ctx.fillText("F", f.x + 5, f.y + 15);
+        });
+
+        // Desenhar Carros
+        enemies.forEach(en => drawCar(en.x, en.y, en.w, en.h, en.color));
+        drawCar(player.x, player.y, player.w, player.h, player.color, true);
+
+        requestAnimationFrame(() => {
+            update();
+            draw();
+        });
+    }
+
+    function gameOver(text) {
+        gameActive = false;
+        msgBox.style.display = 'block';
+        document.getElementById('title').innerText = text;
+    }
+
+    function nextLevel() {
+        if (level >= 20) {
+            gameOver("VOCÊ VENCEU O JOGO!");
+            document.getElementById('desc').innerText = "Parabéns, Piloto!";
+            return;
+        }
+        level++;
+        speed += 1;
+        fuel = 100;
+        distanceToFinish = 2000 + (level * 500);
+        enemies = [];
+        fuelItems = [];
+    }
+
+    function resetGame() {
+        level = 1;
+        speed = 5;
+        fuel = 100;
+        distanceToFinish = 2000;
+        enemies = [];
+        fuelItems = [];
+        gameActive = true;
+        msgBox.style.display = 'none';
+        player.x = canvas.width / 2 - 15;
+    }
+
+    draw();
+</script>
+</body>
+</html>
