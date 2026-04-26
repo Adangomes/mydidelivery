@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Tiger Slot Demo</title>
+    <style>
+        body { background: #1a1a1a; color: gold; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; }
+        .slot-machine { border: 10px solid #d4af37; background: #8b0000; padding: 20px; border-radius: 15px; margin-top: 50px; }
+        .reels { display: flex; gap: 10px; margin-bottom: 20px; }
+        .reel { width: 100px; height: 100px; background: white; border: 5px solid gold; font-size: 50px; display: flex; align-items: center; justify-content: center; color: black; border-radius: 10px; }
+        .controls { text-align: center; }
+        button { padding: 15px 30px; font-size: 20px; background: #ffd700; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        button:disabled { background: #555; }
+        .balance { margin-bottom: 10px; font-size: 24px; }
+    </style>
+</head>
+<body>
+
+    <h2>Slot Demo (Visual Only)</h2>
+    <div class="balance">Saldo: R$ <span id="balance">100.00</span></div>
+    
+    <div class="slot-machine">
+        <div class="reels">
+            <div id="reel1" class="reel">🐯</div>
+            <div id="reel2" class="reel">🐯</div>
+            <div id="reel3" class="reel">🐯</div>
+        </div>
+        <div class="controls">
+            <button id="spinBtn" onclick="spin()">GIRAR (R$ 1,00)</button>
+        </div>
+    </div>
+
+    <h3 id="result"></h3>
+
+    <script>
+        let balance = 100.00;
+        const symbols = ['🐯', '💰', '🧧', '🍊', '💎'];
+        const reelElements = [document.getElementById('reel1'), document.getElementById('reel2'), document.getElementById('reel3')];
+        const balanceEl = document.getElementById('balance');
+        const resultEl = document.getElementById('result');
+        const spinBtn = document.getElementById('spinBtn');
+
+        function spin() {
+            if (balance < 1) return alert("Saldo insuficiente!");
+
+            balance -= 1;
+            updateUI();
+            spinBtn.disabled = true;
+            resultEl.innerText = "Girando...";
+
+            let count = 0;
+            const interval = setInterval(() => {
+                reelElements.forEach(reel => {
+                    reel.innerText = symbols[Math.floor(Math.random() * symbols.length)];
+                });
+                count++;
+                if (count > 20) {
+                    clearInterval(interval);
+                    checkWin();
+                }
+            }, 50);
+        }
+
+        function checkWin() {
+            const results = reelElements.map(r => r.innerText);
+            spinBtn.disabled = false;
+
+            if (results[0] === results[1] && results[1] === results[2]) {
+                let prize = 10.00; // Exemplo de prêmio fixo
+                balance += prize;
+                resultEl.innerText = `GANHOU! + R$ ${prize.toFixed(2)}`;
+            } else {
+                resultEl.innerText = "Tente novamente!";
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            balanceEl.innerText = balance.toFixed(2);
+        }
+    </script>
+</body>
+</html>
