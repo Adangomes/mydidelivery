@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sales Analytics Dashboard | Interview Project</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-main: #2b2d42;
+            --text-muted: #8d99ae;
+            --success: #4cc9f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+        }
+
+        /* Sidebar */
+        nav {
+            width: 250px;
+            height: 100vh;
+            background: var(--primary);
+            color: white;
+            padding: 2rem;
+            position: fixed;
+        }
+
+        nav h2 { margin-bottom: 2rem; font-size: 1.5rem; }
+        nav ul { list-style: none; }
+        nav ul li { padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.1); cursor: pointer; }
+        nav ul li:hover { color: var(--success); }
+
+        /* Main Content */
+        main {
+            margin-left: 250px;
+            padding: 2rem;
+            width: calc(100% - 250px);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .kpi-card h3 { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .kpi-card p { font-size: 1.8rem; font-weight: 600; color: var(--primary); }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+        }
+
+        canvas { width: 100% !important; max-height: 400px; }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; }
+            nav { width: 100%; height: auto; position: relative; }
+            main { margin-left: 0; width: 100%; }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <h2>Sales Pro</h2>
+        <ul>
+            <li>Dashboard</li>
+            <li>Relatórios</li>
+            <li>Vendedores</li>
+            <li>Configurações</li>
+        </ul>
+    </nav>
+
+    <main>
+        <header>
+            <h1>Visão Geral de Vendas</h1>
+            <div id="date">Abril 2026</div>
+        </header>
+
+        <div class="kpi-container">
+            <div class="card kpi-card">
+                <h3>Receita Total</h3>
+                <p>R$ 124.500</p>
+            </div>
+            <div class="card kpi-card">
+                <h3>Vendas Realizadas</h3>
+                <p>1.240</p>
+            </div>
+            <div class="card kpi-card">
+                <h3>Ticket Médio</h3>
+                <p>R$ 100,40</p>
+            </div>
+            <div class="card kpi-card">
+                <h3>Crescimento</h3>
+                <p style="color: #2ecc71;">+14.2%</p>
+            </div>
+        </div>
+
+        <div class="charts-grid">
+            <div class="card">
+                <h3>Desempenho Mensal</h3>
+                <canvas id="mainChart"></canvas>
+            </div>
+            <div class="card">
+                <h3>Vendas por Categoria</h3>
+                <canvas id="pieChart"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Gráfico de Linhas (Vendas Mensais)
+        const ctxLine = document.getElementById('mainChart').getContext('2d');
+        new Chart(ctxLine, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                datasets: [{
+                    label: 'Vendas 2026 (R$)',
+                    data: [12000, 19000, 15000, 25000, 22000, 30000],
+                    borderColor: '#4361ee',
+                    backgroundColor: 'rgba(67, 97, 238, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        // Gráfico de Pizza (Categorias)
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        new Chart(ctxPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Eletrônicos', 'Moda', 'Casa'],
+                datasets: [{
+                    data: [55, 25, 20],
+                    backgroundColor: ['#4361ee', '#4cc9f0', '#3f37c9']
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    </script>
+</body>
+</html>
