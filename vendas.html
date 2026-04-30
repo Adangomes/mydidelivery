@@ -1,239 +1,220 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS AI | Inteligência de Dados Real</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg: #0a0b1e;
-            --card-bg: #161b33;
-            --primary: #7000ff;
-            --accent: #00f2ff;
-            --gain: #2ecc71;
-            --loss: #ff4d4d;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MYDI DELIVERY | Dashboard Inteligente</title>
 
-        body {
-            background: var(--bg);
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 20px;
-        }
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-        .container { max-width: 1200px; margin: 0 auto; }
+<style>
+:root{
+    --bg:#0b0f1a;
+    --card:#141a2e;
+    --primary:#6c5ce7;
+    --accent:#00e5ff;
+    --green:#2ecc71;
+    --red:#ff4d4d;
+}
 
-        .card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
+body{
+    margin:0;
+    font-family:Arial;
+    background:var(--bg);
+    color:white;
+}
 
-        .grid-inputs {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+.container{
+    max-width:1300px;
+    margin:auto;
+    padding:20px;
+}
 
-        input, select {
-            background: #0d1127;
-            border: 1px solid #333;
-            color: white;
-            padding: 12px;
-            border-radius: 10px;
-            width: 100%;
-        }
+h1{
+    margin-bottom:10px;
+}
 
-        .btn-main {
-            background: linear-gradient(45deg, var(--primary), var(--accent));
-            border: none; color: white; padding: 12px;
-            border-radius: 10px; cursor: pointer; font-weight: bold;
-            transition: 0.3s;
-        }
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+}
 
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-        }
+.card{
+    background:var(--card);
+    padding:20px;
+    border-radius:15px;
+}
 
-        .stat-box { text-align: center; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 15px; }
-        
-        .filter-btn {
-            padding: 8px 18px; border-radius: 20px; border: 1px solid var(--accent);
-            background: transparent; color: white; cursor: pointer; margin-right: 5px;
-        }
-        .filter-btn.active { background: var(--accent); color: var(--bg); }
-    </style>
+.kpi{
+    text-align:center;
+}
+
+.kpi h2{
+    margin:0;
+}
+
+input,button{
+    padding:10px;
+    border:none;
+    border-radius:8px;
+}
+
+input{
+    background:#0e1424;
+    color:white;
+}
+
+button{
+    background:linear-gradient(45deg,var(--primary),var(--accent));
+    color:white;
+    cursor:pointer;
+}
+
+.table{
+    width:100%;
+    margin-top:10px;
+}
+
+.table td{
+    padding:8px;
+    border-bottom:1px solid #222;
+}
+
+</style>
 </head>
+
 <body>
 
 <div class="container">
-    <h1>Controle de Fluxo <span style="color: var(--accent);">Automático</span></h1>
 
-    <div class="card">
-        <h3><i class="fas fa-plus-circle"></i> Novo Lançamento Diário</h3>
-        <div class="grid-inputs">
-            <div>
-                <label>Data da Venda</label>
-                <input type="date" id="data-venda">
-            </div>
-            <div>
-                <label>Venda Bruta (R$)</label>
-                <input type="number" id="valor-venda" placeholder="0,00">
-            </div>
-            <div>
-                <label>Perdas/Gastos (R$)</label>
-                <input type="number" id="valor-perda" placeholder="0,00">
-            </div>
-            <button class="btn-main" onclick="salvarDados()" style="margin-top: 22px;">Salvar no Histórico</button>
-        </div>
+<h1>📊 MYDI DELIVERY</h1>
+
+<!-- KPIs -->
+<div class="grid">
+    <div class="card kpi">
+        <h2 id="receita">R$0</h2>
+        <small>Receita</small>
     </div>
 
-    <div class="card">
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-            <h3><i class="fas fa-chart-bar"></i> Visão Geral</h3>
-            <div>
-                <button class="filter-btn" onclick="renderizar('dia')">Por Dia</button>
-                <button class="filter-btn active" onclick="renderizar('mes')">Por Mês</button>
-            </div>
-        </div>
+    <div class="card kpi">
+        <h2 id="custos">R$0</h2>
+        <small>Custos</small>
+    </div>
 
-        <div style="height: 350px; margin-top: 20px;">
-            <canvas id="chartAnalitico"></canvas>
-        </div>
+    <div class="card kpi">
+        <h2 id="lucro">R$0</h2>
+        <small>Lucro</small>
+    </div>
 
-        <div class="stats-row">
-            <div class="stat-box">
-                <small>Mês mais Alto</small>
-                <div id="mes-alto" style="color: var(--gain); font-weight: bold;">--</div>
-            </div>
-            <div class="stat-box">
-                <small>Melhor Dia de Venda</small>
-                <div id="dia-recorde" style="color: var(--accent); font-weight: bold;">--</div>
-            </div>
-            <div class="stat-box">
-                <small>Total Perdas Ano</small>
-                <div id="total-perdas" style="color: var(--loss); font-weight: bold;">R$ 0</div>
-            </div>
-        </div>
+    <div class="card kpi">
+        <h2 id="margem">0%</h2>
+        <small>Margem</small>
     </div>
 </div>
 
+<!-- Lançamentos -->
+<div class="card">
+<h3>Novo Pedido</h3>
+
+<div class="grid">
+<input type="date" id="data">
+<input type="number" id="valor" placeholder="Valor venda">
+<input type="number" id="custo" placeholder="Custo">
+<button onclick="add()">Adicionar</button>
+</div>
+</div>
+
+<!-- Gráfico -->
+<div class="card">
+<canvas id="grafico"></canvas>
+</div>
+
+<!-- Tabela -->
+<div class="card">
+<h3>Relatório</h3>
+<table class="table" id="tabela"></table>
+</div>
+
+</div>
+
 <script>
-    // 1. BANCO DE DADOS LOCAL (Simulando o que ficaria salvo)
-    // Aqui os dados não se multiplicam, eles ficam guardados por data real.
-    let dbVendas = JSON.parse(localStorage.getItem('nexus_db')) || [];
 
-    const ctx = document.getElementById('chartAnalitico').getContext('2d');
-    let meuGrafico;
+let db = JSON.parse(localStorage.getItem('mydi')) || [];
 
-    // 2. FUNÇÃO PARA SALVAR (O coração do sistema)
-    function salvarDados() {
-        const data = document.getElementById('data-venda').value;
-        const venda = parseFloat(document.getElementById('valor-venda').value) || 0;
-        const perda = parseFloat(document.getElementById('valor-perda').value) || 0;
+function add(){
+    let data = document.getElementById('data').value;
+    let valor = +document.getElementById('valor').value;
+    let custo = +document.getElementById('custo').value;
 
-        if (!data) return alert("Selecione uma data!");
+    if(!data) return alert("Data obrigatória");
 
-        // Adiciona ao "banco de dados"
-        dbVendas.push({ data, venda, perda });
-        
-        // Salva no navegador para não perder ao dar F5
-        localStorage.setItem('nexus_db', JSON.stringify(dbVendas));
+    db.push({data,valor,custo});
+    localStorage.setItem('mydi',JSON.stringify(db));
 
-        // Limpa campos e atualiza visual
-        document.getElementById('valor-venda').value = '';
-        document.getElementById('valor-perda').value = '';
-        
-        alert("Lançamento efetuado!");
-        renderizar('mes'); // Atualiza o gráfico automaticamente
-    }
+    render();
+}
 
-    // 3. LÓGICA DE PROCESSAMENTO (Transforma lista de vendas em dados de gráfico)
-    function processarDados(tipo) {
-        let labels = [];
-        let vendasData = [];
-        let perdasData = [];
+function calc(){
 
-        if (tipo === 'mes') {
-            // Agrupa por mês (Jan, Fev...) para o ano inteiro
-            const mesesBr = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-            labels = mesesBr;
-            vendasData = new Array(12).fill(0);
-            perdasData = new Array(12).fill(0);
+    let receita = db.reduce((a,b)=>a+b.valor,0);
+    let custos = db.reduce((a,b)=>a+b.custo,0);
+    let lucro = receita - custos;
+    let margem = receita ? ((lucro/receita)*100).toFixed(1):0;
 
-            dbVendas.forEach(item => {
-                const mesIdx = new Date(item.data).getUTCMonth();
-                vendasData[mesIdx] += item.venda; // SOMA apenas no mês certo
-                perdasData[mesIdx] += item.perda;
-            });
-        } else {
-            // Visão por Dia (mostra os últimos lançamentos reais)
-            dbVendas.sort((a,b) => new Date(a.data) - new Date(b.data));
-            labels = dbVendas.map(i => i.data.split('-').reverse().slice(0,2).join('/'));
-            vendasData = dbVendas.map(i => i.venda);
-            perdasData = dbVendas.map(i => i.perda);
+    document.getElementById('receita').innerText = "R$"+receita;
+    document.getElementById('custos').innerText = "R$"+custos;
+    document.getElementById('lucro').innerText = "R$"+lucro;
+    document.getElementById('margem').innerText = margem+"%";
+}
+
+let chart;
+
+function renderChart(){
+
+    let dias = db.map(i=>i.data);
+    let valores = db.map(i=>i.valor);
+
+    if(chart) chart.destroy();
+
+    chart = new Chart(document.getElementById('grafico'),{
+        type:'line',
+        data:{
+            labels:dias,
+            datasets:[{
+                label:"Vendas",
+                data:valores
+            }]
         }
+    });
+}
 
-        return { labels, vendasData, perdasData };
-    }
+function renderTable(){
 
-    // 4. RENDERIZAÇÃO DO GRÁFICO
-    function renderizar(modo) {
-        const info = processarDados(modo);
+    let html = "<tr><td>Data</td><td>Venda</td><td>Custo</td><td>Lucro</td></tr>";
 
-        if (meuGrafico) meuGrafico.destroy(); // Limpa o gráfico anterior
+    db.forEach(i=>{
+        html+=`
+        <tr>
+        <td>${i.data}</td>
+        <td>${i.valor}</td>
+        <td>${i.custo}</td>
+        <td>${i.valor - i.custo}</td>
+        </tr>`;
+    });
 
-        meuGrafico = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: info.labels,
-                datasets: [
-                    { label: 'Vendas Brutas', data: info.vendasData, backgroundColor: '#2ecc71' },
-                    { label: 'Perdas/Custos', data: info.perdasData, backgroundColor: '#ff4d4d' }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true, grid: { color: '#1a1b3a' } }
-                }
-            }
-        });
+    document.getElementById('tabela').innerHTML = html;
+}
 
-        calcularInsights();
-    }
+function render(){
+    calc();
+    renderChart();
+    renderTable();
+}
 
-    // 5. CÁLCULOS AUTOMÁTICOS (Dia que vendeu mais, etc)
-    function calcularInsights() {
-        if (dbVendas.length === 0) return;
+render();
 
-        // Dia Recorde
-        const recorde = [...dbVendas].sort((a,b) => b.venda - a.venda)[0];
-        document.getElementById('dia-recorde').innerText = recorde.data.split('-').reverse().join('/') + ` (R$ ${recorde.venda})`;
-
-        // Total Perdas
-        const totalP = dbVendas.reduce((acc, cur) => acc + cur.perda, 0);
-        document.getElementById('total-perdas').innerText = `R$ ${totalP.toLocaleString('pt-BR')}`;
-
-        // Mês mais alto (lógica simples de busca)
-        const infoMes = processarDados('mes');
-        const maxVenda = Math.max(...infoMes.vendasData);
-        const mesIdx = infoMes.vendasData.indexOf(maxVenda);
-        document.getElementById('mes-alto').innerText = infoMes.labels[mesIdx] + ` (R$ ${maxVenda})`;
-    }
-
-    // Iniciar sistema
-    renderizar('mes');
 </script>
+
 </body>
 </html>
