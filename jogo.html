@@ -1,265 +1,191 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tiger Slot - Premium Edition</title>
-    <style>
-        :root { --gold: #ffd700; --red: #bc0000; --neon: #00ff00; --pink: #ff00ff; }
-        
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        body { 
-            background: #000; 
-            color: var(--gold); 
-            font-family: 'Arial Black', sans-serif; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            height: 100vh; 
-            margin: 0; 
-            overflow: hidden; 
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tiger Slot PRO</title>
 
-        /* Layout Compacto Celular */
-        .game-container {
-            width: 100%;
-            max-width: 400px;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: space-around;
-            padding: 20px;
-            background: radial-gradient(circle, #300000 0%, #000 100%);
-        }
+<style>
+:root { --gold:#ffd700; --red:#bc0000; --neon:#00ff00; }
 
-        .balance-box { 
-            background: rgba(0,0,0,0.8); 
-            padding: 15px 40px; 
-            border-radius: 50px; 
-            border: 3px solid var(--gold); 
-            box-shadow: 0 0 20px var(--gold);
-            font-size: 24px;
-            text-align: center;
-        }
-        .balance-box span { color: var(--neon); text-shadow: 0 0 10px var(--neon); }
+body{
+    background:#000;
+    color:var(--gold);
+    font-family:Arial Black;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+}
 
-        .slot-machine { 
-            border: 6px solid var(--gold); 
-            background: var(--red); 
-            padding: 10px; 
-            border-radius: 20px; 
-            box-shadow: 0 0 40px var(--red), inset 0 0 20px #000;
-            width: 100%;
-        }
+.game{
+    width:350px;
+    text-align:center;
+}
 
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 8px; 
-        }
+.reel{
+    width:80px;height:80px;
+    font-size:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#fff;
+    border:3px solid gold;
+}
 
-        .reel { 
-            aspect-ratio: 1/1;
-            background: linear-gradient(145deg, #fff, #ddd); 
-            border: 3px solid var(--gold); 
-            font-size: 50px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            border-radius: 10px; 
-            box-shadow: 0 5px 0 #000;
-        }
+.grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:5px;
+}
 
-        .controls { width: 100%; text-align: center; }
+button{
+    padding:15px;
+    margin-top:10px;
+    width:100%;
+    font-weight:bold;
+}
 
-        #spinBtn { 
-            width: 80%;
-            padding: 20px; 
-            font-size: 26px; 
-            background: linear-gradient(180deg, #ff0000, #8b0000); 
-            border: 3px solid var(--gold); 
-            cursor: pointer; 
-            border-radius: 50px; 
-            font-weight: bold; 
-            color: #fff; 
-            text-shadow: 2px 2px #000;
-            box-shadow: 0 0 20px var(--red);
-            animation: buttonPulse 1.5s infinite;
-        }
+input{
+    padding:10px;
+    width:100%;
+    margin-top:10px;
+}
 
-        @keyframes buttonPulse {
-            0% { transform: scale(1); box-shadow: 0 0 10px var(--red); }
-            50% { transform: scale(1.05); box-shadow: 0 0 30px var(--red); }
-            100% { transform: scale(1); box-shadow: 0 0 10px var(--red); }
-        }
-
-        #spinBtn:disabled { background: #333; box-shadow: none; animation: none; color: #666; }
-
-        /* Efeitos Neon */
-        .free-spin-mode { 
-            border-color: var(--neon) !important; 
-            box-shadow: 0 0 60px var(--neon) !important; 
-            animation: neonGlow 0.5s infinite alternate;
-        }
-
-        @keyframes neonGlow {
-            from { box-shadow: 0 0 20px var(--neon); }
-            to { box-shadow: 0 0 50px var(--neon); }
-        }
-
-        /* Modais */
-        .modal-overlay { 
-            display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.95); align-items: center; justify-content: center; text-align: center;
-        }
-        
-        .modal-content h1 { font-size: 45px; color: #fff; text-shadow: 0 0 20px var(--pink); }
-        .btn-open { background: var(--neon); color: #000; padding: 20px 50px; border-radius: 15px; font-size: 28px; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 0 20px var(--neon); }
-
-    </style>
+.modal{
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,0.9);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    color:#fff;
+    font-size:30px;
+}
+</style>
 </head>
-<body onload="showEntryModal()">
 
-    <div class="game-container">
-        <div id="entryModal" class="modal-overlay" style="display: flex;">
-            <div class="modal-content">
-                <div style="font-size: 100px;">🎁</div>
-                <h1>PRESENTÃO!</h1>
-                <p style="color: gold; font-size: 24px;">Abra seu bônus de entrada</p>
-                <button class="btn-open" onclick="collectEntryBonus()">ABRIR</button>
-            </div>
-        </div>
+<body>
 
-        <div class="balance-box">SALDO: R$ <span id="balance">100.00</span></div>
-        
-        <div class="slot-machine" id="machine">
-            <h2 style="text-align: center; margin-top: 0; color: #fff; text-shadow: 0 0 10px var(--gold);">LEANDRO</h2>
-            <div class="grid" id="slotGrid">
-                <div class="reel" id="r0">🐯</div><div class="reel" id="r1">💰</div><div class="reel" id="r2">🧧</div>
-                <div class="reel" id="r3">🍊</div><div class="reel" id="r4">💎</div><div class="reel" id="r5">🐯</div>
-                <div class="reel" id="r6">🧧</div><div class="reel" id="r7">💰</div><div class="reel" id="r8">🍊</div>
-            </div>
-        </div>
+<div class="game">
 
-        <div class="controls">
-            <button id="spinBtn" onclick="initSpin()">GIRAR R$ 2,00</button>
-            <h3 id="statusMsg" style="color: #fff; margin-top: 15px; text-shadow: 0 0 5px var(--gold);">BOA SORTE!</h3>
-        </div>
-    </div>
+<h2>SALDO: R$ <span id="balance">100</span></h2>
 
-    <div id="bonusModal" class="modal-overlay">
-        <div class="modal-content">
-            <h1 id="modalTitle">MODO BÔNUS!</h1>
-            <p id="modalDetail" style="font-size: 30px; color: gold;"></p>
-        </div>
-    </div>
+<input type="number" id="bet" value="2" min="1">
 
-    <script>
-        let balance = 100.00;
-        let spinCount = 0;
-        let autoSpinsRemaining = 0;
-        const symbols = ['🐯', '💰', '🧧', '🍊', '💎'];
-        const gridEls = Array.from({length: 9}, (_, i) => document.getElementById(`r${i}`));
+<div class="grid" id="grid"></div>
 
-        function showEntryModal() { document.getElementById('entryModal').style.display = 'flex'; }
+<button onclick="spin()">GIRAR</button>
 
-        function collectEntryBonus() {
-            balance += 50.00;
-            updateUI();
-            document.getElementById('entryModal').style.display = 'none';
+<hr>
+
+<input type="text" id="pix" placeholder="Digite sua chave Pix">
+<button onclick="sacar()">SACAR</button>
+
+</div>
+
+<div id="modal" class="modal"></div>
+
+<script>
+
+let balance = 100;
+let autoSpins = 0;
+let inAuto = false;
+
+const symbols = ['🐯','💰','🍊','💎','🧧'];
+const grid = document.getElementById("grid");
+
+for(let i=0;i<9;i++){
+    let div=document.createElement("div");
+    div.className="reel";
+    div.innerText="❓";
+    grid.appendChild(div);
+}
+
+function update(){
+    document.getElementById("balance").innerText=balance.toFixed(2);
+}
+
+function randomGrid(){
+    [...grid.children].forEach(el=>{
+        el.innerText = symbols[Math.floor(Math.random()*symbols.length)];
+    });
+}
+
+function diamonds(){
+    [...grid.children].forEach(el=>{
+        el.innerText="💎";
+    });
+}
+
+function spin(){
+
+    let bet = parseFloat(document.getElementById("bet").value);
+
+    if(!inAuto){
+        if(balance < bet) return alert("Sem saldo");
+        balance -= bet;
+    }
+
+    randomGrid();
+
+    // INICIAR AUTO SPIN
+    if(!inAuto && Math.random() < 0.2){
+        inAuto = true;
+        autoSpins = 5;
+        showModal("FREE SPINS!");
+        setTimeout(spin,1000);
+        return;
+    }
+
+    // AUTO SPINS
+    if(inAuto){
+
+        autoSpins--;
+
+        // ÚLTIMO GIRO
+        if(autoSpins === 0){
+            diamonds();
+            balance += 150;
+            inAuto = false;
+            showModal("💎 GANHOU R$150!");
+            update();
+            return;
         }
 
-        async function initSpin() {
-            if (balance < 1 && autoSpinsRemaining <= 0) return alert("Sem saldo!");
-            
-            if (autoSpinsRemaining <= 0) {
-                balance -= 1;
-                spinCount++;
-            } else {
-                autoSpinsRemaining--;
-            }
+        setTimeout(spin,1000);
+    }
 
-            updateUI();
-            toggleControls(false);
+    update();
+}
 
-            let ticks = 0;
-            const timer = setInterval(() => {
-                gridEls.forEach(el => el.innerText = symbols[Math.floor(Math.random() * symbols.length)]);
-                ticks++;
-                if (ticks > 15) {
-                    clearInterval(timer);
-                    applyLogic();
-                }
-            }, 70);
-        }
+function sacar(){
+    let chave = document.getElementById("pix").value;
 
-        function applyLogic() {
-            // 4ª Rodada: DIAMANTES (R$ 20)
-            if (spinCount === 4 && autoSpinsRemaining === 0) {
-                gridEls.forEach(el => el.innerText = '💎');
-                balance += 20;
-                showModal("💎 BIG WIN 💎", "GANHOU R$ 20,00!");
-            }
-            // 7ª Rodada: Inicia 10 giros que pagam R$ 50 no final
-            else if (spinCount === 7 && autoSpinsRemaining === 0) {
-                autoSpinsRemaining = 10;
-                showModal("🐯 FREE SPINS 🐯", "10 GIROS AUTOMÁTICOS!");
-            }
-            // Pagamento dos 50 reais ao terminar os giros grátis da 7ª rodada
-            else if (spinCount === 7 && autoSpinsRemaining === 1) {
-                 balance += 50;
-                 showModal("💰 MEGA WIN 💰", "BÔNUS DOS GIROS: R$ 50,00!");
-            }
-            // 15ª Rodada: Duplica banca
-            else if (spinCount === 15 && autoSpinsRemaining === 0) {
-                balance *= 2;
-                showModal("🔥 DOBROU 🔥", "SUA BANCA DUPLICOU!");
-            }
-            else {
-                checkLines();
-            }
-            finalizeStep();
-        }
+    if(!chave) return alert("Digite a chave Pix");
 
-        function checkLines() {
-            const g = gridEls.map(el => el.innerText);
-            const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8]];
-            let win = 0;
-            lines.forEach(l => {
-                if (g[l[0]] === g[l[1]] && g[l[1]] === g[l[2]]) win += (balance * 0.005);
-            });
-            if (win > 0) {
-                balance += win;
-                document.getElementById('statusMsg').innerText = `GANHOU R$ ${win.toFixed(2)}`;
-            }
-            updateUI();
-        }
+    showModal("Sistema atualizando...");
+    setTimeout(()=>{
+        hideModal();
+        alert("Saque solicitado!");
+    },2000);
+}
 
-        function finalizeStep() {
-            if (autoSpinsRemaining > 0) {
-                document.getElementById('machine').classList.add('free-spin-mode');
-                document.getElementById('statusMsg').innerText = `GIROS GRÁTIS: ${autoSpinsRemaining}`;
-                setTimeout(initSpin, 1200);
-            } else {
-                document.getElementById('machine').classList.remove('free-spin-mode');
-                document.getElementById('statusMsg').innerText = "BOA SORTE!";
-                toggleControls(true);
-            }
-        }
+function showModal(msg){
+    let m = document.getElementById("modal");
+    m.style.display="flex";
+    m.innerText=msg;
+}
 
-        function showModal(title, detail) {
-            const modal = document.getElementById('bonusModal');
-            document.getElementById('modalTitle').innerText = title;
-            document.getElementById('modalDetail').innerText = detail;
-            modal.style.display = 'flex';
-            setTimeout(() => modal.style.display = 'none', 2500);
-        }
+function hideModal(){
+    document.getElementById("modal").style.display="none";
+}
 
-        function updateUI() { document.getElementById('balance').innerText = balance.toFixed(2); }
-        function toggleControls(enable) { document.getElementById('spinBtn').disabled = !enable; }
-    </script>
+update();
+
+</script>
+
 </body>
 </html>
