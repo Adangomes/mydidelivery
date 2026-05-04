@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tiger Slot PRO</title>
+<title>Tiger Slot</title>
 
 <style>
 :root { --gold:#ffd700; --red:#bc0000; --neon:#00ff00; }
@@ -19,48 +19,61 @@ body{
     margin:0;
 }
 
-.game{
-    width:350px;
+.game-container{
+    width:100%;
+    max-width:400px;
     text-align:center;
 }
 
-.reel{
-    width:80px;height:80px;
-    font-size:40px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#fff;
-    border:3px solid gold;
+.balance-box{
+    font-size:26px;
+    margin-bottom:10px;
+}
+
+input{
+    width:80%;
+    padding:10px;
+    margin-bottom:10px;
 }
 
 .grid{
     display:grid;
     grid-template-columns:repeat(3,1fr);
-    gap:5px;
+    gap:8px;
+}
+
+.reel{
+    aspect-ratio:1/1;
+    background:#fff;
+    border:3px solid var(--gold);
+    font-size:40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 button{
+    width:80%;
     padding:15px;
     margin-top:10px;
-    width:100%;
-    font-weight:bold;
+    font-size:18px;
 }
 
-input{
-    padding:10px;
-    width:100%;
-    margin-top:10px;
+.free-spin-mode{
+    box-shadow:0 0 20px var(--neon);
 }
 
 .modal{
-    position:fixed;
-    top:0;left:0;
-    width:100%;height:100%;
-    background:rgba(0,0,0,0.9);
     display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.9);
     justify-content:center;
     align-items:center;
+    flex-direction:column;
     color:#fff;
     font-size:30px;
 }
@@ -69,20 +82,26 @@ input{
 
 <body>
 
-<div class="game">
+<div class="game-container">
 
-<h2>SALDO: R$ <span id="balance">100</span></h2>
+<div class="balance-box">SALDO: R$ <span id="balance">100.00</span></div>
 
-<input type="number" id="bet" value="2" min="1">
+<input type="number" id="betInput" value="2" min="1">
 
-<div class="grid" id="grid"></div>
+<div class="grid" id="slotGrid">
+<div class="reel" id="r0">❓</div><div class="reel" id="r1">❓</div><div class="reel" id="r2">❓</div>
+<div class="reel" id="r3">❓</div><div class="reel" id="r4">❓</div><div class="reel" id="r5">❓</div>
+<div class="reel" id="r6">❓</div><div class="reel" id="r7">❓</div><div class="reel" id="r8">❓</div>
+</div>
 
-<button onclick="spin()">GIRAR</button>
+<button id="spinBtn" onclick="initSpin()">GIRAR R$ 2,00</button>
+
+<h3 id="statusMsg">BOA SORTE!</h3>
 
 <hr>
 
-<input type="text" id="pix" placeholder="Digite sua chave Pix">
-<button onclick="sacar()">SACAR</button>
+<input type="text" id="pixKey" placeholder="Digite sua chave Pix">
+<button onclick="sacarPix()">SACAR</button>
 
 </div>
 
@@ -91,99 +110,145 @@ input{
 <script>
 
 let balance = 100;
-let autoSpins = 0;
-let inAuto = false;
+let spinCount = 0;
+let autoSpinsRemaining = 0;
+let isAuto = false;
 
-const symbols = ['🐯','💰','🍊','💎','🧧'];
-const grid = document.getElementById("grid");
+const symbols = ['🐯','💰','🧧','🍊','💎'];
+const gridEls = Array.from({length:9},(_,i)=>document.getElementById(`r${i}`));
 
-for(let i=0;i<9;i++){
-    let div=document.createElement("div");
-    div.className="reel";
-    div.innerText="❓";
-    grid.appendChild(div);
+function updateUI(){
+    document.getElementById("balance").innerText = balance.toFixed(2);
+    let bet = getBet();
+    document.getElementById("spinBtn").innerText = `GIRAR R$ ${bet.toFixed(2)}`;
 }
 
-function update(){
-    document.getElementById("balance").innerText=balance.toFixed(2);
+function getBet(){
+    return parseFloat(document.getElementById("betInput").value) || 1;
 }
 
-function randomGrid(){
-    [...grid.children].forEach(el=>{
+function randomSpin(){
+    gridEls.forEach(el=>{
         el.innerText = symbols[Math.floor(Math.random()*symbols.length)];
     });
 }
 
 function diamonds(){
-    [...grid.children].forEach(el=>{
-        el.innerText="💎";
-    });
+    gridEls.forEach(el=> el.innerText="💎");
 }
 
-function spin(){
+function initSpin(){
 
-    let bet = parseFloat(document.getElementById("bet").value);
+    let bet = getBet();
 
-    if(!inAuto){
-        if(balance < bet) return alert("Sem saldo");
+    if(!isAuto){
+        if(balance < bet) return alert("Sem saldo!");
         balance -= bet;
+        spinCount++;
+    }else{
+        autoSpinsRemaining--;
     }
 
-    randomGrid();
+    toggleControls(false);
 
-    // INICIAR AUTO SPIN
-    if(!inAuto && Math.random() < 0.2){
-        inAuto = true;
-        autoSpins = 5;
+    let ticks = 0;
+    let timer = setInterval(()=>{
+        randomSpin();
+        ticks++;
+
+        if(ticks > 12){
+            clearInterval(timer);
+            applyLogic();
+        }
+    },80);
+
+    updateUI();
+}
+
+function applyLogic(){
+
+    // INICIAR FREE SPINS
+    if(spinCount === 7 && !isAuto){
+        isAuto = true;
+        autoSpinsRemaining = 10;
         showModal("FREE SPINS!");
-        setTimeout(spin,1000);
+        finalize();
         return;
     }
 
-    // AUTO SPINS
-    if(inAuto){
-
-        autoSpins--;
-
-        // ÚLTIMO GIRO
-        if(autoSpins === 0){
-            diamonds();
-            balance += 150;
-            inAuto = false;
-            showModal("💎 GANHOU R$150!");
-            update();
-            return;
-        }
-
-        setTimeout(spin,1000);
+    // ÚLTIMO GIRO AUTO
+    if(isAuto && autoSpinsRemaining === 0){
+        diamonds();
+        balance += 150;
+        isAuto = false;
+        showModal("💎 GANHOU R$150!");
+        updateUI();
+        finalize();
+        return;
     }
 
-    update();
+    checkWin();
+    finalize();
 }
 
-function sacar(){
-    let chave = document.getElementById("pix").value;
+function checkWin(){
+    const g = gridEls.map(el=>el.innerText);
+    const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8]];
 
-    if(!chave) return alert("Digite a chave Pix");
+    let win = 0;
+    let bet = getBet();
+
+    lines.forEach(l=>{
+        if(g[l[0]]===g[l[1]] && g[l[1]]===g[l[2]]){
+            win += bet * 2;
+        }
+    });
+
+    if(win > 0){
+        balance += win;
+        document.getElementById("statusMsg").innerText = `GANHOU R$ ${win.toFixed(2)}`;
+    }
+}
+
+function finalize(){
+    if(isAuto && autoSpinsRemaining > 0){
+        document.getElementById("statusMsg").innerText = `GIROS GRÁTIS: ${autoSpinsRemaining}`;
+        setTimeout(initSpin,1000);
+    }else{
+        document.getElementById("statusMsg").innerText = "BOA SORTE!";
+        toggleControls(true);
+    }
+}
+
+function toggleControls(enable){
+    document.getElementById("spinBtn").disabled = !enable;
+}
+
+// PIX
+function sacarPix(){
+    let chave = document.getElementById("pixKey").value;
+    if(!chave) return alert("Digite a chave Pix!");
 
     showModal("Sistema atualizando...");
+
     setTimeout(()=>{
         hideModal();
         alert("Saque solicitado!");
     },2000);
 }
 
+// MODAL
 function showModal(msg){
     let m = document.getElementById("modal");
-    m.style.display="flex";
-    m.innerText=msg;
+    m.style.display = "flex";
+    m.innerText = msg;
 }
 
 function hideModal(){
-    document.getElementById("modal").style.display="none";
+    document.getElementById("modal").style.display = "none";
 }
 
-update();
+updateUI();
 
 </script>
 
