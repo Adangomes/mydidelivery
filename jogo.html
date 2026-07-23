@@ -1,256 +1,350 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tiger Slot</title>
-
-<style>
-:root { --gold:#ffd700; --red:#bc0000; --neon:#00ff00; }
-
-body{
-    background:#000;
-    color:var(--gold);
-    font-family:Arial Black;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    margin:0;
-}
-
-.game-container{
-    width:100%;
-    max-width:400px;
-    text-align:center;
-}
-
-.balance-box{
-    font-size:26px;
-    margin-bottom:10px;
-}
-
-input{
-    width:80%;
-    padding:10px;
-    margin-bottom:10px;
-}
-
-.grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:8px;
-}
-
-.reel{
-    aspect-ratio:1/1;
-    background:#fff;
-    border:3px solid var(--gold);
-    font-size:40px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-}
-
-button{
-    width:80%;
-    padding:15px;
-    margin-top:10px;
-    font-size:18px;
-}
-
-.free-spin-mode{
-    box-shadow:0 0 20px var(--neon);
-}
-
-.modal{
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.9);
-    justify-content:center;
-    align-items:center;
-    flex-direction:column;
-    color:#fff;
-    font-size:30px;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP Varejo Moda - Painel de Testes</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f6f9; color: #333; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        aside { width: 220px; background-color: #1e293b; color: #fff; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        aside h2 { font-size: 1.2rem; margin-bottom: 20px; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
+        aside button { background: none; border: none; color: #cbd5e1; padding: 12px; text-align: left; font-size: 0.95rem; cursor: pointer; border-radius: 6px; transition: 0.2s; }
+        aside button:hover, aside button.active { background-color: #334155; color: #fff; font-weight: bold; }
+        
+        /* Main Content */
+        main { flex: 1; padding: 25px; overflow-y: auto; }
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        h1 { margin-bottom: 20px; font-size: 1.5rem; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        
+        /* Forms & Grid */
+        .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
+        .form-group input, .form-group select { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; }
+        
+        /* Buttons */
+        .btn { background-color: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; margin-top: 10px; }
+        .btn:hover { background-color: #1d4ed8; }
+        .btn-success { background-color: #16a34a; }
+        .btn-success:hover { background-color: #15803d; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+        
+        /* PDV Layout */
+        .pdv-container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .cart-summary { background: #0f172a; color: #fff; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; justify: space-between; }
+        .total-price { font-size: 2.2rem; font-weight: bold; color: #4ade80; margin: 15px 0; }
+        
+        /* Badge */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .badge-low { background-color: #fef2f2; color: #dc2626; }
+        .badge-ok { background-color: #f0fdf4; color: #16a34a; }
+    </style>
 </head>
-
 <body>
 
-<div class="game-container">
+    <aside>
+        <h2>Moda ERP</h2>
+        <button class="nav-btn active" onclick="showSection('estoque')">📦 Estoque / Produtos</button>
+        <button class="nav-btn" onclick="showSection('pdv')">🛒 Frente de Caixa (PDV)</button>
+        <button class="nav-btn" onclick="showSection('vendas')">📊 Histórico de Vendas</button>
+    </aside>
 
-<div class="balance-box">SALDO: R$ <span id="balance">100.00</span></div>
+    <main>
+        <!-- SEÇÃO ESTOQUE -->
+        <section id="estoque" class="section active">
+            <h1>Gestão de Estoque & Grade (Moda)</h1>
+            <div class="card">
+                <h3>Cadastrar Novo Produto / SKU</h3>
+                <form id="form-produto" onsubmit="cadastrarProduto(event)" class="form-grid" style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label>Código de Barras / SKU</label>
+                        <input type="text" id="prod-sku" required placeholder="Ex: VEST-FLOR-M">
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição do Produto</label>
+                        <input type="text" id="prod-nome" required placeholder="Ex: Vestido Estampado">
+                    </div>
+                    <div class="form-group">
+                        <label>Tamanho</label>
+                        <select id="prod-tamanho">
+                            <option value="P">P</option>
+                            <option value="M">M</option>
+                            <option value="G">G</option>
+                            <option value="GG">GG</option>
+                            <option value="U">Único</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cor</label>
+                        <input type="text" id="prod-cor" required placeholder="Ex: Pretos/Florido">
+                    </div>
+                    <div class="form-group">
+                        <label>Preço (R$)</label>
+                        <input type="number" step="0.01" id="prod-preco" required placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Qtd em Estoque</label>
+                        <input type="number" id="prod-qtd" required placeholder="0">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <button type="submit" class="btn">Salvar no Estoque</button>
+                    </div>
+                </form>
+            </div>
 
-<input type="number" id="betInput" value="2" min="1">
+            <table>
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Produto</th>
+                        <th>Tamanho</th>
+                        <th>Cor</th>
+                        <th>Preço</th>
+                        <th>Estoque</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-estoque"></tbody>
+            </table>
+        </section>
 
-<div class="grid" id="slotGrid">
-<div class="reel" id="r0">❓</div><div class="reel" id="r1">❓</div><div class="reel" id="r2">❓</div>
-<div class="reel" id="r3">❓</div><div class="reel" id="r4">❓</div><div class="reel" id="r5">❓</div>
-<div class="reel" id="r6">❓</div><div class="reel" id="r7">❓</div><div class="reel" id="r8">❓</div>
-</div>
+        <!-- SEÇÃO PDV -->
+        <section id="pdv" class="section">
+            <h1>Frente de Caixa (PDV)</h1>
+            <div class="pdv-container">
+                <div class="card">
+                    <h3>Adicionar Item à Venda</h3>
+                    <div style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 20px;">
+                        <select id="pdv-select-produto" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;"></select>
+                        <input type="number" id="pdv-qtd" value="1" min="1" style="width: 80px; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                        <button class="btn" onclick="adicionarAoCarrinho()">Adicionar</button>
+                    </div>
 
-<button id="spinBtn" onclick="initSpin()">GIRAR R$ 2,00</button>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qtd</th>
+                                <th>Preço Un.</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-carrinho"></tbody>
+                    </table>
+                </div>
 
-<h3 id="statusMsg">BOA SORTE!</h3>
+                <div class="cart-summary">
+                    <div>
+                        <h3>Resumo da Compra</h3>
+                        <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 5px;">Loja Roupas - Unidade Matriz</p>
+                        <hr style="border-color: #334155; margin: 15px 0;">
+                        <div>Total a Pagar:</div>
+                        <div class="total-price" id="pdv-total">R$ 0,00</div>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: #94a3b8;">Forma de Pagamento</label>
+                        <select id="pdv-pagamento" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border-radius: 6px;">
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="PIX">PIX</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                        </select>
+                        <button class="btn btn-success" style="width: 100%; padding: 15px; font-size: 1.1rem;" onclick="finalizarVenda()">Emitir Pedido / Finalizar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-<hr>
+        <!-- SEÇÃO HISTÓRICO DE VENDAS -->
+        <section id="vendas" class="section">
+            <h1>Relatório de Vendas (Consolidado ERP)</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Venda</th>
+                        <th>Data/Hora</th>
+                        <th>Itens</th>
+                        <th>Pagamento</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-vendas"></tbody>
+            </table>
+        </section>
+    </main>
 
-<input type="text" id="pixKey" placeholder="Digite sua chave Pix">
-<button onclick="sacarPix()">SACAR</button>
+    <script>
+        // Dados de Exemplo (Simulação de Banco de Dados)
+        let produtos = JSON.parse(localStorage.getItem('erp_produtos')) || [
+            { sku: 'BLU-CROP-P', nome: 'Blusa Crop Top', tamanho: 'P', cor: 'Branca', preco: 49.90, qtd: 10 },
+            { sku: 'JEAN-CALC-38', nome: 'Calça Jeans Wide Leg', tamanho: 'M', cor: 'Azul', preco: 119.90, qtd: 3 }
+        ];
 
-</div>
+        let vendas = JSON.parse(localStorage.getItem('erp_vendas')) || [];
+        let carrinho = [];
 
-<div id="modal" class="modal"></div>
-
-<script>
-
-let balance = 100;
-let spinCount = 0;
-let autoSpinsRemaining = 0;
-let isAuto = false;
-
-const symbols = ['🐯','💰','🧧','🍊','💎'];
-const gridEls = Array.from({length:9},(_,i)=>document.getElementById(`r${i}`));
-
-function updateUI(){
-    document.getElementById("balance").innerText = balance.toFixed(2);
-    let bet = getBet();
-    document.getElementById("spinBtn").innerText = `GIRAR R$ ${bet.toFixed(2)}`;
-}
-
-function getBet(){
-    return parseFloat(document.getElementById("betInput").value) || 1;
-}
-
-function randomSpin(){
-    gridEls.forEach(el=>{
-        el.innerText = symbols[Math.floor(Math.random()*symbols.length)];
-    });
-}
-
-function diamonds(){
-    gridEls.forEach(el=> el.innerText="💎");
-}
-
-function initSpin(){
-
-    let bet = getBet();
-
-    if(!isAuto){
-        if(balance < bet) return alert("Sem saldo!");
-        balance -= bet;
-        spinCount++;
-    }else{
-        autoSpinsRemaining--;
-    }
-
-    toggleControls(false);
-
-    let ticks = 0;
-    let timer = setInterval(()=>{
-        randomSpin();
-        ticks++;
-
-        if(ticks > 12){
-            clearInterval(timer);
-            applyLogic();
+        function salvarDados() {
+            localStorage.setItem('erp_produtos', JSON.stringify(produtos));
+            localStorage.setItem('erp_vendas', JSON.stringify(vendas));
         }
-    },80);
 
-    updateUI();
-}
-
-function applyLogic(){
-
-    // INICIAR FREE SPINS
-    if(spinCount === 7 && !isAuto){
-        isAuto = true;
-        autoSpinsRemaining = 10;
-        showModal("FREE SPINS!");
-        finalize();
-        return;
-    }
-
-    // ÚLTIMO GIRO AUTO
-    if(isAuto && autoSpinsRemaining === 0){
-        diamonds();
-        balance += 150;
-        isAuto = false;
-        showModal("💎 GANHOU R$150!");
-        updateUI();
-        finalize();
-        return;
-    }
-
-    checkWin();
-    finalize();
-}
-
-function checkWin(){
-    const g = gridEls.map(el=>el.innerText);
-    const lines = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8]];
-
-    let win = 0;
-    let bet = getBet();
-
-    lines.forEach(l=>{
-        if(g[l[0]]===g[l[1]] && g[l[1]]===g[l[2]]){
-            win += bet * 2;
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+            renderizarTudo();
         }
-    });
 
-    if(win > 0){
-        balance += win;
-        document.getElementById("statusMsg").innerText = `GANHOU R$ ${win.toFixed(2)}`;
-    }
-}
+        function cadastrarProduto(e) {
+            e.preventDefault();
+            const novo = {
+                sku: document.getElementById('prod-sku').value.toUpperCase(),
+                nome: document.getElementById('prod-nome').value,
+                tamanho: document.getElementById('prod-tamanho').value,
+                cor: document.getElementById('prod-cor').value,
+                preco: parseFloat(document.getElementById('prod-preco').value),
+                qtd: parseInt(document.getElementById('prod-qtd').value)
+            };
 
-function finalize(){
-    if(isAuto && autoSpinsRemaining > 0){
-        document.getElementById("statusMsg").innerText = `GIROS GRÁTIS: ${autoSpinsRemaining}`;
-        setTimeout(initSpin,1000);
-    }else{
-        document.getElementById("statusMsg").innerText = "BOA SORTE!";
-        toggleControls(true);
-    }
-}
+            produtos.push(novo);
+            salvarDados();
+            document.getElementById('form-produto').reset();
+            renderizarTudo();
+            alert('SKU cadastrado com sucesso!');
+        }
 
-function toggleControls(enable){
-    document.getElementById("spinBtn").disabled = !enable;
-}
+        function renderizarTudo() {
+            // Renderizar Estoque
+            const tbodyEstoque = document.getElementById('tabela-estoque');
+            tbodyEstoque.innerHTML = '';
+            produtos.forEach(p => {
+                const status = p.qtd <= 3 
+                    ? `<span class="badge badge-low">Baixo (${p.qtd})</span>` 
+                    : `<span class="badge badge-ok">OK (${p.qtd})</span>`;
+                
+                tbodyEstoque.innerHTML += `
+                    <tr>
+                        <td><b>${p.sku}</b></td>
+                        <td>${p.nome}</td>
+                        <td>${p.tamanho}</td>
+                        <td>${p.cor}</td>
+                        <td>R$ ${p.preco.toFixed(2)}</td>
+                        <td>${p.qtd} un.</td>
+                        <td>${status}</td>
+                    </tr>
+                `;
+            });
 
-// PIX
-function sacarPix(){
-    let chave = document.getElementById("pixKey").value;
-    if(!chave) return alert("Digite a chave Pix!");
+            // Renderizar Select do PDV
+            const selectPDV = document.getElementById('pdv-select-produto');
+            selectPDV.innerHTML = '<option value="">Selecione um produto...</option>';
+            produtos.forEach(p => {
+                if(p.qtd > 0) {
+                    selectPDV.innerHTML += `<option value="${p.sku}">${p.nome} (${p.tamanho}/${p.cor}) - R$ ${p.preco.toFixed(2)} [Estoque: ${p.qtd}]</option>`;
+                }
+            });
 
-    showModal("Sistema atualizando...");
+            // Renderizar Vendas
+            const tbodyVendas = document.getElementById('tabela-vendas');
+            tbodyVendas.innerHTML = '';
+            vendas.forEach(v => {
+                tbodyVendas.innerHTML += `
+                    <tr>
+                        <td><b>#${v.id}</b></td>
+                        <td>${v.data}</td>
+                        <td>${v.itens.map(i => `${i.qtd}x ${i.nome}`).join('<br>')}</td>
+                        <td>${v.pagamento}</td>
+                        <td><b>R$ ${v.total.toFixed(2)}</b></td>
+                    </tr>
+                `;
+            });
+        }
 
-    setTimeout(()=>{
-        hideModal();
-        alert("Saque solicitado!");
-    },2000);
-}
+        function adicionarAoCarrinho() {
+            const sku = document.getElementById('pdv-select-produto').value;
+            const qtd = parseInt(document.getElementById('pdv-qtd').value);
+            if(!sku) return alert('Selecione um produto!');
 
-// MODAL
-function showModal(msg){
-    let m = document.getElementById("modal");
-    m.style.display = "flex";
-    m.innerText = msg;
-}
+            const prod = produtos.find(p => p.sku === sku);
+            
+            if (qtd > prod.qtd) {
+                return alert('Quantidade informada é maior do que o estoque disponível!');
+            }
 
-function hideModal(){
-    document.getElementById("modal").style.display = "none";
-}
+            carrinho.push({
+                sku: prod.sku,
+                nome: `${prod.nome} (${prod.tamanho}/${prod.cor})`,
+                preco: prod.preco,
+                qtd: qtd,
+                subtotal: prod.preco * qtd
+            });
 
-updateUI();
+            renderizarCarrinho();
+        }
 
-</script>
+        function renderizarCarrinho() {
+            const tbody = document.getElementById('tabela-carrinho');
+            tbody.innerHTML = '';
+            let total = 0;
 
+            carrinho.forEach(item => {
+                total += item.subtotal;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.nome}</td>
+                        <td>${item.qtd}</td>
+                        <td>R$ ${item.preco.toFixed(2)}</td>
+                        <td>R$ ${item.subtotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('pdv-total').innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        function finalizarVenda() {
+            if(carrinho.length === 0) return alert('O carrinho está vazio!');
+
+            const total = carrinho.reduce((acc, item) => acc + item.subtotal, 0);
+            const formaPagto = document.getElementById('pdv-pagamento').value;
+
+            // Dar baixa no estoque
+            carrinho.forEach(itemCart => {
+                const prod = produtos.find(p => p.sku === itemCart.sku);
+                if(prod) prod.qtd -= itemCart.qtd;
+            });
+
+            // Gravar venda
+            const novaVenda = {
+                id: Math.floor(100000 + Math.random() * 900000),
+                data: new Date().toLocaleString('pt-BR'),
+                itens: carrinho,
+                pagamento: formaPagto,
+                total: total
+            };
+
+            vendas.unshift(novaVenda);
+            salvarDados();
+
+            carrinho = [];
+            renderizarCarrinho();
+            renderizarTudo();
+            alert('Venda realizada com sucesso! Estoque atualizado.');
+        }
+
+        // Inicialização
+        renderizarTudo();
+    </script>
 </body>
 </html>
