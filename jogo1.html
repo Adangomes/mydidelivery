@@ -1,277 +1,350 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Road Fighter Acadêmico V2</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP Varejo Moda - Painel de Testes</title>
     <style>
-        body {
-            margin: 0;
-            background: #1a1a1a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            touch-action: manipulation;
-        }
-        #game-container {
-            position: relative;
-            border: 4px solid #444;
-            background: #333;
-        }
-        canvas { display: block; }
-        #ui {
-            position: absolute;
-            top: 10px; left: 10px; right: 10px;
-            display: flex;
-            justify-content: space-between;
-            background: rgba(0,0,0,0.6);
-            padding: 5px 10px;
-            font-weight: bold;
-            font-size: 14px;
-        }
-        .controls {
-            display: flex;
-            width: 100%;
-            max-width: 400px;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        .btn {
-            width: 80px;
-            height: 80px;
-            background: #555;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            user-select: none;
-            cursor: pointer;
-        }
-        .btn:active { background: #888; }
-        #msg {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            background: rgba(0,0,0,0.9);
-            padding: 30px;
-            border: 2px solid yellow;
-            display: none;
-            z-index: 10;
-        }
-        #timer-bar-container {
-            width: 100%; height: 100%; position: absolute; top: 0; left: 0; pointer-events: none;
-        }
-        #progress {
-            position: absolute; bottom: 0; left: 0; height: 5px; background: #00ff00; width: 0%;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f4f6f9; color: #333; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Sidebar */
+        aside { width: 220px; background-color: #1e293b; color: #fff; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+        aside h2 { font-size: 1.2rem; margin-bottom: 20px; color: #38bdf8; text-transform: uppercase; letter-spacing: 1px; }
+        aside button { background: none; border: none; color: #cbd5e1; padding: 12px; text-align: left; font-size: 0.95rem; cursor: pointer; border-radius: 6px; transition: 0.2s; }
+        aside button:hover, aside button.active { background-color: #334155; color: #fff; font-weight: bold; }
+        
+        /* Main Content */
+        main { flex: 1; padding: 25px; overflow-y: auto; }
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        h1 { margin-bottom: 20px; font-size: 1.5rem; color: #0f172a; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        
+        /* Forms & Grid */
+        .card { background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-size: 0.85rem; font-weight: 600; color: #64748b; }
+        .form-group input, .form-group select { padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; }
+        
+        /* Buttons */
+        .btn { background-color: #2563eb; color: white; border: none; padding: 10px 18px; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; margin-top: 10px; }
+        .btn:hover { background-color: #1d4ed8; }
+        .btn-success { background-color: #16a34a; }
+        .btn-success:hover { background-color: #15803d; }
+        
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        th { background-color: #f8fafc; font-weight: 600; color: #475569; }
+        
+        /* PDV Layout */
+        .pdv-container { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        .cart-summary { background: #0f172a; color: #fff; padding: 20px; border-radius: 8px; display: flex; flex-direction: column; justify: space-between; }
+        .total-price { font-size: 2.2rem; font-weight: bold; color: #4ade80; margin: 15px 0; }
+        
+        /* Badge */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; }
+        .badge-low { background-color: #fef2f2; color: #dc2626; }
+        .badge-ok { background-color: #f0fdf4; color: #16a34a; }
     </style>
 </head>
 <body>
 
-    <div id="game-container">
-        <canvas id="gameCanvas"></canvas>
-        <div id="ui">
-            <div>FASE: <span id="level">1</span></div>
-            <div>TEMPO: <span id="timer">60</span>s</div>
-            <div>BÔNUS: <span id="score">0</span></div>
-        </div>
-        <div id="progress"></div>
-        <div id="msg">
-            <h1 id="title">GAME OVER</h1>
-            <p id="desc">Pressione R ou o botão central</p>
-            <button onclick="resetGame()" style="padding: 10px 20px; cursor:pointer">REINICIAR</button>
-        </div>
-    </div>
+    <aside>
+        <h2>Moda ERP</h2>
+        <button class="nav-btn active" onclick="showSection('estoque')">📦 Estoque / Produtos</button>
+        <button class="nav-btn" onclick="showSection('pdv')">🛒 Frente de Caixa (PDV)</button>
+        <button class="nav-btn" onclick="showSection('vendas')">📊 Histórico de Vendas</button>
+    </aside>
 
-    <div class="controls">
-        <div class="btn" id="btnLeft"><</div>
-        <div class="btn" id="btnRight">></div>
-    </div>
+    <main>
+        <!-- SEÇÃO ESTOQUE -->
+        <section id="estoque" class="section active">
+            <h1>Gestão de Estoque & Grade (Moda)</h1>
+            <div class="card">
+                <h3>Cadastrar Novo Produto / SKU</h3>
+                <form id="form-produto" onsubmit="cadastrarProduto(event)" class="form-grid" style="margin-top: 15px;">
+                    <div class="form-group">
+                        <label>Código de Barras / SKU</label>
+                        <input type="text" id="prod-sku" required placeholder="Ex: VEST-FLOR-M">
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição do Produto</label>
+                        <input type="text" id="prod-nome" required placeholder="Ex: Vestido Estampado">
+                    </div>
+                    <div class="form-group">
+                        <label>Tamanho</label>
+                        <select id="prod-tamanho">
+                            <option value="P">P</option>
+                            <option value="M">M</option>
+                            <option value="G">G</option>
+                            <option value="GG">GG</option>
+                            <option value="U">Único</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Cor</label>
+                        <input type="text" id="prod-cor" required placeholder="Ex: Pretos/Florido">
+                    </div>
+                    <div class="form-group">
+                        <label>Preço (R$)</label>
+                        <input type="number" step="0.01" id="prod-preco" required placeholder="0.00">
+                    </div>
+                    <div class="form-group">
+                        <label>Qtd em Estoque</label>
+                        <input type="number" id="prod-qtd" required placeholder="0">
+                    </div>
+                    <div class="form-group" style="grid-column: 1 / -1;">
+                        <button type="submit" class="btn">Salvar no Estoque</button>
+                    </div>
+                </form>
+            </div>
 
-<script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    // Configurações
-    canvas.width = 360;
-    canvas.height = 500;
-    
-    let gameActive = true;
-    let level = 1;
-    let score = 0;
-    let speed = 6;
-    let timeLeft = 60; // 1 minuto por fase
-    let finishLineY = -1000; // Começa longe
-    let showingFinish = false;
-    let crossFinish = false;
+            <table>
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Produto</th>
+                        <th>Tamanho</th>
+                        <th>Cor</th>
+                        <th>Preço</th>
+                        <th>Estoque</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-estoque"></tbody>
+            </table>
+        </section>
 
-    const player = { x: 165, y: 400, w: 30, h: 50, color: '#ff0000' };
-    let enemies = [];
-    let bonuses = [];
-    let roadOffset = 0;
+        <!-- SEÇÃO PDV -->
+        <section id="pdv" class="section">
+            <h1>Frente de Caixa (PDV)</h1>
+            <div class="pdv-container">
+                <div class="card">
+                    <h3>Adicionar Item à Venda</h3>
+                    <div style="display: flex; gap: 10px; margin-top: 15px; margin-bottom: 20px;">
+                        <select id="pdv-select-produto" style="flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;"></select>
+                        <input type="number" id="pdv-qtd" value="1" min="1" style="width: 80px; padding: 10px; border-radius: 6px; border: 1px solid #cbd5e1;">
+                        <button class="btn" onclick="adicionarAoCarrinho()">Adicionar</button>
+                    </div>
 
-    // Teclado e Botões
-    const keys = {};
-    window.addEventListener('keydown', e => keys[e.key] = true);
-    window.addEventListener('keyup', e => keys[e.key] = false);
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qtd</th>
+                                <th>Preço Un.</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabela-carrinho"></tbody>
+                    </table>
+                </div>
 
-    let moveLeft = false;
-    let moveRight = false;
-    document.getElementById('btnLeft').onmousedown = document.getElementById('btnLeft').ontouchstart = () => moveLeft = true;
-    document.getElementById('btnLeft').onmouseup = document.getElementById('btnLeft').ontouchend = () => moveLeft = false;
-    document.getElementById('btnRight').onmousedown = document.getElementById('btnRight').ontouchstart = () => moveRight = true;
-    document.getElementById('btnRight').onmouseup = document.getElementById('btnRight').ontouchend = () => moveRight = false;
+                <div class="cart-summary">
+                    <div>
+                        <h3>Resumo da Compra</h3>
+                        <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 5px;">Loja Roupas - Unidade Matriz</p>
+                        <hr style="border-color: #334155; margin: 15px 0;">
+                        <div>Total a Pagar:</div>
+                        <div class="total-price" id="pdv-total">R$ 0,00</div>
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; color: #94a3b8;">Forma de Pagamento</label>
+                        <select id="pdv-pagamento" style="width: 100%; padding: 10px; margin-top: 5px; margin-bottom: 15px; border-radius: 6px;">
+                            <option value="Cartão de Crédito">Cartão de Crédito</option>
+                            <option value="Cartão de Débito">Cartão de Débito</option>
+                            <option value="PIX">PIX</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                        </select>
+                        <button class="btn btn-success" style="width: 100%; padding: 15px; font-size: 1.1rem;" onclick="finalizarVenda()">Emitir Pedido / Finalizar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-    function spawnEnemy() {
-        if (Math.random() < 0.03 && !showingFinish) {
-            enemies.push({
-                x: 60 + Math.random() * 210,
-                y: -60, w: 30, h: 50,
-                speed: 1 + Math.random() * 3,
-                type: 'enemy',
-                color: '#0055ff'
+        <!-- SEÇÃO HISTÓRICO DE VENDAS -->
+        <section id="vendas" class="section">
+            <h1>Relatório de Vendas (Consolidado ERP)</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Venda</th>
+                        <th>Data/Hora</th>
+                        <th>Itens</th>
+                        <th>Pagamento</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="tabela-vendas"></tbody>
+            </table>
+        </section>
+    </main>
+
+    <script>
+        // Dados de Exemplo (Simulação de Banco de Dados)
+        let produtos = JSON.parse(localStorage.getItem('erp_produtos')) || [
+            { sku: 'BLU-CROP-P', nome: 'Blusa Crop Top', tamanho: 'P', cor: 'Branca', preco: 49.90, qtd: 10 },
+            { sku: 'JEAN-CALC-38', nome: 'Calça Jeans Wide Leg', tamanho: 'M', cor: 'Azul', preco: 119.90, qtd: 3 }
+        ];
+
+        let vendas = JSON.parse(localStorage.getItem('erp_vendas')) || [];
+        let carrinho = [];
+
+        function salvarDados() {
+            localStorage.setItem('erp_produtos', JSON.stringify(produtos));
+            localStorage.setItem('erp_vendas', JSON.stringify(vendas));
+        }
+
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+            renderizarTudo();
+        }
+
+        function cadastrarProduto(e) {
+            e.preventDefault();
+            const novo = {
+                sku: document.getElementById('prod-sku').value.toUpperCase(),
+                nome: document.getElementById('prod-nome').value,
+                tamanho: document.getElementById('prod-tamanho').value,
+                cor: document.getElementById('prod-cor').value,
+                preco: parseFloat(document.getElementById('prod-preco').value),
+                qtd: parseInt(document.getElementById('prod-qtd').value)
+            };
+
+            produtos.push(novo);
+            salvarDados();
+            document.getElementById('form-produto').reset();
+            renderizarTudo();
+            alert('SKU cadastrado com sucesso!');
+        }
+
+        function renderizarTudo() {
+            // Renderizar Estoque
+            const tbodyEstoque = document.getElementById('tabela-estoque');
+            tbodyEstoque.innerHTML = '';
+            produtos.forEach(p => {
+                const status = p.qtd <= 3 
+                    ? `<span class="badge badge-low">Baixo (${p.qtd})</span>` 
+                    : `<span class="badge badge-ok">OK (${p.qtd})</span>`;
+                
+                tbodyEstoque.innerHTML += `
+                    <tr>
+                        <td><b>${p.sku}</b></td>
+                        <td>${p.nome}</td>
+                        <td>${p.tamanho}</td>
+                        <td>${p.cor}</td>
+                        <td>R$ ${p.preco.toFixed(2)}</td>
+                        <td>${p.qtd} un.</td>
+                        <td>${status}</td>
+                    </tr>
+                `;
             });
-        }
-        // Carrinho Colorido (Bônus)
-        if (Math.random() < 0.005 && !showingFinish) {
-            bonuses.push({
-                x: 60 + Math.random() * 210,
-                y: -60, w: 30, h: 50,
-                color: `hsl(${Math.random() * 360}, 100%, 50%)`
-            });
-        }
-    }
 
-    function update() {
-        if (!gameActive) return;
-
-        // Movimentação
-        if ((keys['ArrowLeft'] || moveLeft) && player.x > 55) player.x -= 6;
-        if ((keys['ArrowRight'] || moveRight) && player.x < 275) player.x += 6;
-
-        // Timer e Lógica de Fase
-        timeLeft -= 1/60;
-        document.getElementById('timer').innerText = Math.max(0, Math.ceil(timeLeft));
-        document.getElementById('progress').style.width = ((60 - timeLeft) / 60 * 100) + "%";
-
-        if (timeLeft <= 0 && !showingFinish) {
-            showingFinish = true;
-            finishLineY = -100;
-        }
-
-        // Movimentar Inimigos
-        enemies.forEach((en, i) => {
-            en.y += speed + en.speed;
-            if (player.x < en.x + en.w && player.x + player.w > en.x &&
-                player.y < en.y + en.h && player.y + player.h > en.y) {
-                endGame("VOCÊ BATEU!");
-            }
-            if (en.y > canvas.height) enemies.splice(i, 1);
-        });
-
-        // Movimentar Bônus
-        bonuses.forEach((b, i) => {
-            b.y += speed + 2;
-            if (player.x < b.x + b.w && player.x + player.w > b.x &&
-                player.y < b.y + b.h && player.y + player.h > b.y) {
-                score += 500;
-                document.getElementById('score').innerText = score;
-                bonuses.splice(i, 1);
-            }
-            if (b.y > canvas.height) bonuses.splice(i, 1);
-        });
-
-        // Linha de Chegada
-        if (showingFinish) {
-            finishLineY += speed;
-            if (finishLineY > player.y && !crossFinish) {
-                crossFinish = true;
-                setTimeout(nextLevel, 1000);
-            }
-        }
-
-        spawnEnemy();
-        roadOffset += speed;
-    }
-
-    function drawCar(x, y, color, isPlayer = false) {
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, 30, 50); // Corpo
-        ctx.fillStyle = "#000";
-        ctx.fillRect(x-2, y+5, 5, 10); ctx.fillRect(x+27, y+5, 5, 10); // Rodas
-        ctx.fillRect(x-2, y+35, 5, 10); ctx.fillRect(x+27, y+35, 5, 10);
-        ctx.fillStyle = "rgba(255,255,255,0.5)";
-        ctx.fillRect(x+5, y+8, 20, 12); // Para-brisa
-    }
-
-    function draw() {
-        ctx.fillStyle = "#2d5a27"; // Grama
-        ctx.fillRect(0,0, canvas.width, canvas.height);
-        
-        ctx.fillStyle = "#444"; // Estrada
-        ctx.fillRect(50, 0, 260, canvas.height);
-
-        // Faixas brancas
-        ctx.strokeStyle = "#fff";
-        ctx.setLineDash([20, 30]);
-        ctx.lineDashOffset = -roadOffset;
-        ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(180, 0); ctx.lineTo(180, canvas.height);
-        ctx.stroke();
-
-        // Linha de Chegada
-        if (showingFinish) {
-            ctx.fillStyle = "#fff";
-            for(let i=0; i<6; i++) {
-                for(let j=0; j<2; j++) {
-                    if((i+j)%2==0) ctx.fillRect(50 + (i*43.3), finishLineY + (j*20), 43.3, 20);
+            // Renderizar Select do PDV
+            const selectPDV = document.getElementById('pdv-select-produto');
+            selectPDV.innerHTML = '<option value="">Selecione um produto...</option>';
+            produtos.forEach(p => {
+                if(p.qtd > 0) {
+                    selectPDV.innerHTML += `<option value="${p.sku}">${p.nome} (${p.tamanho}/${p.cor}) - R$ ${p.preco.toFixed(2)} [Estoque: ${p.qtd}]</option>`;
                 }
+            });
+
+            // Renderizar Vendas
+            const tbodyVendas = document.getElementById('tabela-vendas');
+            tbodyVendas.innerHTML = '';
+            vendas.forEach(v => {
+                tbodyVendas.innerHTML += `
+                    <tr>
+                        <td><b>#${v.id}</b></td>
+                        <td>${v.data}</td>
+                        <td>${v.itens.map(i => `${i.qtd}x ${i.nome}`).join('<br>')}</td>
+                        <td>${v.pagamento}</td>
+                        <td><b>R$ ${v.total.toFixed(2)}</b></td>
+                    </tr>
+                `;
+            });
+        }
+
+        function adicionarAoCarrinho() {
+            const sku = document.getElementById('pdv-select-produto').value;
+            const qtd = parseInt(document.getElementById('pdv-qtd').value);
+            if(!sku) return alert('Selecione um produto!');
+
+            const prod = produtos.find(p => p.sku === sku);
+            
+            if (qtd > prod.qtd) {
+                return alert('Quantidade informada é maior do que o estoque disponível!');
             }
+
+            carrinho.push({
+                sku: prod.sku,
+                nome: `${prod.nome} (${prod.tamanho}/${prod.cor})`,
+                preco: prod.preco,
+                qtd: qtd,
+                subtotal: prod.preco * qtd
+            });
+
+            renderizarCarrinho();
         }
 
-        bonuses.forEach(b => drawCar(b.x, b.y, b.color));
-        enemies.forEach(en => drawCar(en.x, en.y, en.color));
-        drawCar(player.x, player.y, player.color, true);
+        function renderizarCarrinho() {
+            const tbody = document.getElementById('tabela-carrinho');
+            tbody.innerHTML = '';
+            let total = 0;
 
-        update();
-        requestAnimationFrame(draw);
-    }
+            carrinho.forEach(item => {
+                total += item.subtotal;
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.nome}</td>
+                        <td>${item.qtd}</td>
+                        <td>R$ ${item.preco.toFixed(2)}</td>
+                        <td>R$ ${item.subtotal.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
 
-    function nextLevel() {
-        level++;
-        if (level > 20) {
-            endGame("CAMPEÃO MUNDIAL!");
-            return;
+            document.getElementById('pdv-total').innerText = `R$ ${total.toFixed(2)}`;
         }
-        speed += 1.5;
-        timeLeft = 60;
-        showingFinish = false;
-        crossFinish = false;
-        enemies = [];
-        bonuses = [];
-        document.getElementById('level').innerText = level;
-    }
 
-    function endGame(msg) {
-        gameActive = false;
-        document.getElementById('msg').style.display = "block";
-        document.getElementById('title').innerText = msg;
-    }
+        function finalizarVenda() {
+            if(carrinho.length === 0) return alert('O carrinho está vazio!');
 
-    function resetGame() {
-        location.reload();
-    }
+            const total = carrinho.reduce((acc, item) => acc + item.subtotal, 0);
+            const formaPagto = document.getElementById('pdv-pagamento').value;
 
-    draw();
-</script>
+            // Dar baixa no estoque
+            carrinho.forEach(itemCart => {
+                const prod = produtos.find(p => p.sku === itemCart.sku);
+                if(prod) prod.qtd -= itemCart.qtd;
+            });
+
+            // Gravar venda
+            const novaVenda = {
+                id: Math.floor(100000 + Math.random() * 900000),
+                data: new Date().toLocaleString('pt-BR'),
+                itens: carrinho,
+                pagamento: formaPagto,
+                total: total
+            };
+
+            vendas.unshift(novaVenda);
+            salvarDados();
+
+            carrinho = [];
+            renderizarCarrinho();
+            renderizarTudo();
+            alert('Venda realizada com sucesso! Estoque atualizado.');
+        }
+
+        // Inicialização
+        renderizarTudo();
+    </script>
 </body>
 </html>
